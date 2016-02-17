@@ -1,0 +1,42 @@
+[submodule "packages/aggdraw"]
+	path = packages/aggdraw
+	url = https://github.com/jakul/aggdraw.git
+[submodule "packages/pygrib"]
+	path = packages/pygrib
+	url = https://github.com/jswhit/pygrib.git
+[submodule "packages/pyresample"]
+	path = packages/pyresample
+	url = https://github.com/pytroll/pyresample.git
+[submodule "packages/pycoast"]
+	path = packages/pycoast
+	url = https://github.com/pytroll/pycoast.git
+[submodule "packages/pyorbital"]
+	path = packages/pyorbital
+	url = https://github.com/pytroll/pyorbital.git
+[submodule "packages/posttroll"]
+	path = packages/posttroll
+	url = https://github.com/pytroll/posttroll.git
+[submodule "packages/trollsift"]
+	path = packages/trollsift
+	url = https://github.com/pytroll/trollsift.git
+[submodule "packages/pytroll-schedule"]
+	path = packages/pytroll-schedule
+	url = https://github.com/pytroll/pytroll-schedule.git
+[submodule "packages/trollimage"]
+	path = packages/trollimage
+	url = https://github.com/pytroll/trollimage.git
+[submodule "packages/mipp"]
+	path = packages/mipp
+	url = https://github.com/pytroll/mipp.git
+[submodule "packages/mpop"]
+	path = packages/mpop
+	url = https://github.com/pytroll/mpop.git
+[submodule "packages/trollduction"]
+	path = packages/trollduction
+	url = https://github.com/pytroll/trollduction.git
+[submodule "packages/pyspectral"]
+	path = packages/pyspectral
+	url = https://github.com/adybbroe/pyspectral.git
+[submodule "packages/pydecorate"]
+	path = packages/pydecorate
+	url = https://code.google.com/p/pydecorate/

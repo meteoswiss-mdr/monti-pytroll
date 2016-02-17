@@ -17,7 +17,7 @@ export https_proxy=https://proxy.meteoswiss.ch:8080
 export PYTROLLHOME=/opt/users/$(logname)/PyTroll/
 
 export PPP_CONFIG_DIR=$PYTROLLHOME/etc/
-export XRIT_DECOMPRESS_PATH=$PYTROLLHOME/bin/xRITDecompress
+export XRIT_DECOMPRESS_PATH=/opt/users/common/bin/xRITDecompress
 export XRIT_DECOMPRESS_OUTDIR=/tmp/
 #export PY_SHAPEFILES=$PYTROLLHOME/shapes/
 export PYTHONPATH=$PYTROLLHOME/packages/anaconda2/bin:$PYTROLLHOME/scripts

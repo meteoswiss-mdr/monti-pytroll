@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="prodlist2.xsl"?>
+<product_config>
+
+  <common>
+    <output_dir>/opt/pytroll/outbox</output_dir>
+    <unload>False</unload>
+    <!-- To remove all area coverage checks, eg. for running without
+         TLE data, uncomment the following row. -->
+    <check_coverage>False</check_coverage>
+    <!-- Number of processors to use in resampling. If not specified,
+         use one CPU. -->
+         <nprocs>4</nprocs>
+    <!-- Projection method. If not specified, use 'nearest' -->
+    <!-- proj_method>nearest</proj_method -->
+    <!-- Save reprojection information for re-use. Speeds up
+         resampling, but may in some cases cause erroneus
+         results. Default False. -->
+    <!--precompute>True</precompute-->
+  </common>
+
+  <variables>
+    <overlay id="black">#000000</overlay>
+    <overlay id="white">#ffffff</overlay>
+  </variables>
+
+  <groups>
+      <!-- <group id="africa">afhorn,mali</group>
+    <group id="asia">afghanistan</group>
+    <group id="eport">eport</group>-->
+   <group id="pacific">pacific</group>
+  </groups>
+
+  <product_list>
+    <area id="pacific" name="pacific" min_coverage="25">
+      <product id="h8ir1_setvak" name="h8ir1_setvak" graphical_config="himawari-ir.xml" overlay="/opt/pytroll/etc/black_overlay.cfg">
+        <file>himawari/himawari_ir1_{start_time:%Y%m%d%H%M}.png</file>
+      </product>
+      <product id="h8vis" name="h8vis" graphical_config="himawari-vis.xml" overlay="/opt/pytroll/etc/black_overlay.cfg">
+        <file>himawari/himawari_vis_{start_time:%Y%m%d%H%M}.png</file>
+      </product>
+      <product id="h8wv_pifwv" name="h8wv_pifwv" graphical_config="himawari-wv.xml" overlay="/opt/pytroll/etc/black_overlay.cfg">
+        <file>himawari/himawari_wv_{start_time:%Y%m%d%H%M}.png</file>
+      </product>
+    </area>
+  </product_list>
+</product_config>
+

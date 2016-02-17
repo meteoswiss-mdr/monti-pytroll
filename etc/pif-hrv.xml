@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphics>
+    <logo></logo>
+    <labelTopLeft>Meteosat 10</labelTopLeft>
+    <labelTopMid>{nominal_time}</labelTopMid>
+    <labelTopRight>HRV  </labelTopRight>
+    <labelBotLeft></labelBotLeft>
+    <labelBotMid></labelBotMid>
+    <labelBotRight></labelBotRight>
+    <font>/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans-Bold.ttf</font>
+    <fontSize>15</fontSize>
+    <fontColor>black</fontColor>
+    <bgColor>orange</bgColor>
+</graphics>

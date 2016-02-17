@@ -1,0 +1,111 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="prodlist2.xsl"?>
+<product_config>
+
+  <common>
+    <output_dir>/opt/pytroll/outbox</output_dir>
+    <unload>False</unload>
+    <!-- To remove all area coverage checks, eg. for running without
+         TLE data, uncomment the following row. -->
+    <check_coverage>False</check_coverage>
+    <!-- Number of processors to use in resampling. If not specified,
+         use one CPU. -->
+         <nprocs>4</nprocs>
+    <!-- Projection method. If not specified, use 'nearest' -->
+    <!-- proj_method>nearest</proj_method -->
+    <!-- Save reprojection information for re-use. Speeds up
+         resampling, but may in some cases cause erroneus
+         results. Default False. -->
+    <!--precompute>True</precompute-->
+  </common>
+
+  <variables>
+    <overlay id="black">#000000</overlay>
+    <overlay id="white">#ffffff</overlay>
+  </variables>
+
+<!-- test -->
+  <groups>
+      <!-- <group id="africa">afhorn,mali</group>
+    <group id="asia">afghanistan</group>
+    <group id="eport">eport</group>-->
+   <group id="eurol">eurol</group>
+    <group id="pifn">pifn</group>
+    <group id="pifh">pifh</group>
+    <group id="ccs4">ccs4</group>
+    <group id="nrEURO3km">nrEURO3km</group>
+  </groups>
+
+  <product_list>
+    <area id="pifn" name="pifn" min_coverage="25">
+      <product id="pifir" name="pifir" graphical_config="pif-ir.xml" overlay="/opt/pytroll/etc/black_overlay.cfg">
+        <file>intranet/MSG_{productname}_{start_time:%Y%m%d%H%M}.png</file>
+      </product>
+      <product id="pifwv" name="pifwv" graphical_config="pif-wv.xml" overlay="/opt/pytroll/etc/black_overlay.cfg">
+        <file>intranet/MSG_{productname}_{start_time:%Y%m%d%H%M}.png</file>
+      </product>
+      <product id="webproduct" name="webproduct" graphical_config="pif-webproduct.xml" overlay="/opt/pytroll/etc/black_overlay.cfg">
+        <file>intranet/MSG_{productname}_{start_time:%Y%m%d%H%M}.png</file>
+      </product>
+    </area>
+
+    <area id="pifh" name="pifh" min_coverage="25">
+      <product id="pifhrv" name="pifhrv" graphical_config="pif-hrv.xml" overlay="/opt/pytroll/etc/black_overlay.cfg">
+        <file>intranet//MSG_{productname}_{start_time:%Y%m%d%H%M}.png</file>
+      </product>
+    </area>
+
+    <area id="eurol" name="eurol" min_coverage="25">
+      <product id="ir108" name="ir108" graphical_config="overview.xml" overlay="#000000">
+        <file>europe/{platform_name}_{start_time:%Y%m%d_%H%M}_bw_ir4_cll.png</file>
+      </product>
+      <product id="overview" name="overview" graphical_config="overview.xml">
+        <file>europe/{platform_name}_{start_time:%Y%m%d_%H%M}_rgb_{productname}_cll.png</file>
+    </product>
+    </area>
+ 
+    <area id="ccs4" name="ccs4" min_coverage="25">
+       <product id="ir108" name="ir108" graphical_config="overview-ccs4.xml" overlay="#000000">
+           <file>ccs4/{platform_name}_{start_time:%Y%m%d_%H%M}_ccs4_bw_ir4_cll.png</file>
+       </product>
+       <product id="overview" name="overview" graphical_config="overview-ccs4.xml">
+           <file>ccs4/{platform_name}_{start_time:%Y%m%d_%H%M}_ccs4_rgb_{productname}_cll.png</file>
+       </product>
+    </area>
+
+    <area id="nrEURO3km" name="nrEURO3km" min_coverage="25"  format="ninjotiff">
+      <product id="msgir108" name="msgir108">
+         <file>ninjo/MET10_IR108_nrEURO3km_{start_time:%y%m%d%H%M}.tiff</file>
+      </product>
+      <product id="msgvis006" name="msgvis006">
+         <file>ninjo/MET10_VIS006_nrEURO3km_{start_time:%y%m%d%H%M}.tiff</file>
+      </product>
+      <product id="msghrv" name="msghrv">
+         <file>ninjo/MET10_HRV_nrEURO3km_{start_time:%y%m%d%H%M}.tiff</file>
+      </product>
+      <product id="msgwv062" name="msgwv062">
+         <file>ninjo/MET10_WV062_nrEURO3km_{start_time:%y%m%d%H%M}.tiff</file>
+      </product>
+      <product id="msgvis008" name="msgvis008">
+         <file>ninjo/MET10_VIS008_nrEURO3km_{start_time:%y%m%d%H%M}.tiff</file>
+      </product>
+      <product id="msgwv073" name="msgwv073">
+         <file>ninjo/MET10_WV073_nrEURO3km_{start_time:%y%m%d%H%M}.tiff</file>
+      </product>
+      <product id="msgir120" name="msgir120">
+         <file>ninjo/MET10_IR120_nrEURO3km_{start_time:%y%m%d%H%M}.tiff</file>
+      </product>
+
+    </area> 
+
+    <!--<area id="euro4" name="euro4" min_coverage="25">
+      <product id="ir108" name="ir108">
+        <file output_dir="path2">{platform_name}_{start_time:%Y%m%d_%H%M}_{areaname}_bw_ir4.png</file>
+      </product>
+      <product id="overview" name="overview">
+        <file output_dir="path2">{platform_name}_{start_time:%Y%m%d_%H%M}_{areaname}_rgb_{productname}.png</file>
+      </product>
+  </area>-->
+  </product_list>
+</product_config>
+

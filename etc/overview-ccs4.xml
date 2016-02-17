@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphics>
+    <logo></logo>
+    <labelTopLeft>Meteosat 10</labelTopLeft>
+    <labelTopMid>{nominal_time}</labelTopMid>
+    <labelTopRight>EXPO 2015 - Milano</labelTopRight>
+    <labelBotLeft>EUMETSAT/MeteoSwiss</labelBotLeft>
+    <labelBotMid>brought to you by gdb/cll</labelBotMid>
+    <labelBotRight>by: Pytroll</labelBotRight>
+    <font>/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans-Bold.ttf</font>
+    <fontSize>11</fontSize>
+    <fontColor>white</fontColor>
+    <bgColor>red</bgColor>
+</graphics>

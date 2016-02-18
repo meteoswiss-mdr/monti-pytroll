@@ -42,9 +42,10 @@ read junk
 /opt/users/common/packages/Anaconda2-2.4.1-Linux-x86_64.sh
 export HOME=$HOME_ORG
 
+
 # add anaconda to your path
 echo "the script changes your \$PATH and \$PYTHONPATH to avoid conflicts:"
-export PATH="/opt/users/$(logname)/PyTroll/packages/anaconda2/bin:$PATH"
+export PATH=$PYTROLLHOME/packages/anaconda2/bin:$PATH
 echo "\$PATH="$PATH
 export PYTHONPATH=$PYTROLLHOME/packages/anaconda2/bin:$PYTROLLHOME/scripts
 echo "\$PYTHONPATH="$PYTHONPATH

@@ -13,6 +13,11 @@
 # author: Ulrich Hamann
 # version 0.1: 16-02-2016 U. Hamann
 
+# set paths for anaconda (again, for security)
+export PYTROLLHOME=/opt/users/$LOGNAME/PyTroll/
+export PATH=$PYTROLLHOME/packages/anaconda2/bin:$PATH
+export PYTHONPATH=$PYTROLLHOME/packages/anaconda2/bin:$PYTROLLHOME/scripts
+
 # activate virtual environment
 source activate PyTroll
 cd ..
@@ -48,6 +53,23 @@ git submodule add -b develop     https://github.com/pytroll/trollduction.git    
 git submodule add -b develop     https://github.com/adybbroe/pyspectral.git       packages/pyspectral 
 git submodule add -b master      https://code.google.com/p/pydecorate/            packages/pydecorate       
 
+# save branch information in the .gitmodules file
+git config --file=.gitmodules submodule.packages/aggdraw.branch master
+git config --file=.gitmodules submodule.packages/pygrib.branch master
+
+git config --file=.gitmodules submodule.packages/pyresample.branch master
+git config --file=.gitmodules submodule.packages/pycoast.branch master
+git config --file=.gitmodules submodule.packages/pyorbital.branch master
+git config --file=.gitmodules submodule.packages/posttroll.branch develop
+git config --file=.gitmodules submodule.packages/trollsift.branch master
+git config --file=.gitmodules submodule.packages/pytroll-schedule.branch develop
+git config --file=.gitmodules submodule.packages/trollimage.branch develop
+git config --file=.gitmodules submodule.packages/mipp.branch master
+git config --file=.gitmodules submodule.packages/mpop.branch pre-master
+git config --file=.gitmodules submodule.packages/trollduction.branch develop
+git config --file=.gitmodules submodule.packages/pyspectral.branch develop
+git config --file=.gitmodules submodule.packages/pydecorate.branch master
+
 # Install PyTroll packages
 for package in pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate
 do
@@ -55,3 +77,5 @@ do
     python setup.py develop
     cd -
 done
+
+

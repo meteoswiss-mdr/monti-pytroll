@@ -15,10 +15,19 @@
 # author: Ulrich Hamann
 # version 0.1: 16-02-2016 U. Hamann
 
-setup_anaconda.sh
+# installation of Anaconda
+# (use the ". ./" syntax to remember env variable set inside the bash script)
+. ./setup_anaconda.sh
 echo "press enter to continue"
 read junk
 
-setup_virtual_environment.sh
+# update Anaconda, create virt. env. "PyTroll", install python packages
+. ./setup_virtual_environment.sh
 echo "press enter to continue"
 read junk
+
+# install PyTroll packages with develop option
+. ./setup_submodules.sh
+#echo "press enter to continue"
+#read junk
+

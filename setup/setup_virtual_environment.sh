@@ -14,20 +14,25 @@
 # author: Ulrich Hamann
 # version 0.1: 16-02-2016 U. Hamann
 
-echo "Switch off SSL check for conda installations"
+# set paths for anaconda (again, for security)
+export PYTROLLHOME=/opt/users/$LOGNAME/PyTroll/
+export PATH=$PYTROLLHOME/packages/anaconda2/bin:$PATH
+export PYTHONPATH=$PYTROLLHOME/packages/anaconda2/bin:$PYTROLLHOME/scripts
+
+echo "*** Switch off SSL check for conda installations"
 conda config --set ssl_verify false
 
-echo "Update anaconda itself"
+echo "*** Update anaconda itself"
 conda update conda
 
-echo "install additional conda packages with PyTroll-conda-package-list.txt"
+echo "*** Install additional conda packages with PyTroll-conda-package-list.txt"
 conda create -n PyTroll --file PyTroll-conda-package-list.txt
 
-echo "activate virtual environment"
+echo "*** Activate virtual environment"
 source activate PyTroll
 
-echo "do pip installation of additional package"
+echo "*** Pip installation of additional package"
 pip install --trusted-host pypi.python.org -r PyTroll-pip-requirements.txt
 
-echo "deactivate virtual environment"
+echo "*** Deactivate virtual environment"
 source deactivate

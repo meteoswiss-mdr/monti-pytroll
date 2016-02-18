@@ -1,30 +1,37 @@
 #!/bin/bash
 #
-# script to create submodules for the PyTroll superproject
+# script to install a PyTroll packages
 #
 # This script does the following:
-# * adding submodules to the PyTroll superproject
+# * install PyTroll packages
 #
-# The script is part of SETUP_DEVELOPER.sh.
-# !!! DONT USE THIS SCRIPT ON A GIT REPOSITORY !!!
-# !!! THAT ALREADY HAVE THE SUBMODULES BELOW !!! 
-# Please read the whole script before execution!
+# The script is part of setup_user.sh and
+# will only work on the zueub428 in the folder
+# /opt/users/\$(logname)/PyTroll/setup.
+# To install PyTroll on another computer, please use
+# setup_developer.py
 #
 # author: Ulrich Hamann
 # version 0.1: 16-02-2016 U. Hamann
 
-# activate virtual environment
+# set paths for anaconda (again, for security)
+export PYTROLLHOME=/opt/users/$LOGNAME/PyTroll/
+export PATH=$PYTROLLHOME/packages/anaconda2/bin:$PATH
+export PYTHONPATH=$PYTROLLHOME/packages/anaconda2/bin:$PYTROLLHOME/scripts
+
+# git submodule synchronisation 
+git submodule sync
+
+echo "*** Activate virtual environment"
 source activate PyTroll
 cd ..
 
-# Install aggdraw as submodule
-git submodule add -b master https://github.com/jakul/aggdraw.git packages/aggdraw packages/aggdraw
+echo "*** Install aggdraw as submodule"
 cd packages/aggdraw
 python setup.py install 
 cd -
 
-# Install pygrib as submodule
-git submodule add -b master https://github.com/jswhit/pygrib.git  packages/pygrib
+echo "*** Install pygrib as submodule"
 cd packages/pygrib
 cp setup.cfg.template setup.cfg
 # specify jasper library folder
@@ -34,24 +41,13 @@ sed -i -- 's/\#grib\_api\_dir\ \=\ \/usr\/local/grib\_api\_dir\ \=\ \/opt\/users
 python setup.py install 
 cd -
 
-# Add PyTroll packages as submodules to the git super-project
-git submodule add -b master      https://github.com/pytroll/pyresample.git        packages/pyresample
-git submodule add -b master      https://github.com/pytroll/pycoast.git           packages/pycoast
-git submodule add -b master      https://github.com/pytroll/pyorbital.git         packages/pyorbital
-git submodule add -b develop     https://github.com/pytroll/posttroll.git         packages/posttroll
-git submodule add -b master      https://github.com/pytroll/trollsift.git         packages/trollsift
-git submodule add -b develop     https://github.com/pytroll/pytroll-schedule.git  packages/pytroll-schedule
-git submodule add -b develop     https://github.com/pytroll/trollimage.git        packages/trollimage
-git submodule add -b master      https://github.com/pytroll/mipp.git              packages/mipp
-git submodule add -b pre-master  https://github.com/pytroll/mpop.git              packages/mpop
-git submodule add -b develop     https://github.com/pytroll/trollduction.git      packages/trollduction
-git submodule add -b develop     https://github.com/adybbroe/pyspectral.git       packages/pyspectral 
-git submodule add -b master      https://code.google.com/p/pydecorate/            packages/pydecorate       
-
-# Install PyTroll packages
+echo "*** Install PyTroll packages"
 for package in pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate
 do
     cd packages/$package
     python setup.py develop
     cd -
 done
+
+echo "*** Deactivate virtual environment"
+source deactivate

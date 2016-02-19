@@ -37,7 +37,7 @@
 [submodule "packages/mipp"]
 	path = packages/mipp
 	url = https://github.com/pytroll/mipp.git
-	branch = master
+	branch = pre-master
 [submodule "packages/mpop"]
 	path = packages/mpop
 	url = https://github.com/pytroll/mpop.git

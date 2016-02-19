@@ -20,16 +20,16 @@ export PYTHONPATH=$PYTROLLHOME/packages/anaconda2/bin:$PYTROLLHOME/scripts
 
 # activate virtual environment
 source activate PyTroll
-cd ..
+cd $PYTROLLHOME
 
 # Install aggdraw as submodule
-git submodule add -b master https://github.com/jakul/aggdraw.git packages/aggdraw packages/aggdraw
+git submodule add -b master      https://github.com/jakul/aggdraw.git             packages/aggdraw
 cd packages/aggdraw
 python setup.py install 
 cd -
 
 # Install pygrib as submodule
-git submodule add -b master https://github.com/jswhit/pygrib.git  packages/pygrib
+git submodule add -b master      https://github.com/jswhit/pygrib.git             packages/pygrib
 cd packages/pygrib
 cp setup.cfg.template setup.cfg
 # specify jasper library folder
@@ -53,7 +53,38 @@ git submodule add -b develop     https://github.com/pytroll/trollduction.git    
 git submodule add -b develop     https://github.com/adybbroe/pyspectral.git       packages/pyspectral 
 git submodule add -b master      https://code.google.com/p/pydecorate/            packages/pydecorate       
 
-# save branch information in the .gitmodules file
+# specify branch information for the upstream repository with -u (upstream) option insite the submodules folders
+cd packages/aggdraw
+git branch -u origin master
+cd ../pygrib
+git branch -u origin master
+cd ../pyresample
+git branch -u origin master
+cd ../pycoast
+git branch -u origin master
+cd ../pyorbital
+git branch -u origin master
+cd ../posttroll
+git branch -u origin develop
+cd ../trollsift
+git branch -u origin master
+cd ../pytroll-schedule
+git branch -u origin develop
+cd ../trollimage
+git branch -u origin develop
+cd ../mipp
+git branch -u origin master
+cd ../mpop
+git branch -u origin pre-master
+cd ../trollduction
+git branch -u origin develop
+cd ../pyspectral 
+git branch -u origin develop
+cd ../pydecorate 
+git branch -u origin master
+
+
+# specify branch information in the .gitmodules file for new git users
 git config --file=.gitmodules submodule.packages/aggdraw.branch master
 git config --file=.gitmodules submodule.packages/pygrib.branch master
 
@@ -69,6 +100,7 @@ git config --file=.gitmodules submodule.packages/mpop.branch pre-master
 git config --file=.gitmodules submodule.packages/trollduction.branch develop
 git config --file=.gitmodules submodule.packages/pyspectral.branch develop
 git config --file=.gitmodules submodule.packages/pydecorate.branch master
+
 
 # Install PyTroll packages
 for package in pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate

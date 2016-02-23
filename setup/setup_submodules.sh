@@ -27,9 +27,16 @@ branches=( ["aggdraw"]="master" ["pygrib"]="master" ["pyresample"]="master" ["py
            ["pytroll-schedule"]="master" ["trollimage"]="develop" ["mipp"]="master" \
            ["mpop"]="master" ["trollduction"]="develop" ["pyspectral"]="master" ["pydecorate"]="master" )
 
+cd $PYTROLLHOME
+
 # git submodule synchronisation 
 git submodule sync
 
+# update the git submodule to the latest stage of the official repositories 
+git submodule update --remote
+
+# checkout all repositories, to avoid the detached head state
+git submodule foreach -q --recursive 'branch="$(git config -f $toplevel/.gitmodules submodule.$name.branch)"; git checkout $branch'
 
 echo "*** Activate virtual environment"
 source activate PyTroll

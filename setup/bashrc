@@ -37,3 +37,4 @@ activate
 alias ll='ls --color=auto -alh'
 alias ls='ls --color=auto'
 
+alias cdo='/opt/users/common/lib/cdo-1.7.1/bin/cdo'

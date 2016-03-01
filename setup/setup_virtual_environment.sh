@@ -25,7 +25,7 @@ conda config --set ssl_verify false
 echo "*** Update anaconda itself"
 conda update conda
 
-echo "*** Install additional conda packages with PyTroll-conda-package-list.txt"
+echo "*** Create virtual environement and install python packages according to PyTroll-conda-package-list.txt"
 conda create -n PyTroll --file PyTroll-conda-package-list.txt
 
 echo "*** Activate virtual environment"

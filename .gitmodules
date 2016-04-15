@@ -1,11 +1,3 @@
-[submodule "packages/aggdraw"]
-	path = packages/aggdraw
-	url = https://github.com/jakul/aggdraw.git
-	branch = master
-[submodule "packages/pygrib"]
-	path = packages/pygrib
-	url = https://github.com/jswhit/pygrib.git
-	branch = master
 [submodule "packages/pyresample"]
 	path = packages/pyresample
 	url = https://github.com/pytroll/pyresample.git

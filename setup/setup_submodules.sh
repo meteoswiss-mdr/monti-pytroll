@@ -17,7 +17,8 @@
 # set paths for anaconda (again, for security)
 . ./setup_anaconda_zueub428.sh
 
-export packages="aggdraw pygrib pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate"
+#export packages="aggdraw pygrib pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate"
+export packages="pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate"
 
 declare -A branches
 branches=( ["aggdraw"]="master" ["pygrib"]="master" ["pyresample"]="master" ["pycoast"]="master" \

@@ -15,21 +15,13 @@
 export INSTALL_DIR=/opt/users/common/packages
 cd $INSTALL_DIR
 
-#git clone https://github.com/matplotlib/basemap.git
-
-## install geos library
-mkdir -p $INSTALL_DIR/basemap/GEOS-3.3.3
-export GEOS_DIR=$INSTALL_DIR/basemap/GEOS-3.3.3
-cd $INSTALL_DIR/basemap/geos-3.3.3
-# python bindung would require installation of SWIG  http://www.swig.org/exec.html
-./configure --prefix=$GEOS_DIR  # --enable-python --enable-swig
-make; make install
+git clone https://github.com/jakul/aggdraw.git
 
 #echo "*** Activate virtual environment " PyTroll_$(logname)
 #echo "================================ "
 #source activate PyTroll_$(logname)
 
-cd $INSTALL_DIR/basemap/
+cd $INSTALL_DIR/aggdraw
 python setup.py install
 
 #echo "*** Deactivate virtual environment"

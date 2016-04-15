@@ -15,9 +15,7 @@
 # version 0.1: 16-02-2016 U. Hamann
 
 # set paths for anaconda (again, for security)
-export PYTROLLHOME=/opt/users/$LOGNAME/PyTroll/
-export PATH=$PYTROLLHOME/packages/anaconda2/bin:$PATH
-export PYTHONPATH=$PYTROLLHOME/packages/anaconda2/bin:$PYTROLLHOME/scripts
+. ./setup_anaconda_zueub428.sh
 
 export packages="aggdraw pygrib pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate"
 
@@ -39,7 +37,7 @@ git submodule update --remote
 git submodule foreach -q --recursive 'branch="$(git config -f $toplevel/.gitmodules submodule.$name.branch)"; git checkout $branch'
 
 echo "*** Activate virtual environment"
-source activate PyTroll
+source activate PyTroll_$(logname)
 
 for pack in $packages
 do 

@@ -1,6 +1,5 @@
-# .bashrc
 
-echo 'run my bashrc'
+# .bashrc
 
 # Source global definitions
 if [ -f /etc/bashrc ]; then
@@ -16,24 +15,26 @@ export http_proxy=http://proxy.meteoswiss.ch:8080
 export https_proxy=https://proxy.meteoswiss.ch:8080
 
 export PYTROLLHOME=/opt/users/$(logname)/PyTroll/
-echo $PYTROLLHOME
 
-#export PPP_CONFIG_DIR=$PYTROLLHOME/etc/
 export PPP_CONFIG_DIR=$PYTROLLHOME/cfg_offline
-echo $PPP_CONFIG_DIR
-export XRIT_DECOMPRESS_PATH=$PYTROLLHOME/bin/xRITDecompress
-echo $XRIT_DECOMPRESS_PATH
+export XRIT_DECOMPRESS_PATH=/opt/users/common/bin/xRITDecompress
 export XRIT_DECOMPRESS_OUTDIR=/tmp/
-echo $XRIT_DECOMPRESS_OUTDIR
 #export PY_SHAPEFILES=$PYTROLLHOME/shapes/
-export PYTHONPATH=$PYTROLLHOME/lib/python2.7/site-packages:$PYTROLLHOME/scripts
-echo $PYTHONPATH
+export PYTHONPATH=/opt/users/common/packages/anaconda2/bin:$PYTROLLHOME/scripts
 
-alias tkdiff="/opt/users/$(logname)/PyTroll/packages/tkdiff-unix/tkdiff"
+# added by Anaconda2 2.4.1 installer
+export PATH="/opt/users/common/packages/anaconda2/bin:$PATH"
 
-source /opt/users/$(logname)/PyTroll/bin/activate
+# easy access to the easy-install file
+alias easy-install.pth='emacs /opt/users/common/packages/anaconda2/envs/PyTroll_$(logname)/lib/python2.7/site-packages/easy-install.pth &'
 
-## added by Anaconda2 2.4.1 installer
-#export PATH="/opt/users/$(logname)/PyTroll/packages/anaconda2/bin:$PATH"
+# easier activation and deactivation of the virtual environment PyTroll
+alias activate='source activate PyTroll_$(logname)'
+alias deactivate='source deactivate'
+activate
 
-export PYTHONPATH=${PYTHONPATH}:/opt/users/lel/PyTroll/packages/toolz/lib/python2.7/site-packages/
+# some useful alias commands
+alias ll='ls --color=auto -alh'
+alias ls='ls --color=auto'
+
+#alias cdo='/opt/users/common/lib/cdo-1.7.1/bin/cdo'

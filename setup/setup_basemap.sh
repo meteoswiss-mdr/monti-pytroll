@@ -13,9 +13,7 @@
 # version 0.1: 08-03-2016 U. Hamann
 
 # set paths for anaconda (again, for security)
-export PYTROLLHOME=/opt/users/$LOGNAME/PyTroll/
-export PATH=$PYTROLLHOME/packages/anaconda2/bin:$PATH
-export PYTHONPATH=$PYTROLLHOME/packages/anaconda2/bin:$PYTROLLHOME/scripts
+. ./setup_anaconda_zueub428.sh 
 
 ## add basemap package as submodule
 # cd $PYTROLLHOME

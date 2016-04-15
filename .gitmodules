@@ -54,7 +54,3 @@
 	path = packages/pydecorate
 	url = https://code.google.com/p/pydecorate/
 	branch = master
-[submodule "packages/basemap"]
-	path = packages/basemap
-	url = https://github.com/matplotlib/basemap.git
-	branch = master

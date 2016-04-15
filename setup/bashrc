@@ -31,7 +31,7 @@ alias easy-install.pth='emacs /opt/users/common/packages/anaconda2/envs/PyTroll_
 # easier activation and deactivation of the virtual environment PyTroll
 alias activate='source activate PyTroll_$(logname)'
 alias deactivate='source deactivate'
-activate
+source activate PyTroll_$(logname)
 
 # some useful alias commands
 alias ll='ls --color=auto -alh'

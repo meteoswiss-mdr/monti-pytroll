@@ -26,11 +26,15 @@ conda config --set ssl_verify false
 echo "*** Create virtual environement and install python packages according to PyTroll-conda-package-list.txt"
 conda create -n PyTroll_$(logname) --file PyTroll-conda-package-list_no_version_nr.txt
 
-echo "*** Activate virtual environment"
+echo "*** Activate virtual environment" PyTroll_$(logname)
 source activate PyTroll_$(logname)
 
-echo "*** Pip installation of additional package"
+echo ""
+echo "*** Pip installation of additional package (inside the virtual env)"
+echo "==================================================================="
+echo ""
 pip install --trusted-host pypi.python.org -r PyTroll-pip-requirements_no_version_nr2.txt
-
+echo ""
 echo "*** Deactivate virtual environment"
+echo ""
 source deactivate

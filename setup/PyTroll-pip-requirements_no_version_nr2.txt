@@ -15,7 +15,7 @@ Jinja2
 jupyter-client
 jupyter-console
 jupyter-core
-MarkupSafe
+#MarkupSafe
 netCDF4
 netifaces
 numpy

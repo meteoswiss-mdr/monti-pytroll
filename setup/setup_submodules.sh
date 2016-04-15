@@ -28,15 +28,20 @@ branches=( ["aggdraw"]="master" ["pygrib"]="master" ["pyresample"]="master" ["py
 cd $PYTROLLHOME
 
 # git submodule synchronisation 
+echo "git submodule sync"
 git submodule sync
 
 # update the git submodule to the latest stage of the official repositories 
+echo "git submodule update --remote"
 git submodule update --remote
 
 # checkout all repositories, to avoid the detached head state
+echo "avoid the detached head state"
 git submodule foreach -q --recursive 'branch="$(git config -f $toplevel/.gitmodules submodule.$name.branch)"; git checkout $branch'
 
-echo "*** Activate virtual environment"
+echo ""
+echo "*** Activate virtual environment " PyTroll_$(logname)
+echo "================================ "
 source activate PyTroll_$(logname)
 
 for pack in $packages
@@ -50,19 +55,25 @@ do
     if [ "$pack" == "pygrib" ]
     then
 	echo cp setup.cfg.template setup.cfg
+	cp setup.cfg.template setup.cfg
+
         # specify jasper library folder
         echo sed -i -- 's/\#jasper\_dir\ \=\ \/usr\/local/jasper\_dir\ \=\ \/opt\/users\/common\/lib\/jasper/g' setup.cfg
+	sed -i -- 's/\#jasper\_dir\ \=\ \/usr\/local/jasper\_dir\ \=\ \/opt\/users\/common\/lib\/jasper/g' setup.cfg 
         # specify grib_api library folder
         echo sed -i -- 's/\#grib\_api\_dir\ \=\ \/usr\/local/grib\_api\_dir\ \=\ \/opt\/users\/common\/lib\/grib\_api/g' setup.cfg
+	sed -i -- 's/\#grib\_api\_dir\ \=\ \/usr\/local/grib\_api\_dir\ \=\ \/opt\/users\/common\/lib\/grib\_api/g' setup.cfg
     fi
 
     # Install python and PyTroll packages
     if ( [ "$pack" == "aggdraw" ] || [ "$pack" == "aggdraw" ] ) ; then
 	# normal installation in the site-package directory
 	echo python setup.py install 
+	python setup.py install 
     else
 	# development installation using the easy-install.pth file
 	echo python setup.py develop 
+	python setup.py develop 
     fi
 
 done 

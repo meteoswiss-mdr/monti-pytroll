@@ -18,7 +18,7 @@
 . ./setup_anaconda_zueub428.sh
 
 #echo "*** Switch off SSL check for conda installations"
-#conda config --set ssl_verify false
+conda config --set ssl_verify false
 
 #echo "*** Update anaconda itself"
 #conda update conda

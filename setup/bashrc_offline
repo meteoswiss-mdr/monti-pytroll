@@ -1,0 +1,39 @@
+# .bashrc
+
+echo 'run my bashrc'
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+        . /etc/bashrc
+fi
+
+#PS1='\[[\u@ \e[1;31m\]\h \e[0;37m\W]\$\[\e[0m\] '
+
+
+export XAUTHORITY=/home/lom/users/$(logname)/.Xauthority
+
+export http_proxy=http://proxy.meteoswiss.ch:8080
+export https_proxy=https://proxy.meteoswiss.ch:8080
+
+export PYTROLLHOME=/opt/users/$(logname)/PyTroll/
+echo $PYTROLLHOME
+
+#export PPP_CONFIG_DIR=$PYTROLLHOME/etc/
+export PPP_CONFIG_DIR=$PYTROLLHOME/cfg_offline
+echo $PPP_CONFIG_DIR
+export XRIT_DECOMPRESS_PATH=$PYTROLLHOME/bin/xRITDecompress
+echo $XRIT_DECOMPRESS_PATH
+export XRIT_DECOMPRESS_OUTDIR=/tmp/
+echo $XRIT_DECOMPRESS_OUTDIR
+#export PY_SHAPEFILES=$PYTROLLHOME/shapes/
+export PYTHONPATH=$PYTROLLHOME/lib/python2.7/site-packages:$PYTROLLHOME/scripts
+echo $PYTHONPATH
+
+alias tkdiff="/opt/users/$(logname)/PyTroll/packages/tkdiff-unix/tkdiff"
+
+source /opt/users/$(logname)/PyTroll/bin/activate
+
+## added by Anaconda2 2.4.1 installer
+#export PATH="/opt/users/$(logname)/PyTroll/packages/anaconda2/bin:$PATH"
+
+export PYTHONPATH=${PYTHONPATH}:/opt/users/lel/PyTroll/packages/toolz/lib/python2.7/site-packages/

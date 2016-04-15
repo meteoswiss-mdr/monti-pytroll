@@ -1,6 +1,6 @@
 #aggdraw
 argh
-astropy
+#astropy
 Babel
 backports-abc
 backports.ssl-match-hostname

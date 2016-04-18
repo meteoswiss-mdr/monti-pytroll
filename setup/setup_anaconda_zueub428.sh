@@ -23,5 +23,6 @@ echo "the script changes your \$PATH and \$PYTHONPATH to avoid conflicts:"
 export PATH=/opt/users/common/packages/anaconda2/bin:$PATH
 echo "\$PATH="$PATH
 
-export PYTHONPATH=/opt/users/common/packages/anaconda2/bin:$PYTROLLHOME/scripts
+#export PYTHONPATH=/opt/users/common/packages/anaconda2/bin:$PYTROLLHOME/scripts
+export PYTHONPATH=$PYTROLLHOME/scripts
 echo "\$PYTHONPATH="$PYTHONPATH

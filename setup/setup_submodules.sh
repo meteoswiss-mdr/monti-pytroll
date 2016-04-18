@@ -28,26 +28,46 @@ branches=( ["aggdraw"]="master" ["pygrib"]="master" ["pyresample"]="master" ["py
 
 cd $PYTROLLHOME
 
-# git submodule synchronisation 
-echo "git submodule sync"
+
+echo ""
+echo "*** Synchronize PyTroll modules (git submodule sync)"
+echo "===================================================="
 git submodule sync
+echo "Does this look good? (press enter to continue or CTRL+c to abort)"
+read junk
 
-# update the git submodule to the latest stage of the official repositories 
-echo "git submodule update --remote"
+
+echo ""
+echo "*** Update PyTroll modules (git submodule update --remote)"
+echo "=========================================================="
 git submodule update --remote
+echo "Does this look good? (press enter to continue or CTRL+c to abort)"
+read junk
 
-# checkout all repositories, to avoid the detached head state
-echo "avoid the detached head state"
+
+echo ""
+echo "*** Checkout branches of PyTroll modules (... git checkout $branch, in order to avoid the detached head state)"
+echo "=============================================================================================================="
 git submodule foreach -q --recursive 'branch="$(git config -f $toplevel/.gitmodules submodule.$name.branch)"; git checkout $branch'
+echo "Does this look good? (press enter to continue or CTRL+c to abort)"
+read junk
+
 
 echo ""
 echo "*** Activate virtual environment " PyTroll_$(logname)
-echo "================================ "
+echo "============================================= "
 source activate PyTroll_$(logname)
+echo "Is the virtual environement active? (press enter to continue or CTRL+c to abort)"
+read junk
+
+echo ""
+echo "*** Install PyTroll packages "
+echo "============================ "
 
 for pack in $packages
 do 
-    echo install  $pack " with branch " ${branches[$pack]} " from repository " ${repositories[$pack]}
+    echo ""
+    echo "*** install"  $pack " with branch " ${branches[$pack]} " from repository " ${repositories[$pack]}
     cd $PYTROLLHOME
 
     cd packages/$pack

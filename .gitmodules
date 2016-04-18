@@ -40,8 +40,8 @@
 	branch = develop
 [submodule "packages/pyspectral"]
 	path = packages/pyspectral
-	url = https://github.com/adybbroe/pyspectral.git
-	branch = develop
+	url = https://github.com/pytroll/pyspectral.git
+	branch = pre-master
 [submodule "packages/pydecorate"]
 	path = packages/pydecorate
 	url = https://code.google.com/p/pydecorate/

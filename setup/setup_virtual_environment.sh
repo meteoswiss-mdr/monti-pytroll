@@ -89,6 +89,7 @@ echo "    source deactivate"
 echo ""
 echo "    Please do some test, if you can import packages:"
 echo ""
+echo "source activate "PyTroll_$(logname)
 echo "python"
 echo "import matplotlib._path"
 echo "import h5py"

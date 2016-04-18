@@ -1,13 +1,11 @@
 #!/bin/bash
 #
 # This script does the following:
-# * install basemap package
+# * install pygrib package
 #
-# The script is part of setup_user.sh and
-# will only work on the zueub428 in the folder
-# /opt/users/\$(logname)/PyTroll/setup.
-# To install PyTroll on another computer, please 
-# read the administration part in the manual.
+# Please note that you have to install
+# the jasper and grib_api library before
+# you install pygrib.
 #
 # author: Ulrich Hamann
 # version 0.1: 15-04-2016 U. Hamann

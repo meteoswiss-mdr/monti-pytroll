@@ -270,9 +270,6 @@ def load_rgb(satellite, satellite_nr, satellites_name, time_slot, rgb, area, in_
     else:
       fns = deepcopy(data_CTP["CTP"].data)  
     
-    fns[rgb].data[ fns[rgb].data.mask==True ] = no_data
-    fns[rgb].data=np.where(np.logical_or(data_CTP['CTP'].data>=p_max,data_CTP['CTP'].data<p_min),no_data,fns[rgb].data)
-    
     return fns[rgb].data
 
 def initial_xy(x_matrix,y_matrix):
@@ -320,7 +317,11 @@ def compute_new_xy(xy1, dx_ds, dy_ds,  max_x_m, max_y_m):
     
     return (xy1_px, xy2_px, xy2)
 
-
+def mask_rgb_based_pressure(data,p_min,p_max,data_CTP):
+    data[data.mask==True ] = no_data
+    data = np.where(np.logical_or(data_CTP['CTP'].data>=p_max,data_CTP['CTP'].data<p_min),no_data,data)
+    
+    return data
 # ------------------------------------------
 
 #def wind_shiftFun(in_windshift):
@@ -330,7 +331,7 @@ if __name__ == '__main__':
     time_start_TOT = time.time()
     detailed = True 
 
-    area="ccs4" #c2"#"ccs4" #in_windshift.ObjArea
+    area="ccs4c2" #"#"ccs4" #in_windshift.ObjArea
 
     title_color=(255,255,255)
     #layer=''
@@ -355,6 +356,7 @@ if __name__ == '__main__':
     sat_nr = "08" #in_windshift.sat_nr
 
     plot_DisplMeter = True
+    
     
     rgbs = ['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134']  #in_windshift.rgb
     rgbs_only15min = ['IR_039','IR_087','IR_120']
@@ -502,6 +504,16 @@ if __name__ == '__main__':
           data_CTP = global_data_CTP.project(area)
               
           [nx,ny]=data_CTP['CTP'].data.shape
+
+
+          # read all rgbs
+          global_data = GeostationaryFactory.create_scene(in_msg.sat, str(in_msg.sat_nr).zfill(2), "seviri", time_slot)
+          #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
+          area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
+          area_loaded = load_products(global_data, rgbs, in_msg, area_loaded)
+          data = global_data.project(area)
+
+
       
           # read wind field
           if wind_source=="HRW":
@@ -530,7 +542,7 @@ if __name__ == '__main__':
                   u_d[level,:,:], v_d[level,:,:] = HRW_2dfield( hrw_detbas, obj_area )
       
           elif wind_source=="cosmo":
-              u_d, v_d = interpolate_cosmo(year,month,day,hour,minute,layers,zlevel)
+              u_d, v_d = interpolate_cosmo(year,month,day,hour,minute,layers,zlevel,area)
           else:
               print "*** Error in main (functionWSFN.py)"
               print "    unknown wind source ", wind_source
@@ -586,9 +598,8 @@ if __name__ == '__main__':
                   for rgb_num in range(len(rgbs)):
                       rgb=rgbs[rgb_num]
                       if t==1:
-                          forecasts_NextStep[channel_nr[rgb],level,:,:] = load_rgb(in_msg.sat, str(in_msg.sat_nr).zfill(2), "seviri", time_slot, rgb, area, in_msg,data_CTP)
-
-                                                      
+                          forecasts_NextStep[channel_nr[rgb],level,:,:] = mask_rgb_based_pressure(data[rgb].data,p_min,p_max, data_CTP)
+                      
                       #check if for current channel (rgb) you also need the 30 min forecast
                       if t*ForecastTime > 15:
                           if any(rgb in s for s in rgbs_only15min):
@@ -629,7 +640,10 @@ if __name__ == '__main__':
                             
                             
                             print "... pickle data to file: ", outputFile
-                            pickle.dump( forecasts_out[channel_nr[rgb],ind_time,:,:], open(outputFile, "wb" ) )
+                            if area == "ccs4":
+                                pickle.dump( forecasts_out[channel_nr[rgb],ind_time,:,:], open(outputFile, "wb" ) )
+                            else: 
+                                pickle.dump( forecasts_out[channel_nr[rgb],ind_time,20:nx-40,85:ny-135], open(outputFile, "wb" ) )
                             
                             plot_fore = forecasts_out[channel_nr[rgb],ind_time,:,:]
                             plot_fore = np.where (plot_fore>0,plot_fore,np.nan)

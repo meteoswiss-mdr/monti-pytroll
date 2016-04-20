@@ -7,7 +7,7 @@ from mpop.projector import get_area_def
 from mpop.utils import debug_on
 from pyresample import plot
 import numpy as np
-#import aggdraw
+import aggdraw
 from PIL import Image, ImageFont, ImageDraw, ImageEnhance
 from os.path import dirname, exists
 from os import makedirs
@@ -107,18 +107,21 @@ if __name__ == '__main__':
     sat_nr = "08" #in_windshift.sat_nr
 
     channels = ['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134','CTP','CT']
-
     
+    channels15 = ['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134']
+    channels30 = ['WV_062','WV_073','IR_097','IR_108','IR_134']
+
+    only_obs_noForecast = True
 
     plot_tests_glationation      = False
     plot_tests_optical_thickness = False
     plot_tests_updraft           = False
     plot_tests_small_ice         = False
 
-    plot_indicator_optical_thickness = True
-    plot_indicator_glationation      = True
-    plot_indicator_updraft           = True
-    plot_indicator_small_ice         = True
+    plot_indicator_optical_thickness = False
+    plot_indicator_glationation      = False
+    plot_indicator_updraft           = False
+    plot_indicator_small_ice         = False
 
     plot_labelled_objects = False
     plot_final_mask       = False
@@ -175,15 +178,15 @@ if __name__ == '__main__':
     
     # additional test: test to pass for a px to be included in addition to cloud depth, updraft strength and glaciation
     #1#
-    #forth_mask = 'IR_039_minus_IR_108'
-    #mature_th_chDiff = 25
-    #developing_th_chDiff = 8
+    forth_mask = 'IR_039_minus_IR_108'
+    mature_th_chDiff = 25
+    developing_th_chDiff = 8
     #2#
     #forth_mask = 'CloudType'
     #mature_ct = [17,14,12]
     #developing_ct = [8,9,10,17,14,12]
     #3#
-    forth_mask = 'no_mask'
+    #forth_mask = 'no_mask'
     
     
     if forth_mask == 'IR_039_minus_IR_108':
@@ -220,7 +223,7 @@ if __name__ == '__main__':
         name_ForcedMask = 'no'    
     
     #mask that removed the thin cirrus
-    mask_cirrus      = False
+    mask_cirrus      = True
     plot_mask_cirrus = False
     th_cirrus        = 4
     
@@ -385,27 +388,71 @@ if __name__ == '__main__':
           #out_dir = "/data/COALITION2/PicturesSatellite//"+yearS+"-"+monthS+"-"+dayS+"/Mecikalski2/"
           out_dir = "/opt/users/lel/PyTroll/scripts//Mecikalski/"
       
+          if only_obs_noForecast == True:
+              
+              # now read the observations of the channels at -15 min
+              
+              global_data15 = GeostationaryFactory.create_scene(in_msg.sat, str(in_msg.sat_nr).zfill(2), "seviri", time_slot15)
+              # area we would like to read
+              area_loaded = get_area_def("EuropeCanary95")#(in_windshift.areaExtraction)  
+              # load product, global_data is changed in this step!
+              area_loaded = load_products(global_data15, channels15, in_msg, area_loaded)
+              data15 = global_data15.project(area)              
+              
+              
+              # now read the observations of the channels at -30 min
+              
+              global_data30 = GeostationaryFactory.create_scene(in_msg.sat, str(in_msg.sat_nr).zfill(2), "seviri", time_slot30)
+              # area we would like to read
+              area_loaded = get_area_def("EuropeCanary95")#(in_windshift.areaExtraction)  
+              # load product, global_data is changed in this step!
+              area_loaded = load_products(global_data30, channels30, in_msg, area_loaded)
+              data30 = global_data30.project(area)           
+              
+              wv_062_t15 = deepcopy(data15['WV_062'])
+              wv_062_t30 = deepcopy(data30['WV_062'])
+                      
+              wv_073_t15 = deepcopy(data15['WV_073'])
+              wv_073_t30 = deepcopy(data30['WV_073'])            
+          
+              ir_097_t15 = deepcopy(data15['IR_097'])
+              ir_097_t30 = deepcopy(data30['IR_097']) 
+          
+              ir_108_t15 = deepcopy(data15['IR_108'])
+              ir_108_t30 = deepcopy(data30['IR_108']) 
+          
+              ir_134_t15 = deepcopy(data15['IR_134'])
+              ir_134_t30 = deepcopy(data30['IR_134']) 
+          
+              ir_087_t15 = deepcopy(data15['IR_087'])
+              
+              ir_120_t15 = deepcopy(data15['IR_120'])
+              
+              ir_039_t15 = deepcopy(data15['IR_039'])
+              
+              
+          else:
                                                              
-          wv_062_t15 = pickle.load( open( nowcastDir+"%s_%s_WV_062_t15.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S), "rb" ) )
-          wv_062_t30 = pickle.load( open( nowcastDir+"%s_%s_WV_062_t30.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S), "rb" ) )
-                  
-          wv_073_t15 = pickle.load( open( nowcastDir+"%s_%s_WV_073_t15.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S), "rb" ) )
-          wv_073_t30 = pickle.load( open( nowcastDir+"%s_%s_WV_073_t30.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S), "rb" ) )            
-      
-          ir_097_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_097_t15.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S), "rb" ) )
-          ir_097_t30 = pickle.load( open( nowcastDir+"%s_%s_IR_097_t30.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S), "rb" ) ) 
-      
-          ir_108_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_108_t15.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S), "rb" ) )
-          ir_108_t30 = pickle.load( open( nowcastDir+"%s_%s_IR_108_t30.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S), "rb" ) ) 
-      
-          ir_134_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_134_t15.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S), "rb" ) )
-          ir_134_t30 = pickle.load( open( nowcastDir+"%s_%s_IR_134_t30.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S), "rb" ) ) 
-      
-          ir_087_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_087_t15.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S), "rb" ) )
+              wv_062_t15 = pickle.load( open( nowcastDir+"%s_%s_WV_062_t15.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S), "rb" ) )
+              wv_062_t30 = pickle.load( open( nowcastDir+"%s_%s_WV_062_t30.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S), "rb" ) )
+                      
+              wv_073_t15 = pickle.load( open( nowcastDir+"%s_%s_WV_073_t15.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S), "rb" ) )
+              wv_073_t30 = pickle.load( open( nowcastDir+"%s_%s_WV_073_t30.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S), "rb" ) )            
           
-          ir_120_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_120_t15.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S), "rb" ) )
+              ir_097_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_097_t15.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S), "rb" ) )
+              ir_097_t30 = pickle.load( open( nowcastDir+"%s_%s_IR_097_t30.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S), "rb" ) ) 
           
-          ir_039_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_039_t15.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S), "rb" ) )
+              ir_108_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_108_t15.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S), "rb" ) )
+              ir_108_t30 = pickle.load( open( nowcastDir+"%s_%s_IR_108_t30.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S), "rb" ) ) 
+          
+              ir_134_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_134_t15.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S), "rb" ) )
+              ir_134_t30 = pickle.load( open( nowcastDir+"%s_%s_IR_134_t30.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S), "rb" ) ) 
+          
+              ir_087_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_087_t15.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S), "rb" ) )
+              
+              ir_120_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_120_t15.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S), "rb" ) )
+              
+              ir_039_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_039_t15.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S), "rb" ) )
       
       
      

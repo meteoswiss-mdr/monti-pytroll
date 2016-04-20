@@ -1,6 +1,6 @@
 [submodule "packages/pyresample"]
 	path = packages/pyresample
-	url = https://github.com/pytroll/pyresample.git
+	url = https://github.com/meteoswiss-mdr/pyresample.git
 	branch = master
 [submodule "packages/pycoast"]
 	path = packages/pycoast

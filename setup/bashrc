@@ -37,4 +37,6 @@ source activate PyTroll_$(logname)
 alias ll='ls --color=auto -alh'
 alias ls='ls --color=auto'
 
+alias tkdiff='/opt/users/common/packages/tkdiff-unix/tkdiff'
+
 #alias cdo='/opt/users/common/lib/cdo-1.7.1/bin/cdo'

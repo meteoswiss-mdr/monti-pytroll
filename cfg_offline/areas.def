@@ -565,6 +565,16 @@ REGION: scan500m {
 	AREA_EXTENT:	(-1268854.1266382949, -4150234.8425892727, 779145.8733617051, -2062234.8425892727)
 };
 
+# python coord2area_def_merc.py blitzortung 24.15 71.25 -22.1 52.15  min_lat max_lat min_lon max_lon
+REGION: blitzortung {
+        NAME:   blitzortung
+        PCS_ID: merc_15.025_0
+        PCS_DEF:        proj=merc,lat_0=0,lon_0=15.025,ellps=WGS84
+	XSIZE: 690
+        YSIZE: 728
+        AREA_EXTENT:    (-4129953.1084304503, 2754221.6483020033, 4135519.082970113, 11447786.699447317)
+};
+
 REGION: opera_odyssey {
    NAME: OPERA Odyssey composite
    PCS_ID: opera_odyssey

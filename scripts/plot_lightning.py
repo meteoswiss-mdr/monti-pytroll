@@ -4,7 +4,8 @@ import logging
 #sys.path.insert(0, "/home/lom/users/cll/pytroll/install/lib/python2.6/site-packages")
 from mpop.satellites import GeostationaryFactory
 from mpop.projector import get_area_def
-from mpop.utils import debug_on
+from mpop.satin.lightning import unfold_lightning
+from math import pi
 from pyresample import plot
 #from trollimage.colormap import rainbow, purples, prgn, pubugn, brbg, piyg, spectral, greens, greens2
 from trollimage.colormap import greens2
@@ -17,11 +18,14 @@ from os.path import exists
 from os import makedirs
 from pycoast import ContourWriterAGG
 import subprocess
+from ConfigParser import ConfigParser
+from mpop import CONFIG_PATH
 
 import scp_settings
 scpOutputDir = scp_settings.scpOutputDir
 scpID = scp_settings.scpID 
 
+from mpop.utils import debug_on
 #debug_on()
 
 prop_str = 'dens'
@@ -87,26 +91,22 @@ else:
 
 time_slot = datetime(year, month, day, hour, minute)
 
+area='ccs4'
+#area='EuropeCanaryS95'
+obj_area = get_area_def(area)
+
 print "... read lightning data"
 global_data = GeostationaryFactory.create_scene("lightning", "", "thx", time_slot)
-global_data.load([prop_str])
+global_data.load([prop_str], area=area)
+
 print "... global_data "
 print global_data
-area='ccs4'
-obj_area = get_area_def(area)
 #plot.show_quicklook(ccs4, global_data['precip'].data )
 #print "global_data[prop_str].data", global_data[prop_str].data
 print "... shape: ", global_data[prop_str].data.shape
 print "... min/max: ", global_data[prop_str].data.min(), global_data[prop_str].data.max()
 print "... dt: ", global_data.dt, " min"
-print "... dx: ", global_data.dx, " km"
-print "... form: ", global_data.form
-
 dt_str = ("%04d" % global_data.dt) + "min"
-dx_str = ("%03d" % global_data.dx) + "km"
-
-prop = np.ma.asarray(global_data[prop_str].data)
-prop.mask = (prop == 0) 
 
 yearS = str(year)
 #yearS = yearS[2:]
@@ -119,19 +119,124 @@ dateS=yearS+'-'+monthS+'-'+dayS
 timeS = hourS+':'+minS+' UTC'
 
 #outputDir='./pics/'+yearS+'-'+monthS+'-'+dayS+'_lightnings/'
-#outputDir='/data/cinesat/out/'
+outputDir='/data/cinesat/out/'
 #outputDir='./'+yearS+'-'+monthS+'-'+dayS+'/THX/'
-outputDir='./pics/'
+#outputDir='./pics/'
 #outputDir='./'+yearS+'-'+monthS+'-'+dayS+'/'+yearS+'-'+monthS+'-'+dayS+'_'+prop_str+'-'+area+'/'
-#outputDir='/data/COALITION2/PicturesSatellite/'+yearS+'-'+monthS+'-'+dayS+'/'+yearS+'-'+monthS+'-'+dayS+'_THX-'+area+'/'
+#outputDir='/data/COALITION2/PicturesSatellite/'+yearS+'-'+monthS+'-'+dayS+'/'+yearS+'-'+monthS+'-'+dayS+'_THX_'+area+'/'
 
-if not exists(outputDir):
-    print '... create output directory: ' + outputDir
-    makedirs(outputDir)
 
-file_basename = 'THX_'+prop_str+'-'+'ccs4'+'_'+yearS[2:]+monthS+dayS+hourS+minS+'_'+dt_str+'_'+dx_str
-file_basename2 = 'THX_'+prop_str+'-'+'ccs4'+'_'+yearS[2:]+monthS+dayS+'_'+dt_str+'_'+dx_str
+# choose one property 
+prop = np.ma.asarray(global_data[prop_str].data)
+prop.mask = (prop == 0) 
 
+# empty if not unfolding
+dx_str = ""
+
+if unfold_lightning:
+
+    ########## input ###########
+    form = 'gauss'  # averaging kernel 
+
+    # fixed unfold radius
+    #dx = 10      # averaging radius in km
+
+    # Read config file content
+    conf = ConfigParser()
+    conf.read(os.path.join(CONFIG_PATH, global_data.fullname + ".cfg"))
+    dx = float(conf.get("thx-level2", "dx"))
+
+    dx *= 1000 # convert from km to m
+
+    ########## input ###########
+
+    dx_str = ("%03d" % round(dx/1000.)) + "km"
+
+    print "... unfold radius ", dx
+
+    ### !!! THIS IS VERY ROUGH !!!
+    ### !!! pixel_size_x != pixel_size_y !!!
+    ### !!! pixel_size_x not constant over image !!!
+    dpixel = dx / obj_area.pixel_size_x  
+
+    form = 'gauss'
+    # expand the area of the lightning to +- dx km depending on the form
+    prop     = unfold_lightning(prop, dpixel, form)             
+    #densIC   = unfold_lightning(densIC.data, dpixel, form)
+    #densCG   = unfold_lightning(densCG.data, dpixel, form)
+    #curr_abs = unfold_lightning(curr_abs.data, dpixel, form)
+    #curr_neg = unfold_lightning(curr_neg.data, dpixel, form)
+    #curr_pos = unfold_lightning(curr_neg.data, dpixel, form)
+
+    # define the non-data values 
+    prop.mask = (prop == 0)
+
+    if form == 'circle':
+        dArea =  pi*dx/1000.*dx/1000.
+    elif form == 'square':
+        dArea = (2*dx/1000.-1)*(2*dx/1000.-1)
+    elif form == 'gauss':
+        dArea = pi*dx/1000.*dx/1000. # !!! ??? what is resonable here ??? !!!
+    else:
+        print '*** Error unknown lightning shape'
+        quit()
+
+########## input ###########
+method='linear'
+method='logarithmic'
+############################
+
+log_str=''
+if method=='logarithmic':
+    print "... data.min(), data.max() = ", prop.min(), prop.max()
+    print "*** transform to logarithmic lightning rate"
+    prop=np.log10(prop)
+    print "... after log transformation: data.min(), data.max() = ", prop.min(), prop.max()
+
+    #units='log(flashrate)'
+    log_str='log_10 '
+    # units='log(I)'
+    tick_marks=1        # default
+    minor_tick_marks=0.1   # default
+
+########## input ###########
+fixed_minmax = True
+############################
+
+if fixed_minmax:
+    
+    if prop_str=='dens' or prop_str=='densIC' or prop_str=='densCG':
+        max_data=100.0
+    else:
+        max_data=1000.0
+    if form == 'gauss':
+        min_data=0.01
+        max_data=2.00
+
+    if method=='logarithmic':
+        min_data = np.log10(min_data)
+        max_data = np.log10(max_data)
+    print "... used fixed min/max values for plotting: ", min_data, max_data
+
+else:
+    min_data=prop.min()
+    max_data=prop.max()
+    #max_data = np.percentile(prop.data[ind],99.5)
+    print "... used variable min/max values for plotting: ", min_data, max_data
+
+    #if prop_str=='dens' or prop_str=='densIC' or prop_str=='densCG':
+    #    max_data=2.0
+    #else:
+    #    max_data=3.0
+    #if form == 'gauss':
+    #    min_data=-2
+    #    max_data=0.3
+        
+
+########## input ###########
+file_basename = 'THX_'+prop_str+'-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS+'_'+dt_str+'_'+dx_str
+file_basename2 = 'THX_'+prop_str+'-'+area+'_'+yearS[2:]+monthS+dayS+'_'+dt_str+'_'+dx_str
+############################
 
 # calculate statistics (area with precipitation, mean precipitation, total precipitation)
 if save_statistics:
@@ -175,24 +280,25 @@ if save_statistics:
     f1.close()
     print "wrote statistics file: emacs "+ statisticFile +" &"
 
+
+plot_type = 'trollimage'
+#plot_type = 'contours'
+
+if not exists(outputDir):
+    print '... create output directory: ' + outputDir
+    makedirs(outputDir)
+
 if plot_diagram:
     #outputFile = "./pics/radar.png"
     outputFile = outputDir + file_basename + '.png'
 
-    min_data=prop.min()
-    max_data=prop.max()
     #ind = (prop != 0.0) 
-    #max_data = np.percentile(prop.data[ind],99.5)
-    min_data=0
-    #max_data=35
-    max_data=80
     
-    method='linear'
 
     fontsize=18
     font = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf", fontsize)
 
-    units='flashs / (' +("%d" % global_data.dA)+'km^2 '+ ("%d" % global_data.dt) +'min)'
+    units='flashs / (' +("%d" % dArea)+'km^2 '+ ("%d" % global_data.dt) +'min)'
     if len(layer) > 0:
         layer=layer+':'
     tick_marks=5        # default
@@ -224,39 +330,59 @@ if plot_diagram:
     else:
         print "*** Error, unknown property", prop_str
 
-    log_str=''
-    if True:
-        prop=np.log10(prop)
-        min_data=prop.min()
-        #max_data=prop.max()
-        if prop_str=='dens' or prop_str=='densIC' or prop_str=='densCG':
-            max_data=2.0
+    if plot_type == 'trollimage':
+        print '... use trollimage to ', method,' plot data (min,max)=',min_data, max_data
+        if 'fill_value' in locals():
+            img = trollimage(prop, mode="L", fill_value=fill_value)  # fillvalue    -> opaque background 
         else:
-            max_data=3.0
-        method='logarithmic'
-        #units='log(RR)'
-        log_str='log_10 '
-        # units='log(I)'
-        tick_marks=1        # default
-        minor_tick_marks=0.1   # default
+            img = trollimage(prop, mode="L")                         # no fillvalue -> transparent backgroud
 
-    print '... use trollimage to ', method,' plot data (min,max)=',min_data, max_data
-    if 'fill_value' in locals():
-        img = trollimage(prop, mode="L", fill_value=fill_value)  # fillvalue    -> opaque background 
-    else:
-        img = trollimage(prop, mode="L")                         # no fillvalue -> transparent backgroud
+        #colorbar=prgn        # colorbars in trollimage-v0.3.0-py2.7.egg/trollimage/colormap.py
+        #colorbar=rainbow
+        #colorbar=pubugn
+        #colorbar=brbg
+        #colorbar=piyg   # too purple at the beginning
+        #colorbar=spectral
+        colorbar=greens2.reverse()
+        colorbar.set_range(min_data, max_data)
+        img.colorize(colorbar)
 
-    #colorbar=prgn        # colorbars in trollimage-v0.3.0-py2.7.egg/trollimage/colormap.py
-    #colorbar=rainbow
-    #colorbar=pubugn
-    #colorbar=brbg
-    #colorbar=piyg   # too purple at the beginning
-    #colorbar=spectral
-    colorbar=greens2.reverse()
-    colorbar.set_range(min_data, max_data)
-    img.colorize(colorbar)
+        PIL_image=img.pil_image()
 
-    PIL_image=img.pil_image()
+    elif plot_type == 'contours':
+        import matplotlib.pyplot as plt
+        from numpy import arange
+        from mpop.imageo.HRWimage import prepare_figure
+        from mpop.imageo.TRTimage import fig2img
+        import matplotlib.cm as cm
+
+        (ny,nx)=prop.shape
+        X, Y = np.meshgrid(range(nx), np.arange(ny-1, -1, -1))
+
+        print prop.min(), prop.max()
+
+        fig, ax = prepare_figure(obj_area)
+
+        colormap=cm.autumn_r
+
+        vmin=-1.8
+        vmax=-0.2
+
+        # half transparent lowest level 
+        clevels=[-2.5]
+        CS = plt.contour(X, Y, prop, clevels, linewidths=1.5, cmap=colormap, vmin=vmin, vmax=vmax, alpha=0.25)
+        # opaque higher levels 
+        clevels=[-1.6,-0.9,-0.2]
+        CS = plt.contour(X, Y, prop, clevels, linewidths=2.0, cmap=colormap, vmin=vmin, vmax=vmax) # , linestyles='solid'
+
+        ## adding the Contour lines with labels
+        #cset = contour(Z,arange(-1,1.5,0.2),linewidths=2,cmap=cm.Set2)
+        #clabel(cset,inline=True,fmt='%1.1f',fontsize=10)
+        #plt.clabel(CS, inline=1, fontsize=10)
+
+        PIL_image = fig2img ( fig )
+
+
     dc = DecoratorAGG(PIL_image)
 
     draw = ImageDraw.Draw(PIL_image)

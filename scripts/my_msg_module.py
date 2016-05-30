@@ -400,20 +400,10 @@ def check_input(in_msg, fullname, time_slot, segments=[6,7,8], HRsegments=[20,21
     ## currently no check for hdf data
     if in_msg.reader_level == "seviri-level4":
        return in_msg.RGBs
-    ## currently no check for cpp or hsaf data
-    if in_msg.sat == "cpp" or in_msg.sat == "hsaf":
+    ## currently no check for cpp
+    if in_msg.sat == "cpp":
        return in_msg.RGBs
 
-    conf = ConfigParser()
-    conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
-    print os.path.join(CONFIG_PATH, fullname + ".cfg")
-    inputDirectory = time_slot.strftime(conf.get("seviri-level1", "dir"))
-    #inputDirectory='/data/OWARNA/hau/database/meteosat/radiance/2014/11/04/'
-    #inputDirectory="/data/cinesat/in/eumetcast1/"
-
-    if in_msg.verbose:
-        print '... check input in directory '
-        print '    '+inputDirectory
 
     # convert str to array, if only one string is given
     if type(in_msg.RGBs) is str:
@@ -426,6 +416,17 @@ def check_input(in_msg, fullname, time_slot, segments=[6,7,8], HRsegments=[20,21
     for rgb in in_msg.RGBs:
 
         if rgb in products.MSG or rgb in products.MSG_color or rgb in products.RGBs_buildin or rgb in products.RGBs_user:
+
+            conf = ConfigParser()
+            conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
+            print os.path.join(CONFIG_PATH, fullname + ".cfg")
+            inputDirectory = time_slot.strftime(conf.get("seviri-level1", "dir"))
+            #inputDirectory='/data/OWARNA/hau/database/meteosat/radiance/2014/11/04/'
+            #inputDirectory="/data/cinesat/in/eumetcast1/"
+
+            if in_msg.verbose:
+                print '... check input in directory '
+                print '    '+inputDirectory
 
             if not pro_file_checked:
                 #check prologues file 
@@ -605,6 +606,27 @@ def check_input(in_msg, fullname, time_slot, segments=[6,7,8], HRsegments=[20,21
                     print "*** Warning, no NWC SAF file found: "+filename
             else:
                 print "    NWC SAF file found: "+glob.glob(filename)[0]
+                rgb_complete.append(rgb)
+
+        elif rgb in products.HSAF:
+
+            import datetime
+
+            conf = ConfigParser()
+            conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
+            inputDirectory = time_slot.strftime(conf.get("seviri-level2", "dir"))
+
+            end_time = time_slot + datetime.timedelta(minutes=12)
+            filename = end_time.strftime(conf.get("seviri-level2", "filename", raw=True))
+            #    #e.g. SAFNWC_MSG?_%(product)s%Y%m%d%H%M_FES_*
+            filename = os.path.join(inputDirectory, filename)
+
+            if len(glob.glob(filename)) == 0:
+                if in_msg.verbose:
+                    print "*** Warning, no HSAF file found: "+filename
+            else:
+                if in_msg.verbose:
+                    print "    HSAF file found: "+glob.glob(filename)[0]
                 rgb_complete.append(rgb)
 
         else:

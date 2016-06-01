@@ -67,6 +67,7 @@ import products
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
 
+
 def plot_msg(in_msg):
 
 
@@ -113,29 +114,25 @@ def plot_msg(in_msg):
    # check if input data is complete 
    if in_msg.verbose:
       print "*** check input data"
-   RGBs = check_input(in_msg, in_msg.sat+str(in_msg.sat_nr).zfill(2), in_msg.datetime)  # in_msg.sat_nr might be changed to backup satellite
+   RGBs = check_input(in_msg, in_msg.sat+in_msg.sat_nr_str(), in_msg.datetime)  
+   # in_msg.sat_nr might be changed to backup satellite
+
    if len(RGBs) != len(in_msg.RGBs):
       print "*** Warning, input not complete."
       print "*** Warning, process only: ", RGBs
-
-   if type(in_msg.sat_nr) is int:
-      sat_nr_str = str(in_msg.sat_nr).zfill(2)
-   elif type(in_msg.sat_nr) is str:
-      sat_nr_str = in_msg.sat_nr
-   else:
-      print "*** Waring, unknown type of sat_nr", type(in_msg.sat_nr)
-      sat_nr_str = in_msg.sat_nr
+   #else:
+   #   print "... produce plots for ", RGBs
 
    if in_msg.verbose:
       print '*** Create plots for '
-      print '    Satellite/Sensor: '+in_msg.sat + '  ' + sat_nr_str
+      print '    Satellite/Sensor: '+in_msg.sat + '  ' + in_msg.sat_nr_str()
       print '    Date/Time:        '+dateS +' '+hourS+':'+minS+'UTC'
       print '    RGBs:            ', in_msg.RGBs
       print '    Area:            ', in_msg.areas
 
 
    # define satellite data object
-   global_data = GeostationaryFactory.create_scene(in_msg.sat, sat_nr_str, "seviri", in_msg.datetime)
+   global_data = GeostationaryFactory.create_scene(in_msg.sat, in_msg.sat_nr_str(), "seviri", in_msg.datetime)
    # print "type(global_data) ", type(global_data)   # <class 'mpop.scene.SatelliteInstrumentScene'>
    # print "dir(global_data)", dir(global_data)  [..., '__init__', ... 'area', 'area_def', 'area_id', 'channel_list', 'channels', 
    #      'channels_to_load', 'check_channels', 'fullname', 'get_area', 'image', 'info', 'instrument_name', 'lat', 'load', 'loaded_channels', 
@@ -147,13 +144,13 @@ def plot_msg(in_msg):
    #else:
    #   scan_time = 15 # min
    #datetime_m1 -= timedelta(scan_time)
-   #global_data_m1 = GeostationaryFactory.create_scene(in_msg.sat, sat_nr_str, "seviri", datetime_m1)
+   #global_data_m1 = GeostationaryFactory.create_scene(in_msg.sat, in_msg.sat_nr_str(), "seviri", datetime_m1)
 
-   if len(RGBs) == 0:
+   if len(RGBs) == 0 and len(in_msg.postprocessing_areas) == 0:
       return RGBs
 
    if in_msg.verbose:
-      print "*** load satellite channels for "+in_msg.sat+sat_nr_str+" ", global_data.fullname
+      print "*** load satellite channels for "+in_msg.sat+in_msg.sat_nr_str()+" ", global_data.fullname
 
    # initialize processed RGBs
    RGBs_done=[]
@@ -185,7 +182,6 @@ def plot_msg(in_msg):
    #   if all_loaded:
    #      rgb_complete.append(rgb)
    #print "rgb_complete", rgb_complete
-
 
    # preprojecting the data to another area 
    # --------------------------------------
@@ -260,10 +256,26 @@ def plot_msg(in_msg):
          
          for rgb in RGBs:
 
+            # do automatic chose if no input
+            if in_msg.HRV_enhancement is None:
+                                     # UTC is shifted by 1hour to local winter time ( more or less solar time)
+               if area == 'ccs4' and (5 < in_msg.datetime.hour) and (in_msg.datetime.hour < 19) and rgb in ['VIS006', 'VIS008','VIS006c','VIS008c','overview','overview_sun', 'natural','green_snow','red_snow','convection']:  
+                  HRV_enhancement=True
+                  print "*** switch on HRV enhancement"
+               else:
+                  HRV_enhancement=False
+            else:
+               HRV_enhancement=in_msg.HRV_enhancement
+
+            if HRV_enhancement:
+               HRV_enhance_str='hr_'
+            else:
+               HRV_enhance_str=''
+
             if not check_loaded_channels(rgb, data):
                continue 
 
-            PIL_image = create_PIL_image(rgb, data, in_msg)   # !!! in_msg.colorbar[rgb] is initialized inside (give attention to rgbs) !!!
+            PIL_image = create_PIL_image(rgb, data, in_msg, HRV_enhancement=HRV_enhancement)   # !!! in_msg.colorbar[rgb] is initialized inside (give attention to rgbs) !!!
 
             add_border_and_rivers(PIL_image, cw, area_tuple, in_msg)
    
@@ -276,7 +288,7 @@ def plot_msg(in_msg):
 
             # add title to image
             if in_msg.add_title:
-               add_title(PIL_image, rgb, int(data.number), dateS, hourS, minS, area, dc, in_msg.verbose )
+               add_title(PIL_image, HRV_enhance_str+rgb, int(data.number), dateS, hourS, minS, area, dc, in_msg.verbose )
 
             # add MeteoSwiss and Pytroll logo
             if in_msg.add_logos:
@@ -320,7 +332,7 @@ def plot_msg(in_msg):
    
             # save file
             if in_msg.verbose:
-               print '... save final file :' + outputFile
+               print '... save final file: ' + outputFile
             PIL_image.save(outputFile, optimize=True)  # optimize -> minimize file size
    
             if in_msg.compress_to_8bit:
@@ -349,6 +361,7 @@ def plot_msg(in_msg):
                RGBs_done.append(rgb)
    
       ## start postprocessing
+      print "postprocessing", in_msg.postprocessing_areas
       if area in in_msg.postprocessing_areas:
          postprocessing(in_msg, RGBs_done, global_data.time_slot, data.number, area)
 
@@ -432,7 +445,7 @@ def load_products(data_object, RGBs, in_msg, area_loaded):
          data_object.load([rgb], reader_level=in_msg.reader_level)
          #print data_object[rgb].data.shape, data_object[rgb].data.min(), data_object[rgb].data.max()
 
-      if in_msg.HRV_enhancement:
+      if in_msg.HRV_enhancement==True or in_msg.HRV_enhancement==None:
          # load also the HRV channel (there is a check inside in the load function, if the channel is already loaded)
          if in_msg.verbose:
             print "    load additionally the HRV channel for HR enhancement"
@@ -536,12 +549,13 @@ def mask_data(data, area):
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
 
-def create_PIL_image(rgb, data, in_msg, colormap='rainbow'):
+def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=False):
 
    from mpop.imageo.palettes import convert_palette2colormap
-   from trollimage.colormap import RainRate
+   from trollimage.colormap import RainRate, rainbow   # reload in order to be save not to use a scaled colormap
 
    if in_msg.verbose:
+      print ""
       print "*** make image for: ", rgb
 
    # default colormap 
@@ -622,7 +636,7 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow'):
             print "*** Warning, no specified maximum for plotting in get_input_msg.py or input file"
    if in_msg.verbose and rgb not in products.RGBs_buildin:
       print '... set value range from min_data (',min_data,') to max_data (',max_data,')'
-      print colormap.values[0], colormap.values[-1]
+      print '    min/max value of colormap', colormap.values[0], colormap.values[-1]
 
    # specifies if a colorbar does make sense at all
    in_msg.colormap={}
@@ -665,14 +679,13 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow'):
       quit()
 
 
-   if in_msg.HRV_enhancement:
+   if HRV_enhancement:
       if in_msg.verbose:
          print "enhance the image with the HRV channel"
       luminance = GeoImage((data["HRV"].data), data.area, data.time_slot,
                            crange=(0, 100), mode="L")
       luminance.enhance(gamma=2.0)
       img.replace_luminance(luminance.channels[0])
-      rgb='HR'+rgb
 
    ## alternative: for geoimages is possible to add coasts and borders, but not for trollimage
    #if hasattr(img, 'add_overlay'):
@@ -767,6 +780,7 @@ def add_title(PIL_image, rgb, sat_nr, dateS, hourS, minS, area, dc, verbose ):
 
       if PIL_image.mode == 'RGB' or PIL_image.mode == 'RGBA':    # color 
          title_color=(255,255,255)
+         #title_color=(0,0,0)
          outline=(255, 0, 0)
       elif PIL_image.mode == 'L':    # black white 
          title_color=(255)

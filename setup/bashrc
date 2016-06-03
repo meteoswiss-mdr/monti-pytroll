@@ -21,7 +21,7 @@ export PYTROLLHOME=/opt/users/$LOGNAME/PyTroll/
 
 export PPP_CONFIG_DIR=$PYTROLLHOME/etc/
 export XRIT_DECOMPRESS_PATH=/opt/users/common/bin/xRITDecompress
-export XRIT_DECOMPRESS_OUTDIR=/tmp/
+export XRIT_DECOMPRESS_OUTDIR=/tmp/SEVIRI_DECOMPRESSED_$LOGNAME
 #export PY_SHAPEFILES=$PYTROLLHOME/shapes/
 export PYTHONPATH=/opt/users/common/packages/anaconda2/bin:$PYTROLLHOME/scripts
 export PSP_CONFIG_FILE=/opt/users/common/packages/pyspectral_rsr_data/pyspectral.cfg

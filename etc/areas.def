@@ -15,42 +15,6 @@
 # Get slice of coordinate set:
 # cart_subset = area_def.cartesian_coords[100:200, 350:]
 
-REGION: world_plat_21600_10800 {
-NAME:           world_plat_21600_10800
-PCS_ID:         world_plat_21600_10800
-PCS_DEF:        proj=eqc,ellps=WGS84
-XSIZE:          21600
-YSIZE:          10800
-AREA_EXTENT:    (-20037508.342789244, -10018754.171394622, 20037508.342789244, 10018754.171394622)
-};
-
-REGION: world_plat_21600_10927 {
-NAME:           world_plat_21600_10927
-PCS_ID:         world_plat_21600_10927
-PCS_DEF:        proj=eqc,ellps=WGS84,lon_0=10
-XSIZE:          21600
-YSIZE:          10927
-AREA_EXTENT:    (-20037508.342789244, -10018754.171394622, 20037508.342789244, 10018754.171394622)
-};
-
-REGION: world_plat_8192_4096 {
-        NAME:           world_plat_8192_4096_
-        PCS_ID:         world_plat_8192_4096
-        PCS_DEF:        proj=eqc,ellps=WGS84
-        XSIZE:          8192
-        YSIZE:          4096
-        AREA_EXTENT:    (-20037508.342789244, -10018754.171394622, 20037508.342789244, 10018754.171394622)
-};
-
-REGION: nrEURO3km {
-        NAME:           nrEURO3km
-        PCS_ID:         eqc_-1.02539_42.06787
-        PCS_DEF:        proj=eqc,lat_0=42.06787,lon_0=-1.02539,ellps=WGS84
-        XSIZE:          3000
-        YSIZE:          1500
-        AREA_EXTENT:    (-4504247.085104304, -2251372.135989299, 4504247.085104305, 2251372.1359892967)
-};
-
 REGION: afghanistan {
 	NAME:		Afghanistan
 	PCS_ID:		merc
@@ -67,6 +31,15 @@ REGION: ccs4 {
         XSIZE:          710
         YSIZE:          640 
         AREA_EXTENT:    (255000.0, -160000.0, 965000.0, 480000.0)
+};
+
+REGION: ccs4c2 {
+        NAME:           CCS4 Swiss projection (COSMO2)
+        PCS_ID:         somerc
+        PCS_DEF:        proj=somerc, lat_0=46.9524055555556, lon_0=7.43958333333333, ellps=bessel, x_0=600000, y_0=200000, k_0=1 
+        XSIZE:          930
+        YSIZE:          700
+        AREA_EXTENT:    (170000.0, -200000, 1100000, 500000)
 };
 
 REGION: ticino {
@@ -113,6 +86,17 @@ REGION: italy {
         YSIZE:  666
         AREA_EXTENT:    (-587352.9327758726, -645653.7974573227, 587352.9327758722, 687005.4997812625)
 };
+
+REGION: Etna {
+        NAME:   Etna
+        PCS_ID: stere_17.5_38.75
+        PCS_DEF:        proj=stere,lat_0=38.75,lon_0=17.5,ellps=WGS84
+        XSIZE:  806
+        YSIZE:  499
+        AREA_EXTENT:    (-403240.96553004615, -240108.9275068149, 403240.96553004574, 259375.57126517183)
+};
+
+
 
 # python ../test/coord2area_def_geos.py hsaf 0.0 26.  72.5 -24   38.5  3.003 good
 # python ../test/coord2area_def_geos.py hsaf 0.0 26.  72.5 -24.2 39.5  3.003 better!
@@ -296,16 +280,6 @@ REGION: SeviriDiskFull00 {
         #PCS_DEF:       proj=geos, lon_0=0.0, a=6378144.0, b=6356759.0, h=35785831.0, rf=295.49
         XSIZE:         3712
         YSIZE:         3712
-        AREA_EXTENT:   (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
-};
-
-REGION: SeviriDiskFull00S4 {
-        NAME:          Full globe MSG image 0 degrees (quarter resolution)
-        PCS_ID:        geos0
-        PCS_DEF:       proj=geos, lon_0=0.0, a=6378169.00, b=6356583.80, h=35785831.0
-        #PCS_DEF:       proj=geos, lon_0=0.0, a=6378144.0, b=6356759.0, h=35785831.0, rf=295.49
-        XSIZE:         928
-        YSIZE:         928
         AREA_EXTENT:   (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
 };
 
@@ -601,6 +575,15 @@ REGION: blitzortung {
         AREA_EXTENT:    (-4129953.1084304503, 2754221.6483020033, 4135519.082970113, 11447786.699447317)
 };
 
+REGION: opera_odyssey {
+   NAME: OPERA Odyssey composite
+   PCS_ID: opera_odyssey
+   PCS_DEF: proj=laea,lat_0=55.0,lon_0=10.0,ellps=WGS84,units='m'
+   XSIZE: 1900
+   YSIZE: 2200
+   AREA_EXTENT: (-1950000.0004161082, -2300000.0010312637, 1850000.0002276993, 2099999.999573728)
+};
+
 REGION: SouthArabia {
         NAME:   SouthArabia
         PCS_ID: geos_50.0_0.0
@@ -609,178 +592,3 @@ REGION: SouthArabia {
         YSIZE:  629
         AREA_EXTENT:    (-1091701.7912749145, 877278.435346408, 1091701.7912749113, 2135859.5476465565)
 };
-
-
-REGION: odyssey {
-   NAME: OPERA Odyssey composite
-   PCS_ID: odyssey
-   PCS_DEF: proj=laea,lat_0=55.0,lon_0=10.0,ellps=WGS84,units='m'
-   XSIZE: 1900
-   YSIZE: 2200
-   AREA_EXTENT: (-1950000.0004161082, -2300000.0010312637, 1850000.0002276993, 2099999.999573728)
-};
-
-REGION: odysseyS2 {
-   NAME: OPERA Odyssey composite
-   PCS_ID: odyssey
-   PCS_DEF: proj=laea,lat_0=55.0,lon_0=10.0,ellps=WGS84,units='m'
-   XSIZE:  950
-   YSIZE: 1100
-   AREA_EXTENT: (-1950000.0004161082, -2300000.0010312637, 1850000.0002276993, 2099999.999573728)
-};
-
-REGION: odysseyS25 {
-   NAME: OPERA Odyssey composite
-   PCS_ID: odyssey
-   PCS_DEF: proj=laea,lat_0=55.0,lon_0=10.0,ellps=WGS84,units='m'
-   XSIZE:  760
-   YSIZE:  880
-   AREA_EXTENT: (-1950000.0004161082, -2300000.0010312637, 1850000.0002276993, 2099999.999573728)
-};
-
-REGION: odysseyS3 {
-   NAME: OPERA Odyssey composite
-   PCS_ID: odyssey
-   PCS_DEF: proj=laea,lat_0=55.0,lon_0=10.0,ellps=WGS84,units='m'
-   XSIZE:  633
-   YSIZE:  733
-   AREA_EXTENT: (-1950000.0004161082, -2300000.0010312637, 1850000.0002276993, 2099999.999573728)
-};
-
-REGION: odysseyS4 {
-   NAME: OPERA Odyssey composite
-   PCS_ID: odyssey
-   PCS_DEF: proj=laea,lat_0=55.0,lon_0=10.0,ellps=WGS84,units='m'
-   XSIZE:  475
-   YSIZE:  550
-   AREA_EXTENT: (-1950000.0004161082, -2300000.0010312637, 1850000.0002276993, 2099999.999573728)
-};
-
-# NINJO Projection used in Cinesat
-REGION: nq0001km{
-        NAME:           nq0001km
-        PCS_ID:         EQUIRECT_0.000000_1000.0
-        PCS_DEF:        proj=eqc,lon_0=0.000000,ellps=WGS84
-        XSIZE:          10000
-        YSIZE:          5000
-        AREA_EXTENT:    (-5009164.4654698949, 3061642.2191855619, 5009164.4654698949, 8070306.8601417951)
-};
-
-REGION: nq0003km{
-        NAME:   nq0003km
-        PCS_ID: EQUIRECT_0.000000_3000.0
-        PCS_DEF:        proj=eqc,lon_0=0.000000,ellps=WGS84
-        XSIZE:  6666
-        YSIZE:  6666
-        AREA_EXTENT:    (-10016827.23100899, -10016827.23100899, 10016828.344203897, 10016827.23100899)
-};
-REGION: nq0008km{
-        NAME:   nq0008km
-        PCS_ID: EQUIRECT_0.000000_8000.0
-        PCS_DEF:        proj=eqc,lon_0=0.000000,ellps=WGS84
-        XSIZE:  2500
-        YSIZE:  2500
-        AREA_EXTENT:    (-10015323.304688372, -10015323.304688372, 10015323.304688372, 10015323.304688372)
-};
-
-REGION: nqceur1km{
-        NAME:   nqceur1km
-        PCS_ID: EQUIRECT_0.0_1000.0
-        PCS_DEF:        proj=eqc,lon_0=0.0,ellps=WGS84
-        XSIZE:  4000
-        YSIZE:  2000
-        AREA_EXTENT:    (-1446768.2148744117, 4564542.1740975734, 2559963.1228071474, 6567405.7920348747)
-};
-
-REGION: nqceur3km{
-        NAME:   nqceur3km
-        PCS_ID: EQUIRECT_0.0_3000.0
-        PCS_DEF:        proj=eqc,lon_0=0.0,ellps=WGS84
-        XSIZE:  1333
-        YSIZE:  666
-        AREA_EXTENT:    (-1446768.2148744117, 4568048.7380575622, 2556957.4965557288, 6566905.9675212139)
-};
-
-REGION: nqeuro1km{
-        NAME:           nqeuro1km
-        PCS_ID:         EQUIRECT_0.0_1000.0
-        PCS_DEF:        proj=eqc,lon_0=0.0,ellps=WGS84
-        XSIZE:          12000
-        YSIZE:          6000
-        AREA_EXTENT:    (-6011097.7687445702, 2560675.5675482242, 6011097.7687445702, 8571273.5117791332)
-};
-REGION: pifh {
-        NAME:          pifh
-        PCS_ID:        stere
-        PCS_DEF:       proj=stere, lat_0=90, lon_0=,lat_ts=, ellps=WGS84
-        XSIZE:         700
-        YSIZE:         700
-        AREA_EXTENT:   (-269780.822478,-3047523.526860,807201.850740,-1973758.570141)
-};
-
-REGION: pifn {
-        NAME:          pifn
-        PCS_ID:        stere
-        PCS_DEF:       proj=stere, lat_0=90, lon_0=,lat_ts=, ellps=WGS84
-        XSIZE:         700
-        YSIZE:         700
-        AREA_EXTENT:   (-1535188.696532,-3840893.826839,1199528.899587,-1113429.042362)
-};
-REGION: swiss02 {
-        NAME:          swiss02
-        PCS_ID:        swiss02
-        PCS_DEF:       proj=stere, lat_0=90, lon_0=,lat_ts=, ellps=WGS84
-        XSIZE:         701
-        YSIZE:         551
-        AREA_EXTENT:   (55430.855257,-2845872.431411,563494.664883,-2280086.192722)
-};
-REGION: nrEuro4km {
-        NAME:          nrEuro4km
-        PCS_ID:        nrEuro4km
-        PCS_DEF:       proj=stere, lat_0=90, lon_0=,lat_ts=, ellps=WGS84
-        XSIZE:         1280
-        YSIZE:         1024
-        AREA_EXTENT:   (-1162298.313205,-3754578.052310,1148655.678415,-1134810.942758)
-};
-REGION: nrEuro4kmEqc {
-        NAME:          nrEuro4kmEqc
-        PCS_ID:        nrEuro4kmEqc
-        PCS_DEF:       proj=eqc, lat_0=90, lon_10=,lat_ts=, ellps=WGS84
-        XSIZE:         1280
-        YSIZE:         1024
-        AREA_EXTENT:   (-1914791.755643,-7027601.680169,5048047.473048,-3145035.545921)
-};
-REGION: australia_pacific {
-        NAME:          Australia/Pacific - Global 1km USGS Landuse database
-        PCS_ID:        laeae134s15
-        PCS_DEF:       proj=laea,a=6370997.0,lat_0=-15.0,lon_0=135.0
-        XSIZE:         9300
-        YSIZE:         8000
-        AREA_EXTENT:   (-5000000, -3944890, 4299000, 4054110)
-}; 
-# Euroasia-Asia:
-REGION: euroasia_asia {
-        NAME:           Euroasia - optimised for Asia - Global 1km USGS Landuse database
-        PCS_ID:         laeae100n45
-        PCS_DEF:        proj=laea,a=6370997.0,lat_0=45.0,lon_0=100.0
-        XSIZE:          13000
-        YSIZE:          12000
-        AREA_EXTENT:    (-8000000, -5499000, 4999000, 6500000)
-};
-REGION: japan {
-        NAME:           japan 
-        PCS_ID:         japan 
-        PCS_DEF:        proj=laea,a=6370997.0,lat_0=20.0,lon_0=135.0
-        XSIZE:          2325
-        YSIZE:          2000
-        AREA_EXTENT:    (-5000000, -3944890, 4299000, 4054110)
-};
-REGION: pacific {
-        NAME:           pacific
-        PCS_ID:         stere_135.0_10.0
-        PCS_DEF:        proj=stere,lat_0=10.0,lon_0=135.0,ellps=WGS84
-        XSIZE:          1091
-        YSIZE:          1355
-        AREA_EXTENT:    (-5455058.952272, -6635997.881756476, 5455058.952271994, 6918305.063692819)
-};
-

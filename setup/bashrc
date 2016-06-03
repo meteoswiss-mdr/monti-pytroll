@@ -8,30 +8,34 @@ fi
 
 #PS1='\[[\u@ \e[1;31m\]\h \e[0;37m\W]\$\[\e[0m\] '
 
+echo $USER
+echo $(logname)
+echo $LOGNAME
 
-export XAUTHORITY=/home/lom/users/$(logname)/.Xauthority
+export XAUTHORITY=/home/lom/users/$LOGNAME/.Xauthority
 
 export http_proxy=http://proxy.meteoswiss.ch:8080
 export https_proxy=https://proxy.meteoswiss.ch:8080
 
-export PYTROLLHOME=/opt/users/$(logname)/PyTroll/
+export PYTROLLHOME=/opt/users/$LOGNAME/PyTroll/
 
 export PPP_CONFIG_DIR=$PYTROLLHOME/etc/
 export XRIT_DECOMPRESS_PATH=/opt/users/common/bin/xRITDecompress
 export XRIT_DECOMPRESS_OUTDIR=/tmp/
 #export PY_SHAPEFILES=$PYTROLLHOME/shapes/
 export PYTHONPATH=/opt/users/common/packages/anaconda2/bin:$PYTROLLHOME/scripts
+export PSP_CONFIG_FILE=/opt/users/common/packages/pyspectral_rsr_data/pyspectral.cfg
 
 # added by Anaconda2 2.4.1 installer
 export PATH="/opt/users/common/packages/anaconda2/bin:$PATH"
 
 # easy access to the easy-install file
-alias easy-install.pth='emacs /opt/users/common/packages/anaconda2/envs/PyTroll_$(logname)/lib/python2.7/site-packages/easy-install.pth &'
+alias easy-install.pth='emacs /opt/users/common/packages/anaconda2/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth &'
 
 # easier activation and deactivation of the virtual environment PyTroll
-alias activate='source activate PyTroll_$(logname)'
+alias activate='source activate PyTroll_$LOGNAME'
 alias deactivate='source deactivate'
-source activate PyTroll_$(logname)
+source activate PyTroll_$LOGNAME
 
 # some useful alias commands
 alias ll='ls --color=auto -alh'

@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+print "version1"
 a = 1
 b = 1
 t = np.arange(0,2*np.pi, 0.1)

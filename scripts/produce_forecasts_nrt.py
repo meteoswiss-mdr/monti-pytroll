@@ -56,7 +56,7 @@ def read_HRW(sat, sat_nr, instrument, time_slot, ntimes, dt=5, read_basic_or_det
     # read data for previous time steps if needed
     for it in range(1,ntimes):
         time_slot_i = time_slot - timedelta( minutes = it*5 )
-        data_i = GeostationaryFactory.create_scene("meteosat", "09", "seviri", time_slot_i)
+        data_i = GeostationaryFactory.create_scene(sat, "9", "seviri", time_slot_i)
         data_i.load(['HRW'], reader_level="seviri-level5", read_basic_or_detailed=read_basic_or_detailed)
         # merge all datasets
         data['HRW'].HRW_detailed = data['HRW'].HRW_detailed + data_i['HRW'].HRW_detailed
@@ -124,91 +124,81 @@ def check_cosmo_area (nc_cosmo, nx, ny, area):
  
     return x_min_cut, x_max_cut, y_min_cut, y_max_cut
 
+def get_cosmo_filenames (t_sat, nrt=True, runs_before = 0 ):
 
-def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure', area='ccs4', cosmo = None, nrt = False, rapid_scan_mode_satellite = True):
+    # get COSMO model start time
+    hour_run = t_sat.hour //3 * 3 
+    t_run = datetime(t_sat.year, t_sat.month, t_sat.day, hour_run, 0)
+
+    if runs_before != 0:
+        print "    try ", runs_before ," model start(s) before "
+        t_run -= runs_before * timedelta(hours = 3) 
+
+    dt = t_sat - t_run
+    hour_forecast1 = "%02d" % int (dt.total_seconds() / 3600) # using integer devision 
+    hour_forecast2 = "%02d" % int (dt.total_seconds() / 3600 +1)  # using integer devision 
+
+    yearS, monthS, dayS, hourS, minS = string_date(t_run)
+
     if nrt:          
-        cosmoDir='/data/cinesat/in/cosmo/' #2016052515_05_cosmo-1_UV_swissXXL
         cosmo = "cosmo-1"
     else:
-        cosmoDir='/data/COALITION2/database/cosmo/' #20150515_cosmo2_ccs4c2 / 2015051506_00_cosmo2_UVccs4c2.nc or 2015070706_00_cosmo2_UV_ccs4c2.nc
         cosmo = "cosmo2"
-    
-    if rapid_scan_mode_satellite:
-        dt = 2
-    else:
-        dt = 12
-    
-    t_run = datetime(year,month,day,hour,0)
-    
-    yearS, monthS, dayS, hourS, minS = string_date(t_run)
-    
-    hour_run=hour//3 * 3
-    
-    hour_runS = "%02d" % hour_run
-    hour_forecast = hour - hour_run
-    hour_forecast1S  = "%02d" % hour_forecast
-    hour_forecast2S = "%02d" % (hour_forecast+1)
-    
-    if nrt:
-        add_path = ""
-    else:
-        add_path = yearS+monthS+dayS+"_"+cosmo+"_"+area+"/"
-    
-    
-    pro_file1= add_path + yearS+monthS+dayS+hour_runS+"_"+hour_forecast1S+"_"+cosmo+"_UV*.nc"
-    pro_filename1 = glob.glob(cosmoDir+'/'+pro_file1)
-    pro_file2= add_path + yearS+monthS+dayS+hour_runS+"_"+hour_forecast2S+"_"+cosmo+"_UV*.nc"
-    pro_filename2 = glob.glob(cosmoDir+'/'+pro_file2)
 
-
-    if len(pro_filename1)>1 or len(pro_filename2)>1:
-        print "Warning, more than one cosmo file available!!"
-        print "Files t1", pro_filename1
-        print "Files t2", pro_filename2
-        
-    
-    if len(pro_filename1)<1 or len(pro_filename2)<1:
-        t_run -= timedelta(hours = 3)
-        hour_forecast += 3
-        
-        yearS = str(t_run.year)
-        monthS = "%02d" % t_run.month
-        dayS   = "%02d" % t_run.day
-        hourS  = "%02d" % t_run.hour
-             
-        hour_runS  = "%02d" % hour_run
-        hour_forecast1S  = "%02d" % hour_forecast
-        hour_forecast2S = "%02d" % (hour_forecast+1)
-        
-        if nrt:
-            add_path = ""
-        else:
-            add_path = yearS+monthS+dayS+"_"+cosmo+"_"+area+"/"        
-        
-        pro_file1= add_path + yearS+monthS+dayS+hour_runS+"_"+hour_forecast1S+"_"+cosmo+"_UV*.nc"
-        pro_filename1 = glob.glob(cosmoDir+'/'+pro_file1)
-        pro_file2= add_path + yearS+monthS+dayS+hour_runS+"_"+hour_forecast2S+"_"+cosmo+"_UV*.nc"
-        pro_filename2 = glob.glob(cosmoDir+'/'+pro_file2)        
-        
-        
-        if len(pro_filename1)>1 or len(pro_filename2)>1:
-            print "Warning, more than one cosmo file available!!"
-            print "Files t1", pro_filename1
-            print "Files t2", pro_filename2            
+    if nrt:          
+        cosmoDir='/data/cinesat/in/cosmo/' #2016052515_05_cosmo-1_UV_swissXXL
+    else:
+        cosmoDir='/data/COALITION2/database/cosmo/' #20150515_cosmo2_ccs4c2 / 2015051506_00_cosmo2_UVccs4c2.nc or 2015070706_00_cosmo2_UV_ccs4c2.nc
             
-        elif len(pro_filename1)<1 or len(pro_filename2)<1:
-            print "No cosmo wind data"
-            print cosmoDir+'/'+pro_file1
-            print cosmoDir+'/'+pro_file2
+    if nrt:
+        cosmoDir += "/"
+    else:
+        cosmoDir += yearS+monthS+dayS+"_"+cosmo+"_"+area+"/"
+
+    cosmo_file1 = yearS+monthS+dayS+hourS+"_"+hour_forecast1+"_"+cosmo+"_UV*.nc"
+    cosmo_file2 = yearS+monthS+dayS+hourS+"_"+hour_forecast2+"_"+cosmo+"_UV*.nc"
+
+    return cosmoDir+cosmo_file1, cosmoDir+cosmo_file2
+
+def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure', area='ccs4', cosmo = None, nrt = False, rapid_scan_mode_satellite = True):
+
+    
+    file1, file2 = get_cosmo_filenames ( datetime(year,month,day,hour,minute) )
+
+    print "... search for ", file1, " and ", file2
+    filename1 = glob.glob(file1)
+    filename2 = glob.glob(file2)
+
+    if len(filename1)>1 or len(filename2)>1:
+        print "Warning, more than one cosmo file available!!"
+        print "Files t1", filename1
+        print "Files t2", filename2
+            
+    if len(filename1)<1 or len(filename2)<1:
+        print "*** Warning, found no cosmo wind data "
+        file1, file2 = get_cosmo_filenames ( datetime(year,month,day,hour,minute), runs_before = 1 )
+        print file1, file2
+
+        print "... search for ", file1, " and ", file2
+        filename1 = glob.glob(file1)
+        filename2 = glob.glob(file2)
+        
+        if len(filename1)>1 or len(filename2)>1:
+            print "Warning, more than one cosmo file available!!"
+            print "Files t1", filename1
+            print "Files t2", filename2
+        elif len(filename1)<1 or len(filename2)<1:
+            print "*** Error, no cosmo wind data with model start ", str(t_run)
+            print file1
+            print file2
             quit()
     
-    file_cosmo_1 = pro_filename1[0]
-    file_cosmo_2 = pro_filename2[0]
+    file_cosmo_1 = filename1[0]
+    file_cosmo_2 = filename2[0]
     
     #cosmoDir='/data/cinesat/in/cosmo' #2016052400_03_cosmo-1_UV_swissXXL.nc
 
-    print '... read ', file_cosmo_1 
-                                    
+    print '... read ', file_cosmo_1  
     print '... read ', file_cosmo_2
     
     nc_cosmo_1 = netCDF4.Dataset(file_cosmo_1,'r',format='NETCDF4') 
@@ -220,8 +210,8 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     pressure2 = nc_cosmo_2.variables['z_1'][:]
     pressure2 = pressure2.astype(int)    
     
-    print pressure1
-    print pressure2
+    print "    pressure levels in file1: ", pressure1
+    print "    pressure levels in file1: ", pressure2
 
     u_all1 = nc_cosmo_1.variables['U'][:] 
     v_all1 = nc_cosmo_1.variables['V'][:]
@@ -237,21 +227,28 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     x_min_cut1, x_max_cut1, y_min_cut1, y_max_cut1 = check_cosmo_area (nc_cosmo_1, nx1, ny1, area)
     x_min_cut2, x_max_cut2, y_min_cut2, y_max_cut2 = check_cosmo_area (nc_cosmo_2, nx2, ny2, area) 
     
-    p_chosen=np.sort(layers)[::-1]
-    print '... p_chosen: ', p_chosen, layers
+    p_chosen = np.sort(layers)[::-1] * 100 # 100 == convert hPa to Pa
 
-    u_d=np.zeros((len(p_chosen),nx,ny))
-    v_d=np.zeros((len(p_chosen),nx,ny))
+    u_d = np.zeros((len(p_chosen),nx,ny))
+    v_d = np.zeros((len(p_chosen),nx,ny))
+
+    if rapid_scan_mode_satellite:
+        dt = 2
+    else:
+        dt = 12
 
     position_t = (minute+dt)/5
     previous   = 1-(1./12*position_t)
-    
+
     for g in range(len(p_chosen)):
+        i1 = np.where(pressure1==p_chosen[g])[0][0]
+        i2 = np.where(pressure2==p_chosen[g])[0][0]
+        print "... temporal interpolation for wind field at", p_chosen[g]
         print g, len(p_chosen), np.where(pressure1==p_chosen[g])[0][0]
-        u1 = u_all1[0,np.where(pressure1==p_chosen[g])[0][0], x_max_cut1 : nx1-x_min_cut1, y_min_cut1 : ny1 - y_max_cut1] #20:nx-40,85:ny-135
-        u2 = u_all2[0,np.where(pressure1==p_chosen[g])[0][0], x_max_cut2 : nx2-x_min_cut2, y_min_cut2 : ny2 - y_max_cut2]
-        v1 = v_all1[0,np.where(pressure2==p_chosen[g])[0][0], x_max_cut1 : nx1-x_min_cut1, y_min_cut1 : ny1 - y_max_cut1]
-        v2 = v_all2[0,np.where(pressure2==p_chosen[g])[0][0], x_max_cut2 : nx2-x_min_cut2, y_min_cut2 : ny2 - y_max_cut2]
+        u1 = u_all1[0, i1, x_max_cut1 : nx1-x_min_cut1, y_min_cut1 : ny1 - y_max_cut1] #20:nx-40,85:ny-135
+        u2 = u_all2[0, i2, x_max_cut2 : nx2-x_min_cut2, y_min_cut2 : ny2 - y_max_cut2]     #### UH index changed i1 -> i2 !!! ###
+        v1 = v_all1[0, i1, x_max_cut1 : nx1-x_min_cut1, y_min_cut1 : ny1 - y_max_cut1]     #### UH index changed i2 -> i1 !!! ###
+        v2 = v_all2[0, i2, x_max_cut2 : nx2-x_min_cut2, y_min_cut2 : ny2 - y_max_cut2]
         u_d[g,:,:] = previous*u1 + (1-previous)*u2
         v_d[g,:,:] = previous*v1 + (1-previous)*v2      
 
@@ -344,7 +341,7 @@ def nowcastRGB(forecast1,xy1_py,xy2_px):
     
     return forecast2
 
-def load_rgb(satellite, satellite_nr, satellites_name, time_slot, rgb, area, in_msg,data_CTP):
+def load_rgb(satellite, satellite_nr, satellites_name, time_slot, rgb, area, in_msg, data_CTP):
     if rgb != 'CTP':
       # read the data we would like to forecast
       global_data_RGBforecast = GeostationaryFactory.create_scene(satellite, satellite_nr, satellites_name, time_slot)
@@ -454,16 +451,17 @@ if __name__ == '__main__':
 
     # load a few standard things 
     from get_input_msg import get_input_msg
-    in_msg = get_input_msg('input_template')
+    in_msg = get_input_msg('input_MSG')
     in_msg.resolution = 'i'
+    #in_msg.sat="Meteosat-"
     in_msg.sat_nr = 9
     in_msg.add_title=False
     in_msg.outputDir='./pics/'
     in_msg.outputFile='WS_%(rgb)s-%(area)s_%y%m%d%H%M'
     in_msg.fill_value = [0,0,0] # black
-    in_msg.reader_level = "seviri-level4"
+    #in_msg.reader_level = "seviri-level4"
     #in_msg.fill_value = None    # transparent
-    #colormap='rainbow'
+    #colormap='rainbow' 
     colormap='greys'
 
     rapid_scan_mode = False
@@ -575,7 +573,8 @@ if __name__ == '__main__':
             minute=00
     
     
-    
+    #outputDir="/data/COALITION2/PicturesSatellite/LEL_results_wind/"
+    outputDir="/data/cinesat/out/"
     
     while time_slot <= time_slotSTOP:
     
@@ -614,24 +613,25 @@ if __name__ == '__main__':
           area_tuple = (proj4_string, area_extent)
       
           # read CTP to distinguish high, medium and low clouds
-          global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(in_msg.sat_nr).zfill(2), "seviri", time_slot)
+          print "*** read CTP for ", in_msg.sat, in_msg.sat_nr_str(), "seviri", str(time_slot)
+          global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, in_msg.sat_nr_str(), "seviri", time_slot)
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
-          area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
-          area_loaded = load_products(global_data_CTP, ['CTP'], in_msg, area_loaded)
+          #area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
+          area_loaded = load_products(global_data_CTP, ['CTP'], in_msg, get_area_def("ccs4"))
           data_CTP = global_data_CTP.project(area)
               
           [nx,ny]=data_CTP['CTP'].data.shape
 
 
           # read all rgbs
-          global_data = GeostationaryFactory.create_scene(in_msg.sat, str(in_msg.sat_nr).zfill(2), "seviri", time_slot)
+          global_data = GeostationaryFactory.create_scene(in_msg.sat, in_msg.sat_nr_str(), "seviri", time_slot)
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
           area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
           area_loaded = load_products(global_data, rgbs, in_msg, area_loaded)
           data = global_data.project(area)
 
           if downscaling_data == True:
-               from Mecikalski_test_LEL import downscale          
+               from plot_coalition2_EuropeS95 import downscale          
                data = downscale(data, mode = mode_downscaling)
 
    
@@ -646,7 +646,7 @@ if __name__ == '__main__':
                   else:
                       p_min=pressure_limits[len(pressure_limits)-1-level]  
       
-                  hrw_data = read_HRW("meteosat", sat_nr, "seviri", time_slot, ntimes, \
+                  hrw_data = read_HRW(in_msg.sat, sat_nr, "seviri", time_slot, ntimes, \
                                        min_correlation=min_correlation, min_conf_nwp=min_conf_nwp, \
                                        min_conf_no_nwp=min_conf_no_nwp, cloud_type=cloud_type, p_limits=[p_min,p_max])
       
@@ -755,7 +755,11 @@ if __name__ == '__main__':
                             
                             forecasts_out[channel_nr[rgb],ind_time,forecasts_out[channel_nr[rgb],ind_time,:,:]==no_data] = np.nan
                             forecasts_out[channel_nr[rgb],ind_time,:,:] = ma.masked_invalid(forecasts_out[channel_nr[rgb],ind_time,:,:])
-                            outputFile = "/data/COALITION2/PicturesSatellite/LEL_results_wind//"+yearS+"-"+monthS+"-"+dayS+"/channels/%s_%s_%s_t%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime))
+
+                            # time_slot.strftime( outputDir )
+                            if not nrt:
+                                outputDir = outputDir+"/"+ yearS+"-"+monthS+"-"+dayS+"/channels/"
+                            outputFile = outputDir +"/"+ "%s_%s_%s_t%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime))
                             #outputFile = "/opt/users/lel/PyTroll/scripts/channels/%s_%s_%s_t%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime))
                             
                             

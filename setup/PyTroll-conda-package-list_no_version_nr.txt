@@ -106,7 +106,7 @@ pillow
 pip
 pixman
 ply
-proj.4
+proj4
 psutil
 ptyprocess
 py

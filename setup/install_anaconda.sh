@@ -29,7 +29,8 @@ echo "When asked: Do you approve the license terms? [yes|no]"
 echo "answer with >>> yes"
 echo ""
 echo "When asked where to install anaconda, the answer should look like this:"
-echo "[/home/lom/users/"$LOGNAME"/anaconda2] >>> /opt/users/"$LOGNAME"/PyTroll/packages/anaconda2"
+#echo "[/home/lom/users/"$LOGNAME"/anaconda2] >>> /opt/users/"$LOGNAME"/PyTroll/packages/anaconda2"
+echo "[/home/lom/users/"$LOGNAME"/anaconda3] >>> /opt/users/"$LOGNAME"/PyTroll/packages/anaconda3"
 echo "you have to press enter to approve the installation location"
 echo "(this is the default for this installation)"
 echo ""
@@ -39,13 +40,17 @@ echo ""
 echo "Did you read the last lines? (Continue with enter)"
 echo ""
 read junk
-/opt/users/common/packages/Anaconda2-2.4.1-Linux-x86_64.sh
+#/opt/users/common/packages/Anaconda2-2.4.1-Linux-x86_64.sh
+#/opt/users/common/packages/Anaconda2-4.0.0-Linux-x86_64.sh
+/opt/users/common/packages/Anaconda3-4.0.0-Linux-x86_64.sh
 export HOME=$HOME_ORG
 
 
 # add anaconda to your path
 echo "the script changes your \$PATH and \$PYTHONPATH to avoid conflicts:"
-export PATH=$PYTROLLHOME/packages/anaconda2/bin:$PATH
+#export PATH=$PYTROLLHOME/packages/anaconda2/bin:$PATH
+export PATH=$PYTROLLHOME/packages/anaconda3/bin:$PATH
 echo "\$PATH="$PATH
-export PYTHONPATH=$PYTROLLHOME/packages/anaconda2/bin:$PYTROLLHOME/scripts
+#export PYTHONPATH=$PYTROLLHOME/packages/anaconda2/bin:$PYTROLLHOME/scripts
+export PYTHONPATH=$PYTROLLHOME/packages/anaconda3/bin:$PYTROLLHOME/scripts
 echo "\$PYTHONPATH="$PYTHONPATH

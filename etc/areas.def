@@ -565,9 +565,10 @@ REGION: scan500m {
 	AREA_EXTENT:	(-1268854.1266382949, -4150234.8425892727, 779145.8733617051, -2062234.8425892727)
 };
 
-# python coord2area_def_merc.py blitzortung 24.15 71.25 -22.1 52.15  min_lat max_lat min_lon max_lon
-REGION: blitzortung {
-        NAME:   blitzortung
+# same projection as blitzortung
+# python coord2area_def_merc.py EuroMercator 24.15 71.25 -22.1 52.15  min_lat max_lat min_lon max_lon
+REGION: EuroMercator {
+        NAME:   EuroMercator
         PCS_ID: merc_15.025_0
         PCS_DEF:        proj=merc,lat_0=0,lon_0=15.025,ellps=WGS84
 	XSIZE: 690

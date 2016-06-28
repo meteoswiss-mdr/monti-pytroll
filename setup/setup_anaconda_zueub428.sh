@@ -1,3 +1,4 @@
+
 #!/bin/bash
 #
 # script to install a virtual environment called "PyTroll"
@@ -24,5 +25,6 @@ export PATH=/opt/users/common/packages/anaconda2/bin:$PATH
 echo "\$PATH="$PATH
 
 #export PYTHONPATH=/opt/users/common/packages/anaconda2/bin:$PYTROLLHOME/scripts
+#unset PYTHONPATH
 export PYTHONPATH=$PYTROLLHOME/scripts
-echo "\$PYTHONPATH="$PYTHONPATH
+#echo "\$PYTHONPATH="$PYTHONPATH

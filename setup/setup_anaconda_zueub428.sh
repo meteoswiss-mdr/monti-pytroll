@@ -21,7 +21,8 @@ mkdir -p $PYTROLLHOME/packages
 
 # add anaconda to your path
 echo "the script changes your \$PATH and \$PYTHONPATH to avoid conflicts:"
-export PATH=/opt/users/common/packages/anaconda2/bin:$PATH
+#export PATH=/opt/users/common/packages/anaconda2/bin:$PATH
+export PATH=/opt/users/common/packages/anaconda3/bin:$PATH
 echo "\$PATH="$PATH
 
 #export PYTHONPATH=/opt/users/common/packages/anaconda2/bin:$PYTROLLHOME/scripts

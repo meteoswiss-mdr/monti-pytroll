@@ -20,8 +20,10 @@
 
 # set paths for anaconda (again, for security)
 export PYTROLLHOME=/opt/users/$LOGNAME/PyTroll/
-export PATH=$PYTROLLHOME/packages/anaconda2/bin:$PATH
-export PYTHONPATH=$PYTROLLHOME/packages/anaconda2/bin:$PYTROLLHOME/scripts
+#export PATH=$PYTROLLHOME/packages/anaconda2/bin:$PATH
+#export PYTHONPATH=$PYTROLLHOME/packages/anaconda2/bin:$PYTROLLHOME/scripts
+export PATH=$PYTROLLHOME/packages/anaconda3/bin:$PATH
+export PYTHONPATH=$PYTROLLHOME/packages/anaconda3/bin:$PYTROLLHOME/scripts
 
 # activate virtual environment
 source activate PyTroll

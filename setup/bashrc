@@ -23,14 +23,22 @@ export PPP_CONFIG_DIR=$PYTROLLHOME/etc/
 export XRIT_DECOMPRESS_PATH=/opt/users/common/bin/xRITDecompress
 export XRIT_DECOMPRESS_OUTDIR=/tmp/SEVIRI_DECOMPRESSED_$LOGNAME
 #export PY_SHAPEFILES=$PYTROLLHOME/shapes/
-export PYTHONPATH=/opt/users/common/packages/anaconda2/bin:$PYTROLLHOME/scripts
 export PSP_CONFIG_FILE=/opt/users/common/packages/pyspectral_rsr_data/pyspectral.cfg
 
-# added by Anaconda2 2.4.1 installer
-export PATH="/opt/users/common/packages/anaconda2/bin:$PATH"
+## added by Anaconda2 2.4.1 installer
+#export PATH="/opt/users/common/packages/anaconda2/bin:$PATH"
+#
+## easy access to the easy-install file
+#alias easy-install.pth='emacs /opt/users/common/packages/anaconda2/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth &'
+#export PYTHONPATH=/opt/users/common/packages/anaconda2/bin:$PYTROLLHOME/scripts
+
+# added by Anaconda3 4.0.0 installer
+export PATH="/opt/users/common/packages/anaconda3/bin:$PATH"
 
 # easy access to the easy-install file
-alias easy-install.pth='emacs /opt/users/common/packages/anaconda2/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth &'
+alias easy-install.pth='emacs /opt/users/common/packages/anaconda3/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth &'
+
+export PYTHONPATH=/opt/users/common/packages/anaconda3/bin:$PYTROLLHOME/scripts
 
 # easier activation and deactivation of the virtual environment PyTroll
 alias activate='source activate PyTroll_$LOGNAME'

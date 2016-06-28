@@ -25,7 +25,8 @@ conda config --set ssl_verify false
 
 echo "*** Create virtual environement and install python packages according to PyTroll-conda-package-list.txt"
 echo "======================================================================================================="
-conda create -n PyTroll_$(logname) --file PyTroll-conda-package-list_no_version_nr.txt
+conda create -n PyTroll_$(logname) --copy --file PyTroll-conda-package-list_no_version_nr.txt
+### !!! without copy conda does not create shaired library files !!!
 echo "Could you create the virtual environment? (press enter to continue or CTRL+c to abort)"
 read junk
 

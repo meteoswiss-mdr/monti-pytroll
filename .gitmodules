@@ -44,5 +44,5 @@
 	branch = pre-master
 [submodule "packages/pydecorate"]
 	path = packages/pydecorate
-	url = https://code.google.com/p/pydecorate/
+	url = https://github.com/pytroll/pydecorate.git
 	branch = master

@@ -73,6 +73,16 @@ def input(in_msg):
     in_msg.rapid_scan_mode = False   # use 15 and 30min for estimating the updraft
     #in_msg.rapid_scan_mode = True   # use  5 and 10min for estimating the updraft (useful if no wind data is available)
 
+    # channels needed to produce the coalition2 product
+    in_msg.RGBs=[]
+    in_msg.RGBs.append('IR_039c')      # colored version
+    in_msg.RGBs.append('WV_062c')      # colored version
+    in_msg.RGBs.append('WV_073c')      # colored version
+    in_msg.RGBs.append('IR_087c')      # colored version
+    in_msg.RGBs.append('IR_097c')      # colored version
+    in_msg.RGBs.append('IR_108c')      # colored version
+    in_msg.RGBs.append('IR_120c')      # colored version
+    in_msg.RGBs.append('IR_134c')      # colored version
 
     in_msg.forced_mask = 'no_mask'              
     #in_msg.forced_mask = 'IR_039_minus_IR_108'  # force to include any pixel (in mature_mask) regardless of the other thresholds

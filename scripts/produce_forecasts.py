@@ -34,6 +34,7 @@ from particles_displacement import particles_displacement
 import numpy.ma as ma
 import netCDF4
 import pickle
+from scipy import ndimage
 
 
 import scp_settings
@@ -79,7 +80,7 @@ def m_to_pixel(value,size,conversion): #,coordinate):
             m[value==np.nan] = np.nan
             return ms
 
-def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure', area='ccs4'):
+def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure', area='ccs4', cosmo = "cosmo2"):
 
     hour_run=hour//3 * 3
     if hour-hour_run<2:
@@ -116,10 +117,10 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
         print "    unknown zlevel: ", zlevel
         quit()
         
-    cosmoDir='/data/COALITION2/database/cosmo2/'
+    cosmoDir='/data/COALITION2/database/cosmo/' #20150810_cosmo2_ccs4
 
-    file_cosmo_1 = (cosmoDir+'/%s_lm_fine'+areaS+zlevelS+'/%s_%s_cosmo2_UV'+areaS+zlevelS+'.nc') % (yearS+monthS+dayS,yearS+monthS+dayS+hour_runS,hour_forecastS)        
-    file_cosmo_2 = (cosmoDir+'/%s_lm_fine'+areaS+zlevelS+'/%s_%s_cosmo2_UV'+areaS+zlevelS+'.nc') % (yearS+monthS+dayS,yearS+monthS+dayS+hour_runS,hour_forecast_nextS)        
+    file_cosmo_1 = (cosmoDir+'/%s_'+cosmo+areaS+zlevelS+'/%s_%s_%s_UV'+areaS+zlevelS+'.nc') % (yearS+monthS+dayS,yearS+monthS+dayS+hour_runS,hour_forecastS,cosmo)        
+    file_cosmo_2 = (cosmoDir+'/%s_'+cosmo+areaS+zlevelS+'/%s_%s_%s_UV'+areaS+zlevelS+'.nc') % (yearS+monthS+dayS,yearS+monthS+dayS+hour_runS,hour_forecast_nextS,cosmo)        
     
     print '... read ', file_cosmo_1
     print '... read ', file_cosmo_2
@@ -318,7 +319,7 @@ def compute_new_xy(xy1, dx_ds, dy_ds,  max_x_m, max_y_m):
     return (xy1_px, xy2_px, xy2)
 
 def mask_rgb_based_pressure(data,p_min,p_max,data_CTP):
-    data[data.mask==True ] = no_data
+    ####################################data[data.mask==True ] = no_data
     data = np.where(np.logical_or(data_CTP['CTP'].data>=p_max,data_CTP['CTP'].data<p_min),no_data,data)
     
     return data
@@ -330,8 +331,8 @@ if __name__ == '__main__':
     
     time_start_TOT = time.time()
     detailed = True 
-
-    area="ccs4c2" #"#"ccs4" #in_windshift.ObjArea
+ 
+    area = "ccs4c2" #"ccs4" #"#in_windshift.ObjArea
 
     title_color=(255,255,255)
     #layer=''
@@ -355,7 +356,7 @@ if __name__ == '__main__':
     # satellite for HRW winds
     sat_nr = "08" #in_windshift.sat_nr
 
-    plot_DisplMeter = True
+    plot_DisplMeter = False #if you want to plot the forecast for each channel
     
     
     rgbs = ['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134']  #in_windshift.rgb
@@ -371,15 +372,38 @@ if __name__ == '__main__':
     in_msg.outputDir='./pics/'
     in_msg.outputFile='WS_%(rgb)s-%(area)s_%y%m%d%H%M'
     in_msg.fill_value = [0,0,0] # black
+    in_msg.reader_level = "seviri-level4"
     #in_msg.fill_value = None    # transparent
     #colormap='rainbow'
     colormap='greys'
 
-    NumForecast=6 #number of forecasts you want to produce from observation at t=0
+    rapid_scan_mode = False
+    
+    dt_forecast1 = 15
+    dt_forecast2 = 30
+    
+    if rapid_scan_mode ==True:
+            dt_forecast1 = 5
+            dt_forecast2 = 10
+    if rapid_scan_mode == True:
+        print "... RAPID SCAN MODE"
+    else:
+        print "... NOT RAPID SCAN MODE"
+    
+    dt_forecast1S = "%02d" % dt_forecast1
+    dt_forecast2S = "%02d" % dt_forecast2
+    
     ForecastTime=5 #time in minutes from observation at t=0 when you want each observation (first forecast after ForecastTime, second after 2*ForecastTime...)
     NumComputationSteps=1 #number of computation time steps: the number of steps when the velocity should be updated within each ForecastTime
-    
-    
+    NumForecast=dt_forecast2/ForecastTime #6number of forecasts you want to produce from observation at t=0
+
+    downscaling_data = True
+    mode_downscaling = 'gaussian_225_125'
+    #mode_downscaling = 'convolve_405_300'
+    #mode_downscaling = 'gaussian_150_100'
+    #mode_downscaling = 'no_downscaling'    
+
+
 #integration method, uncomment one
     #method="rk4"
     method="euler" 
@@ -513,8 +537,11 @@ if __name__ == '__main__':
           area_loaded = load_products(global_data, rgbs, in_msg, area_loaded)
           data = global_data.project(area)
 
+          if downscaling_data == True:
+               from Mecikalski_test_LEL import downscale          
+               data = downscale(data, mode = mode_downscaling)
 
-      
+   
           # read wind field
           if wind_source=="HRW":
               u_d=np.zeros((n_levels,nx,ny))
@@ -601,7 +628,7 @@ if __name__ == '__main__':
                           forecasts_NextStep[channel_nr[rgb],level,:,:] = mask_rgb_based_pressure(data[rgb].data,p_min,p_max, data_CTP)
                       
                       #check if for current channel (rgb) you also need the 30 min forecast
-                      if t*ForecastTime > 15:
+                      if t*ForecastTime > dt_forecast1:
                           if any(rgb in s for s in rgbs_only15min):
                               continue
                       
@@ -617,8 +644,8 @@ if __name__ == '__main__':
                       forecast2 = fill_with_closest_pixel(forecast2)
                       forecasts_NextStep[channel_nr[rgb],level,:,:] = forecast2
                       
-                      if t*ForecastTime == 15 or t*ForecastTime == 30:
-                          if t*ForecastTime == 15:
+                      if t*ForecastTime == dt_forecast1 or t*ForecastTime == dt_forecast2:
+                          if t*ForecastTime == dt_forecast1:
                               ind_time = 0
                               
                           else:
@@ -635,15 +662,24 @@ if __name__ == '__main__':
                             
                             forecasts_out[channel_nr[rgb],ind_time,forecasts_out[channel_nr[rgb],ind_time,:,:]==no_data] = np.nan
                             forecasts_out[channel_nr[rgb],ind_time,:,:] = ma.masked_invalid(forecasts_out[channel_nr[rgb],ind_time,:,:])
-                            #outputFile = "/data/COALITION2/PicturesSatellite/LEL_results_wind//"+yearS+"-"+monthS+"-"+dayS+"/channels/%s_%s_%s_t%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime))
-                            outputFile = "/opt/users/lel/PyTroll/scripts/channels/%s_%s_%s_t%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime))
+                            outputFile = "/data/COALITION2/PicturesSatellite/LEL_results_wind//"+yearS+"-"+monthS+"-"+dayS+"/channels/%s_%s_%s_t%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime))
+                            #outputFile = "/opt/users/lel/PyTroll/scripts/channels/%s_%s_%s_t%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime))
                             
                             
                             print "... pickle data to file: ", outputFile
+                            
+                            PIK = []
                             if area == "ccs4":
-                                pickle.dump( forecasts_out[channel_nr[rgb],ind_time,:,:], open(outputFile, "wb" ) )
-                            else: 
-                                pickle.dump( forecasts_out[channel_nr[rgb],ind_time,20:nx-40,85:ny-135], open(outputFile, "wb" ) )
+                                    PIK.append( forecasts_out[channel_nr[rgb],ind_time,:,:])
+                            elif area == "ccs4c2": 
+                                    PIK.append( forecasts_out[channel_nr[rgb],ind_time,20:nx-40,85:ny-135])
+                            else:
+                                    print "unknown area, saving entire domain"
+                                    PIK.append( forecasts_out[channel_nr[rgb],ind_time,:,:])
+                                
+                            PIK.append(mode_downscaling)
+                            print mode_downscaling
+                            pickle.dump(PIK, open(outputFile,"wb"))
                             
                             plot_fore = forecasts_out[channel_nr[rgb],ind_time,:,:]
                             plot_fore = np.where (plot_fore>0,plot_fore,np.nan)

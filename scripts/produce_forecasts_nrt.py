@@ -35,8 +35,7 @@ import numpy.ma as ma
 import netCDF4
 import pickle
 from scipy import ndimage
-from astropy.convolution import MexicanHat2DKernel
-
+from my_msg_module import check_input
 
 import scp_settings
 scpOutputDir = scp_settings.scpOutputDir
@@ -342,6 +341,7 @@ def nowcastRGB(forecast1,xy1_py,xy2_px):
     return forecast2
 
 def load_rgb(satellite, satellite_nr, satellites_name, time_slot, rgb, area, in_msg, data_CTP):
+
     if rgb != 'CTP':
       # read the data we would like to forecast
       global_data_RGBforecast = GeostationaryFactory.create_scene(satellite, satellite_nr, satellites_name, time_slot)
@@ -451,15 +451,15 @@ if __name__ == '__main__':
 
     # load a few standard things 
     from get_input_msg import get_input_msg
-    in_msg = get_input_msg('input_MSG')
+    in_msg = get_input_msg('input_coalition2')
     in_msg.resolution = 'i'
-    #in_msg.sat="Meteosat-"
+    in_msg.sat="Meteosat-"
     in_msg.sat_nr = 9
     in_msg.add_title=False
     in_msg.outputDir='./pics/'
     in_msg.outputFile='WS_%(rgb)s-%(area)s_%y%m%d%H%M'
     in_msg.fill_value = [0,0,0] # black
-    #in_msg.reader_level = "seviri-level4"
+    in_msg.reader_level = "seviri-level2"
     #in_msg.fill_value = None    # transparent
     #colormap='rainbow' 
     colormap='greys'
@@ -565,6 +565,7 @@ if __name__ == '__main__':
                 time_slot -= timedelta(minutes=delay)
             nrt = True
             time_slotSTOP = time_slot 
+            print "... chose time (automatically): ", str(time_slotSTOP)
         else: # fixed date for text reasons
             year=2014          # 2014 09 15 21 35
             month= 7           # 2014 07 23 18 30
@@ -579,6 +580,8 @@ if __name__ == '__main__':
     while time_slot <= time_slotSTOP:
     
           print time_slot
+          in_msg.datetime = time_slot
+
           year = time_slot.year
           month = time_slot.month
           day = time_slot.day
@@ -605,6 +608,12 @@ if __name__ == '__main__':
           print "x min ", obj_area.area_extent[0]
           print "x size ", obj_area.pixel_size_x
           
+          # check if input data is complete 
+          if in_msg.verbose:
+              print "*** check input data", in_msg.RGBs
+          RGBs = check_input(in_msg, in_msg.sat+in_msg.sat_nr_str(), in_msg.datetime)  
+          # in_msg.sat_nr might be changed to backup satellite
+
           # define area
           proj4_string = obj_area.proj4_string            
           # e.g. proj4_string = '+proj=geos +lon_0=0.0 +a=6378169.00 +b=6356583.80 +h=35785831.0'
@@ -622,13 +631,26 @@ if __name__ == '__main__':
               
           [nx,ny]=data_CTP['CTP'].data.shape
 
-
           # read all rgbs
+          print "*** read all other channels for ", in_msg.sat, in_msg.sat_nr_str(), "seviri", str(time_slot)
           global_data = GeostationaryFactory.create_scene(in_msg.sat, in_msg.sat_nr_str(), "seviri", time_slot)
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
           area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
           area_loaded = load_products(global_data, rgbs, in_msg, area_loaded)
           data = global_data.project(area)
+
+          if False:
+              from trollimage.image import Image as trollimage
+              from trollimage.colormap import rainbow
+              prop = data["IR_108"].data
+              min_data = prop.min()
+              max_data = prop.max()
+              colormap = deepcopy(rainbow)
+              colormap.set_range(min_data, max_data)
+              img = trollimage(prop, mode="L", fill_value=[0,0,0])
+              img.colorize(colormap)
+              img.show()
+              quit()
 
           if downscaling_data == True:
                from plot_coalition2_EuropeS95 import downscale          

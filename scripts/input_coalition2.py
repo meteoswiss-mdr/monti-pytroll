@@ -1,11 +1,10 @@
-
 def input(in_msg):
 
     print "*** read input from input_coalition2.py"
 
     #------------------------------------------------------------------------
     # if not specified (False), current (last) observation time is chosen  
-    # chosse specification, if you want a default time without command line arguments 
+    # choose specification, if you want a default time without command line arguments 
     # (the specified time is overwritten by the command line arguments of plot_msg.py)
     #------------------------------------------------------------------------
     if False:
@@ -32,16 +31,29 @@ def input(in_msg):
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('EuropeCanary')    # upper third of MSG disk, satellite at 0.0 deg East, full resolution 
     #in_msg.areas.append('EuropeCanary95')  # upper third of MSG disk, satellite at 9.5 deg East, full resolution 
-    #in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
+    in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
     #in_msg.areas.append('fullearth')       # full earth 600x300                    # does not yet work
     #in_msg.areas.append('met09globe')      # Cropped globe MSG image 3620x3620     # does not yet work
     #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
     #in_msg.areas.append('odysseyS25')      # Area of Odyssey composite (factor 2.5 smaller)
-    #in_msg.area = 'ccs4'
-    in_msg.area = "EuropeCanaryS95" # "ccs4" "blitzortung" #"eurotv" # "eurotv"
-
+    in_msg.areas.append('ccs4')
+    #in_msg.areas.append('EuropeCanaryS95') # "ccs4" "blitzortung" #"eurotv" # "eurotv"
+    #in_msg.areas.append("blitzortung")
+    
+    
+    in_msg.broad_areas = ['eurotv','blitzortung','EuropeCanaryS95','EuropeCanary95','germ','EuropeCanary','euro4','fullearth','met09globe','met09globeFull','odysseyS25']
+    
+    in_msg.areasNoRapidScan = ['fullearth','met09globe','met09globeFull'] #should also be changed to coordinates check!!!!
+      
+    in_msg.settings = "default" # the settings will be automatically defined depending on the area chosen
+      #in_msg.settings == "manual"
+    
+    #near real time or offline (will be overwritten depending on the date) ###changed: should know, based on the date, where to look for things!!!
+    in_msg.nrt = False
+    #in_msg.nrt = True 
+    
     # set cloud mask 
     #-------------------------
     #in_msg.show_clouds = 'all'
@@ -49,29 +61,11 @@ def input(in_msg):
     #in_msg.show_clouds = 'mature'
     in_msg.show_clouds = 'developing_and_mature'
 
-    in_msg.use_TB_forecast = True    # use forecasted brightness temperatures (wind data required)
-    in_msg.use_TB_forecast = False   # use brightness temperatures without lagrangian displacement 
-
     # directory containing the forecasted brightness temperatures
-    in_msg.nowcastDir="/data/cinesat/out/"
-    #in_msg.nowcastDir="/data/COALITION2/PicturesSatellite/LEL_results_wind//"+yearS+"-"+monthS+"-"+dayS+"/channels/" 
+    in_msg.nowcastDirNrt="/data/cinesat/out/"
+    in_msg.nowcastDirOffline= '/data/COALITION2/PicturesSatellite/LEL_results_wind/'
     #in_msg.nowcastDir="/opt/users/lel/PyTroll/scripts/channels_new//" 
-
-    in_msg.mode_downscaling = 'gaussian_225_125'
-    #in_msg.mode_downscaling = 'convolve_405_300'
-    #in_msg.mode_downscaling = 'gaussian_150_100'
-    #in_msg.mode_downscaling = 'no_downscaling'
-
-    in_msg.mask_labelsSmall_lowUS = True   # ???
-    in_msg.mask_labelsSmall_lowUS = False  # ???
-
-    in_msg.clean_mask = 'skimage' 
-    #in_msg.clean_mask = 'scipy' 
-    #in_msg.clean_mask = 'both' 
-    #in_msg.clean_mask = 'no_cleaning'
-
-    in_msg.rapid_scan_mode = False   # use 15 and 30min for estimating the updraft
-    #in_msg.rapid_scan_mode = True   # use  5 and 10min for estimating the updraft (useful if no wind data is available)
+    #in_msg.nowcastDir= '/data/COALITION2/PicturesSatellite/LEL_results_wind/'
 
     # channels needed to produce the coalition2 product
     in_msg.RGBs=[]
@@ -84,34 +78,31 @@ def input(in_msg):
     in_msg.RGBs.append('IR_120c')      # colored version
     in_msg.RGBs.append('IR_134c')      # colored version
 
-    in_msg.forced_mask = 'no_mask'              
-    #in_msg.forced_mask = 'IR_039_minus_IR_108'  # force to include any pixel (in mature_mask) regardless of the other thresholds
-    #in_msg.forced_mask = 'CloudType'
-
     #-----------------------------
     # choose production of results
     #-----------------------------
     in_msg.results = ['C2rgb']
+    in_msg.results.append('C2rgbHRV')
     # --------------------------------------
     # choose production of auxiliary results
     # --------------------------------------
     # mask that removed the thin cirrus
     in_msg.aux_results=[]
-    in_msg.aux_results.append('mask_cirrus')
-    in_msg.aux_results.append('tests_glationation')
-    in_msg.aux_results.append('tests_optical_thickness')
-    in_msg.aux_results.append('tests_updraft')
-    in_msg.aux_results.append('tests_small_ice')
-    in_msg.aux_results.append('indicator_glationation')
-    in_msg.aux_results.append('indicator_optical_thickness')
-    in_msg.aux_results.append('indicator_updraft')
-    in_msg.aux_results.append('indicator_small_ice')
-    in_msg.aux_results.append('labelled_objects')
-    in_msg.aux_results.append('final_mask')
-    in_msg.aux_results.append('forced_mask')
-    in_msg.aux_results.append('mature_mask')
-    in_msg.aux_results.append('developing_mask')
-    in_msg.aux_results.append('IR_108')
+    #in_msg.aux_results.append('mask_cirrus')
+    #in_msg.aux_results.append('tests_glationation')
+    #in_msg.aux_results.append('tests_optical_thickness')
+    #in_msg.aux_results.append('tests_updraft')
+    #in_msg.aux_results.append('tests_small_ice')
+    #in_msg.aux_results.append('indicator_glationation')
+    #in_msg.aux_results.append('indicator_optical_thickness')
+    #in_msg.aux_results.append('indicator_updraft')
+    #in_msg.aux_results.append('indicator_small_ice')
+    #in_msg.aux_results.append('labelled_objects')
+    #in_msg.aux_results.append('final_mask')
+    #in_msg.aux_results.append('forced_mask')
+    #in_msg.aux_results.append('mature_mask')
+    #in_msg.aux_results.append('developing_mask')
+    #in_msg.aux_results.append('IR_108')
   
 
     # please download the shape file 
@@ -132,13 +123,16 @@ def input(in_msg):
     #in_msg.sat_nr=10
     #in_msg.RSS=False 
 
-    in_msg.reader_level="seviri-level2"
-    #in_msg.reader_level="seviri-level4" 
+    # switch off Rapid scan, if large areas are wanted 
+    if ('fullearth' in in_msg.areas) or ('met09globe' in in_msg.areas) or ('met09globeFull' in in_msg.areas): 
+       in_msg.RSS=False 
 
     #in_msg.outputDir='./pics/'
     #in_msg.outputDir = "./%Y-%m-%d/%Y-%m-%d_%(rgb)s-%(area)s/"
     #in_msg.outputDir = '/data/cinesat/out/'
-    in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
+    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
+    in_msg.outputDirOffline =  '/opt/users/lel/PyTroll/scripts//Mecikalski/'
+    in_msg.outputDirNrt = '/opt/users/lel/PyTroll/scripts//Mecikalski_online/'#'/data/cinesat/out/'
     #if in_msg.only_obs_noForecast == True:
     #    in_msg.outputDir = "/opt/users/lel/PyTroll/scripts//Mecikalski_obs/"
     #elif in_msg.RSS == True:
@@ -148,36 +142,205 @@ def input(in_msg):
 
     #in_msg.postprocessing_areas=['ccs4']
     in_msg.postprocessing_composite=["C2rgb-IR_108","C2rgb-HRV"]    
-
-    in_msg.scpOutput = True
-    #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
+    
+    in_msg.outputDirForecastsNrt = "/data/cinesat/out/"
+    in_msg.outputDirForecastsOffline = "/data/COALITION2/PicturesSatellite/LEL_results_wind/"
+   
+    in_msg.scpOutput = False
+    in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
 
-    # switch off Rapid scan, if large areas are wanted 
-    if ('fullearth' in in_msg.areas) or ('met09globe' in in_msg.areas) or ('met09globeFull' in in_msg.areas): 
-       in_msg.RSS=False 
-
-    # make some automatic adjustments to the input 
-    europe_areas = ["eurotv","blitzortung","EuropeCanaryS95"]
-    if in_msg.area not in europe_areas:
-        scale = "local"
+    in_msg.chosen_settings={}
+    #settings: set to None for automatic choice
+    if in_msg.settings == "manual":
+        
+        check_overwriting = 0; current_setting = 'use_TB_forecast'
+        
+        #1) SETTING: choose one
+        in_msg.chosen_settings['use_TB_forecast'] = True; check_overwriting+=1    # use forecasted brightness temperatures (wind data required) [suggested for CH]
+        #in_msg.chosen_settings['use_TB_forecast'] = False; check_overwriting+=1   # use brightness temperatures without lagrangian displacement [required for area not covered by NWCSAF and cosmo]
+        #in_msg.chosen_settings['use_TB_forecast'] = None; check_overwriting+=1 
+        
+        if check_overwriting > 1:
+            print "you are overwriting your settings!!!! Check: ", current_setting
+            quit()
+            
+        
+        check_overwriting = 0; current_setting = 'mode_downscaling'
+        
+        #2) SETTING: choose one
+        in_msg.chosen_settings['mode_downscaling'] = 'gaussian_225_125'; check_overwriting+=1 #[suggested for CH]
+        #in_msg.chosen_settings['mode_downscaling'] = 'convolve_405_300'; check_overwriting+=1
+        #in_msg.chosen_settings['mode_downscaling'] = 'gaussian_150_100'; check_overwriting+=1
+        #in_msg.chosen_settings['mode_downscaling'] = 'no_downscaling'; check_overwriting+=1 #[suggested for non local areas]
+        #in_msg.chosen_settings['mode_downscaling'] = None; check_overwriting+=1
+        
+        if check_overwriting > 1:
+            print "you are overwriting your settings!!!! Check: ", current_setting
+            quit()
+                    
+        
+        check_overwriting = 0; current_setting = 'mask_labelsSmall_lowUS'
+        
+        #3) SETTING: choose one
+        in_msg.chosen_settings['mask_labelsSmall_lowUS'] = True; check_overwriting+=1   # mask that removes the small clouds with low US
+        #in_msg.chosen_settings['mask_labelsSmall_lowUS'] = False; check_overwriting+=1  # [suggested if clean_mask = 'no_cleaning'; suggested for non local]
+        #in_msg.chosen_settings['mask_labelsSmall_lowUS'] = None; check_overwriting+=1
+        
+        if check_overwriting > 1:
+            print "you are overwriting your settings!!!! Check: ", current_setting
+            quit()
+                    
+        
+        check_overwriting = 0; current_setting = 'clean_mask'
+        
+        #4) SETTING: choose one
+        in_msg.chosen_settings['clean_mask'] = 'skimage'; check_overwriting+=1 #[suggested for local]
+        #in_msg.chosen_settings['clean_mask'] = 'scipy'; check_overwriting+=1 
+        #in_msg.chosen_settings['clean_mask'] = 'both'; check_overwriting+=1 
+        #in_msg.chosen_settings['clean_mask'] = 'no_cleaning'; check_overwriting+=1 #[suggested for non local]
+        #in_msg.chosen_settings['clean_mask'] = None; check_overwriting+=1
+        
+        if check_overwriting > 1:
+            print "you are overwriting your settings!!!! Check: ", current_setting
+            quit()
+                
+        
+        check_overwriting = 0; current_setting = 'rapid_scan_mode'
+        
+        #5) SETTING: choose one
+        in_msg.chosen_settings['rapid_scan_mode'] = False; check_overwriting+=1   # use 15 and 30min for estimating the updraft #[suggested for local]
+        #in_msg.chosen_settings['rapid_scan_mode'] = True; check_overwriting+=1   # use  5 and 10min for estimating the updraft (useful if no wind data is available) #[suggested for non local]
+        #in_msg.chosen_settings['rapid_scan_mode'] = None; check_overwriting+=1
+        
+        if check_overwriting > 1:
+            print "you are overwriting your settings!!!! Check: ", current_setting
+            quit()
+                    
+        
+        check_overwriting = 0; current_setting = 'forth_mask'
+        
+        #6) SETTING: choose one
+        in_msg.chosen_settings['forth_mask'] = 'IR_039_minus_IR_108'; check_overwriting+=1              
+        #in_msg.chosen_settings['forth_mask'] = 'CloudType'; check_overwriting+=1 #at the moment this is not possible (problems loading CT)
+        #in_msg.chosen_settings['forth_mask'] = 'no_mask'; check_overwriting+=1
+        #in_msg.chosen_settings['forth_mask'] = None; check_overwriting+=1
+        
+        if check_overwriting > 1:
+            print "you are overwriting your settings!!!! Check: ", current_setting
+            quit()
+                    
+        
+        check_overwriting = 0; current_setting = 'forced_mask'
+        
+        #7) SETTING: choose one
+        in_msg.chosen_settings['forced_mask'] = 'no_mask'; check_overwriting+=1              
+        #in_msg.chosen_settings['forced_mask'] = 'IR_039_minus_IR_108'; check_overwriting+=1  # force to include any pixel (in mature_mask) regardless of the other thresholds
+        #in_msg.chosen_settings['forced_mask'] = 'CloudType'; check_overwriting+=1
+        #in_msg.chosen_settings['forced_mask'] = None; check_overwriting+=1
+        if check_overwriting > 1:
+            print "you are overwriting your settings!!!! Check: ", current_setting
+            quit()
+                    
+        
+        check_overwriting = 0; current_setting = 'mask_cirrus'
+        
+        #8) SETTING: choose one
+        in_msg.chosen_settings['mask_cirrus'] = True; check_overwriting+=1
+        #in_msg.chosen_settings['mask_cirrus'] = False; check_overwriting+=1
+        #in_msg.chosen_settings['mask_cirrus'] = None; check_overwriting+=1
+        
+        if check_overwriting > 1:
+            print "you are overwriting your settings!!!! Check: ", current_setting
+            quit()
+                    
+        
+        #check_overwriting = 0; current_setting = 'reader_level'
+        
+        #9) SETTING: choose one
+        #in_msg.chosen_settings['reader_level']="seviri-level2"; check_overwriting+=1
+        #in_msg.chosen_settings['reader_level']="seviri-level4" ; check_overwriting+=1
+        #in_msg.chosen_settings['reader_level']= None; check_overwriting+=1
+        
+        #if check_overwriting > 1:
+        #    print "you are overwriting your settings!!!! Check: ", current_setting
+        #    quit()
+            
     else:
-        scale = "europe"
+        in_msg.chosen_settings['use_TB_forecast'] = None
+        in_msg.chosen_settings['mode_downscaling'] = None
+        in_msg.chosen_settings['mask_labelsSmall_lowUS'] = None
+        in_msg.chosen_settings['clean_mask'] = None
+        in_msg.chosen_settings['rapid_scan_mode'] = None
+        in_msg.chosen_settings['forth_mask'] = None            
+        in_msg.chosen_settings['forced_mask'] = None
+        in_msg.chosen_settings['mask_cirrus'] = None
+        #in_msg.chosen_settings['reader_level']= None    
 
-    if scale == "europe":
-        print "*** activated Europe version"
-        print "    activate rapid scan mode, no downscaling, "
-        print "    no TB forecasts, no cleaning and mask_labelsSmall_lowUS ???"
-        in_msg.rapid_scan_mode = True
-        in_msg.mode_downscaling = 'no_downscaling'
-        in_msg.use_TB_forecast = False
-        in_msg.clean_mask = 'no_cleaning'
-        in_msg.mask_labelsSmall_lowUS = False
+    #PLOTTING SETTINGS. Not used??
+    in_msg.title_color = (255,255,255)
+    #in_msg.layer = ''
+    in_msg.layer = ' 2nd layer'
+    #in_msg.layer = '3rd layer'
+    in_msg.add_rivers = False
+    in_msg.add_borders = False
+    in_msg.legend = True
 
+    #saving output labels as pickle or shelve
+    in_msg.pickle_labels = True; in_msg.shelve_labels = False
+    #in_msg.pickle_labels = False; in_msg.shelve_labels = True
+    #in_msg.pickle_labels = False; in_msg.shelve_labels = False
+
+    # load a few standard things 
+    #in_msg.outputFile = 'WS_%(rgb)s-%(area)s_%y%m%d%H%M'
+    #in_msg.fill_value = [0,0,0] # black
+    
+    #in_msg.fill_value = None    # transparent
+
+    #INPUT NEEDED FOR PRODUCE_FORECASTS!!!!!!!!!!!
+    #in_msg.ntimes = 2 #in_windshift.ntimes
+    #print "... aggregate winddata for ", ntimes, " timesteps" 
+    #min_correlation = 85 #in_windshift.min_correlation
+    #min_conf_nwp = 80 #in_windshift.min_conf_nwp
+    #min_conf_no_nwp = 80 #in_windshift.min_conf_no_nwp
+    #cloud_type = [5,6,7,8,9,10,11,12,13,14] #in_windshift.cloud_type
+
+    # satellite for HRW winds
+    ##sat_nr = "08" #in_windshift.sat_nr
+    
+    in_msg.channels15 = ['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134']
+    in_msg.channels30 = ['WV_062','WV_073','IR_097','IR_108','IR_134']
+
+    nrt = True
+
+    in_msg.settingsLocal = {}
+    in_msg.settingsLocal['use_TB_forecast'] = True
+    in_msg.settingsLocal['mode_downscaling'] = 'gaussian_225_125'
+    in_msg.settingsLocal['mask_labelsSmall_lowUS'] = True
+    in_msg.settingsLocal['clean_mask'] = 'skimage' 
+    in_msg.settingsLocal['rapid_scan_mode'] = False
+    in_msg.settingsLocal['forth_mask'] = 'IR_039_minus_IR_108'
+    in_msg.settingsLocal['forced_mask'] = 'no_mask'
+    in_msg.settingsLocal['mask_cirrus'] = True
+    #in_msg.settingsLocal["reader_level="seviri-level4"
+
+    in_msg.settingsBroad = {}
+    in_msg.settingsBroad['use_TB_forecast'] = False
+    in_msg.settingsBroad['mode_downscaling'] = 'no_downscaling'
+    in_msg.settingsBroad['mask_labelsSmall_lowUS'] = False
+    in_msg.settingsBroad['clean_mask'] = 'no_cleaning'
+    in_msg.settingsBroad['rapid_scan_mode'] = True 
+    in_msg.settingsBroad['forth_mask'] = 'IR_039_minus_IR_108'
+    in_msg.settingsBroad['forced_mask'] = 'no_mask'
+    in_msg.settingsBroad['mask_cirrus'] = True            
+    #in_msg.settingsBroad['reader_level="seviri-level2"         
+    
+    
     # -------------   
     # input checks 
     # -------------   
-    if in_msg.area in europe_areas:
+    """
+    if in_msg.area in broad_areas:
         if in_msg.use_TB_forecast == True:
             print "*** Error in plot_coalition2.py"
             print "    currently no brightness temperature forecast"
@@ -202,7 +365,7 @@ def input(in_msg):
         print "    in_msg.outputDir: ", in_msg.outputDir
         print "    in_msg.postprocessing_areas: ", in_msg.postprocessing_areas
         print "    in_msg.postprocessing_composite: ", in_msg.postprocessing_composite
-
+    """
     #in_msg.check_input = False
 
     #in_msg.make_plots=True

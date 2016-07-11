@@ -1,0 +1,409 @@
+from datetime import datetime, timedelta
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from mpop.imageo.TRTimage import fig2img    
+from mpop.imageo.HRWimage import prepare_figure
+import history_backward
+from history_backward import history_backward, string_date, Cells
+from properties_cells import create_dir
+from future_properties import future_properties
+import scipy
+from math import sqrt
+from scipy import ndimage
+from mpop.projector import get_area_def
+import shelve
+from copy import deepcopy
+import numpy as np
+import cPickle as pickle
+from skimage.transform import resize
+import scipy.misc as sm
+import matplotlib.dates as mdates
+import subprocess
+import glob
+from Cells import Cells
+import cProfile
+import pstats
+import time
+
+def resize_array(array,dx,dy, nx, ny):
+    temp_array=np.zeros_like(array)
+    array_out = np.zeros_like(array)
+    
+    if dx>0:
+        temp_array[dx:,:]  = deepcopy(array[0:-dx,:])
+    elif dx < 0:
+        temp_array[0:dx,:] = deepcopy(array[-dx:,:])
+    else:
+        temp_array[:,:]    = deepcopy(array[:,:])
+    
+    if dy>0:
+        array_out[:,dy:]  = temp_array[:,0:-dy]
+    elif dy < 0:
+        array_out[:,0:dy] = temp_array[:,-dy:]
+    else:
+        array_out[:,:]    = temp_array[:,:]  
+
+    return array_out
+
+def figure_labels(labels, outputFile, timeObs, dt, area_plot="ccs4", add_name = None):
+    yearS, monthS, dayS, hourS, minS = string_date(timeObs)
+    data_time = timeObs + timedelta(minutes = dt)
+    yearSf, monthSf, daySf, hourSf, minSf = string_date(data_time)
+    
+    labels = np.flipud(labels)
+    
+    obj_area = get_area_def(area_plot)
+    fig, ax = prepare_figure(obj_area) 
+    plt.contour(labels,[0.5],colors='y')
+    #plt.imshow(labels, origin="lower")
+    PIL_image = fig2img ( fig )
+    if add_name != None:
+          PIL_image.save(create_dir(outputFile)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_Forc"+hourSf+minSf+add_name+".png")
+          path = (outputFile)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_Forc"+hourSf+minSf+add_name+".png"
+    else:
+          PIL_image.save(create_dir(outputFile)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_Forc"+hourSf+minSf+".png")
+          path = (outputFile)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_Forc"+hourSf+minSf+".png"
+    print "... display ",path," &"
+    plt.close( fig)    
+#savefig('demo.png', transparent=True)
+
+
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+
+#if __name__ == '__main__':
+def main():
+    verbose = False
+    forecasted_areas = []
+    ttt = datetime(2015,7,7,12,55)
+    t_stop = datetime(2015,7,7,13,55)
+    #interesting_cell = 67
+    outputFile = "forecasting_labels/"
+    
+    while ttt <= t_stop - timedelta(hours = 1):
+        if verbose:
+            print("******** read cell properties from shelve")
+        yearS, monthS, dayS, hourS, minS = string_date(ttt)
+        filename = 'cells/%s.shelve'%(yearS+monthS+dayS+hourS+minS)
+        myShelve = shelve.open(filename)
+        labels_all = deepcopy(myShelve['labels'])
+        
+        if verbose:
+            print(labels_all)
+        
+        unique_labels = np.unique(labels_all[labels_all>0])
+        if verbose:
+            print(unique_labels)
+        
+                
+        model = "linear_exp"; ylabel = "area"
+        #model = "linear"; ylabel = "channel"
+        #model = "linear"; ylabel = "displacement_dx"
+        #model = "linear"; ylabel = "displacement_dy"
+        
+        forecasted_labels = {}
+                
+        for interesting_cell in unique_labels:
+              
+              print "******** computing history backward"
+              forecasted_labels["ID"+str(interesting_cell)]=[]
+              
+              #cProfile.run('history_backward(ttt.day,ttt.month,ttt.year,ttt.hour,ttt.minute,interesting_cell, True, ttt-timedelta(hours = 1)-timedelta(minutes = 5))')
+              #quit()
+              ind, area, displacement, time = history_backward(ttt.day,ttt.month,ttt.year,ttt.hour,ttt.minute,interesting_cell, True, ttt-timedelta(hours = 1)-timedelta(minutes = 5))
+              
+              if len(area)<=1:  
+                  print "new cell"
+                  break
+                  
+              print("******** computed history backward")
+              print("******** computing extrapolation")
+              
+              t, y = future_properties(time,area, ylabel, model)
+              
+              print("******** computed extrapolation")
+      
+              #print "******** computing history forward"
+              #ind1, area1, displacement1, time1 = history_backward(ttt.day,ttt.month,ttt.year,ttt.hour,ttt.minute,interesting_cell, False, ttt+timedelta(hours = 1))
+              #print "******** computed history forward"
+      
+              #t2 = time1 #[::-1]
+              #y2 = area1 #[::-1]
+      
+      
+      
+              nx,ny = labels_all.shape
+              if verbose:
+                  print(nx,ny)
+      
+      
+              label_cell = np.zeros(labels_all.shape)
+              label_cell[labels_all==interesting_cell] = 1
+              #pickle.dump(label_cell, open("test_label.p", "wb" ) )
+              #quit()
+              dt = 0
+      
+              print("******** produce label figures")
+              if False:
+                  figure_labels(label_cell, outputFile, ttt, dt, area_plot="ccs4",add_name = "_ID"+str(interesting_cell))
+      
+              area_current = sum(sum(label_cell))
+      
+              forecasted_areas.append(area_current)
+      
+              indx = np.where(t==ttt)[0] + 1
+      
+              print "******** compute displacement"
+              if displacement.shape[1]==2:
+                    if len(displacement) == 0:
+                        dx = 0
+                        dy = 0
+                    else:
+                        try:
+                            dx =  int(round(displacement[:,0].mean()))
+                            dy = int(round(displacement[:,1].mean()))
+                        except ValueError:
+                            print("VALUE ERROR")
+                            print(displacement)
+                            quit()
+                    print dx, dy
+      
+              else:
+                    print("wrong displacement")
+                    quit()
+      
+              labels_in_time={}
+              
+              index_stop = 12
+              
+              print("******** calculate forecasts")
+              for i in range(13):
+                  
+                  dt += 5
+                  if verbose:
+                      print("... for time ", dt ,", index ", indx + i)
+                  if indx+i >= len(y):
+                      index_stop = deepcopy(i)
+                      break
+                  else:    
+                      area_new = y[indx+i]
+                      area_prev = y[indx+i-1]
+                  if verbose:
+                      print("area px that will be grown ", area_current)
+                  
+                      print("area forecasted ", area_new)
+                  
+                      print("area forecasted prev ", area_prev)
+                  #growth = sqrt(float(area_new)/float(area_current))
+                  
+                  if area_new < 0 or len(area_new)==0 or len(area_prev)==0:
+                      if verbose:
+                          print("the cell is predicted to disappear")
+                      index_stop = deepcopy(i)
+                      break
+                  
+                  growth = sqrt(float(area_new)/float(area_prev))
+                  if verbose:
+                      print("growing by ", growth)
+                      print("dx ", dx)
+                      print("dy ", dy)
+      
+                  #figure_labels(label_cell, outputFile, ttt, dt, area_plot="ccs4", add_name = "before")
+
+                  shifted_label = resize_array(label_cell,dx,dy, nx, ny)
+
+                  #figure_labels(shifted_label, outputFile, ttt, dt, area_plot="ccs4", add_name = "before_shifted")
+                  #quit()
+                  if verbose:
+                      print("   after shift ", sum(sum(shifted_label)))
+                  
+                  if sum(sum(shifted_label))==0:#the cell is outside the domain
+                      break
+                  
+                  #center of mass before resizing
+                  center_before = ndimage.measurements.center_of_mass(shifted_label)
+                  center_before = np.rint(center_before)        
+                  if verbose:
+                      print("   after shift ", sum(sum(shifted_label)))
+                  resized_label = scipy.misc.imresize(shifted_label,float(growth),'nearest')
+      
+                  resized_label[resized_label >0] = 1
+                          
+                  temp_label = np.zeros((nx,ny))
+
+                  #after resizing, the array is larger/smaller than nx,ny --> create new array that contains all the label region                  
+                  if resized_label.shape[0]<nx:
+                      temp_label[0:resized_label.shape[0],0:resized_label.shape[1]] = deepcopy(resized_label)
+                  else:
+                      x_start = max(min(np.nonzero(resized_label)[0])-1,0)
+                      y_start = max(min(np.nonzero(resized_label)[1])-1,0)      
+                      temp_label[0:min(nx,resized_label.shape[0]-x_start),0:min(ny,resized_label.shape[1]-y_start)] = deepcopy(resized_label[x_start:min(x_start+nx,resized_label.shape[0]),y_start:min(y_start+ny,resized_label.shape[1])])            
+                  
+                  if verbose:
+                      print(np.unique(temp_label))
+                      print("   after resize ", sum(sum(temp_label)))
+                  #figure_labels(resized_label, outputFile, ttt, dt, area_plot="ccs4", add_name = "before_shifted_resized")
+      
+                  #center of mass after resizing
+                  center_after = ndimage.measurements.center_of_mass(temp_label)
+                  center_after = np.rint(center_after)         
+      
+                  dx_new,dy_new = center_before - center_after
+      
+                  shifted_label = resize_array(temp_label,dx_new,dy_new, nx, ny)
+                  if verbose:
+                      print("   after shift2 ", sum(sum(shifted_label)))
+                  label_cell = np.zeros((nx,ny))
+
+                  label_cell[0:,0:] = shifted_label[0:nx,0:ny]
+      
+                  if label_cell.shape[0] != nx or label_cell.shape[1] != ny:
+                        print("incorrect size")
+                        quit()
+                  
+                  forecasted_labels["ID"+str(interesting_cell)].append(deepcopy(label_cell))
+                  #figure_labels(label_cell, outputFile, ttt, dt, area_plot="ccs4",add_name = "_ID"+str(interesting_cell))
+      
+                  #indx+=1
+      
+                  label_cell = shifted_label #????????????????????????????????????
+      
+                  area_current = sum(sum(label_cell))
+                  if verbose:
+                      print("end ", area_current)
+                  forecasted_areas.append(area_current)
+                  #add check to make sure the area you produced is more or less correct
+      
+      
+              print("******** produce images")
+      
+              t_temp = deepcopy(ttt)
+              forecasted_time = []
+      
+              for gg in range(len(forecasted_areas)):
+                  forecasted_time.append(t_temp)
+                  t_temp+=timedelta(minutes = 5)
+      
+              if False:
+                  t_composite = deepcopy(ttt)
+                  for i in range(min(len(y),index_stop)):
+          
+                      yearSf, monthSf, daySf, hourSf, minSf = string_date(t_composite)
+                      contour_file = outputFile + "Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_Forc"+hourSf+minSf+"_ID"+str(interesting_cell)+".png"    
+                      type_image = "_HRV"
+                      #background_file = "/data/COALITION2/PicturesSatellite//"+yearS+"-"+monthS+"-"+dayS+"/"+yearS+"-"+monthS+"-"+dayS+type_image+"_"+"ccs4"+"/MSG"+type_image+"-"+"ccs4"+"_"+yearS[2:]+monthS+dayS+hourS+minS+".png"
+                      background_file = "/data/COALITION2/PicturesSatellite/LEL_results_wind/"+yearS+"-"+monthS+"-"+dayS+"/RGB-HRV_dam/"+yearS+monthS+dayS+"_"+hourS+minS+"*.png"            
+                      out_file1 = create_dir( outputFile+"Contours/")+"Obs"+hourS+minS+"_Forc"+hourSf+minSf+"_ID"+str(interesting_cell)+".png"
+                      if verbose:
+                          print("... create composite "+contour_file+" "+background_file+" "+out_file1)
+                      #subprocess.call("/usr/bin/composite "+contour_file+" "+background_file+" "+out_file1, shell=True)
+                      if verbose:
+                          print("... saved composite: display ", out_file1, " &")
+                      t_composite+=timedelta(minutes=5)
+      
+      
+              if False:
+                  fig, ax = plt.subplots()
+                  ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+                  ax.plot_date(t, y, 'o',label="Fit and extrapolation")
+                  ax.plot_date(forecasted_time, forecasted_areas, '*',label="forecasted")
+                  ax.plot_date(t2, y2, '*', label="Observations")
+                  ax.set_xlim([t[0]-timedelta(minutes = 5), t2[-1]+timedelta(minutes = 5)])
+                  ax.set_ylabel("area")
+                  ax.legend(loc="best");
+                  fig.savefig("area_in_time.png")
+                  plt.close( fig)    
+      
+        t_composite = deepcopy(ttt)
+        background_im = glob.glob('/data/COALITION2/PicturesSatellite/LEL_results_wind/'+yearS+'-'+monthS+'-'+dayS+'/RGB-HRV_dam/'+yearS+monthS+dayS+'_'+hourS+minS+'*.png')
+        im = plt.imread(background_im[0])
+        obj_area = get_area_def("ccs4")
+        fig,ax = prepare_figure(obj_area)
+        plt.imshow(np.flipud(im))   
+        
+        time_wanted = [4,8,12]  
+        color_wanted = ['g','c','y']   
+        for i in range(len(time_wanted)):
+            yearSf, monthSf, daySf, hourSf, minSf = string_date(ttt+timedelta(minutes = i*5))
+            ind_time = time_wanted [i]
+            for key, forc_labels in forecasted_labels.iteritems():  #forecasted_labels["ID"+str(interesting_cell)]=[]  
+                if len(forc_labels)>ind_time:
+                    plt.contour(np.flipud(forc_labels[ind_time]),[0.5],colors=color_wanted[i])
+        PIL_image = fig2img ( fig )
+        PIL_image.save(create_dir(outputFile)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_Forc"+hourSf+minSf+".png")
+        path = (outputFile)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_Forc"+hourSf+minSf+".png"
+        print "... display ",path," &"
+        plt.close( fig)                             
+             
+        
+        if False:
+            for i in range(12):    
+                  contour_files = glob.glob(outputFile + "Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_Forc"+hourSf+minSf+"_ID*.png")
+                  if verbose:
+                            print("Files found: ",contour_files)
+                  if len(contour_files)>0:
+                      background_file = "/data/COALITION2/PicturesSatellite/LEL_results_wind/"+yearS+"-"+monthS+"-"+dayS+"/RGB-HRV_dam/"+yearS+monthS+dayS+"_"+hourS+minS+"*.png"
+                      out_file1 = create_dir( outputFile+"Contours/")+"Obs"+hourS+minS+"_Forc"+hourSf+minSf+".png"
+                  t_composite+=timedelta(minutes=5)  
+  
+        ttt += timedelta(minutes = 5)
+
+"""
+    yearS, monthS, dayS, hourS, minS = string_date(timeObs)
+    data_time = timeObs + timedelta(minutes = dt)
+    yearSf, monthSf, daySf, hourSf, minSf = string_date(data_time)
+    
+    labels = np.flipud(labels)
+    
+    obj_area = get_area_def(area_plot)
+    fig, ax = prepare_figure(obj_area) 
+    plt.contour(labels,[0.5],colors='y')
+    #plt.imshow(labels, origin="lower")
+    PIL_image = fig2img ( fig )
+    if add_name != None:
+          PIL_image.save(create_dir(outputFile)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_Forc"+hourSf+minSf+add_name+".png")
+          path = (outputFile)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_Forc"+hourSf+minSf+add_name+".png"
+    else:
+          PIL_image.save(create_dir(outputFile)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_Forc"+hourSf+minSf+".png")
+          path = (outputFile)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_Forc"+hourSf+minSf+".png"
+    print "... display ",path," &"
+    plt.close( fig)   
+"""
+
+
+
+if __name__ == '__main__':
+    #filenames = []
+    #for i in range(5):
+    #    filename = 'test_forecastProf_%d.stats' % i
+    #    cProfile.run('print %d, main()' % i, filename)
+    # Read all 5 stats files into a single object
+    verbose = False
+    profiling = True
+    if profiling:
+        cProfile.run('main()','test_forecastProf.prof')
+    else:
+        main()
+    #stats = pstats.Stats('test_forecastProf_0.stats')
+    #for i in range(1, 5):
+    #    stats.add('test_forecastProf_%d.stats' % i)
+    
+    # Clean up filenames for the report
+    #stats.strip_dirs()
+    
+    # Sort the statistics by the cumulative time spent in the function
+    #stats.sort_stats('cumulative')
+    
+    #stats.print_stats()
+
+
+
+
+
+
+
+
+
+
+

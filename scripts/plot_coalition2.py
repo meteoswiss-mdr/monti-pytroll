@@ -40,7 +40,6 @@ from trollimage.image import Image as trollimage
 
 from skimage import morphology
 from scipy import ndimage
-from astropy.convolution import MexicanHat2DKernel
 
 # ===============================
 

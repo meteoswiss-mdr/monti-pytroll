@@ -1,4 +1,3 @@
-
 # depiction options
 # -----------------
 
@@ -57,34 +56,11 @@ developing_th_chDiff = 8.0
 mature_ct            = [17,14,12]
 developing_ct        = [8,9,10,17,14,12]
 
-# string for filenames
-if forth_mask == 'IR_039_minus_IR_108':
-    name_4Mask = 'IRdiff'
-elif forth_mask == 'CloudType':
-    name_4Mask = 'CT'
-elif forth_mask == 'no_mask':
-    name_4Mask = 'none'
-else:
-    print "*** Error in main (Mecikalski_test.py)"
-    print "    unknown 4th mask", forth_mask
-    quit() 
-
 # settings of the forced_mask (force to include any pixel (in mature_mask) regardless of the other thresholds)
 # ------------------------------------------------------------------------------------------------------------
 # threshold for forced_mask 
 force_th_chDiff      = 40.0
 cloud_type_forced    = [17,14]
-
-if forced_mask == 'IR_039_minus_IR_108':
-    name_ForcedMask = 'IRdiff'
-elif forced_mask == 'CloudType':
-    name_ForcedMask = 'CT'
-elif forced_mask == 'no_mask':
-    name_ForcedMask = 'no'
-else:
-    print "    unknown forcing mask -> applying no forcing mask", forced_mask 
-    name_ForcedMask = 'no'   
-
 
 #additional threshold for mask_cirrus (cd6 > th)
 # -----------------------------------
@@ -96,3 +72,10 @@ th_cirrus            = 4.0
 # [removes small holes within clouds (max_holes = max number of px to fill with clouds) and small clouds (min_cloud = number px minimum to keep a cloud)]
 min_cloud = 20.0 #100.0 #
 max_holes = 500.0
+
+
+# additional parameters for cleaning (if mask_labelsSmall_lowUS) 
+# -----------------------------------------------
+# [removes cells with mean_us <= 3 and area<=500 (move this also to coalition2_settings)]
+mask_labelsSmall_lowUS_maxUS = 3.0 
+mask_labelsSmall_lowUS_maxArea = 500.0

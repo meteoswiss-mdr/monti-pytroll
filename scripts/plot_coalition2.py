@@ -229,8 +229,12 @@ if __name__ == '__main__':
     
     from get_input_msg import get_input_msg
     
-    in_msg = get_input_msg(sys.argv[1])
-    print in_msg.areas
+    input_file = sys.argv[1]
+    if input_file[-3:] == '.py': 
+        input_file=input_file[:-3]
+    in_msg = get_input_msg(input_file)
+
+    print "in_msg.areas ", in_msg.areas
     
     from coalition2_settings import *
     
@@ -269,9 +273,7 @@ if __name__ == '__main__':
     else:
       if True:  # automatic choise of last 5min 
               from my_msg_module import get_last_SEVIRI_date
-              datetime1 = get_last_SEVIRI_date(True)
-              if in_msg.delay != 0:
-                      datetime1 -= timedelta(minutes=in_msg.delay)
+              datetime1 = get_last_SEVIRI_date(True, delay=in_msg.delay)
               year  = datetime1.year
               month = datetime1.month
               day   = datetime1.day
@@ -333,11 +335,6 @@ if __name__ == '__main__':
 
           print "*** read data for ", in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot
           
-          RGBs = check_input(in_msg, in_msg.sat+sat_nr_str, in_msg.datetime)  # in_msg.sat_nr might be changed to backup satellite
-          if len(RGBs) != len(in_msg.RGBs):
-              print "*** Warning, input not complete."
-              print "*** Warning, process only: ", RGBs
-
           # now read the data we would like to forecast
           global_data = GeostationaryFactory.create_scene(in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot)
           #global_data_RGBforecast = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
@@ -410,7 +407,18 @@ if __name__ == '__main__':
                 
                 
                 if chosen_settings['scale'] == 'local':
-                      area_loaded = load_products(global_data, ['CTH'], in_msg, area_loaded )
+                    for i_try in range(10):
+                        # check if 'CTH' file is present
+                        RGBs = check_input(in_msg, in_msg.sat+sat_nr_str, in_msg.datetime, RGBs="CTH")
+                        if len(RGBs) > 0:
+                            # exit loop, if input is found
+                            break
+                        else:
+                            # else wait 20s and try again
+                            import time
+                            time.sleep(25)
+                    # load the cloud top height data
+                    area_loaded = load_products(global_data, ['CTH'], in_msg, area_loaded )
           
                 print '... project data to desired area ', chosen_areas
                 data = global_data.project(chosen_areas)
@@ -447,8 +455,9 @@ if __name__ == '__main__':
                 # read old brightness temperatures (if possible shifted by lagrangian cell movement)
                 if chosen_settings['use_TB_forecast'] == True:
       
-                    print "************** ", in_msg.nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S) 
-                    print "************** ", in_msg.nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S)                                   
+                    print "*** read forecasted brightness temperatures" 
+                    print "    ", in_msg.nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S) 
+                    print "    ", in_msg.nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S)                                   
                     wv_062_t15 = pickle.load( open( in_msg.nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) ) 
                     wv_062_t30 = pickle.load( open( in_msg.nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S), "rb" ) )
                             

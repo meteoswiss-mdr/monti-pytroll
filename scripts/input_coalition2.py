@@ -20,7 +20,7 @@ def input(in_msg):
     # e.g. current time               2015-05-31 12:33 UTC
     # delay 5 min                     2015-05-31 12:28 UTC
     # last Rapid Scan Service picture 2015-05-31 12:25 UTC (Scan start) 
-    in_msg.delay=0
+    in_msg.delay=3
 
     #----------------
     # chose area

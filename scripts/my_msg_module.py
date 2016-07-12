@@ -364,7 +364,7 @@ output:
   rgb  -> rgbs where all segments are available 
 '''
 
-def check_input(in_msg, fullname, time_slot, segments=[6,7,8], HRsegments=[20,21,22,23]):
+def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegments=[20,21,22,23]):
                 #rgb, RSS=True, date=None, sat_nr=None, segments=[6,7,8], HRsegments=[18,19,20,21,22,23,24],verbose=True):
 
     from time import strftime
@@ -404,16 +404,22 @@ def check_input(in_msg, fullname, time_slot, segments=[6,7,8], HRsegments=[20,21
     if in_msg.sat == "cpp":
        return in_msg.RGBs
 
+    ## check all RGBs, if not some are defined explecitly
+    if RGBs == None:
+        RGBs = in_msg.RGBs
 
     # convert str to array, if only one string is given
-    if type(in_msg.RGBs) is str:
-        in_msg.RGBs=[in_msg.RGBs]
+    if type(RGBs) is str:
+        RGBs = [RGBs]
 
     rgb_complete=[]
     channels_complete=[False,False,False,False,False,False,False,False,False,False,False,False]
     pro_file_checked=False
 
-    for rgb in in_msg.RGBs:
+    for rgb in RGBs:
+
+        if in_msg.verbose:
+            print "... check input for ", rgb
 
         if rgb in products.MSG or rgb in products.MSG_color or rgb in products.RGBs_buildin or rgb in products.RGBs_user:
 
@@ -835,8 +841,9 @@ def convert_NWCSAF_to_radiance_format(satscene, area, rgb, nwcsaf_calibrate, IS_
     satscene[rgb].area = satscene[pge].area
     satscene[rgb].area_def = satscene[pge].area_def
     if palette != None:
-        print "(my_msg_module) copy palette"
+        print "(my_msg_module) copy palette for ", rgb
         satscene[rgb].palette = palette
+        #print "(my_msg_module) palette ", palette
 
 
     #if IS_PYRESAMPLE_LOADED:

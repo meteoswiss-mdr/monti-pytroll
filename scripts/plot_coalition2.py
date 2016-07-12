@@ -351,15 +351,15 @@ if __name__ == '__main__':
           
           print "now should start areas", in_msg.areas
                     
-          for chosen_areas in in_msg.areas:
+          for area in in_msg.areas:
           
-                print "producing output for area: ", chosen_areas
+                print "producing output for area: ", area
                 
-                chosen_settings = check_input_file(in_msg, chosen_areas)
+                chosen_settings = check_input_file(in_msg, area)
                 
                 print "  *******SETTINGS*******"
                 print "      nrt: ", in_msg.nrt
-                print "      area: ", chosen_areas
+                print "      area: ", area
                 print "      scale: ", chosen_settings['scale']
                 print "      use_TB_forecast: ", chosen_settings['use_TB_forecast']
                 print '      mode_downscaling: ', chosen_settings['mode_downscaling']
@@ -370,7 +370,7 @@ if __name__ == '__main__':
                 print '      forced_mask: ', chosen_settings['forced_mask']
                 print '      mask_cirrus: ', chosen_settings['mask_cirrus']
                   
-                obj_area = get_area_def(chosen_areas)
+                obj_area = get_area_def(area)
                 
                 time_slot15 = time_slot - timedelta(minutes=chosen_settings['dt_forecast1'])
                 
@@ -412,8 +412,8 @@ if __name__ == '__main__':
                 if chosen_settings['scale'] == 'local':
                       area_loaded = load_products(global_data, ['CTH'], in_msg, area_loaded )
           
-                print '... project data to desired area ', chosen_areas
-                data = global_data.project(chosen_areas)
+                print '... project data to desired area ', area
+                data = global_data.project(area)
                 
                 # print type(data)
                 loaded_channels = [chn.name for chn in data.loaded_channels()]
@@ -512,7 +512,7 @@ if __name__ == '__main__':
                     area_loaded15 = get_area_def(area2load)#(in_windshift.areaExtraction)  
                     # load product, global_data is changed in this step!
                     area_loaded15 = load_products(global_data15, in_msg.channels15, in_msg, area_loaded15)
-                    data15 = global_data15.project(chosen_areas)              
+                    data15 = global_data15.project(area)              
                     
                     data15 = downscale(data15,chosen_settings['mode_downscaling'])
                     
@@ -523,7 +523,7 @@ if __name__ == '__main__':
                     area_loaded = get_area_def(area2load)#(in_windshift.areaExtraction)  
                     # load product, global_data is changed in this step!
                     area_loaded = load_products(global_data30, in_msg.channels30, in_msg, area_loaded)
-                    data30 = global_data30.project(chosen_areas)           
+                    data30 = global_data30.project(area)           
                     data30 = downscale(data30,chosen_settings['mode_downscaling'])
                       
                     wv_062_t15 = deepcopy(data15['WV_062'].data)
@@ -999,7 +999,7 @@ if __name__ == '__main__':
                 # set transparency for "no clouds" 
                 rgbArray[sum_array<=0,3] = background_alpha
             
-                c2File = (in_msg.outputDir+"/cosmo/Channels/indicators_in_time/RGB"+maskS+"/%s_%s_C2rgb"+maskS+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask"+chosen_areas+".png") % (yearS+monthS+dayS,hourS+minS)
+                c2File = (in_msg.outputDir+"/cosmo/Channels/indicators_in_time/RGB"+maskS+"/%s_%s_C2rgb"+maskS+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask"+area+".png") % (yearS+monthS+dayS,hourS+minS)
                 #c2File = ("/data/cinesat/out/"+"/%s_%s_C2rgb"+maskS+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask.png") % (yearS+monthS+dayS,hourS+minS)
                 if 'C2rgb' in in_msg.results:
                     img1 = Image.fromarray( rgbArray,'RGBA')
@@ -1010,24 +1010,28 @@ if __name__ == '__main__':
                     #pickle.dump( img1, open("RGB"+yearS+monthS+dayS+hourS+minS+".p", "wb" ) )
                 
                 if 'C2rgbHRV' in in_msg.results and in_msg.nrt == False:
-                    if chosen_areas == "ccs4":
+                    if area == "ccs4":
                         type_image = "_HRV"
                     else:
                         type_image = "_overview"
                     #c2FileHRV = (in_msg.outputDir+"/cosmo/Channels/indicators_in_time/RGB-HRV"+maskS+"/%s_%s_C2rgb"+maskS+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask.png") % (yearS+monthS+dayS,hourS+minS)
-                    hrvFile = "/data/COALITION2/PicturesSatellite//"+yearS+"-"+monthS+"-"+dayS+"/"+yearS+"-"+monthS+"-"+dayS+type_image+"_"+chosen_areas+"/MSG"+type_image+"-"+chosen_areas+"_"+yearS[2:]+monthS+dayS+hourS+minS+".png"
+                    hrvFile = "/data/COALITION2/PicturesSatellite//"+yearS+"-"+monthS+"-"+dayS+"/"+yearS+"-"+monthS+"-"+dayS+type_image+"_"+area+"/MSG"+type_image+"-"+area+"_"+yearS[2:]+monthS+dayS+hourS+minS+".png"
                     out_file1 = create_dir( in_msg.outputDir +"/cosmo/Channels/indicators_in_time/RGB-HRV"+maskS+"/"+yearS+monthS+dayS+"_"+hourS+minS+"_C2rgb-HRV_"+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask.png" )
                     print "... create composite "+c2File+" "+hrvFile+" "+out_file1
                     subprocess.call("/usr/bin/composite "+c2File+" "+hrvFile+" "+out_file1, shell=True)
                     print "... saved composite: display ", out_file1, " &"
                 
                 ## start postprocessing
-                if chosen_areas in in_msg.postprocessing_areas:
-                    postprocessing(in_msg, 'C2rgb', global_data.time_slot, data.number, chosen_areas)
+                if area in in_msg.postprocessing_areas:
+                    postprocessing(in_msg, 'C2rgb', global_data.time_slot, data.number, area)
       
                 if in_msg.scpOutput: 
                     if in_msg.verbose:
                         print "... secure copy "+out_file+ " to "+in_msg.scpOutputDir
                     subprocess.call("scp "+in_msg.scpID+" "+out_file+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
+          
+            
           # add 5min and do the next time step
+          
+          
           time_slot = time_slot + timedelta(minutes=5)

@@ -27,6 +27,9 @@ mpl.use('Agg')
 import time
 import copy
 from particles_displacement import particles_displacement
+from properties_cells import properties_cells
+from test_forecast import plot_forecast_area
+from Cells import Cells
 import numpy.ma as ma
 import netCDF4
 import pickle
@@ -968,8 +971,7 @@ if __name__ == '__main__':
                     outputFile = in_msg.outputDir +"/cosmo/Channels/indicators_in_time/masks/"+yearS+monthS+dayS+"_"+hourS+minS+"_4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask_Final_mask.png"
                     text_to_write = "Forth mask: %s\nForcen mask: %s\nCleaning: %s"%(in_msg.name_4Mask,in_msg.name_ForcedMask,cleaning_text)
                     make_figure(mask, obj_area, outputFile,colorbar = True,text_to_write = "Final mask", vmin = 0, vmax = 1)
-      
-                              
+                
                 labels, numobjects = ndimage.label(mask)
                 
                 metadata = {}
@@ -983,7 +985,7 @@ if __name__ == '__main__':
                 metadata['glaciation_indicators'] = n_tests_gi
                 metadata['updraft_strength']      = n_tests_us
                 
-                if in_msg.shelve_labels:
+                if in_msg.shelve_labels==True and properties_cells == False:
                       labels = labels.astype('uint32') 
                       filename = 'labels/Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)
                       print "*** writing variables ", filename
@@ -993,7 +995,7 @@ if __name__ == '__main__':
                       myShelve.update(dict_labels)
                       # close the shelve
                       myShelve.close()
-                elif in_msg.pickle_labels:
+                elif in_msg.pickle_labels==True and properties_cells == False:
                       labels = labels.astype('uint32') 
                       pickle.dump( labels, open(create_dir(in_msg.outputDir +"/cosmo/Channels/labels/labels_"+yearS+monthS+dayS+hourS+minS+".p"), "wb" ) )
                 
@@ -1039,6 +1041,14 @@ if __name__ == '__main__':
                         print "... secure copy "+out_file+ " to "+in_msg.scpOutputDir
                     subprocess.call("scp "+in_msg.scpID+" "+out_file+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
           
+                if area == "ccs4" and in_msg.properties_cells == True:
+                    print "**** Computing properties of the cells"
+                    make_figure(labels, obj_area, 'uff/TEST_RGBMASK.png',colorbar = False,text_to_write = None)
+                    
+                    labels_corrected, first_time_step = properties_cells(time_slot,time_slot,current_labels = labels, metadata = metadata)
+                    
+                    if in_msg.plot_forecast == True and first_time_step == False:
+                        plot_forecast_area(time_slot, in_msg.model_fit_area,outputFile="new_forecasted_area/", current_labels = labels_corrected, t_stop=time_slot,BackgroundFile=out_file1)
             
           # add 5min and do the next time step
           

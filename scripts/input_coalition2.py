@@ -31,7 +31,7 @@ def input(in_msg):
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('EuropeCanary')    # upper third of MSG disk, satellite at 0.0 deg East, full resolution 
     #in_msg.areas.append('EuropeCanary95')  # upper third of MSG disk, satellite at 9.5 deg East, full resolution 
-    in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
+    #in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
     #in_msg.areas.append('fullearth')       # full earth 600x300                    # does not yet work
@@ -42,6 +42,14 @@ def input(in_msg):
     #in_msg.areas.append('EuropeCanaryS95') # "ccs4" "blitzortung" #"eurotv" # "eurotv"
     #in_msg.areas.append("blitzortung")
     
+    in_msg.properties_cells = True
+    in_msg.plot_forecast = True
+    
+    #model which will be used to fit the history of the cells and extrapolate the future area
+    #in_msg.model_fit_area = "linear_exp" #reccomended
+    in_msg.model_fit_area = "linear_exp_exp" #reccomended
+    #in_msg.model_fit_area = "linear"
+     
     
     in_msg.broad_areas = ['eurotv','blitzortung','EuropeCanaryS95','EuropeCanary95','germ','EuropeCanary','euro4','fullearth','met09globe','met09globeFull','odysseyS25']
     

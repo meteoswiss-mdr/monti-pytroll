@@ -61,15 +61,15 @@ def create_dir(outputFile):
 
 def force_to_observed_cloud_mask(mod, obs):
     if np.any(mod.mask == True) == False:
-        if verbose:
-            print "NO MASK ACTIVE!!!!!!!!!"
+        #if verbose:
+         #   print "NO MASK ACTIVE!!!!!!!!!"
         if np.any(np.isnan(mod)):
             mod = ma.masked_where(np.isnan(mod), mod)
-            print "the invalid are NAN"
+            #print "the invalid are NAN"
         else:
             mod = ma.masked_where(mod <= 0, mod)
-            if verbose:
-                print "the invalid are <= 0"
+            #if verbose:
+            #    print "the invalid are <= 0"
     mod[mod.mask==True] = np.nan
     mod = fill_with_closest_pixel(mod) 
     mod[obs==True] = np.nan

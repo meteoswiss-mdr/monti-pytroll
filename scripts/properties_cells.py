@@ -555,7 +555,10 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None):
               filename =labels_dir +  'Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)
               myShelve = shelve.open(filename)
               myShelve['labels'] = deepcopy(data_new )
-              myShelve.close()              
+              myShelve.close() 
+              filenames_for_permission =  glob.glob(labels_dir +  'Labels_%s*'%(yearS+monthS+dayS+hourS+minS))
+              for file_per in filenames_for_permission:
+                    os.chmod(file_per, 0664)  ## FOR PYTHON3: 0o664          
               print("....updated cells labels")
               list_cells = all_cells.keys()
               for cell_connection in list_cells:

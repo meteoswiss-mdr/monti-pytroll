@@ -323,10 +323,10 @@ def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=Non
             
         background_im = glob.glob(background_im_filename)
         
-        currentRGB_im_filename = "Mecikalski/cosmo/Channels/indicators_in_time/RGB_dam/"+yearS+monthS+dayS+"_"+hourS+minS+"*ccs4.png"
+        currentRGB_im_filename = "/opt/users/lel/PyTroll/scripts/Mecikalski/cosmo/Channels/indicators_in_time/RGB_dam/"+yearS+monthS+dayS+"_"+hourS+minS+"*ccs4.png"
         currentRGB_im = glob.glob(currentRGB_im_filename)
         
-        
+        print("background file: ",BackgroundFile)
         im = plt.imread(background_im[0])
         #img1 = Image.imread(currentRGB_im[0])
         obj_area = get_area_def("ccs4")
@@ -387,7 +387,7 @@ def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=Non
             
             path_composite = (outputFile)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_composite.png"     
             subprocess.call("/usr/bin/composite "+currentRGB_im[0]+" "+path+" "+path_composite, shell=True)
-        
+            print "... display",path_composite,"&"
         
         
         if False:
@@ -451,7 +451,7 @@ if __name__ == '__main__':
     
     ttt = datetime(2015,7,7,12,55)
     #interesting_cell = 67
-    outputFile = "forecasting_labels/"    
+    outputFile = "/opt/users/lel/PyTroll/scripts/forecasting_labels/"    
                 
     model = "linear_exp_exp"
     #model = "linear"; ylabel = "channel"

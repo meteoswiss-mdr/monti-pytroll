@@ -250,7 +250,9 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None):
     count_double = 0
     
     #labels_dir = '/data/cinesat/out/labels/'
+
     labels_dir = '/opt/users/lel/PyTroll/scripts/labels/' #compatible to all users
+
     
     while t1 <= tStop:
           
@@ -286,7 +288,6 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None):
                 print "--- reading labels from shelve files"
                 filename =labels_dir +  'Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)
                 
-                print "opening ", filename    
                 myShelve = shelve.open(filename)  
                 
                 data1 = deepcopy(myShelve['labels'])
@@ -308,7 +309,7 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None):
 
           file_previous_labels = labels_dir +  'Labels_%s*'%(year0S+month0S+day0S+hour0S+min0S)
           filename1 = glob.glob(file_previous_labels)
-          
+                    
           if len(filename1)>0:
               first_time_step = False
           else:
@@ -546,7 +547,7 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None):
                               item.split = 1
       
               labels, numobjects = ndimage.label(data_new)
-              
+              print("....starting updating cells")
               outputFile = "/data/COALITION2/PicturesSatellite/LEL_results_wind//"+yearS+"-"+monthS+"-"+dayS+"/labels/"
               make_figureLabels(deepcopy(data_new), all_cells, obj_area, "fig_labels/", colorbar = False, vmin = False, vmax = False, white_background = True, t = t1)
               data_new = data_new.astype('uint32') #unsigned char int  https://docs.python.org/2/library/array.html
@@ -555,7 +556,7 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None):
               myShelve = shelve.open(filename)
               myShelve['labels'] = deepcopy(data_new )
               myShelve.close()              
-              
+              print("....updated cells labels")
               list_cells = all_cells.keys()
               for cell_connection in list_cells:
                   ancestors = all_cells[cell_connection].id_prev
@@ -570,14 +571,17 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None):
               d = shelve.open(filename)
               d['connections'] = deepcopy(connections)
               d.close()
-          
+              print("....updated cells connections")
+              
+              
+          print("....starting updating cells")
           filename =labels_dir +  'Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)
           myShelve = shelve.open(filename)
           dict_cells = {'cells': all_cells, 'labels':data_new , 'metadata': metadata}
           myShelve.update(dict_cells)
           # close the shelve
           myShelve.close()   
-
+          print("....updated all cells")
           test= shelve.open( labels_dir +  'Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)   )  
           t1 = t1 + timedelta(minutes=5)  
           

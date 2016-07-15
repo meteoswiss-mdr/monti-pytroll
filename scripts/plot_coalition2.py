@@ -1049,7 +1049,7 @@ if __name__ == '__main__':
                     labels_corrected, first_time_step = properties_cells(time_slot,time_slot,current_labels = labels, metadata = metadata)
                     
                     if in_msg.plot_forecast == True and first_time_step == False:
-                        plot_forecast_area(time_slot, in_msg.model_fit_area,outputFile="new_forecasted_area/", current_labels = labels_corrected, t_stop=time_slot,BackgroundFile=out_file1)
+                        plot_forecast_area(time_slot, in_msg.model_fit_area,outputFile="/opt/users/lel/PyTroll/scripts/new_forecasted_area/", current_labels = labels_corrected, t_stop=time_slot,BackgroundFile=out_file1)
             
           # add 5min and do the next time step
           

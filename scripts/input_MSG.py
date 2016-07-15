@@ -1,7 +1,7 @@
 
 def input(in_msg):
 
-    print "*** read input from input_template.py"
+    print "*** read input from input_MSG.py"
 
     #------------------------------------------------------------------------
     # if not specified (False), current (last) observation time is chosen  

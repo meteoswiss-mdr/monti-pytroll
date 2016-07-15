@@ -20,12 +20,14 @@ def get_input_msg(input_file=None):
          self.RSS = True
          self.check_input = False
          self.reader_level = None
-         self.save_reprojected_data=[]
-         self.save_statistics=False
-         self.HRV_enhancement=False
-         self.make_plots=True
-         self.fill_value=None          # black (0,0,0) / white (1,1,1) / transparent None  
-         self.nwcsaf_calibrate=False   # False -> dont scale to real values, plot with palette
+         self.parallax_correction = False
+         self.parallax_gapfilling = 'False'
+         self.save_reprojected_data = []
+         self.save_statistics = False
+         self.HRV_enhancement = False
+         self.make_plots = True
+         self.fill_value = None          # black (0,0,0) / white (1,1,1) / transparent None  
+         self.nwcsaf_calibrate = False   # False -> dont scale to real values, plot with palette
          self.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
          self.outputDir = "./%Y-%m-%d/%(rgb)s-%(area)s/"
          self.compress_to_8bit=False
@@ -33,7 +35,7 @@ def get_input_msg(input_file=None):
          self.scpOutputDir = scp_settings.scpOutputDir
          self.scpID = scp_settings.scpID
          self.mapDir = ""
-         self.mapResolution=None
+         self.mapResolution = None
          self.indicate_mask = True
          self.add_title = True
          self.add_borders = True
@@ -80,7 +82,7 @@ def get_input_msg(input_file=None):
                            'dcld':1,'dcot':10,'dcwp':2,'dndv':1,'dreff':20,\
                            'precip':10,'precip_ir':10,'qa':10,'reff':10,'satz':10,'sds':100,'sds_cs':100,'sds_diff':100,'sds_diff_cs':100,\
                            'sunz':10,'lat':10,'lon':10,'time_offset':100}
-         self.minor_tick_marks= {'VIS006': 5, 'VIS008': 5, 'IR_016': 5, 'IR_039': 5, 'WV_062': 5, 'WV_073': 5,\
+         self.minor_tick_marks = {'VIS006': 5, 'VIS008': 5, 'IR_016': 5, 'IR_039': 5, 'WV_062': 5, 'WV_073': 5,\
                            'IR_087': 5, 'IR_097': 5, 'IR_108': 5, 'IR_120': 5, 'IR_134': 5, 'HRV': 5,\
                            'vza': 1, 'vaa': 1, 'lat': 1, 'lon': 1,\
                            'CTH': 1, 'CTP':  50,'CTT': 5, 'CT': 1, 'CT_PHASE': 1, 'CMa': 1, 'CMa_DUST':  1, 'CMa_TEST': 1, 'CMa_VOLCANIC': 1, 'clouddepth':1,
@@ -140,9 +142,28 @@ def get_input_msg(input_file=None):
             print "*** Error in sat_nr_str (get_input_msg.py)"
             print "    unknown type of sat_nr", type(self.sat_nr)
             quit()
-         return sat_nr_str
+
+         #return sat_nr_str
+         return ""
+
+      def sat_str(self, layout="%(sat)s-%(sat_nr)s"):
+         if self.sat[0:8].lower() == "meteosat":
+            return "Meteosat-"+str(int(self.sat_nr))
+         else:
+            return self.sat+str(int(self.sat_nr))
+         
       def msg_str(self, layout="%(msg)s-%(msg_nr)s"):
+         """
+         general purpuse
+         returns a string representing the meteosat satellite"
+         optinonal input:
+         layout (string) specifying the format/layout of the returned string
+         possible inputs: 
+             layout="%(msg)s-%(msg_nr)s"   (default)
+             layout="%(msg)s-%(0msg_nr)s"  (with leading zero in for MSG numbers smaller than 10)
+         """
          if self.sat[0:8]=="meteosat" or self.sat[0:8]=="Meteosat":
+            
             if 8 <= self.sat_nr and self.sat_nr <=11:
                d={'msg':'MSG', 'msg_nr':str(int(self.sat_nr)-7), 'sat':self.sat, 'sat_nr':str(self.sat_nr),'0sat_nr':str(self.sat_nr).zfill(2)}
                msg_str = layout % d
@@ -150,6 +171,7 @@ def get_input_msg(input_file=None):
                print "*** Error in msg_str (get_input_msg.py)"
                print "    try to get msg_string for sat number", self.sat_nr, " which is not meteosat SECOND generation "
                quit()
+
          else:
             print "*** Error in msg_str (get_input_msg.py)"
             print "    try to get msg_string for sat ", self.sat, " which is not Meteosat/meteosat"
@@ -157,7 +179,7 @@ def get_input_msg(input_file=None):
          return msg_str
 
    # define input class
-   in_msg=input_msg_class()
+   in_msg = input_msg_class()
 
    # get input from (user specified) file 
    input_module = __import__(input_file)

@@ -61,13 +61,15 @@ def create_dir(outputFile):
 
 def force_to_observed_cloud_mask(mod, obs):
     if np.any(mod.mask == True) == False:
-        print "NO MASK ACTIVE!!!!!!!!!"
+        if verbose:
+            print "NO MASK ACTIVE!!!!!!!!!"
         if np.any(np.isnan(mod)):
             mod = ma.masked_where(np.isnan(mod), mod)
             print "the invalid are NAN"
         else:
             mod = ma.masked_where(mod <= 0, mod)
-            print "the invalid are <= 0"
+            if verbose:
+                print "the invalid are <= 0"
     mod[mod.mask==True] = np.nan
     mod = fill_with_closest_pixel(mod) 
     mod[obs==True] = np.nan
@@ -297,7 +299,6 @@ if __name__ == '__main__':
       
 
           print "current time: ", time_slot
-          print "stopping time: ", time_slotSTOP
           
           year = time_slot.year
           month = time_slot.month
@@ -349,7 +350,7 @@ if __name__ == '__main__':
           # load product, global_data is changed in this step!
           area_loaded = load_products(global_data, in_msg.RGBs, in_msg, area_loaded ) #
           
-          print "now should start areas", in_msg.areas
+          print "Areas chosen:", in_msg.areas
                     
           for area in in_msg.areas:
           

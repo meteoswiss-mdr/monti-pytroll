@@ -250,7 +250,7 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None):
     count_double = 0
     
     #labels_dir = '/data/cinesat/out/labels/'
-    labels_dir = 'labels/'
+    labels_dir = '/opt/users/lel/PyTroll/scripts/labels/' #compatible to all users
     
     while t1 <= tStop:
           

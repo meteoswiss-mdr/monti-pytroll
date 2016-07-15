@@ -465,7 +465,12 @@ def get_info_current_time(time, data_container): # all_connections = None, all_c
     if string_id not in data_container['all_connections'].keys():
         filename = '/opt/users/lel/PyTroll/scripts/labels/Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)
         myShelve = shelve.open(filename)
-        data_container['all_connections'][string_id]     = myShelve['connections'] 
+        try:
+            data_container['all_connections'][string_id]     = myShelve['connections'] 
+        except KeyError:
+            1+2
+            #if you try to read the current timestep it won't find the connections yet!!! COULD BE DANGEROUS, could give error later
+        
         data_container['all_cell_properties'][string_id] = myShelve['cells']
         data_container['all_labels'][string_id]          = myShelve['labels']   
     # !!!!!!!!! some can be returned as NONE if None as input ---> should always have all as output even if not needed/used/known !!!!!!!!!!    

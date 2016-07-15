@@ -295,9 +295,9 @@ def input(in_msg):
     in_msg.legend = True
 
     #saving output labels as pickle or shelve
-    in_msg.pickle_labels = True; in_msg.shelve_labels = False
+    #in_msg.pickle_labels = True; in_msg.shelve_labels = False
     #in_msg.pickle_labels = False; in_msg.shelve_labels = True
-    #in_msg.pickle_labels = False; in_msg.shelve_labels = False
+    in_msg.pickle_labels = False; in_msg.shelve_labels = False
 
     # load a few standard things 
     #in_msg.outputFile = 'WS_%(rgb)s-%(area)s_%y%m%d%H%M'

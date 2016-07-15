@@ -113,7 +113,7 @@ def add_history(history_cell, t, id_prev, num_mean108):
     hour0S  = "%02d" % t.hour
     min0S   = "%02d" % t.minute    
     
-    filename = 'labels/Labels_%s.shelve'%(year0S+month0S+day0S+hour0S+min0S)
+    filename = '/opt/users/lel/PyTroll/scripts/labels/Labels_%s.shelve'%(year0S+month0S+day0S+hour0S+min0S)
     myShelve = shelve.open(filename) 
     #print("cells available at current time("+year0S+"-"+month0S+"-"+day0S+" "+hour0S+":"+min0S+")\n", [key for key in myShelve['cells'].keys()])
     
@@ -125,7 +125,7 @@ def add_history(history_cell, t, id_prev, num_mean108):
     if len(id_prev) == 1:
         #print("++++one previous")
         id_prev = id_prev[0]
-        mean108 = np.array(myShelve['cells'][id_prev].mean108)
+        mean108 = np.array(myShelve['cells'][id_prev].mean108) 
         id_prev_new = myShelve['cells'][id_prev].id_prev
         area = myShelve['cells'][id_prev].area_px
         if myShelve['cells'][id_prev].split == 1:
@@ -463,7 +463,7 @@ def get_info_current_time(time, data_container): # all_connections = None, all_c
     string_id = yearS+monthS+dayS+hourS+minS
     
     if string_id not in data_container['all_connections'].keys():
-        filename = 'labels/Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)
+        filename = '/opt/users/lel/PyTroll/scripts/labels/Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)
         myShelve = shelve.open(filename)
         data_container['all_connections'][string_id]     = myShelve['connections'] 
         data_container['all_cell_properties'][string_id] = myShelve['cells']

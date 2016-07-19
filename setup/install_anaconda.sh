@@ -14,10 +14,11 @@
 # author: Ulrich Hamann
 # version 0.1: 16-02-2016 U. Hamann
 
-export PYTROLLHOME=/opt/users/$(logname)/PyTroll/
-mkdir -p $PYTROLLHOME/packages
 export HOME_ORG=$HOME
-export HOME=$PYTROLLHOME/packages
+#export PYTROLLHOME=/opt/users/$(logname)/PyTroll/
+#mkdir -p $PYTROLLHOME/packages
+#export HOME=$PYTROLLHOME/packages
+export HOME=/opt/users/common/packages
 echo ""
 echo "... PyTroll installation script starts"
 echo ""

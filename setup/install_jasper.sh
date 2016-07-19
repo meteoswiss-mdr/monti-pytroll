@@ -25,7 +25,8 @@ wget http://www.linuxfromscratch.org/patches/blfs/svn/jasper-1.900.1-security_fi
 cd jasper-1.900.1
 patch -Np1 -i ../jasper-1.900.1-security_fixes-2.patch
 
-# install 
+# configure, make and install 
+export CFLAGS="-fPIC -m64"   # use fPIC and compile for 64bit machine
 ./configure --prefix=/opt/users/common/lib/jasper --enable-shared --disable-static --mandir=/opt/users/common/lib/jasper/man 
 make
 make install

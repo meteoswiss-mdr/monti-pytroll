@@ -14,8 +14,17 @@
 # author: Ulrich Hamann
 # version 0.1: 16-02-2016 U. Hamann
 
-# set paths for anaconda (again, for security)
-. ./setup_anaconda_zueub428.sh
+# open proxy ports
+export http_proxy=http://proxy.meteoswiss.ch:8080
+export https_proxy=https://proxy.meteoswiss.ch:8080
+
+# This is now only done once for all users
+## set paths for anaconda (again, for security)
+#. ./setup_anaconda_zueub428.sh
+
+# add Anaconda directory to the path and check, if it is installed
+export PATH="/opt/users/common/packages/anaconda3/bin:$PATH"
+conda -V >/dev/null 2>&1 || { echo "Setup of virtual environment requires conda but it's not installed. Contact Ulrich. Aborting." >&2; exit 1; }
 
 #echo "*** Switch off SSL check for conda installations"
 conda config --set ssl_verify false

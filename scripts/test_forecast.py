@@ -75,7 +75,7 @@ def figure_labels(labels, outputFile, timeObs, dt, area_plot="ccs4", add_name = 
 # ----------------------------------------------------------------------
 
 #if __name__ == '__main__':
-def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=None, BackgroundFile=None):
+def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=None, BackgroundFile=None, ForeGroundRGBFile = None, labels_dir = '/opt/users/lel/PyTroll/scripts/labels/'):
     verbose = False
     if t_stop == None:
         t_stop = ttt
@@ -89,7 +89,7 @@ def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=Non
         
         if current_labels == None:
               yearS, monthS, dayS, hourS, minS = string_date(ttt)
-              filename = 'cells/%s.shelve'%(yearS+monthS+dayS+hourS+minS)
+              filename = 'Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)
               myShelve = shelve.open(filename)
               labels_all = deepcopy(myShelve['labels'])
         else:
@@ -106,7 +106,6 @@ def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=Non
         forecasted_areas = []    
         at_least_one_cell = False        
         for interesting_cell in unique_labels:
-              
               print "******** computing history backward"
               forecasted_labels["ID"+str(interesting_cell)]=[]
               
@@ -122,16 +121,17 @@ def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=Non
               t, y = future_properties(time,area, ylabel, model)
               
               print("******** computed extrapolation")
-      
-              #print "******** computing history forward"
-              #ind1, area1, displacement1, time1 = history_backward(ttt.day,ttt.month,ttt.year,ttt.hour,ttt.minute,interesting_cell, False, ttt+timedelta(hours = 1))
-              #print "******** computed history forward"
-      
-              #t2 = time1 #[::-1]
-              #y2 = area1 #[::-1]
-      
-      
-      
+              
+              if False:
+                    print "******** computing history forward"
+                    ind1, area1, displacement1, time1 = history_backward(ttt.day,ttt.month,ttt.year,ttt.hour,ttt.minute,interesting_cell, False, ttt+timedelta(hours = 1))
+                    print "******** computed history forward"
+            
+                    t2 = time1 #[::-1]
+                    y2 = area1 #[::-1]
+            
+            
+            
               nx,ny = labels_all.shape
               if verbose:
                   print(nx,ny)
@@ -302,17 +302,16 @@ def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=Non
                           print("... saved composite: display ", out_file1, " &")
                       t_composite+=timedelta(minutes=5)
       
-      
               if False:
                   fig, ax = plt.subplots()
                   ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
                   ax.plot_date(t, y, 'o',label="Fit and extrapolation")
                   ax.plot_date(forecasted_time, forecasted_areas, '*',label="forecasted")
                   ax.plot_date(t2, y2, '*', label="Observations")
-                  ax.set_xlim([t[0]-timedelta(minutes = 5), t2[-1]+timedelta(minutes = 5)])
+                  #ax.set_xlim([t[0]-timedelta(minutes = 5), t2[-1]+timedelta(minutes = 5)])
                   ax.set_ylabel("area")
                   ax.legend(loc="best");
-                  fig.savefig("area_in_time.png")
+                  fig.savefig(yearS+monthS+dayS+"_"+hourS+minS+"_AreaInTime"+"ID"+str(interesting_cell)+".png")
                   plt.close( fig)    
       
         t_composite = deepcopy(ttt)
@@ -323,11 +322,15 @@ def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=Non
             
         background_im = glob.glob(background_im_filename)
         
-        currentRGB_im_filename = "/opt/users/lel/PyTroll/scripts/Mecikalski/cosmo/Channels/indicators_in_time/RGB_dam/"+yearS+monthS+dayS+"_"+hourS+minS+"*ccs4.png"
-        currentRGB_im = glob.glob(currentRGB_im_filename)
+        if ForeGroundRGBFile == None:
+            currentRGB_im_filename = "/opt/users/lel/PyTroll/scripts/Mecikalski/cosmo/Channels/indicators_in_time/RGB_dam/"+yearS+monthS+dayS+"_"+hourS+minS+"*ccs4.png"
         
-        print("background file: ",BackgroundFile)
+        else:
+            currentRGB_im_filename = ForeGroundRGBFile
+        
+        currentRGB_im = glob.glob(currentRGB_im_filename)
         im = plt.imread(background_im[0])
+        
         #img1 = Image.imread(currentRGB_im[0])
         obj_area = get_area_def("ccs4")
         fig,ax = prepare_figure(obj_area)
@@ -378,14 +381,14 @@ def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=Non
         #PIL_image.paste(img1, (0, 0), img1)
                
         PIL_image.save(create_dir(outputFile)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+".png")
-        path = (outputFile)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+".png"
+        path = (outputFile)+yearS+monthS+dayS+hourS+minS+"Forecast.png"
         print "... display ",path," &"
         plt.close( fig)                             
         if True:
             print "path foreground", currentRGB_im[0]
             
             
-            path_composite = (outputFile)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_composite.png"     
+            path_composite = (outputFile)+yearS+monthS+dayS+"_Obs"+hourS+minS+"Forecast_composite.png"     
             subprocess.call("/usr/bin/composite "+currentRGB_im[0]+" "+path+" "+path_composite, shell=True)
             print "... display",path_composite,"&"
         
@@ -449,8 +452,8 @@ if __name__ == '__main__':
     verbose = False
     profiling = False
     
-    ttt = datetime(2015,7,7,12,55)
-    #interesting_cell = 67
+    ttt = datetime(2015,7,7,13,0)
+    interesting_cell = 67
     outputFile = "/opt/users/lel/PyTroll/scripts/forecasting_labels/"    
                 
     model = "linear_exp_exp"

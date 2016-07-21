@@ -188,9 +188,9 @@ def check_input_file(in_msg, area):
         print "Over the area you chose ", area," there is no Rapid Scan available.\n Suggestion: set rapid_scan_mode to False"
         quit()
     
-	if chosen_settings['rapid_scan_mode']==True:
-		chosen_settings['dt_forecast1'] = 5
-		chosen_settings['dt_forecast2'] = 10
+    if chosen_settings['rapid_scan_mode']==True:
+    		chosen_settings['dt_forecast1'] = 5
+    		chosen_settings['dt_forecast2'] = 10
     else:
         chosen_settings['dt_forecast1'] = 15
         chosen_settings['dt_forecast2'] = 30
@@ -263,6 +263,7 @@ if __name__ == '__main__':
           #    in_msg.nrt = False
           #else:
           #    in_msg.nrt = True #bad fix, different place cosmo and similar
+          in_msg.nrt = False
           if len(sys.argv) > 7:
               yearSTOP   = int(sys.argv[7])
               monthSTOP  = int(sys.argv[8])
@@ -339,6 +340,15 @@ if __name__ == '__main__':
 
           print "*** read data for ", in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot
           
+          for i_try in range(30):
+              RGBs = check_input(in_msg, in_msg.sat+sat_nr_str, in_msg.datetime, RGBs=in_msg.RGBs)
+              if len(RGBs) > 0:
+                  # exit loop, if input is found
+                  break
+              else:
+                  # else wait 20s and try again
+                  import time
+                  time.sleep(25)
           # now read the data we would like to forecast
           global_data = GeostationaryFactory.create_scene(in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot)
           #global_data_RGBforecast = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
@@ -370,6 +380,8 @@ if __name__ == '__main__':
                 print '      forth_mask: ', chosen_settings['forth_mask']
                 print '      forced_mask: ', chosen_settings['forced_mask']
                 print '      mask_cirrus: ', chosen_settings['mask_cirrus']
+                print '      dt_forecast1: ', chosen_settings['dt_forecast1']
+                print '      dt_forecast2: ', chosen_settings['dt_forecast2']
                   
                 obj_area = get_area_def(area)
                 
@@ -410,8 +422,8 @@ if __name__ == '__main__':
                     in_msg.name_ForcedMask = 'no'
                 
                 
-                if chosen_settings['scale'] == 'local':
-                    for i_try in range(10):
+                if chosen_settings['scale'] == 'local' and in_msg.no_NWCSAF == False:
+                    for i_try in range(30):
                         # check if 'CTH' file is present
                         RGBs = check_input(in_msg, in_msg.sat+sat_nr_str, in_msg.datetime, RGBs="CTH")
                         if len(RGBs) > 0:
@@ -437,9 +449,11 @@ if __name__ == '__main__':
                 if in_msg.nrt == True:
                     in_msg.outputDir = in_msg.outputDirNrt
                     in_msg.nowcastDir = in_msg.nowcastDirNrt
+                    in_msg.labelsDir = in_msg.labelsDirNrt
                 else:
                     in_msg.outputDir = in_msg.outputDirOffline
                     in_msg.nowcastDir = in_msg.nowcastDirOffline
+                    in_msg.labelsDir = in_msg.labelsDirOffline
                 if in_msg.nowcastDir == '/data/COALITION2/PicturesSatellite/LEL_results_wind/':
                     print "      updated in_msg.nowcastDir"
                     in_msg.nowcastDir+= '/'+yearS+'-'+monthS+'-'+dayS+'/channels/'				
@@ -450,7 +464,7 @@ if __name__ == '__main__':
                 print "    nx, ny= ", nx,ny
       
                 #print type(data['CTP'].data)
-                if chosen_settings['scale'] != 'local':
+                if chosen_settings['scale'] != 'local' or in_msg.no_NWCSAF == True:
                     mask_NoClouds = np.where(data['IR_108'].data < -10.0) # does this actually work??? (also no clouds should have BT)
                 else:
                     data['CTH'].data = ma.masked_less(data['CTH'].data, 1) #1 to make sure 0 is also masked
@@ -1011,8 +1025,8 @@ if __name__ == '__main__':
                 # set transparency for "no clouds" 
                 rgbArray[sum_array<=0,3] = background_alpha
             
-                c2File = (in_msg.outputDir+"/cosmo/Channels/indicators_in_time/RGB"+maskS+"/%s_%s_C2rgb"+maskS+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask"+area+".png") % (yearS+monthS+dayS,hourS+minS)
-                #c2File = ("/data/cinesat/out/"+"/%s_%s_C2rgb"+maskS+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask.png") % (yearS+monthS+dayS,hourS+minS)
+                #c2File = (in_msg.outputDir+"/cosmo/Channels/indicators_in_time/RGB"+maskS+"/%s_%s_C2rgb"+maskS+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask"+area+".png") % (yearS+monthS+dayS,hourS+minS)
+                c2File = (in_msg.outputDir+"/%s_%s_C2rgb"+maskS+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask"+area+".png") % (yearS+monthS+dayS,hourS+minS)
                 if 'C2rgb' in in_msg.results:
                     img1 = Image.fromarray( rgbArray,'RGBA')
                     #add_border_and_rivers( img1, cw, area_tuple, in_msg)
@@ -1021,14 +1035,17 @@ if __name__ == '__main__':
                     
                     #pickle.dump( img1, open("RGB"+yearS+monthS+dayS+hourS+minS+".p", "wb" ) )
                 
-                if 'C2rgbHRV' in in_msg.results and in_msg.nrt == False:
+                if 'C2rgbHRV' in in_msg.results: # and in_msg.nrt == False:
                     if area == "ccs4":
                         type_image = "_HRV"
                     else:
                         type_image = "_overview"
                     #c2FileHRV = (in_msg.outputDir+"/cosmo/Channels/indicators_in_time/RGB-HRV"+maskS+"/%s_%s_C2rgb"+maskS+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask.png") % (yearS+monthS+dayS,hourS+minS)
-                    hrvFile = "/data/COALITION2/PicturesSatellite//"+yearS+"-"+monthS+"-"+dayS+"/"+yearS+"-"+monthS+"-"+dayS+type_image+"_"+area+"/MSG"+type_image+"-"+area+"_"+yearS[2:]+monthS+dayS+hourS+minS+".png"
-                    out_file1 = create_dir( in_msg.outputDir +"/cosmo/Channels/indicators_in_time/RGB-HRV"+maskS+"/"+yearS+monthS+dayS+"_"+hourS+minS+"_C2rgb-HRV_"+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask.png" )
+                    #hrvFile = "/data/COALITION2/PicturesSatellite//"+yearS+"-"+monthS+"-"+dayS+"/"+yearS+"-"+monthS+"-"+dayS+type_image+"_"+area+"/MSG"+type_image+"-"+area+"_"+yearS[2:]+monthS+dayS+hourS+minS+".png"
+                     
+                    hrvFile = "/data/cinesat/out/MSG_IR-108-"+area+"_"+"16"+monthS+dayS+hourS+minS+".png"
+                    print "...creating composite", "/data/cinesat/out/MSG_IR-108-"+area+"_"+"16"+monthS+dayS+hourS+minS+".png"
+                    out_file1 = create_dir( in_msg.outputDir +"/"+yearS+monthS+dayS+"_"+hourS+minS+"_C2rgb-HRV_"+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask"+area+".png" )
                     print "... create composite "+c2File+" "+hrvFile+" "+out_file1
                     subprocess.call("/usr/bin/composite "+c2File+" "+hrvFile+" "+out_file1, shell=True)
                     print "... saved composite: display ", out_file1, " &"
@@ -1044,12 +1061,20 @@ if __name__ == '__main__':
           
                 if area == "ccs4" and in_msg.properties_cells == True:
                     print "**** Computing properties of the cells"
-                    make_figure(labels, obj_area, 'uff/TEST_RGBMASK.png',colorbar = False,text_to_write = None)
-                    
-                    labels_corrected, first_time_step = properties_cells(time_slot,time_slot,current_labels = labels, metadata = metadata)
-                    
+                    if 'labels_tracked' in in_msg.aux_results:
+                        outputDir_labels = in_msg.outputDir+'/labels/'
+                    else:
+                        outputDir_labels = None
+                    labels_corrected, first_time_step = properties_cells(time_slot,time_slot,current_labels = labels, metadata = metadata, labels_dir = in_msg.labelsDir, outputDir_labels = outputDir_labels, in_msg = in_msg)
+                    if first_time_step:
+                        print "no history to follow, first timestep"
                     if in_msg.plot_forecast == True and first_time_step == False:
-                        plot_forecast_area(time_slot, in_msg.model_fit_area,outputFile="/opt/users/lel/PyTroll/scripts/new_forecasted_area/", current_labels = labels_corrected, t_stop=time_slot,BackgroundFile=out_file1)
+                        print "**** Forecasting Area"
+                        if in_msg.nrt == False:
+                            add_path = "/new_forecasted_area/"
+                        else:
+                            add_path = ""
+                        plot_forecast_area(time_slot, in_msg.model_fit_area,outputFile = in_msg.outputDir+add_path, current_labels = labels_corrected, t_stop=time_slot, BackgroundFile=out_file1, ForeGroundRGBFile = c2File, labels_dir = in_msg.labelsDir)
             
           # add 5min and do the next time step
           

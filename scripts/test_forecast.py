@@ -75,7 +75,7 @@ def figure_labels(labels, outputFile, timeObs, dt, area_plot="ccs4", add_name = 
 # ----------------------------------------------------------------------
 
 #if __name__ == '__main__':
-def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=None, BackgroundFile=None, ForeGroundRGBFile = None, labels_dir = '/opt/users/lel/PyTroll/scripts/labels/'):
+def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=None, BackgroundFile=None, ForeGroundRGBFile = None, labels_dir = '/opt/users/lel/PyTroll/scripts/labels/', in_msg = None):
     verbose = False
     if t_stop == None:
         t_stop = ttt
@@ -379,16 +379,29 @@ def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=Non
         PIL_image = fig2img ( fig )
         
         #PIL_image.paste(img1, (0, 0), img1)
-               
-        PIL_image.save(create_dir(outputFile)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+".png")
-        path = (outputFile)+yearS+monthS+dayS+hourS+minS+"Forecast.png"
+        if in_msg == None:
+            PIL_image.save(create_dir(outputFile)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+".png")
+            path = (outputFile)+yearS+monthS+dayS+hourS+minS+"Forecast.png"
+        else:
+            dic_figure={}
+            dic_figure['rgb']='C2rgbForecastTMP-HRV'
+            dic_figure['area']='ccs4'
+            PIL_image.save(create_dir(outputFile)+in_msg.standardOutputName%dic_figure)
+            path = (outputFile)+in_msg.standardOutputName%('C2rgbForecastTMP-HRV',area)
+        
         print "... display ",path," &"
         plt.close( fig)                             
         if True:
             print "path foreground", currentRGB_im[0]
             
+            if in_msg == None:
+                path_composite = (outputFile)+yearS+monthS+dayS+"_Obs"+hourS+minS+"Forecast_composite.png"     
+            else:
+                dic_figure={}
+                dic_figure['rgb']='C2rgbForecast-HRV'
+                dic_figure['area']='ccs4'
+                path_composite = (outputFile)+in_msg.standardOutputName%dic_figure
             
-            path_composite = (outputFile)+yearS+monthS+dayS+"_Obs"+hourS+minS+"Forecast_composite.png"     
             subprocess.call("/usr/bin/composite "+currentRGB_im[0]+" "+path+" "+path_composite, shell=True)
             print "... display",path_composite,"&"
         

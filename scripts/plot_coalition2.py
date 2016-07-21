@@ -1024,9 +1024,17 @@ if __name__ == '__main__':
                 rgbArray[sum_array<=0,2] = background_color[2] 
                 # set transparency for "no clouds" 
                 rgbArray[sum_array<=0,3] = background_alpha
-            
-                #c2File = (in_msg.outputDir+"/cosmo/Channels/indicators_in_time/RGB"+maskS+"/%s_%s_C2rgb"+maskS+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask"+area+".png") % (yearS+monthS+dayS,hourS+minS)
-                c2File = (in_msg.outputDir+"/%s_%s_C2rgb"+maskS+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask"+area+".png") % (yearS+monthS+dayS,hourS+minS)
+                
+                in_msg.standardOutputName = in_msg.standardOutputName.replace('%y%m%d%H%M',time.strftime('%y%m%d%H%M',time_slot.timetuple()))
+                
+                ###c2File = (in_msg.outputDir+"/cosmo/Channels/indicators_in_time/RGB"+maskS+"/%s_%s_C2rgb"+maskS+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask"+area+".png") % (yearS+monthS+dayS,hourS+minS)
+                #c2File = (in_msg.outputDir+"/%s_%s_C2rgb"+maskS+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask"+area+".png") % (yearS+monthS+dayS,hourS+minS)
+                dic_figure={}
+                dic_figure['rgb']='C2rgb'
+                dic_figure['area']=area
+                print in_msg.standardOutputName
+                c2File = (in_msg.outputDir+in_msg.standardOutputName%dic_figure)
+                
                 if 'C2rgb' in in_msg.results:
                     img1 = Image.fromarray( rgbArray,'RGBA')
                     #add_border_and_rivers( img1, cw, area_tuple, in_msg)
@@ -1045,7 +1053,12 @@ if __name__ == '__main__':
                      
                     hrvFile = "/data/cinesat/out/MSG_IR-108-"+area+"_"+"16"+monthS+dayS+hourS+minS+".png"
                     print "...creating composite", "/data/cinesat/out/MSG_IR-108-"+area+"_"+"16"+monthS+dayS+hourS+minS+".png"
-                    out_file1 = create_dir( in_msg.outputDir +"/"+yearS+monthS+dayS+"_"+hourS+minS+"_C2rgb-HRV_"+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask"+area+".png" )
+                    #out_file1 = create_dir( in_msg.outputDir +"/"+yearS+monthS+dayS+"_"+hourS+minS+"_C2rgb-HRV_"+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask"+area+".png" )
+                    dic_figure={}
+                    dic_figure['rgb']='C2rgb-HRV'
+                    dic_figure['area']=area
+                    print in_msg.standardOutputName
+                    out_file1 = create_dir( in_msg.outputDir+in_msg.standardOutputName%dic_figure)
                     print "... create composite "+c2File+" "+hrvFile+" "+out_file1
                     subprocess.call("/usr/bin/composite "+c2File+" "+hrvFile+" "+out_file1, shell=True)
                     print "... saved composite: display ", out_file1, " &"
@@ -1074,7 +1087,7 @@ if __name__ == '__main__':
                             add_path = "/new_forecasted_area/"
                         else:
                             add_path = ""
-                        plot_forecast_area(time_slot, in_msg.model_fit_area,outputFile = in_msg.outputDir+add_path, current_labels = labels_corrected, t_stop=time_slot, BackgroundFile=out_file1, ForeGroundRGBFile = c2File, labels_dir = in_msg.labelsDir)
+                        plot_forecast_area(time_slot, in_msg.model_fit_area,outputFile = in_msg.outputDir+add_path, current_labels = labels_corrected, t_stop=time_slot, BackgroundFile=out_file1, ForeGroundRGBFile = c2File, labels_dir = in_msg.labelsDir, in_msg = in_msg)
             
           # add 5min and do the next time step
           

@@ -17,4 +17,4 @@ echo "*** Start to make seviri pictures"
 
 ## remove result files older than 1 hour (done in plot_ms.sh)
 #echo "*** Remove all result files older than 1 hour"
-#find /data/cinesat/out/* -mmin +60 -exec rm {} \;
+#find /data/cinesat/out/* -type f -mmin +60 -exec rm {} \;

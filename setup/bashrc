@@ -1,3 +1,4 @@
+#!/bin/bash
 
 # .bashrc
 
@@ -8,9 +9,9 @@ fi
 
 #PS1='\[[\u@ \e[1;31m\]\h \e[0;37m\W]\$\[\e[0m\] '
 
-echo $USER
-echo $(logname)
-echo $LOGNAME
+echo "USER" ${USER}
+echo "\$(logname)" $(logname)
+echo "\$LOGNAME" $LOGNAME
 
 export XAUTHORITY=/home/lom/users/$LOGNAME/.Xauthority
 
@@ -34,6 +35,9 @@ export PSP_CONFIG_FILE=/opt/users/common/packages/pyspectral_rsr_data/pyspectral
 
 # added by Anaconda3 4.0.0 installer
 export PATH="/opt/users/common/packages/anaconda3/bin:$PATH"
+conda -V
+which conda
+which python
 
 # easy access to the easy-install file
 alias easy-install.pth='emacs /opt/users/common/packages/anaconda3/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth &'
@@ -50,5 +54,10 @@ alias ll='ls --color=auto -alh'
 alias ls='ls --color=auto'
 
 alias tkdiff='/opt/users/common/packages/tkdiff-unix/tkdiff'
+
+export FULLNAME=`getent passwd $LOGNAME | cut -d ":" -f 5 | cut -d "," -f 1`
+export FIRSTNAME=`echo $FULLNAME | cut -d " " -f 1`
+export LASTNAME=`echo $FULLNAME | cut -d " " -f 2`
+export EMAIL=${FIRSTNAME}.${LASTNAME}@meteoswiss.ch
 
 #alias cdo='/opt/users/common/lib/cdo-1.7.1/bin/cdo'

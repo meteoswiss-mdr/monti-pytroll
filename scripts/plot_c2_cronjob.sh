@@ -29,7 +29,7 @@ $python ${dir1}/plot_coalition2_EuropeS95.py > /tmp/plot_coalition2_EuropeS95.tx
 
 # remove uncompressed data older than 10min
 echo "*** Remove uncompressed data files older than 12min"
-#find /tmp/?-000-MSG?__-MSG?_???____-*_-*___-*-__ -mmin +15 -exec rm {} \;
+#find /tmp/?-000-MSG?__-MSG?_???____-*_-*___-*-__ -type f -mmin +15 -exec rm {} \;
 find /tmp/?-000-MSG?__-MSG?_???____-*_-*___-*-__  -type f -mmin +40 -delete \;
 
 find /tmp/SEVIRI_DECOMPRESSED_hau/?-000-MSG?__-MSG?_???____-*_-*___-*-__ -type f -mmin +40 -delete

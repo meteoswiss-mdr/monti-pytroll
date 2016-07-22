@@ -14,8 +14,9 @@ def get_input_msg(input_file=None):
          self.delay = 0
          self.RGBs = []
          self.areas = []
-         #self.sat = "meteosat"
-         self.sat = "Meteosat-"
+         self.sat = "meteosat"     # using the old config file: meteosat09.cfg
+         #self.sat = "Meteosat"      # using the new config file: Meteosat-9.cfg 
+         #self.sat = "Meteosat-"      # using the new config file: Meteosat-9.cfg 
          self.sat_nr = None  # rapid scan service
          self.RSS = True
          self.check_input = False
@@ -103,13 +104,16 @@ def get_input_msg(input_file=None):
 
       def add_rgb(self, rgb):
          self.RGBs.append(rgb)
+
       def add_area(self, area):
          self.areas.append(area)
+
       def update_datetime(self, year, month, day, hour, minute):
          if year != None and month != None and day != None and hour != None and minute != None: 
             self.datetime=datetime(year, month, day, hour, minute, 0)
          else:
             print "*** WARNING: cannot update time!"
+
       def get_last_SEVIRI_date(self):
          from my_msg_module import get_last_SEVIRI_date
          self.datetime = get_last_SEVIRI_date(self.RSS, delay=self.delay)
@@ -143,11 +147,15 @@ def get_input_msg(input_file=None):
             print "    unknown type of sat_nr", type(self.sat_nr)
             quit()
 
-         #return sat_nr_str
-         return ""
+         if self.sat[0:8] == "Meteosat":
+            return ""
+         else:
+            return sat_nr_str
 
       def sat_str(self, layout="%(sat)s-%(sat_nr)s"):
-         if self.sat[0:8].lower() == "meteosat":
+         if self.sat[0:8] == "meteosat":
+            return "meteosat"
+         elif self.sat[0:8].lower() == "meteosat":
             return "Meteosat-"+str(int(self.sat_nr))
          else:
             return self.sat+str(int(self.sat_nr))

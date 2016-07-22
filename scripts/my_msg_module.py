@@ -68,7 +68,7 @@ output:
   date structure with the date of the last SEVIRI observation
 '''
 
-def rgb_prerequisites(rgb, verbose=True):
+def rgb_prerequisites(rgb, sat="meteosat", sat_nr="10", verbose=True):
 
     # import glob
     from mpop.satellites import GeostationaryFactory
@@ -77,7 +77,7 @@ def rgb_prerequisites(rgb, verbose=True):
 
     # create an arbitrary data container
     date = datetime.datetime(2000, 12, 24, 18, 0, 0) # like christmas eve :-)
-    global_data = GeostationaryFactory.create_scene("meteosat", "10", "seviri", date)
+    global_data = GeostationaryFactory.create_scene(sat, sat_nr, "seviri", date)
 
     if type(rgb) is str:
         rgb=[rgb]
@@ -439,15 +439,8 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                 pro_file_checked=True
                 sat_nr_org = in_msg.sat_nr
                 while in_msg.sat_nr > 7:
-                    if in_msg.sat_nr == 8:
-                        MSG="MSG1"
-                    elif in_msg.sat_nr == 9:
-                        MSG="MSG2"
-                    elif in_msg.sat_nr == 10:
-                        MSG="MSG3"
-                    else:
-                        print "*** Error, known MSG satellite", in_msg.sat_nr
-                        quit()
+
+                    MSG = in_msg.msg_str(layout="%(msg)s%(msg_nr)s")
 
                     if in_msg.verbose:
                         print "... check input files for ", MSG, str(in_msg.datetime), in_msg.RGBs
@@ -486,7 +479,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                     print "    found epilogue file"                
 
             # retrieve channels needed for specific rgb
-            channels_needed = rgb_prerequisites(rgb, verbose=False)
+            channels_needed = rgb_prerequisites(rgb, sat_nr=str(in_msg.sat_nr), verbose=False)
         
             if in_msg.verbose:
                 print "    check input files for ", rgb, ', channels needed: ', channels_needed

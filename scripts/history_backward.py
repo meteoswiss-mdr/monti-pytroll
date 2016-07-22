@@ -105,7 +105,7 @@ def make_figureLabels(values, all_cells, obj_area, outputFile, colorbar = True, 
     plt.close( fig)
 
 
-def add_history(history_cell, t, id_prev, num_mean108): 
+def add_history(history_cell, t, id_prev, num_mean108, labels_dir): 
                           
     year0S  = str(t.year)
     month0S = "%02d" % t.month
@@ -113,7 +113,7 @@ def add_history(history_cell, t, id_prev, num_mean108):
     hour0S  = "%02d" % t.hour
     min0S   = "%02d" % t.minute    
     
-    filename = '/opt/users/lel/PyTroll/scripts/labels/Labels_%s.shelve'%(year0S+month0S+day0S+hour0S+min0S)
+    filename = labels_dir +'/Labels_%s.shelve'%(year0S+month0S+day0S+hour0S+min0S)
     myShelve = shelve.open(filename) 
     #print("cells available at current time("+year0S+"-"+month0S+"-"+day0S+" "+hour0S+":"+min0S+")\n", [key for key in myShelve['cells'].keys()])
     
@@ -174,13 +174,13 @@ def add_history(history_cell, t, id_prev, num_mean108):
     myShelve.close()
     return history_cell, id_prev_new
 
-def add_history1(history_cell, cell_id, cells_to_correct, cells_known, t_to_correct, t_known, num_rgb, interesting_cell, backward, data_container): #(ancestors).(children)
+def add_history1(history_cell, cell_id, cells_to_correct, cells_known, t_to_correct, t_known, num_rgb, interesting_cell, backward, data_container,labels_dir): #(ancestors).(children)
     verbose = False
     year2S, month2S, day2S, hour2S, min2S = string_date(t_known)
     year1S, month1S, day1S, hour1S, min1S = string_date(t_to_correct)
     
-    string_id1, data_container = get_info_current_time(t_to_correct, data_container)
-    string_id2, data_container = get_info_current_time(t_known, data_container)
+    string_id1, data_container = get_info_current_time(t_to_correct, data_container, labels_dir)
+    string_id2, data_container = get_info_current_time(t_known, data_container, labels_dir)
         
     Atot_to_correct = 0
     Atot_known = 0
@@ -280,13 +280,13 @@ def add_history1(history_cell, cell_id, cells_to_correct, cells_known, t_to_corr
     
     #displacement between tInterest (t) and tInterest - 5 min
     labels_outKnownPlus1 = np.zeros(labels_out_to_correctPlus1.shape)
-    cells_to_use, data_container = find_ancestors(cells_to_correct,t,data_container)
+    cells_to_use, data_container = find_ancestors(cells_to_correct,t,data_container,labels_dir)
 
     if cells_to_use == []:
         test_KnownHistory = 1 #there are no cells_to_correct of the current cells_to_correct! Displacement will be 0 and no image cells_to_correct
         
     else:
-        string_idMinus1, data_container = get_info_current_time(t_interestMinus1, data_container)
+        string_idMinus1, data_container = get_info_current_time(t_interestMinus1, data_container, labels_dir)
         labels = deepcopy(data_container['all_labels'][string_idMinus1]) #deepcopy(myShelveMinus1['labels'])
             
     
@@ -336,14 +336,14 @@ def add_history1(history_cell, cell_id, cells_to_correct, cells_known, t_to_corr
     return history_cell, data_container
 
 
-def find_ancestors(cell, t, data_container):
+def find_ancestors(cell, t, data_container,labels_dir):
     
     verbose = False
     if verbose:
         print("**** finding ancestors \n", cell, t)
     ancestors = []
     
-    string_id, data_container = get_info_current_time(t, data_container)
+    string_id, data_container = get_info_current_time(t, data_container,labels_dir)
     
     if cell[0] == "I":
         cell1 = []
@@ -372,12 +372,12 @@ def find_ancestors(cell, t, data_container):
     
     
     
-def find_children(cell,t,data_container) :
+def find_children(cell,t,data_container,labels_id) :
     verbose = False
     if verbose:
         print("**** finding children \n", cell, t)
     children = []   
-    string_id, data_container = get_info_current_time(t, data_container)
+    string_id, data_container = get_info_current_time(t, data_container, labels_dir)
     
     connections = data_container['all_connections'][string_id]
     
@@ -413,7 +413,8 @@ def find_relatives(cellInterest, t1, t2, data_container): # tHistory, tInterest)
         while t > t1 and time_disappear==0: #while t > tInterest and time_disappear==0:  
             
             t_prev = t - timedelta(minutes = 5)
-            ancestors, data_container = find_ancestors(children, t, data_container)
+            
+            ancestors, data_container = find_ancestors(children, t, data_container,labels_dir)
             
             if len(ancestors)==0:
                 time_disappear = deepcopy(t)
@@ -438,7 +439,7 @@ def find_relatives(cellInterest, t1, t2, data_container): # tHistory, tInterest)
         if not_changing == 0 and time_disappear ==0:
             while t < t2: # tHistory:    
                 t_prev = deepcopy(t)
-                children, data_container = find_children(children,t_prev, data_container)
+                children, data_container = find_children(children,t_prev, data_container,labels_dir)
                 t += timedelta(minutes = 5)
                 
             if len(children_save) !=0:
@@ -457,21 +458,24 @@ def find_relatives(cellInterest, t1, t2, data_container): # tHistory, tInterest)
     else:
           return [],[], data_container
      
-def get_info_current_time(time, data_container): # all_connections = None, all_cell_properties = None, all_labels = None)
+def get_info_current_time(time, data_container, labels_dir): # all_connections = None, all_cell_properties = None, all_labels = None)
     
     yearS, monthS, dayS, hourS, minS = string_date(time)
     string_id = yearS+monthS+dayS+hourS+minS
     
     if string_id not in data_container['all_connections'].keys():
-        filename = '/opt/users/lel/PyTroll/scripts/labels/Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)
+        filename = labels_dir+'/Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)
         myShelve = shelve.open(filename)
         try:
             data_container['all_connections'][string_id]     = myShelve['connections'] 
         except KeyError:
             1+2
             #if you try to read the current timestep it won't find the connections yet!!! COULD BE DANGEROUS, could give error later
-        
-        data_container['all_cell_properties'][string_id] = myShelve['cells']
+        try:
+            data_container['all_cell_properties'][string_id] = myShelve['cells']
+        except KeyError:
+            print("ERROR reading: ", filename)
+            return None, None
         data_container['all_labels'][string_id]          = myShelve['labels']   
     # !!!!!!!!! some can be returned as NONE if None as input ---> should always have all as output even if not needed/used/known !!!!!!!!!!    
     return string_id, data_container
@@ -486,7 +490,7 @@ def check_if_CenterOfMass_outside(labels_tmp):
     else:
         return False
         
-def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t_stop = None):
+def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t_stop = None, labels_dir = '/opt/users/lel/PyTroll/scripts/labels/'):
 
         """                                          
         --------------------------------------------------
@@ -526,7 +530,10 @@ def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t
         hourS  = "%02d" % t1.hour
         minS   = "%02d" % t1.minute
     
-        string_id, data_container = get_info_current_time(t1, data_container)
+        string_id, data_container = get_info_current_time(t1, data_container,labels_dir)
+        
+        if string_id == None:
+            return None, None, None, None
         
         labels_id = np.unique(data_container['all_labels'][string_id])
         
@@ -584,7 +591,7 @@ def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t
                          t = t + timedelta (minutes = 5)
                          t_temp = deepcopy(t1)
                          while t_temp < t:
-                            children, data_container = find_children(children, t_temp, data_container)
+                            children, data_container = find_children(children, t_temp, data_container,labels_dir)
                             t_temp += timedelta(minutes = 5) 
                     
                     if verbose:
@@ -593,16 +600,16 @@ def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t
                     
                     if backward:
                               children, ancestors, data_container = find_relatives(children, t, t_requestHist, data_container)
-                    else:
+                    elif children!=[]:
                               children, ancestors, data_container = find_relatives(children, t_requestHist, t, data_container) 
                     
                     if len(children)>0 and len(ancestors)>0:
                               if verbose:
                                   print("after finding relatives \n Children",children, "\n Ancestors", ancestors)
                               if backward:
-                                    history_cell["ID"+str(cell_id)], data_container = add_history1(history_cell["ID"+str(cell_id)], cell_id, ancestors, children, t, t_requestHist, len(rgb_load), interesting_cell, backward, data_container)
+                                    history_cell["ID"+str(cell_id)], data_container = add_history1(history_cell["ID"+str(cell_id)], cell_id, ancestors, children, t, t_requestHist, len(rgb_load), interesting_cell, backward, data_container,labels_dir)
                               else:
-                                    history_cell["ID"+str(cell_id)], data_container = add_history1(history_cell["ID"+str(cell_id)], cell_id, children, ancestors, t, t_requestHist, len(rgb_load), interesting_cell, backward, data_container)
+                                    history_cell["ID"+str(cell_id)], data_container = add_history1(history_cell["ID"+str(cell_id)], cell_id, children, ancestors, t, t_requestHist, len(rgb_load), interesting_cell, backward, data_container,labels_dir)
                               
                               if verbose:
                                   print("history written for: ","ID",str(cell_id))

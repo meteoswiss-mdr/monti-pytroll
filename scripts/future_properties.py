@@ -72,9 +72,10 @@ def future_properties(time,property_values, property_name,model):
             print("... x1", x1)
         
         if len(x1) != len(y):
-            print ("different length of x1",len(x1)," and y", len(y))
-            print("x1", x1)
-            print("y1", y1)
+            if verbose:
+                print ("different length of x1",len(x1)," and y", len(y))
+                print("x1", x1)
+                print("y1", y1)
             t1 = t1[1:npredict+1]
             quit()
         

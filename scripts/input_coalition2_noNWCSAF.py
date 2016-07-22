@@ -22,7 +22,7 @@ def input(in_msg):
     # last Rapid Scan Service picture 2015-05-31 12:25 UTC (Scan start) 
     in_msg.delay=3
 
-    in_msg.no_NWCSAF = False
+    in_msg.no_NWCSAF = True
 
     #----------------
     # chose area
@@ -354,11 +354,11 @@ def input(in_msg):
     nrt = True
 
     in_msg.settingsLocal = {}
-    in_msg.settingsLocal['use_TB_forecast'] = True
+    in_msg.settingsLocal['use_TB_forecast'] = False
     in_msg.settingsLocal['mode_downscaling'] = 'gaussian_225_125'
     in_msg.settingsLocal['mask_labelsSmall_lowUS'] = True
     in_msg.settingsLocal['clean_mask'] = 'skimage' 
-    in_msg.settingsLocal['rapid_scan_mode'] = False
+    in_msg.settingsLocal['rapid_scan_mode'] = True
     in_msg.settingsLocal['forth_mask'] = 'IR_039_minus_IR_108'
     in_msg.settingsLocal['forced_mask'] = 'no_mask'
     in_msg.settingsLocal['mask_cirrus'] = True

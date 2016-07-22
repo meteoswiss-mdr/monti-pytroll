@@ -193,10 +193,10 @@ def save_all_cells(all_cells):
 ...
 """
     
-def properties_cells(t1,tStop,current_labels = None, metadata = None):
+def properties_cells(t1,tStop,current_labels = None, metadata = None, labels_dir = None, outputDir_labels = None, in_msg = None):
     
     
-    rgb_load = ['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134','CTP','CTT']
+    rgb_load = ['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134'] #,'CTP','CTT']
     #rgb_out = 'WV_062minusIR_108'
     only_obs_noForecast = False
     rapid_scan_mode = True
@@ -209,21 +209,23 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None):
         in_dir = "/opt/users/lel/PyTroll/scripts//Mecikalski/cosmo/Channels/labels/"    
        
     # load a few standard things 
-    from get_input_msg import get_input_msg
-    in_msg = get_input_msg('input_template')
-    in_msg.resolution = 'i'
-    in_msg.sat_nr = 9
-    in_msg.add_title = False
-    in_msg.outputDir = './pics/'
-    in_msg.outputFile = 'WS_%(rgb)s-%(area)s_%y%m%d%H%M'
-    in_msg.fill_value = [0,0,0] # black    
-    in_msg.reader_level = "seviri-level4"
+    if in_msg == None:
+        from get_input_msg import get_input_msg
+        in_msg = get_input_msg('input_template')
+        in_msg.resolution = 'i'
+        in_msg.sat_nr = 9
+        in_msg.add_title = False
+        in_msg.outputDir = './pics/'
+        in_msg.outputFile = 'WS_%(rgb)s-%(area)s_%y%m%d%H%M'
+        in_msg.fill_value = [0,0,0] # black    
+        in_msg.reader_level = "seviri-level4"
       
+        
+    
+        # satellite for HRW winds
+        sat_nr = "08" #in_windshift.sat_nr
+    
     area = "ccs4" #c2"#"ccs4" #in_windshift.ObjArea
-
-    # satellite for HRW winds
-    sat_nr = "08" #in_windshift.sat_nr
-
     # define area object 
     obj_area = get_area_def(area)#(in_windshift.ObjArea)
 
@@ -250,8 +252,8 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None):
     count_double = 0
     
     #labels_dir = '/data/cinesat/out/labels/'
-
-    labels_dir = '/opt/users/lel/PyTroll/scripts/labels/' #compatible to all users
+    if labels_dir == None:
+          labels_dir = '/opt/users/lel/PyTroll/scripts/labels/' #compatible to all users
 
     
     while t1 <= tStop:
@@ -309,8 +311,13 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None):
 
           file_previous_labels = labels_dir +  'Labels_%s*'%(year0S+month0S+day0S+hour0S+min0S)
           filename1 = glob.glob(file_previous_labels)
+          
+          if t0.hour == 0 and t0.minute == 0:
+              check_date = True
+          else:
+              check_date = False
                     
-          if len(filename1)>0:
+          if len(filename1)>0 or check_date:
               first_time_step = False
           else:
               first_time_step = True
@@ -548,8 +555,8 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None):
       
               labels, numobjects = ndimage.label(data_new)
               print("....starting updating cells")
-              outputFile = "/data/COALITION2/PicturesSatellite/LEL_results_wind//"+yearS+"-"+monthS+"-"+dayS+"/labels/"
-              make_figureLabels(deepcopy(data_new), all_cells, obj_area, "fig_labels/", colorbar = False, vmin = False, vmax = False, white_background = True, t = t1)
+              if outputDir_labels != None:
+                  make_figureLabels(deepcopy(data_new), all_cells, obj_area, outputDir_labels, colorbar = False, vmin = False, vmax = False, white_background = True, t = t1)
               data_new = data_new.astype('uint32') #unsigned char int  https://docs.python.org/2/library/array.html
               
               filename =labels_dir +  'Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)
@@ -574,7 +581,7 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None):
               d = shelve.open(filename)
               d['connections'] = deepcopy(connections)
               d.close()
-              print("....updated cells connections")
+              print("....updated cells connections", labels_dir +  'Labels_%s.shelve'%(year0S+month0S+day0S+hour0S+min0S))
               
               
           print("....starting updating cells")
@@ -585,7 +592,7 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None):
           # close the shelve
           myShelve.close()   
           print("....updated all cells")
-          test= shelve.open( labels_dir +  'Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)   )  
+          
           t1 = t1 + timedelta(minutes=5)  
           
     return data_new, first_time_step                        

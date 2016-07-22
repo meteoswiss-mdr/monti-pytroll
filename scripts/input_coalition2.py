@@ -329,7 +329,13 @@ def input(in_msg):
     #in_msg.pickle_labels = False; in_msg.shelve_labels = True
     in_msg.pickle_labels = False; in_msg.shelve_labels = False
 
+    in_msg.postprocessing_areas= []
+    in_msg.postprocessing_areas.append("ccs4")
+    #in_msg.postprocessing_areas=['EuropeCanaryS95']
     
+    in_msg.postprocessing_composite1=["C2rgb-ir108"]
+    in_msg.postprocessing_composite2=["C2rgb-Forecast-ir108"]  
+
     
     # load a few standard things 
     #in_msg.outputFile = 'WS_%(rgb)s-%(area)s_%y%m%d%H%M'

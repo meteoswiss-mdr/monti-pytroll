@@ -33,7 +33,7 @@ def input(in_msg):
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('EuropeCanary')    # upper third of MSG disk, satellite at 0.0 deg East, full resolution 
     #in_msg.areas.append('EuropeCanary95')  # upper third of MSG disk, satellite at 9.5 deg East, full resolution 
-    in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
+    #in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
     #in_msg.areas.append('fullearth')       # full earth 600x300                    # does not yet work
@@ -100,7 +100,7 @@ def input(in_msg):
     ###in_msg.nowcastDir= '/data/COALITION2/PicturesSatellite/LEL_results_wind/'
     
     #directors with labels
-    in_msg.labelsDirNrt = '/data/cinesat/out/labels/'
+    in_msg.labelsDirNrt = '/data/cinesat/out/labels/' #'/opt/users/lel/PyTroll/scripts/labels_nrt/' #
     in_msg.labelsDirOffline = '/opt/users/lel/PyTroll/scripts/labels/'
 
     # channels needed to produce the coalition2 product
@@ -184,8 +184,8 @@ def input(in_msg):
     in_msg.outputDirForecastsNrt = "/data/cinesat/out/" #'/opt/users/lel/PyTroll/scripts/nrt_test/' #
     in_msg.outputDirForecastsOffline = "/data/COALITION2/PicturesSatellite/LEL_results_wind/"
    
-    in_msg.scpOutput = False
-    in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
+    in_msg.scpOutput = True
+    #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
 
     in_msg.chosen_settings={}
@@ -329,7 +329,12 @@ def input(in_msg):
     #in_msg.pickle_labels = False; in_msg.shelve_labels = True
     in_msg.pickle_labels = False; in_msg.shelve_labels = False
 
+    in_msg.postprocessing_areas= []
+    in_msg.postprocessing_areas.append("ccs4")
+    #in_msg.postprocessing_areas=['EuropeCanaryS95']
     
+    in_msg.postprocessing_composite1=["C2rgb-ir108"]
+    in_msg.postprocessing_composite2=["C2rgb-Forecast-ir108"]      
     
     # load a few standard things 
     #in_msg.outputFile = 'WS_%(rgb)s-%(area)s_%y%m%d%H%M'

@@ -28,6 +28,8 @@ import time
 from matplotlib import colors, cm
 from PIL import Image
 
+from postprocessing import postprocessing
+
 def resize_array(array,dx,dy, nx, ny):
     temp_array=np.zeros_like(array)
     array_out = np.zeros_like(array)
@@ -106,10 +108,10 @@ def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=Non
         forecasted_areas = []    
         at_least_one_cell = False        
         for interesting_cell in unique_labels:
-              print "******** computing history backward"
+              print "******** computing history backward (labels_dir = ",labels_dir,")"
               forecasted_labels["ID"+str(interesting_cell)]=[]
               
-              ind, area, displacement, time = history_backward(ttt.day,ttt.month,ttt.year,ttt.hour,ttt.minute,interesting_cell, True, ttt-timedelta(hours = 1)) #-timedelta(minutes = 10))
+              ind, area, displacement, time = history_backward(ttt.day,ttt.month,ttt.year,ttt.hour,ttt.minute,interesting_cell, True, ttt-timedelta(hours = 1),labels_dir = labels_dir) #-timedelta(minutes = 10))
               
               if area == None or len(area)<=1:  
                   print "new cell or cell with COM outside domain"
@@ -118,7 +120,10 @@ def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=Non
               print("******** computed history backward")
               print("******** computing extrapolation")
               
-              t, y = future_properties(time,area, ylabel, model)
+              if len(area)<=3:
+                    t, y = future_properties(time,area, ylabel, "linear")
+              else:
+                    t, y = future_properties(time,area, ylabel, model)
               
               print("******** computed extrapolation")
               
@@ -334,7 +339,7 @@ def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=Non
         #img1 = Image.imread(currentRGB_im[0])
         obj_area = get_area_def("ccs4")
         fig,ax = prepare_figure(obj_area)
-        plt.imshow(np.flipud(im))   
+        #plt.imshow(np.flipud(im))   
         
         if at_least_one_cell:      
               time_wanted_minutes = [5,20,40,60] 
@@ -384,10 +389,10 @@ def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=Non
             path = (outputFile)+yearS+monthS+dayS+hourS+minS+"Forecast.png"
         else:
             dic_figure={}
-            dic_figure['rgb']='C2rgbForecastTMP-HRV'
+            dic_figure['rgb']= 'Forecast' #'C2rgbForecastTMP-IR-108'
             dic_figure['area']='ccs4'
             PIL_image.save(create_dir(outputFile)+in_msg.standardOutputName%dic_figure)
-            path = (outputFile)+in_msg.standardOutputName%('C2rgbForecastTMP-HRV',area)
+            path = (outputFile)+in_msg.standardOutputName%dic_figure
         
         print "... display ",path," &"
         plt.close( fig)                             
@@ -398,13 +403,25 @@ def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=Non
                 path_composite = (outputFile)+yearS+monthS+dayS+"_Obs"+hourS+minS+"Forecast_composite.png"     
             else:
                 dic_figure={}
-                dic_figure['rgb']='C2rgbForecast-HRV'
+                dic_figure['rgb']='C2rgbForecast-IR-108'
                 dic_figure['area']='ccs4'
                 path_composite = (outputFile)+in_msg.standardOutputName%dic_figure
-            
-            subprocess.call("/usr/bin/composite "+currentRGB_im[0]+" "+path+" "+path_composite, shell=True)
-            print "... display",path_composite,"&"
-        
+                dic_figure = {}
+                dic_figure['rgb'] = 'IR-108'
+                dic_figure['area']='ccs4'
+                path_IR108 = (outputFile)+in_msg.standardOutputName%dic_figure
+                
+            if False:
+                subprocess.call("/usr/bin/composite "+currentRGB_im[0]+" "+path+" "+path_IR108+" "+path_composite, shell=True)
+            else:
+                print "---starting post processing"
+                #if area in in_msg.postprocessing_areas:
+                in_msg.postprocessing_composite = deepcopy(in_msg.postprocessing_composite2)
+                postprocessing(in_msg, [], ttt, in_msg.sat_nr, "ccs4")
+            #print "... display",path_composite,"&"
+            if in_msg.scpOutput and False: 
+                print "... secure copy "+path_composite+ " to "+in_msg.scpOutputDir #
+                subprocess.call("scp "+in_msg.scpID+" "+path_composite  +" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)    #BackgroundFile   #
         
         if False:
             for i in range(12):    

@@ -565,8 +565,9 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None, labels_dir
               myShelve.close() 
               filenames_for_permission =  glob.glob(labels_dir +  'Labels_%s*'%(yearS+monthS+dayS+hourS+minS))
               for file_per in filenames_for_permission:
+                    print("modified permission: ", file_per)
                     os.chmod(file_per, 0664)  ## FOR PYTHON3: 0o664          
-              print("....updated cells labels")
+              print("....updated cells labels", filename)
               list_cells = all_cells.keys()
               for cell_connection in list_cells:
                   ancestors = all_cells[cell_connection].id_prev
@@ -582,7 +583,9 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None, labels_dir
               d['connections'] = deepcopy(connections)
               d.close()
               print("....updated cells connections", labels_dir +  'Labels_%s.shelve'%(year0S+month0S+day0S+hour0S+min0S))
-              
+              filenames_for_permission =  glob.glob(labels_dir +  'Labels_%s*'%(year0S+month0S+day0S+hour0S+min0S))
+              for file_per in filenames_for_permission:
+                    os.chmod(file_per, 0664)  ## FOR PYTHON3: 0o664               
               
           print("....starting updating cells")
           filename =labels_dir +  'Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)
@@ -592,6 +595,10 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None, labels_dir
           # close the shelve
           myShelve.close()   
           print("....updated all cells")
+          filenames_for_permission =  glob.glob(labels_dir +  'Labels_%s*'%(yearS+monthS+dayS+hourS+minS))
+          for file_per in filenames_for_permission:
+                print("modified permission: ", file_per)
+                os.chmod(file_per, 0664)  ## FOR PYTHON3: 0o664          
           
           t1 = t1 + timedelta(minutes=5)  
           

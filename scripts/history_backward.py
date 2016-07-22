@@ -30,6 +30,8 @@ import numpy.ma as ma
 import netCDF4
 import pickle
 import subprocess
+
+import glob
  
 from trollimage.colormap import rainbow
 from trollimage.image import Image as trollimage
@@ -210,7 +212,8 @@ def add_history1(history_cell, cell_id, cells_to_correct, cells_known, t_to_corr
         labels_out_to_correct[labels_to_correct==label] = label
         Atot_to_correct += data_container['all_cell_properties'][string_id1][ids].area_px
         for i in range(num_rgb):
-            AT_to_correct[i] += data_container['all_cell_properties'][string_id1][ids].mean108[i] * data_container['all_cell_properties'][string_id1][ids].area_px
+            tmp_check = data_container['all_cell_properties'][string_id1][ids].mean108[i] * data_container['all_cell_properties'][string_id1][ids].area_px
+            AT_to_correct[i] += tmp_check
                     
     for ids in cells_known:
         label = int(ids[2:])
@@ -372,7 +375,7 @@ def find_ancestors(cell, t, data_container,labels_dir):
     
     
     
-def find_children(cell,t,data_container,labels_id) :
+def find_children(cell,t,data_container,labels_dir) :
     verbose = False
     if verbose:
         print("**** finding children \n", cell, t)
@@ -396,7 +399,8 @@ def find_children(cell,t,data_container,labels_id) :
     
     return children, data_container
     
-def find_relatives(cellInterest, t1, t2, data_container): # tHistory, tInterest):
+def find_relatives(cellInterest, t1, t2, data_container,labels_dir): # tHistory, tInterest):
+    #print("...finding relatives, directory labels: ",labels_dir)
     verbose = False
     children = deepcopy(cellInterest)
     
@@ -464,19 +468,28 @@ def get_info_current_time(time, data_container, labels_dir): # all_connections =
     string_id = yearS+monthS+dayS+hourS+minS
     
     if string_id not in data_container['all_connections'].keys():
+        
         filename = labels_dir+'/Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)
-        myShelve = shelve.open(filename)
-        try:
-            data_container['all_connections'][string_id]     = myShelve['connections'] 
-        except KeyError:
-            1+2
-            #if you try to read the current timestep it won't find the connections yet!!! COULD BE DANGEROUS, could give error later
-        try:
-            data_container['all_cell_properties'][string_id] = myShelve['cells']
-        except KeyError:
-            print("ERROR reading: ", filename)
-            return None, None
-        data_container['all_labels'][string_id]          = myShelve['labels']   
+        check_file_exists = glob.glob(filename+"*")
+        if len(check_file_exists)>0:
+              myShelve = shelve.open(filename)
+              try:
+                  data_container['all_connections'][string_id]     = myShelve['connections'] 
+              except KeyError:
+                  1+2
+              except EOFError:
+                  print("EOFError: ",filename)
+                  quit()
+                  #if you try to read the current timestep it won't find the connections yet!!! COULD BE DANGEROUS, could give error later
+              try:
+                  data_container['all_cell_properties'][string_id] = myShelve['cells']
+              except KeyError:
+                  print("ERROR reading: ", filename)
+                  return None, None
+              data_container['all_labels'][string_id]          = myShelve['labels'] 
+        else:
+              print("File doesn't exist: ",filename)
+              return None, None  
     # !!!!!!!!! some can be returned as NONE if None as input ---> should always have all as output even if not needed/used/known !!!!!!!!!!    
     return string_id, data_container
 
@@ -497,7 +510,8 @@ def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t
         """
         #from Cells import Cells
         print("history backward of cell ID",id_interesting_cell)
-        verbose = False        
+        print("labels_dir = ",labels_dir,)
+        verbose = False     
         t1 = datetime(year, month, day, hour, minute)
         
         data_container = {}
@@ -547,13 +561,14 @@ def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t
         
         history_cell ={}
     
-        rgb_load = ['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134','CTP','CTT']
+        rgb_load = ['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134'] #,'CTP','CTT']
             
         names = ["WV_062minusIR_108","WV_062minusWV_073","IR_108","WV_073minusIR_134","WV_062minusIR_097","IR_087minusIR_120","IR_087minus2IR_108plusIR_120","IR_087minusIR_108","IR_120minusIR_108","IR_097minusIR_134","WV_062minusIR_120","CloudTopPressure","CloudTopTemperature"]
         
         labels_tmp = np.where(data_container['all_labels'][string_id]==id_interesting_cell,1,0)
         
         if check_if_CenterOfMass_outside(labels_tmp):
+            print("center of mass outside")
             return None, None, None, None
         
         for i in range(len(labels_id)):
@@ -599,9 +614,9 @@ def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t
 
                     
                     if backward:
-                              children, ancestors, data_container = find_relatives(children, t, t_requestHist, data_container)
+                              children, ancestors, data_container = find_relatives(children, t, t_requestHist, data_container, labels_dir)
                     elif children!=[]:
-                              children, ancestors, data_container = find_relatives(children, t_requestHist, t, data_container) 
+                              children, ancestors, data_container = find_relatives(children, t_requestHist, t, data_container, labels_dir) 
                     
                     if len(children)>0 and len(ancestors)>0:
                               if verbose:
@@ -636,9 +651,9 @@ def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t
         displacement = history_cell[interesting_cell].center
     
         if rgbs.ndim >1:
-            ind = np.zeros((rgbs.shape[0],13))
+            ind = np.zeros((rgbs.shape[0],11))
         else:
-            ind = np.zeros((13))
+            ind = np.zeros((11))
         
 
         if ind.size>13:
@@ -656,8 +671,8 @@ def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t
               ind[:,9]  = rgbs[:,rgb_load.index('IR_097')] - rgbs[:,rgb_load.index('IR_134')] # us 5
               ind[:,10] = rgbs[:,rgb_load.index('WV_062')] - rgbs[:,rgb_load.index('IR_120')] # us 7
               
-              ind[:,11] = rgbs[:,rgb_load.index('CTP')]
-              ind[:,12] = rgbs[:,rgb_load.index('CTT')]
+              #ind[:,11] = rgbs[:,rgb_load.index('CTP')]
+              #ind[:,12] = rgbs[:,rgb_load.index('CTT')]
         else:
               ind[0]  = rgbs[rgb_load.index('WV_062')] - rgbs[rgb_load.index('IR_108')] # cd 1 also us 6
               ind[1]  = rgbs[rgb_load.index('WV_062')] - rgbs[rgb_load.index('WV_073')] # cd 2 also us 1 & 4
@@ -673,8 +688,8 @@ def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t
               ind[9]  = rgbs[rgb_load.index('IR_097')] - rgbs[rgb_load.index('IR_134')] # us 5
               ind[10] = rgbs[rgb_load.index('WV_062')] - rgbs[rgb_load.index('IR_120')] # us 7
               
-              ind[11] = rgbs[rgb_load.index('CTP')]
-              ind[12] = rgbs[rgb_load.index('CTT')]        
+              #ind[11] = rgbs[rgb_load.index('CTP')]
+              #ind[12] = rgbs[rgb_load.index('CTT')]        
         t_end = deepcopy(t1)
 
         

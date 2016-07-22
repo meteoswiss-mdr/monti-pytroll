@@ -46,6 +46,8 @@ from scipy import ndimage
 from my_msg_module import check_input
 #from astropy.convolution import MexicanHat2DKernel
 
+from postprocessing import postprocessing
+
 # ===============================
 
 def create_dir(outputFile):
@@ -1055,7 +1057,7 @@ if __name__ == '__main__':
                     print "...creating composite", "/data/cinesat/out/MSG_IR-108-"+area+"_"+"16"+monthS+dayS+hourS+minS+".png"
                     #out_file1 = create_dir( in_msg.outputDir +"/"+yearS+monthS+dayS+"_"+hourS+minS+"_C2rgb-HRV_"+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask"+area+".png" )
                     dic_figure={}
-                    dic_figure['rgb']='C2rgb-HRV'
+                    dic_figure['rgb']='C2rgb-IR-108'
                     dic_figure['area']=area
                     print in_msg.standardOutputName
                     out_file1 = create_dir( in_msg.outputDir+in_msg.standardOutputName%dic_figure)
@@ -1069,8 +1071,14 @@ if __name__ == '__main__':
       
                 if in_msg.scpOutput: 
                     if in_msg.verbose:
-                        print "... secure copy "+out_file+ " to "+in_msg.scpOutputDir
-                    subprocess.call("scp "+in_msg.scpID+" "+out_file+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
+                        print "... secure copy "+out_file1+ " to "+in_msg.scpOutputDir
+                    if False:
+                        subprocess.call("scp "+in_msg.scpID+" "+out_file1+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
+                    else:
+                        if area in in_msg.postprocessing_areas:
+                           print "area in post processing"
+                           in_msg.postprocessing_composite = deepcopy(in_msg.postprocessing_composite1)
+                           postprocessing(in_msg, [], time_slot, in_msg.sat_nr, area)
           
                 if area == "ccs4" and in_msg.properties_cells == True:
                     print "**** Computing properties of the cells"
@@ -1090,6 +1098,10 @@ if __name__ == '__main__':
                         plot_forecast_area(time_slot, in_msg.model_fit_area,outputFile = in_msg.outputDir+add_path, current_labels = labels_corrected, t_stop=time_slot, BackgroundFile=out_file1, ForeGroundRGBFile = c2File, labels_dir = in_msg.labelsDir, in_msg = in_msg)
             
           # add 5min and do the next time step
-          
-          
+          f4p = in_msg.labelsDir+"/Labels*"
+          import glob
+          filenames_for_permission = glob.glob(f4p)
+          for file_per in filenames_for_permission:
+                #print("modified permission: ", file_per)
+                os.chmod(file_per, 0664)  ## FOR PYTHON3: 0o664           
           time_slot = time_slot + timedelta(minutes=5)

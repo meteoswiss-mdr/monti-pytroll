@@ -611,7 +611,7 @@ if __name__ == '__main__':
           # check if input data is complete 
           if in_msg.verbose:
               print "*** check input data", in_msg.RGBs
-          RGBs = check_input(in_msg, in_msg.sat+in_msg.sat_nr_str(), in_msg.datetime)  
+          RGBs = check_input(in_msg, in_msg.sat_str()+in_msg.sat_nr_str(), in_msg.datetime)  
           # in_msg.sat_nr might be changed to backup satellite
 
           # define area
@@ -622,8 +622,9 @@ if __name__ == '__main__':
           area_tuple = (proj4_string, area_extent)
       
           # read CTP to distinguish high, medium and low clouds
-          print "*** read CTP for ", in_msg.sat, in_msg.sat_nr_str(), "seviri", str(time_slot)
-          global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, in_msg.sat_nr_str(), "seviri", time_slot)
+          print "*** read CTP for ", in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", str(time_slot)
+          global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", time_slot)
+          #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, in_msg.sat_nr_str(), "seviri", time_slot)
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
           #area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
           area_loaded = load_products(global_data_CTP, ['CTP'], in_msg, get_area_def("ccs4"))
@@ -633,7 +634,7 @@ if __name__ == '__main__':
 
           # read all rgbs
           print "*** read all other channels for ", in_msg.sat, in_msg.sat_nr_str(), "seviri", str(time_slot)
-          global_data = GeostationaryFactory.create_scene(in_msg.sat, in_msg.sat_nr_str(), "seviri", time_slot)
+          global_data = GeostationaryFactory.create_scene(in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", time_slot)
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
           area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
           area_loaded = load_products(global_data, rgbs, in_msg, area_loaded)

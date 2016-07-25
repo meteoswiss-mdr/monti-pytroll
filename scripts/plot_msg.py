@@ -577,7 +577,7 @@ def mask_data(data, area):
 def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=False):
 
    from mpop.imageo.palettes import convert_palette2colormap
-   from trollimage.colormap import RainRate, rainbow   # reload in order to be save not to use a scaled colormap
+   from trollimage.colormap import rainbow   # reload in order to be save not to use a scaled colormap
 
    if in_msg.verbose:
       print ""
@@ -612,6 +612,7 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
             data[rgb].info['units'] = 'km'
          plot_type='trollimage'
          if rgb == 'CRR' or rgb == 'CRPh' :
+            from trollimage.colormap import RainRate
             colormap=RainRate
       else:
          plot_type='palette'
@@ -629,11 +630,13 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
    elif rgb in products.HSAF:
       prop = data[rgb].data
       plot_type='trollimage'
+      from trollimage.colormap import RainRate
       colormap=RainRate
    elif rgb in products.CPP:
       prop = data[rgb].data
       plot_type='trollimage'
       if rgb == 'precip' or rgb == 'precip_ir' or rgb == 'cot' or rgb == 'cwp':
+         from trollimage.colormap import RainRate
          colormap=RainRate
    else:
       # includes products.RGBs_buildin

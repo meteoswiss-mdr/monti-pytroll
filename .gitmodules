@@ -1,14 +1,14 @@
 [submodule "packages/pyresample"]
 	path = packages/pyresample
 	url = https://github.com/meteoswiss-mdr/pyresample.git
-	branch = master
+	branch = pre-master
 [submodule "packages/pycoast"]
 	path = packages/pycoast
 	url = https://github.com/pytroll/pycoast.git
 	branch = master
 [submodule "packages/pyorbital"]
 	path = packages/pyorbital
-	url = https://github.com/pytroll/pyorbital.git
+	url = https://github.com/meteoswiss-mdr/pyorbital.git
 	branch = master
 [submodule "packages/posttroll"]
 	path = packages/posttroll

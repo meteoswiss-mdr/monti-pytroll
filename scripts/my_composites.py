@@ -1,4 +1,5 @@
 from mpop.imageo.geo_image import GeoImage
+from copy import deepcopy
 
 def hr_visual(self):
     """Make a High Resolution visual BW image composite from Seviri
@@ -73,6 +74,61 @@ def sandwich(self):
 sandwich.prerequisites = set(["HRV", 10.8])
 #sandwich.prerequisites = set([10.8])   
 
+def HRVir108(self, cos_scaled=True, use_HRV=False, smooth=False):
+
+    self.check_channels("VIS006", "HRV", "IR_108")
+    import numpy as np
+
+    # calculate longitude/latitude and solar zenith angle 
+    from pyorbital.astronomy import sun_zenith_angle
+    lonlats = self["IR_108"].area.get_lonlats()
+    sza = sun_zenith_angle(self.time_slot, lonlats[0], lonlats[1])
+
+    # threshold sza
+    sza1 = 80.
+    ir1 = 190.
+    ir2 = 320.
+    vis1 =  0.
+    if not cos_scaled:
+        vis2 = 75. #for pure vis/hrv
+    else:
+        vis2 = 110. #for scaling with cos(sza)
+
+    # scale the vis and ir channel to appropriate min / max 
+    ir108 = (self["IR_108"].data - ir1) / (ir2-ir1)
+    if not use_HRV:
+        vis   = (self["VIS006"].data - vis1) / (vis2-vis1) 
+    else:
+        vis   = (self["HRV"].data    - vis1) / (vis2-vis1)
+
+    if not smooth:
+        mask = np.array(sza > sza1)
+    else:
+        mask = np.zeros(ir108.shape)
+        mask[np.where( sza1 > sza1 )] = 1
+
+
+    print "*** AAA ", type(mask)
+    print "*** AAA ", mask
+    print "mask", mask.shape, type(mask)
+
+    if not cos_scaled:
+        ch1 = vis * (1-mask) 
+    else:
+        ch1 = vis * (1-mask) / (np.cos(np.radians(sza))+0.05)
+    ch2 = (1 - ir108) * mask
+
+    img = GeoImage(ch1+ch2, self.area, self.time_slot, fill_value=(0,0,0), mode="L")
+
+    from trollimage.colormap import rainbow
+    cm = deepcopy(rainbow)
+    cm.set_range(0, 1)
+    img.colorize(cm)
+
+    return img
+
+HRVir108.prerequisites = set(["VIS006", "HRV", 10.8])
+
 def ndvi(self):
     """Make a normalized vegitation index image 
     from Seviri channels.
@@ -99,7 +155,6 @@ def ndvi(self):
     return img
 
 ndvi.prerequisites = set(['VIS006', 'VIS008'])
-
 
 def WV_062_minus_WV_073(self):
     """Make a colored image of the difference of two Seviri channels.
@@ -434,7 +489,7 @@ clouddepth.prerequisites = set(['WV_062','WV_073','IR_087','IR_108','IR_120','IR
 
 
 
-seviri = [hr_visual, hr_overview, sandwich, ndvi, WV_062_minus_WV_073, WV_062_minus_IR_108, WV_073_minus_IR_134, \
+seviri = [hr_visual, hr_overview, sandwich, HRVir108, ndvi, WV_062_minus_WV_073, WV_062_minus_IR_108, WV_073_minus_IR_134, \
           IR_120_minus_IR_108, IR_087_minus_IR_108, IR_087_minus_IR_120, trichannel, clouddepth, mask_clouddepth]
 
 
@@ -450,7 +505,7 @@ def get_image(data, rgb):
         obj_image = data.image.convection
     elif rgb=='convection_co2':
         obj_image = data.image.convection_co2
-    elif rgb=='day_microphysics':           # requires the pyspectral modul 
+    elif rgb=='day_microphysics':    # requires the pyspectral modul, in composite code in /mpop/mpop/instruments/seviri.py
         obj_image = data.image.day_microphysics
     elif rgb=='dust':
         obj_image = data.image.dust
@@ -488,6 +543,8 @@ def get_image(data, rgb):
         obj_image = data.image.hr_overview
     elif rgb=='sandwich':
         obj_image = data.image.sandwich
+    elif rgb=='HRVir108':
+        obj_image = data.image.HRVir108
     elif rgb=='ndvi':
         obj_image = data.image.ndvi
     elif rgb=='WV_062-WV_073':

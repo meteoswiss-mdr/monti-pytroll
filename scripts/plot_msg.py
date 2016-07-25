@@ -113,8 +113,8 @@ def plot_msg(in_msg):
 
    # check if input data is complete 
    if in_msg.verbose:
-      print "*** check input data"
-   RGBs = check_input(in_msg, in_msg.sat+in_msg.sat_nr_str(), in_msg.datetime)  
+      print "*** check input data for ", in_msg.sat_str()
+   RGBs = check_input(in_msg, in_msg.sat_str()+in_msg.sat_nr_str(), in_msg.datetime)  
    # in_msg.sat_nr might be changed to backup satellite
 
    if len(RGBs) != len(in_msg.RGBs):
@@ -125,14 +125,17 @@ def plot_msg(in_msg):
 
    if in_msg.verbose:
       print '*** Create plots for '
-      print '    Satellite/Sensor: '+in_msg.sat + '  ' + in_msg.sat_nr_str()
+      print '    Satellite/Sensor: ' + in_msg.sat_str() 
+      print '    Satellite number: ' + in_msg.sat_nr_str()
       print '    Date/Time:        '+dateS +' '+hourS+':'+minS+'UTC'
       print '    RGBs:            ', in_msg.RGBs
       print '    Area:            ', in_msg.areas
 
 
    # define satellite data object
-   global_data = GeostationaryFactory.create_scene(in_msg.sat, in_msg.sat_nr_str(), "seviri", in_msg.datetime)
+   #global_data = GeostationaryFactory.create_scene(in_msg.sat, in_msg.sat_nr_str(), "seviri", in_msg.datetime)
+   global_data = GeostationaryFactory.create_scene(in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", in_msg.datetime)
+
    # print "type(global_data) ", type(global_data)   # <class 'mpop.scene.SatelliteInstrumentScene'>
    # print "dir(global_data)", dir(global_data)  [..., '__init__', ... 'area', 'area_def', 'area_id', 'channel_list', 'channels', 
    #      'channels_to_load', 'check_channels', 'fullname', 'get_area', 'image', 'info', 'instrument_name', 'lat', 'load', 'loaded_channels', 
@@ -150,7 +153,7 @@ def plot_msg(in_msg):
       return RGBs
 
    if in_msg.verbose:
-      print "*** load satellite channels for "+in_msg.sat+in_msg.sat_nr_str()+" ", global_data.fullname
+      print "*** load satellite channels for " + in_msg.sat_str()
 
    # initialize processed RGBs
    RGBs_done=[]
@@ -203,6 +206,16 @@ def plot_msg(in_msg):
          # PROJECT data to new area 
          data = global_data.project(area)
          resolution='i'
+
+      if in_msg.parallax_correction:
+         if in_msg.verbose:
+            loaded_products = [chn.name for chn in data.loaded_channels()]
+            print "    perform parallax correction for loaded channels: ", loaded_products
+         if area == 'ccs4':
+            estimate_cth=False
+         else:
+            estimate_cth=True
+         data = data.parallax_corr(fill=in_msg.parallax_gapfilling, estimate_cth=estimate_cth, replace=True)
 
       #import matplotlib.pyplot as plt
       #plt.imshow(data['lat'].data)
@@ -288,7 +301,7 @@ def plot_msg(in_msg):
 
             # add title to image
             if in_msg.add_title:
-               add_title(PIL_image, HRV_enhance_str+rgb, int(data.number), dateS, hourS, minS, area, dc, in_msg.verbose )
+               add_title(PIL_image, HRV_enhance_str+rgb, data.sat_nr(), dateS, hourS, minS, area, dc, in_msg.verbose )
 
             # add MeteoSwiss and Pytroll logo
             if in_msg.add_logos:
@@ -320,8 +333,8 @@ def plot_msg(in_msg):
                add_colorscale(dc, rgb, in_msg, unit=unit)
 
             # create output filename
-            outputDir =              format_name(in_msg.outputDir,  data.time_slot, area=area, rgb=rgb, sat=data.satname, sat_nr=data.number)
-            outputFile = outputDir + format_name(in_msg.outputFile, data.time_slot, area=area, rgb=rgb, sat=data.satname, sat_nr=data.number)
+            outputDir =              format_name(in_msg.outputDir,  data.time_slot, area=area, rgb=rgb, sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
+            outputFile = outputDir + format_name(in_msg.outputFile, data.time_slot, area=area, rgb=rgb, sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
    
             # check if output directory exists, if not create it
             path= dirname(outputFile)
@@ -390,6 +403,15 @@ def load_products(data_object, RGBs, in_msg, area_loaded):
    except ImportError:
       LOGGER.warning("pyresample missing. Can only work in satellite projection")
 
+   if in_msg.parallax_correction:
+      if 'CTH' not in RGBs:
+         RGBs.append('CTH')
+      if in_msg.nwcsaf_calibrate == False:
+         print "*** Error in plot_msg (plot_msg.py) "
+         print "    in_msg.nwcsaf_calibrate = ", in_msg.nwcsaf_calibrate
+         print "    parallax correction needs physical (calibrated) CTH values"
+         quit()
+
    # load all channels / information 
    for rgb in RGBs:
       if rgb in products.MSG or rgb in products.MSG_color: 
@@ -420,7 +442,10 @@ def load_products(data_object, RGBs, in_msg, area_loaded):
 
          data_object.load([pge.replace('_', '')], calibrate=in_msg.nwcsaf_calibrate, reader_level="seviri-level3") 
     
-                                 # False, area_extent=area_loaded.area_extent (difficulties to find correct h5 input file)
+         #print "bullshit"
+         #quit()
+
+         # False, area_extent=area_loaded.area_extent (difficulties to find correct h5 input file)
          #print data_object.loaded_channels()
          #loaded_channels = [chn.name for chn in data_object.loaded_channels()]
          #if pge not in loaded_channels:
@@ -580,10 +605,11 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
       plot_type='trollimage'
    elif rgb in (products.CTTH + products.PC + products.CRR + products.PPh) :
       prop = data[rgb].data
-      prop.mask = (prop == 0)
+      prop.mask = (prop <= 0)
       if in_msg.nwcsaf_calibrate==True:
          if rgb == 'CTH':
             prop /= 1000. # 1000. == m -> km
+            data[rgb].info['units'] = 'km'
          plot_type='trollimage'
          if rgb == 'CRR' or rgb == 'CRPh' :
             colormap=RainRate

@@ -5,5 +5,8 @@ packages/anacon*
 **/*.pyc
 **/*.swp
 **/*.[oa]
+**/*.png
+**/*.save
+**/*_save
 ### ignore emacs backup files ### 
 **/*~

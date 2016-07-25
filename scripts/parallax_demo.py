@@ -71,10 +71,11 @@ colors="rainbow"
 #colors="greys"
 
 
-if False:
+if True:
 
     # do parallax correction for all channels
     data = data.parallax_corr(fill="bilinear")
+    cth = data["CTTH"].height
 
 else:
 

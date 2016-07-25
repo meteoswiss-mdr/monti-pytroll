@@ -15,7 +15,7 @@ from mpop.imageo.HRWimage import HRW_2dfield # , HRWstreamplot, HRWimage
 from datetime import timedelta
 from plot_msg import create_PIL_image, add_border_and_rivers, add_title
 from pycoast import ContourWriterAGG
-from pydecorate import DecoratorAGG
+from pydecorate import DecoratorAGG          
 from my_msg_module import format_name, fill_with_closest_pixel
 from copy import deepcopy 
 from my_msg_module import convert_NWCSAF_to_radiance_format, get_NWC_pge_name, check_input
@@ -40,7 +40,6 @@ from trollimage.image import Image as trollimage
 
 from skimage import morphology
 from scipy import ndimage
-from astropy.convolution import MexicanHat2DKernel
 
 # ===============================
 
@@ -191,6 +190,12 @@ if __name__ == '__main__':
         #mode_downscaling = 'gaussian_150_100'
         #mode_downscaling = 'no_downscaling'
 
+    # !!! changes for ccs4 !!!
+    only_obs_noForecast = False   ### temporary
+    rapid_scan_mode = False       ### temporary
+    mode_downscaling = 'gaussian_225_125'  ### temporary
+
+
         
     if scale != "europe" and len(sys.argv) < 2:
         clean_mask = 'skimage'
@@ -278,12 +283,14 @@ if __name__ == '__main__':
     add_borders = False
     legend = True
 
-    pickle_labels = True
+    pickle_labels = False
     shelve_labels = True
+    #labels_dir = "./labels/"
+    labels_dir = "/data/cinesat/out/labels/"
     if scale == "europe":
         pickle_labels = False
         shelve_labels = False
-    
+
     # choose saturation for each indictor
     cmax_cd =  255   
     cmin_cd =  -80   
@@ -488,12 +495,9 @@ if __name__ == '__main__':
           in_msg.RGBs = channels
           RGBs = check_input(in_msg, in_msg.sat+in_msg.sat_nr_str(), in_msg.datetime) 
           # in_msg.sat_nr might be changed to backup satellite
-          ## only_obs_noForecast = True   ### temporary
-          ## rapid_scan_mode = True       ### temporary
-          #mode_downscaling = 'gaussian_225_125'  ### temporary
 
           # now read the data we would like to forecast
-          global_data = GeostationaryFactory.create_scene(in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot)
+          global_data = GeostationaryFactory.create_scene(in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", time_slot)
           #global_data_RGBforecast = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
       
           # area we would like to read
@@ -591,8 +595,17 @@ if __name__ == '__main__':
              
           if only_obs_noForecast == True:
               
+              # now read the observations of the channels at -30 min
+              print "*** read data for ", in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot30
+              global_data30 = GeostationaryFactory.create_scene(in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot30)
+              # area we would like to read
+              area_loaded = get_area_def(area2load)#(in_windshift.areaExtraction)  
+              # load product, global_data is changed in this step!
+              area_loaded = load_products(global_data30, channels30, in_msg, area_loaded)
+              data30 = global_data30.project(area)           
+              data30 = downscale(data30,mode_downscaling)
+
               # now read the observations of the channels at -15 min
-              
               print "*** read data for ", in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot15
               global_data15 = GeostationaryFactory.create_scene(in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot15)
               # area we would like to read
@@ -600,7 +613,6 @@ if __name__ == '__main__':
               # load product, global_data is changed in this step!
               area_loaded15 = load_products(global_data15, channels15, in_msg, area_loaded15)
               data15 = global_data15.project(area)              
-              
               data15 = downscale(data15,mode_downscaling)
               
               if False:
@@ -617,16 +629,6 @@ if __name__ == '__main__':
                   img.colorize(colormap)
                   img.show()
                   quit()              
-
-              # now read the observations of the channels at -30 min
-              print "*** read data for ", in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot30
-              global_data30 = GeostationaryFactory.create_scene(in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot30)
-              # area we would like to read
-              area_loaded = get_area_def(area2load)#(in_windshift.areaExtraction)  
-              # load product, global_data is changed in this step!
-              area_loaded = load_products(global_data30, channels30, in_msg, area_loaded)
-              data30 = global_data30.project(area)           
-              data30 = downscale(data30,mode_downscaling)
                 
               wv_062_t15 = deepcopy(data15['WV_062'].data)
               wv_062_t30 = deepcopy(data30['WV_062'].data)
@@ -1194,7 +1196,7 @@ if __name__ == '__main__':
           
           if shelve_labels:
                 labels = labels.astype('uint32') 
-                filename = 'labels/Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)
+                filename = labels_dir + '/Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)
                 print "*** writing variables ", filename
                 myShelve = shelve.open(filename)
                 # write data as dictionary into the shelve
@@ -1204,7 +1206,7 @@ if __name__ == '__main__':
                 myShelve.close()
           elif pickle_labels:
                 labels = labels.astype('uint32') 
-                pickle.dump( labels, open(create_dir(out_dir +"/cosmo/Channels/labels/labels_"+yearS+monthS+dayS+hourS+minS+".p"), "wb" ) )
+                pickle.dump( labels, open(create_dir(labels_dir +"/cosmo/Channels/labels/labels_"+yearS+monthS+dayS+hourS+minS+".p"), "wb" ) )
           
           if plot_labelled_objects:
                 outputFile = out_dir +"/cosmo/Channels/indicators_in_time/labelled/"+yearS+monthS+dayS+"_"+hourS+minS+"_4th"+name_4Mask+"_"+name_ForcedMask+"AdditionalMask.png"

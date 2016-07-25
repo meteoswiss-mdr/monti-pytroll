@@ -123,7 +123,7 @@ def n_file_composite(composite, in_msg, sat_nr, time_slot, area):
         print "    composite "+file_list[0]+" "+file_list[1]+" "+comp_file
     subprocess.call("/usr/bin/composite "+file_list[0]+" "+file_list[1]+" "+comp_file, shell=True) #+" 2>&1 &"
 
-    if in_msg.scpOutput:
+    if in_msg.scpOutput and composite in in_msg.postprocessing_composite:
         if in_msg.verbose:
             print "... secure copy "+comp_file+ " to "+in_msg.scpOutputDir
             subprocess.call("/usr/bin/scp "+in_msg.scpID+" "+comp_file+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)

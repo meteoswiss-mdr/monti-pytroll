@@ -53,7 +53,14 @@ source activate PyTroll_$LOGNAME
 alias ll='ls --color=auto -alh'
 alias ls='ls --color=auto'
 
-alias tkdiff='/opt/users/common/packages/tkdiff-unix/tkdiff'
+if [ -f /usr/bin/tkdiff ]
+then
+  echo "...use /usr/bin/tkdiff"
+else
+  echo "...use /opt/users/common/packages/tkdiff-unix/tkdiff"
+  alias tkdiff='/opt/users/common/packages/tkdiff-unix/tkdiff'
+fi
+
 
 export FULLNAME=`getent passwd $LOGNAME | cut -d ":" -f 5 | cut -d "," -f 1`
 export FIRSTNAME=`echo $FULLNAME | cut -d " " -f 1`

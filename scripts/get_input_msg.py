@@ -154,10 +154,13 @@ def get_input_msg(input_file=None):
 
       def sat_str(self, layout="%(sat)s-%(sat_nr)s"):
          if self.sat[0:8] == "meteosat":
+            #print "sat_str meteosat"
             return "meteosat"
          elif self.sat[0:8].lower() == "meteosat":
+            #print "sat_str "+"Meteosat-"+str(int(self.sat_nr))
             return "Meteosat-"+str(int(self.sat_nr))
          else:
+            #print "sat_str "+self.sat+str(int(self.sat_nr))
             return self.sat+str(int(self.sat_nr))
          
       def msg_str(self, layout="%(msg)s-%(msg_nr)s"):

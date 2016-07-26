@@ -40,7 +40,7 @@ import aggdraw
 from numpy import where, zeros
 import numpy.ma as ma
 from os.path import dirname, exists, join
-from os import makedirs
+from os import makedirs, chmod
 import subprocess
 from mpop.projector import get_area_def
 from copy import deepcopy
@@ -153,7 +153,7 @@ def plot_msg(in_msg):
       return RGBs
 
    if in_msg.verbose:
-      print "*** load satellite channels for " + in_msg.sat_str()
+      print "*** load satellite channels for " + in_msg.sat_str()+in_msg.sat_nr_str()+" ", global_data.fullname
 
    # initialize processed RGBs
    RGBs_done=[]
@@ -347,6 +347,7 @@ def plot_msg(in_msg):
             if in_msg.verbose:
                print '... save final file: ' + outputFile
             PIL_image.save(outputFile, optimize=True)  # optimize -> minimize file size
+            chmod(outputFile, 0664)  ## FOR PYTHON3: 0o664  # give access read/write access to group members
    
             if in_msg.compress_to_8bit:
                if in_msg.verbose:
@@ -374,9 +375,8 @@ def plot_msg(in_msg):
                RGBs_done.append(rgb)
    
       ## start postprocessing
-      print "postprocessing", in_msg.postprocessing_areas
       if area in in_msg.postprocessing_areas:
-         postprocessing(in_msg, RGBs_done, global_data.time_slot, data.number, area)
+         postprocessing(in_msg, RGBs_done, global_data.time_slot, int(data.sat_nr()), area)
 
    if in_msg.verbose:
       print " "
@@ -441,9 +441,6 @@ def load_products(data_object, RGBs, in_msg, area_loaded):
             print "    load NWC-SAF product: "+pge.replace('_', '') 
 
          data_object.load([pge.replace('_', '')], calibrate=in_msg.nwcsaf_calibrate, reader_level="seviri-level3") 
-    
-         #print "bullshit"
-         #quit()
 
          # False, area_extent=area_loaded.area_extent (difficulties to find correct h5 input file)
          #print data_object.loaded_channels()

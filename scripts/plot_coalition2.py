@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 mpl.use('Agg')
 import time
+from time import strftime
 import copy
 from particles_displacement import particles_displacement
 from properties_cells import properties_cells
@@ -232,71 +233,10 @@ def check_area(area_wanted):
 # ===============================
 
 
-if __name__ == '__main__':
-    
-    from get_input_msg import get_input_msg
-    
-    input_file = sys.argv[1]
-    if input_file[-3:] == '.py': 
-        input_file=input_file[:-3]
-    in_msg = get_input_msg(input_file)
+#if __name__ == '__main__':
 
-    print "in_msg.areas ", in_msg.areas
+def plot_coalition2(in_msg, time_slot, time_slotSTOP):
     
-    from coalition2_settings import *
-    
-    print "input imported"
-    
-    if len(sys.argv) > 2:
-    	if len(sys.argv) < 7:
-          print "***           "
-          print "*** Warning, please specify date and time completely, e.g."
-          print "***          python plot_radar.py 2014 07 23 16 10 "
-          print "***           "
-          quit() # quit at this point
-    	else:
-          year   = int(sys.argv[2])
-          month  = int(sys.argv[3])
-          day    = int(sys.argv[4])
-          hour   = int(sys.argv[5])
-          minute = int(sys.argv[6])
-          time_slot = datetime(year, month, day, hour, minute)
-          #if time_slot.year < 2016:
-          #    in_msg.nrt = False
-          #else:
-          #    in_msg.nrt = True #bad fix, different place cosmo and similar
-          in_msg.nrt = False
-          if len(sys.argv) > 7:
-              yearSTOP   = int(sys.argv[7])
-              monthSTOP  = int(sys.argv[8])
-              daySTOP    = int(sys.argv[9])
-              hourSTOP   = int(sys.argv[10])
-              minuteSTOP = int(sys.argv[11])
-              time_slotSTOP = datetime(yearSTOP, monthSTOP, daySTOP, hourSTOP, minuteSTOP)
-              #nrt = False
-              #in_msg.reader_level="seviri-level4"
-        
-          else:
-              time_slotSTOP = time_slot 
-    else:
-      if True:  # automatic choise of last 5min 
-              from my_msg_module import get_last_SEVIRI_date
-              datetime1 = get_last_SEVIRI_date(True, delay=in_msg.delay)
-              year  = datetime1.year
-              month = datetime1.month
-              day   = datetime1.day
-              hour  = datetime1.hour
-              minute = datetime1.minute
-    
-              time_slot = datetime(year, month, day, hour, minute)
-              time_slotSTOP = time_slot 
-              in_msg.nrt = True
-      else: # fixed date for text reasons
-              year   = 2015          # 2014 09 15 21 35
-              month  =  7           # 2014 07 23 18 30
-              day    =  7
-              hour   = 13
-              minute = 00
 
     while time_slot <= time_slotSTOP:
       
@@ -335,15 +275,15 @@ if __name__ == '__main__':
               print "*** Waring, unknown type of sat_nr", type(in_msg.sat_nr)
               sat_nr_str = in_msg.sat_nr
                 
-          RGBs = check_input(in_msg, in_msg.sat+sat_nr_str, in_msg.datetime)  # in_msg.sat_nr might be changed to backup satellite
-          if len(RGBs) != len(in_msg.RGBs):
-              print "*** Warning, input not complete."
-              print "*** Warning, process only: ", RGBs
+          #RGBs = check_input(in_msg, in_msg.sat+sat_nr_str, in_msg.datetime)  # in_msg.sat_nr might be changed to backup satellite
+          #if len(RGBs) != len(in_msg.RGBs):
+          #    print "*** Warning, input not complete."
+          #    print "*** Warning, process only: ", RGBs
 
-          print "*** read data for ", in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot
+          #print "*** read data for ", in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot
           
           for i_try in range(30):
-              RGBs = check_input(in_msg, in_msg.sat+sat_nr_str, in_msg.datetime, RGBs=in_msg.RGBs)
+              RGBs = check_input(in_msg, in_msg.sat_str()+in_msg.sat_nr_str(), in_msg.datetime, RGBs=in_msg.RGBs)
               if len(RGBs) > 0:
                   # exit loop, if input is found
                   break
@@ -351,8 +291,11 @@ if __name__ == '__main__':
                   # else wait 20s and try again
                   import time
                   time.sleep(25)
+                  
+          print "*** load data for ", in_msg.sat_str(), in_msg.sat_nr_str()
+          
           # now read the data we would like to forecast
-          global_data = GeostationaryFactory.create_scene(in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot)
+          global_data = GeostationaryFactory.create_scene(in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", time_slot)
           #global_data_RGBforecast = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
       
           # area we would like to read
@@ -425,9 +368,10 @@ if __name__ == '__main__':
                 
                 
                 if chosen_settings['scale'] == 'local' and in_msg.no_NWCSAF == False:
+                    print "... check for CTH observation (scale=", chosen_settings['scale']," no_NWCSAF=", in_msg.no_NWCSAF, ")"
                     for i_try in range(30):
                         # check if 'CTH' file is present
-                        RGBs = check_input(in_msg, in_msg.sat+sat_nr_str, in_msg.datetime, RGBs="CTH")
+                        RGBs = check_input(in_msg, in_msg.sat_str()+in_msg.sat_nr_str(), in_msg.datetime, RGBs="CTH")
                         if len(RGBs) > 0:
                             # exit loop, if input is found
                             break
@@ -533,28 +477,29 @@ if __name__ == '__main__':
       
                 else:
                     # no forecasted brightness temperature available, use old observations 
-      
-                    # read the observations of the channels at -15 min
-                    print "*** read data for ", in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot15
-                    global_data15 = GeostationaryFactory.create_scene(in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot15)
-                    # area we would like to read
-                    area_loaded15 = get_area_def(area2load)#(in_windshift.areaExtraction)  
-                    # load product, global_data is changed in this step!
-                    area_loaded15 = load_products(global_data15, in_msg.channels15, in_msg, area_loaded15)
-                    data15 = global_data15.project(area)              
-                    
-                    data15 = downscale(data15,chosen_settings['mode_downscaling'])
                     
                     # now read the observations of the channels at -30 min
-                    print "*** read data for ", in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot30
-                    global_data30 = GeostationaryFactory.create_scene(in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot30)
+                    print "*** read data for ", in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot30
+                    
+                    global_data30 = GeostationaryFactory.create_scene(in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot30)
                     # area we would like to read
                     area_loaded = get_area_def(area2load)#(in_windshift.areaExtraction)  
                     # load product, global_data is changed in this step!
                     area_loaded = load_products(global_data30, in_msg.channels30, in_msg, area_loaded)
                     data30 = global_data30.project(area)           
-                    data30 = downscale(data30,chosen_settings['mode_downscaling'])
-                      
+                    data30 = downscale(data30,chosen_settings['mode_downscaling'])      
+                    
+                    # read the observations of the channels at -15 min
+                    print "*** read data for ", in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot15
+                    
+                    global_data15 = GeostationaryFactory.create_scene(in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot15)
+                    # area we would like to read
+                    area_loaded15 = get_area_def(area2load)#(in_windshift.areaExtraction)  
+                    # load product, global_data is changed in this step!
+                    area_loaded15 = load_products(global_data15, in_msg.channels15, in_msg, area_loaded15)
+                    data15 = global_data15.project(area)              
+                    data15 = downscale(data15,chosen_settings['mode_downscaling'])
+                    
                     wv_062_t15 = deepcopy(data15['WV_062'].data)
                     wv_062_t30 = deepcopy(data30['WV_062'].data)
                             
@@ -1027,15 +972,15 @@ if __name__ == '__main__':
                 # set transparency for "no clouds" 
                 rgbArray[sum_array<=0,3] = background_alpha
                 
-                in_msg.standardOutputName = in_msg.standardOutputName.replace('%y%m%d%H%M',time.strftime('%y%m%d%H%M',time_slot.timetuple()))
+                standardOutputName = in_msg.standardOutputName.replace('%y%m%d%H%M',strftime('%y%m%d%H%M',time_slot.timetuple()))
                 
                 ###c2File = (in_msg.outputDir+"/cosmo/Channels/indicators_in_time/RGB"+maskS+"/%s_%s_C2rgb"+maskS+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask"+area+".png") % (yearS+monthS+dayS,hourS+minS)
                 #c2File = (in_msg.outputDir+"/%s_%s_C2rgb"+maskS+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask"+area+".png") % (yearS+monthS+dayS,hourS+minS)
                 dic_figure={}
                 dic_figure['rgb']='C2rgb'
                 dic_figure['area']=area
-                print in_msg.standardOutputName
-                c2File = (in_msg.outputDir+in_msg.standardOutputName%dic_figure)
+                print standardOutputName
+                c2File = (in_msg.outputDir+standardOutputName%dic_figure)
                 
                 if 'C2rgb' in in_msg.results:
                     img1 = Image.fromarray( rgbArray,'RGBA')
@@ -1053,32 +998,38 @@ if __name__ == '__main__':
                     #c2FileHRV = (in_msg.outputDir+"/cosmo/Channels/indicators_in_time/RGB-HRV"+maskS+"/%s_%s_C2rgb"+maskS+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask.png") % (yearS+monthS+dayS,hourS+minS)
                     #hrvFile = "/data/COALITION2/PicturesSatellite//"+yearS+"-"+monthS+"-"+dayS+"/"+yearS+"-"+monthS+"-"+dayS+type_image+"_"+area+"/MSG"+type_image+"-"+area+"_"+yearS[2:]+monthS+dayS+hourS+minS+".png"
                      
-                    hrvFile = "/data/cinesat/out/MSG_IR-108-"+area+"_"+"16"+monthS+dayS+hourS+minS+".png"
-                    print "...creating composite", "/data/cinesat/out/MSG_IR-108-"+area+"_"+"16"+monthS+dayS+hourS+minS+".png"
+                    #hrvFile = in_msg.outputDir+"MSG_IR-108-"+area+"_"+"16"+monthS+dayS+hourS+minS+".png"
+                    
                     #out_file1 = create_dir( in_msg.outputDir +"/"+yearS+monthS+dayS+"_"+hourS+minS+"_C2rgb-HRV_"+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask"+area+".png" )
-                    dic_figure={}
-                    dic_figure['rgb']='C2rgb-IR-108'
-                    dic_figure['area']=area
-                    print in_msg.standardOutputName
-                    out_file1 = create_dir( in_msg.outputDir+in_msg.standardOutputName%dic_figure)
-                    print "... create composite "+c2File+" "+hrvFile+" "+out_file1
-                    subprocess.call("/usr/bin/composite "+c2File+" "+hrvFile+" "+out_file1, shell=True)
-                    print "... saved composite: display ", out_file1, " &"
+                    if in_msg.nrt == False:
+                        if area == "ccs4":
+                            type_image = "_HRV"
+                        else:
+                            type_image = "_overview"
+
+                        hrvFile = "/data/COALITION2/PicturesSatellite//"+yearS+"-"+monthS+"-"+dayS+"/"+yearS+"-"+monthS+"-"+dayS+type_image+"_"+area+"/MSG"+type_image+"-"+area+"_"+yearS[2:]+monthS+dayS+hourS+minS+".png"
+                        dic_figure={}
+                        dic_figure['rgb']='C2rgb-'+type_image[1:] #-IR-108'
+                        dic_figure['area']=area
+                        print standardOutputName
+                        out_file1 = create_dir( in_msg.outputDir+standardOutputName%dic_figure)
+                        print "...creating composite", out_file1
+                        print "... create composite "+c2File+" "+hrvFile+" "+out_file1
+                        subprocess.call("/usr/bin/composite "+c2File+" "+hrvFile+" "+out_file1, shell=True)
+                        print "... saved composite: display ", out_file1, " &"
                 
-                ## start postprocessing
-                if area in in_msg.postprocessing_areas:
-                    postprocessing(in_msg, 'C2rgb', global_data.time_slot, data.number, area)
+                    ## start postprocessing
+                    elif area in in_msg.postprocessing_areas:
+                       print "area in post processing"
+                       in_msg.postprocessing_composite = deepcopy(in_msg.postprocessing_composite1)
+                       postprocessing(in_msg, [], time_slot, int(data.sat_nr()), area)
       
-                if in_msg.scpOutput: 
-                    if in_msg.verbose:
-                        print "... secure copy "+out_file1+ " to "+in_msg.scpOutputDir
-                    if False:
-                        subprocess.call("scp "+in_msg.scpID+" "+out_file1+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
-                    else:
-                        if area in in_msg.postprocessing_areas:
-                           print "area in post processing"
-                           in_msg.postprocessing_composite = deepcopy(in_msg.postprocessing_composite1)
-                           postprocessing(in_msg, [], time_slot, in_msg.sat_nr, area)
+                #if in_msg.scpOutput: 
+                #    if in_msg.verbose:
+                #        print "... secure copy "+out_file1+ " to "+in_msg.scpOutputDir
+                #    if False:
+                #        subprocess.call("scp "+in_msg.scpID+" "+out_file1+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
+
           
                 if area == "ccs4" and in_msg.properties_cells == True:
                     print "**** Computing properties of the cells"
@@ -1086,7 +1037,8 @@ if __name__ == '__main__':
                         outputDir_labels = in_msg.outputDir+'/labels/'
                     else:
                         outputDir_labels = None
-                    labels_corrected, first_time_step = properties_cells(time_slot,time_slot,current_labels = labels, metadata = metadata, labels_dir = in_msg.labelsDir, outputDir_labels = outputDir_labels, in_msg = in_msg)
+                    labels_corrected, first_time_step = properties_cells(time_slot, time_slot, current_labels=labels, metadata=metadata,
+                                                                        labels_dir=in_msg.labelsDir, outputDir_labels=outputDir_labels, in_msg=in_msg, sat_data=data)
                     if first_time_step:
                         print "no history to follow, first timestep"
                     if in_msg.plot_forecast == True and first_time_step == False:
@@ -1095,7 +1047,8 @@ if __name__ == '__main__':
                             add_path = "/new_forecasted_area/"
                         else:
                             add_path = ""
-                        plot_forecast_area(time_slot, in_msg.model_fit_area,outputFile = in_msg.outputDir+add_path, current_labels = labels_corrected, t_stop=time_slot, BackgroundFile=out_file1, ForeGroundRGBFile = c2File, labels_dir = in_msg.labelsDir, in_msg = in_msg)
+                        plot_forecast_area(time_slot, in_msg.model_fit_area, outputFile=in_msg.outputDir+add_path, current_labels=labels_corrected,
+                                          t_stop=time_slot, BackgroundFile=out_file1, ForeGroundRGBFile=c2File, labels_dir=in_msg.labelsDir, in_msg=in_msg)
             
           # add 5min and do the next time step
           f4p = in_msg.labelsDir+"/Labels*"
@@ -1105,3 +1058,73 @@ if __name__ == '__main__':
                 #print("modified permission: ", file_per)
                 os.chmod(file_per, 0664)  ## FOR PYTHON3: 0o664           
           time_slot = time_slot + timedelta(minutes=5)
+
+
+if __name__ == '__main__':
+
+    from get_input_msg import get_input_msg
+    
+    input_file = sys.argv[1]
+    if input_file[-3:] == '.py': 
+        input_file=input_file[:-3]
+    in_msg = get_input_msg(input_file)
+
+    print "in_msg.areas ", in_msg.areas
+    
+    from coalition2_settings import *
+    
+    print "input imported"
+    
+    if len(sys.argv) > 2:
+    	if len(sys.argv) < 7:
+          print "***           "
+          print "*** Warning, please specify date and time completely, e.g."
+          print "***          python plot_radar.py 2014 07 23 16 10 "
+          print "***           "
+          quit() # quit at this point
+    	else:
+          year   = int(sys.argv[2])
+          month  = int(sys.argv[3])
+          day    = int(sys.argv[4])
+          hour   = int(sys.argv[5])
+          minute = int(sys.argv[6])
+          time_slot = datetime(year, month, day, hour, minute)
+          #if time_slot.year < 2016:
+          #    in_msg.nrt = False
+          #else:
+          #    in_msg.nrt = True #bad fix, different place cosmo and similar
+          in_msg.nrt = False
+          if len(sys.argv) > 7:
+              yearSTOP   = int(sys.argv[7])
+              monthSTOP  = int(sys.argv[8])
+              daySTOP    = int(sys.argv[9])
+              hourSTOP   = int(sys.argv[10])
+              minuteSTOP = int(sys.argv[11])
+              time_slotSTOP = datetime(yearSTOP, monthSTOP, daySTOP, hourSTOP, minuteSTOP)
+              #nrt = False
+              #in_msg.reader_level="seviri-level4"
+        
+          else:
+              time_slotSTOP = time_slot 
+    else:
+      if True:  # automatic choise of last 5min 
+              from my_msg_module import get_last_SEVIRI_date
+              datetime1 = get_last_SEVIRI_date(True, delay=in_msg.delay)
+              year  = datetime1.year
+              month = datetime1.month
+              day   = datetime1.day
+              hour  = datetime1.hour
+              minute = datetime1.minute
+    
+              time_slot = datetime(year, month, day, hour, minute)
+              time_slotSTOP = time_slot 
+              in_msg.nrt = True
+      else: # fixed date for text reasons
+              year   = 2015          # 2014 09 15 21 35
+              month  =  7           # 2014 07 23 18 30
+              day    =  7
+              hour   = 13
+              minute = 00
+    print "plot_coalition2 "
+    plot_coalition2(in_msg, time_slot, time_slotSTOP)
+

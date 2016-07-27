@@ -260,6 +260,8 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
       
           in_msg.datetime = time_slot
           
+
+          
           if type(in_msg.sat_nr) is int:
               if in_msg.sat[0:8]=="meteosat":
                   sat_nr_str = str(in_msg.sat_nr).zfill(2)
@@ -273,7 +275,6 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
               print "*** Waring, unknown type of sat_nr", type(in_msg.sat_nr)
               sat_nr_str = in_msg.sat_nr
                 
-
           #RGBs = check_input(in_msg, in_msg.sat+sat_nr_str, in_msg.datetime)  # in_msg.sat_nr might be changed to backup satellite
           #if len(RGBs) != len(in_msg.RGBs):
           #    print "*** Warning, input not complete."
@@ -282,8 +283,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
           #print "*** read data for ", in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot
           
           for i_try in range(30):
-              RGBs = check_input(in_msg, in_msg.sat_str()+in_msg.sat_nr_str(), in_msg.datetime, RGBs=in_msg.RGBs)# in_msg.sat_nr might be changed to backup satellite
-
+              RGBs = check_input(in_msg, in_msg.sat_str()+in_msg.sat_nr_str(), in_msg.datetime, RGBs=in_msg.RGBs)
               if len(RGBs) > 0:
                   # exit loop, if input is found
                   break
@@ -296,9 +296,8 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
           
           # now read the data we would like to forecast
           global_data = GeostationaryFactory.create_scene(in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", time_slot)
-
           #global_data_RGBforecast = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
-
+      
           # area we would like to read
           area2load = "EuropeCanary95" #"ccs4" #c2"#"ccs4" #in_windshift.ObjArea
           area_loaded = get_area_def(area2load )#(in_windshift.areaExtraction)  
@@ -483,7 +482,6 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     print "*** read data for ", in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot30
                     
                     global_data30 = GeostationaryFactory.create_scene(in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot30)
-
                     # area we would like to read
                     area_loaded = get_area_def(area2load)#(in_windshift.areaExtraction)  
                     # load product, global_data is changed in this step!
@@ -495,14 +493,13 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     print "*** read data for ", in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot15
                     
                     global_data15 = GeostationaryFactory.create_scene(in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot15)
-
                     # area we would like to read
                     area_loaded15 = get_area_def(area2load)#(in_windshift.areaExtraction)  
                     # load product, global_data is changed in this step!
                     area_loaded15 = load_products(global_data15, in_msg.channels15, in_msg, area_loaded15)
                     data15 = global_data15.project(area)              
                     data15 = downscale(data15,chosen_settings['mode_downscaling'])
-
+                    
                     wv_062_t15 = deepcopy(data15['WV_062'].data)
                     wv_062_t30 = deepcopy(data30['WV_062'].data)
                             
@@ -583,12 +580,12 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
             
                 cd = np.zeros((nx,ny))
                 n_tests_cd = 0.
-                cd = np.where( cloud_depth[0,:,:] >  th_cd[0], cd+1, cd );   n_tests_cd+=1. ;   n_tests_cd+=1.# !!! changed from - 16.0
-                cd = np.where( cloud_depth[1,:,:] >  th_cd[1], cd+1, cd );   n_tests_cd+=1. ;   n_tests_cd+=1.# !!! changed from -7.5
-                cd = np.where( cloud_depth[2,:,:] <  th_cd[2], cd+1, cd );   n_tests_cd+=1. ;   n_tests_cd+=1.
-                cd = np.where( cloud_depth[3,:,:] >  th_cd[3], cd+1, cd );   n_tests_cd+=1. ;   n_tests_cd=1.
-                cd = np.where( cloud_depth[4,:,:] >  th_cd[4], cd+1, cd );   n_tests_cd+=1. ;   n_tests_cd+=1.
-                #cd = np.where( cloud_depth[5,:,:] <  th_cd[5], cd+1, cd );   n_tests_cd+=1. ;   n_tests_cd=1. # !!! changed DEACTIVATED
+                cd = np.where( cloud_depth[0,:,:] >  th_cd[0], cd+1, cd );   n_tests_cd+=1. ;   #n_tests_cd+=1.# !!! changed from - 16.0
+                cd = np.where( cloud_depth[1,:,:] >  th_cd[1], cd+1, cd );   n_tests_cd+=1. ;   #n_tests_cd+=1.# !!! changed from -7.5
+                cd = np.where( cloud_depth[2,:,:] <  th_cd[2], cd+1, cd );   n_tests_cd+=1. ;   #n_tests_cd+=1.
+                cd = np.where( cloud_depth[3,:,:] >  th_cd[3], cd+1, cd );   n_tests_cd+=1. ;   #n_tests_cd=1.
+                cd = np.where( cloud_depth[4,:,:] >  th_cd[4], cd+1, cd );   n_tests_cd+=1. ;   #n_tests_cd+=1.
+                #cd = np.where( cloud_depth[5,:,:] <  th_cd[5], cd+1, cd );   n_tests_cd+=1. ;   #n_tests_cd=1. # !!! changed DEACTIVATED
                 
                 #cirrus = np.where( cloud_depth[5,:,:]           >  th_cirrus ,cirrus +1, cirrus)
                 
@@ -1026,7 +1023,6 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                        print "area in post processing"
                        in_msg.postprocessing_composite = deepcopy(in_msg.postprocessing_composite1)
                        postprocessing(in_msg, [], time_slot, int(data.sat_nr()), area)
-
       
                 #if in_msg.scpOutput: 
                 #    if in_msg.verbose:
@@ -1041,10 +1037,8 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                         outputDir_labels = in_msg.outputDir+'/labels/'
                     else:
                         outputDir_labels = None
-
                     labels_corrected, first_time_step = properties_cells(time_slot, time_slot, current_labels=labels, metadata=metadata,
                                                                         labels_dir=in_msg.labelsDir, outputDir_labels=outputDir_labels, in_msg=in_msg, sat_data=data)
-
                     if first_time_step:
                         print "no history to follow, first timestep"
                     if in_msg.plot_forecast == True and first_time_step == False:
@@ -1053,10 +1047,8 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                             add_path = "/new_forecasted_area/"
                         else:
                             add_path = ""
-
                         plot_forecast_area(time_slot, in_msg.model_fit_area, outputFile=in_msg.outputDir+add_path, current_labels=labels_corrected,
                                           t_stop=time_slot, BackgroundFile=out_file1, ForeGroundRGBFile=c2File, labels_dir=in_msg.labelsDir, in_msg=in_msg)
-
             
           # add 5min and do the next time step
           f4p = in_msg.labelsDir+"/Labels*"
@@ -1102,6 +1094,7 @@ if __name__ == '__main__':
           #else:
           #    in_msg.nrt = True #bad fix, different place cosmo and similar
           in_msg.nrt = False
+          
           if len(sys.argv) > 7:
               yearSTOP   = int(sys.argv[7])
               monthSTOP  = int(sys.argv[8])

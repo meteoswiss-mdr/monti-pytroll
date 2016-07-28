@@ -193,7 +193,7 @@ def save_all_cells(all_cells):
 ...
 """
     
-def properties_cells(t1,tStop,current_labels = None, metadata = None, labels_dir = None, outputDir_labels = None, in_msg = None):
+def properties_cells(t1,tStop,current_labels = None, metadata = None, labels_dir = None, outputDir_labels = None, in_msg = None, sat_data = None):
     
     
     rgb_load = ['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134'] #,'CTP','CTT']
@@ -260,18 +260,22 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None, labels_dir
           
           print in_msg.sat, str(in_msg.sat_nr), "seviri", t1
           
-          # now read the data we would like to forecast
-          global_data = GeostationaryFactory.create_scene(in_msg.sat, str(in_msg.sat_nr), "seviri", t1)
-          #global_data_RGBforecast = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
-      
-          # area we would like to read
-          area_loaded = get_area_def("EuropeCanary95")#(in_windshift.areaExtraction)  
-      
-          # load product, global_data is changed in this step!
-          area_loaded = load_products(global_data, rgb_load, in_msg, area_loaded)
+          if sat_data == None:
+              # now read the data we would like to forecast
+              global_data = GeostationaryFactory.create_scene(in_msg.sat, str(in_msg.sat_nr), "seviri", t1)
+              #global_data_RGBforecast = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
           
-          print '... project data to desired area ', area
-          data = global_data.project(area)
+              # area we would like to read
+              area_loaded = get_area_def("EuropeCanary95")#(in_windshift.areaExtraction)  
+          
+              # load product, global_data is changed in this step!
+              area_loaded = load_products(global_data, rgb_load, in_msg, area_loaded)
+              
+              print '... project data to desired area ', area
+              data = global_data.project(area)
+          
+          else:
+              data = sat_data
           
           yearS  = str(t1.year)
           monthS = "%02d" % t1.month

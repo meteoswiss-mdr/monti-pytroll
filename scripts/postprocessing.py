@@ -134,7 +134,7 @@ def n_file_composite(composite, in_msg, sat_nr, time_slot, area):
 #-----------------------------------------------------------------------------------------
 
 
-def postprocessing (in_msg, RGBs_done, time_slot, sat_nr, area):
+def postprocessing (in_msg, time_slot, sat_nr, area):
 
     print ""
     print "*** start post processing for area: ", area

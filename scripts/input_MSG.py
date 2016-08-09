@@ -34,7 +34,7 @@ def input(in_msg):
     ##in_msg.RGBs.append('VIS008')       # black and white
     ##in_msg.RGBs.append('IR_016')       # black and white
     ##in_msg.RGBs.append('IR_039')       # black and white
-    ##in_msg.RGBs.append('WV_062')       # black and white
+    in_msg.RGBs.append('WV_062')       # black and white
     ##in_msg.RGBs.append('WV_073')       # black and white
     ##in_msg.RGBs.append('IR_087')       # black and white
     ##in_msg.RGBs.append('IR_097')       # black and white
@@ -50,7 +50,7 @@ def input(in_msg):
     #in_msg.RGBs.append('WV_073c')      # colored version
     #in_msg.RGBs.append('IR_087c')      # colored version
     #in_msg.RGBs.append('IR_097c')      # colored version
-    in_msg.RGBs.append('IR_108c')      # colored version
+    #in_msg.RGBs.append('IR_108c')      # colored version
     #in_msg.RGBs.append('IR_120c')      # colored version
     #in_msg.RGBs.append('IR_134c')      # colored version
     #in_msg.RGBs.append('HRVc')         # colored version
@@ -111,7 +111,7 @@ def input(in_msg):
     ## NWC SAF PEG 3 
     in_msg.nwcsaf_calibrate=True
     #in_msg.RGBs.append('CTT')
-    in_msg.RGBs.append('CTH')
+    #in_msg.RGBs.append('CTH')
     #in_msg.RGBs.append('CTP')
     ## NWC SAF PEG 13 
     #in_msg.nwcsaf_calibrate=False
@@ -158,11 +158,11 @@ def input(in_msg):
     #----------------
     #in_msg.areas.append('EuropeCanary')    # upper third of MSG disk, satellite at 0.0 deg East, full resolution 
     #in_msg.areas.append('EuropeCanary95')  # upper third of MSG disk, satellite at 9.5 deg East, full resolution 
-    in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
+    #in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
     #in_msg.areas.append('EuroMercator')    # same projection as blitzortung.org
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
-    #in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
+    in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
     #in_msg.areas.append('alps95')          # area around Switzerland processed by NWCSAF software 349x151 
     #in_msg.areas.append('ticino')          # stereographic proj of Ticino 342x311
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
@@ -174,12 +174,14 @@ def input(in_msg):
     #in_msg.areas.append('opera_odyssey')
 
     # 8=MSG1, 9=MSG2, 10=MSG3
+    in_msg.sat = "Meteosat"
+    #in_msg.sat = "meteosat"
     #in_msg.sat_nr=8
     #in_msg.RSS=False 
-    in_msg.sat_nr=9
-    in_msg.RSS=True
-    #in_msg.sat_nr=10
-    #in_msg.RSS=False
+    #in_msg.sat_nr=9
+    #in_msg.RSS=True
+    in_msg.sat_nr=10
+    in_msg.RSS=False
     
     # switch off Rapid scan, if large areas are wanted 
     if ('fullearth' in in_msg.areas) or ('met09globe' in in_msg.areas) or ('met09globeFull' in in_msg.areas): 
@@ -187,7 +189,7 @@ def input(in_msg):
 
     in_msg.check_input = False
     #in_msg.reader_level="seviri-level4" 
-    in_msg.parallax_correction = True
+    in_msg.parallax_correction = False
     in_msg.parallax_gapfilling = 'bilinear' # 'False' (default), 'nearest'
     #in_msg.save_reprojected_data=['ccs4']
     in_msg.reprojected_data_filename='%(msg)s_%(area)s_%Y%m%d%H%M_nwcsaf.nc'
@@ -204,21 +206,21 @@ def input(in_msg):
     in_msg.HRV_enhancement = False
 
     in_msg.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
-    in_msg.outputDir='./pics/'
+    #in_msg.outputDir='./pics/'
     #in_msg.outputDir = "./%Y-%m-%d/%Y-%m-%d_%(rgb)s-%(area)s/"
-    #in_msg.outputDir = '/data/cinesat/out/'
+    in_msg.outputDir = '/data/cinesat/out/'
     #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
 
     in_msg.compress_to_8bit=False
 
-    #in_msg.scpOutput = True
+    in_msg.scpOutput = True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
 
     # please download the shape file 
     in_msg.mapDir='/opt/users/common/shapes/'
 
-    #in_msg.postprocessing_areas=["ccs4"]
+    in_msg.postprocessing_areas=["ccs4"]
     #in_msg.postprocessing_areas=['EuropeCanaryS95']
     #in_msg.postprocessing_composite=["h03-ir108"] 
     #in_msg.postprocessing_composite=["hrwdp-ir108"] 
@@ -230,4 +232,4 @@ def input(in_msg):
     #in_msg.postprocessing_composite=["hrwdp-streamd-HRV", "hrwdp-streamd-ir108"] #"hrwdCT-ir108", "hrwdCT-HRV"
     #in_msg.postprocessing_composite=["hrwdpL-streamdL-HRV","hrwdpL-streamdL-ir108"] 
     #in_msg.postprocessing_composite=["hrwdpH-streamdH-HRV","hrwdpH-streamdH-ir108"] 
-    in_msg.postprocessing_composite=["hrwdp-streamd-ir108","TRT-streamd-ir108"] 
+    #in_msg.postprocessing_composite=["hrwdp-streamd-ir108","TRT-streamd-ir108"] 

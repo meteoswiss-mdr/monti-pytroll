@@ -41,7 +41,7 @@ def input(in_msg):
     #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
     #in_msg.areas.append('odysseyS25')      # Area of Odyssey composite (factor 2.5 smaller)
     in_msg.areas.append('ccs4')
-    #in_msg.areas.append('EuropeCanaryS95') # "ccs4" "blitzortung" #"eurotv" # "eurotv"
+    in_msg.areas.append('EuropeCanaryS95') # "ccs4" "blitzortung" #"eurotv" # "eurotv"
     #in_msg.areas.append("blitzortung")
     
     in_msg.properties_cells = True
@@ -51,19 +51,9 @@ def input(in_msg):
     #in_msg.model_fit_area = "linear_exp" #reccomended
     in_msg.model_fit_area = "linear_exp_exp" #reccomended
     #in_msg.model_fit_area = "linear"
-    
-    in_msg.rapid_scan_modeForecast = False #reccomended: easier to see development in 30-15-0 minutes comparisons
-    #in_msg.rapid_scan_modeForecast = True
-    
+        
     in_msg.area_forecast = "ccs4c2" #reccomended: this way extra borders that allow to always have values within ccs4 area (but slower)
     #in_msg.area_forecast = "ccs4" 
-    
-    if in_msg.rapid_scan_modeForecast == False:
-          in_msg.dt_forecast1 = 15
-          in_msg.dt_forecast2 = 30
-    else:
-          in_msg.dt_forecast1 = 5
-          in_msg.dt_forecast2 = 10 
              
     in_msg.integration_method_velocity = "euler"
     #in_msg.integration_method_velocity = "rk4" 
@@ -118,7 +108,7 @@ def input(in_msg):
     # choose production of results
     #-----------------------------
     in_msg.results = ['C2rgb']
-    in_msg.results.append('C2rgbHRV')
+    #### in_msg.results.append('C2rgbHRV')  use now 
     # --------------------------------------
     # choose production of auxiliary results
     # --------------------------------------
@@ -152,7 +142,8 @@ def input(in_msg):
                                    ## c  crude resolution: Another ~80 % reduction. 
                                    ## None -> automatic choise
 
-    #in_msg.sat = "meteosat"  # default "meteosat"
+    #in_msg.sat = "meteosat"   # old format: "meteosat" uses meteosat09.cfg files
+    in_msg.sat = "Meteosat"  # new format: "Meteosat" uses Meteosat-9.cfg files
     # 8=MSG1, 9=MSG2, 10=MSG3
     #in_msg.sat_nr=8
     #in_msg.RSS=False 
@@ -165,11 +156,21 @@ def input(in_msg):
     if ('fullearth' in in_msg.areas) or ('met09globe' in in_msg.areas) or ('met09globeFull' in in_msg.areas): 
        in_msg.RSS=False 
 
+    in_msg.forecasts_in_rapid_scan_mode = False #reccomended: easier to see development in 30-15-0 minutes comparisons   # for MSG3 the only possible
+    #in_msg.forecasts_in_rapid_scan_mode = True
+
+    if in_msg.RSS==False:
+        print "*** Warning: use TB forecast in 15min mode, as they are only available every 15min"
+        in_msg.forecasts_in_rapid_scan_mode = False
+    
+    in_msg.choose_forecast_times()
+
     #in_msg.outputDir='./pics/'
-    in_msg.standardOutputName = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
+    in_msg.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
     #in_msg.outputDir = '/data/cinesat/out/'
     #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
-    in_msg.outputDirOffline =  '/opt/users/lel/PyTroll/scripts//Mecikalski/'
+    #in_msg.outputDirOffline =  '/opt/users/lel/PyTroll/scripts//Mecikalski/'
+    in_msg.outputDirOffline =  '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
     in_msg.outputDirNrt = '/data/cinesat/out/' #'/opt/users/lel/PyTroll/scripts/nrt_test/' #
     #if in_msg.only_obs_noForecast == True:
     #    in_msg.outputDir = "/opt/users/lel/PyTroll/scripts//Mecikalski_obs/"
@@ -179,8 +180,16 @@ def input(in_msg):
     #    in_msg.outputDir = "/opt/users/lel/PyTroll/scripts//Mecikalski/"
 
     #in_msg.postprocessing_areas=['ccs4']
-    in_msg.postprocessing_composite=["C2rgb-IR_108","C2rgb-HRV"]    
+    #### in_msg.postprocessing_composite=["C2rgb-IR_108","C2rgb-HRV"]    not used anymore 
     
+    in_msg.postprocessing_areas= []
+    in_msg.postprocessing_areas.append("ccs4")
+    #in_msg.postprocessing_areas=['EuropeCanaryS95']
+    
+    in_msg.postprocessing_composite1 = ["C2rgb-IR_108"]
+    in_msg.postprocessing_composite2 = ["C2rgb-Forecast-IR_108"]      
+
+
     in_msg.outputDirForecastsNrt = "/data/cinesat/out/" #'/opt/users/lel/PyTroll/scripts/nrt_test/' #
     in_msg.outputDirForecastsOffline = "/data/COALITION2/PicturesSatellite/LEL_results_wind/"
    
@@ -329,12 +338,6 @@ def input(in_msg):
     #in_msg.pickle_labels = False; in_msg.shelve_labels = True
     in_msg.pickle_labels = False; in_msg.shelve_labels = False
 
-    in_msg.postprocessing_areas= []
-    in_msg.postprocessing_areas.append("ccs4")
-    #in_msg.postprocessing_areas=['EuropeCanaryS95']
-    
-    in_msg.postprocessing_composite1=["C2rgb-ir108"]
-    in_msg.postprocessing_composite2=["C2rgb-Forecast-ir108"]      
     
     # load a few standard things 
     #in_msg.outputFile = 'WS_%(rgb)s-%(area)s_%y%m%d%H%M'

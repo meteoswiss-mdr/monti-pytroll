@@ -51,19 +51,9 @@ def input(in_msg):
     #in_msg.model_fit_area = "linear_exp" #reccomended
     in_msg.model_fit_area = "linear_exp_exp" #reccomended
     #in_msg.model_fit_area = "linear"
-    
-    in_msg.rapid_scan_modeForecast = False #reccomended: easier to see development in 30-15-0 minutes comparisons
-    #in_msg.rapid_scan_modeForecast = True
-    
+        
     in_msg.area_forecast = "ccs4c2" #reccomended: this way extra borders that allow to always have values within ccs4 area (but slower)
     #in_msg.area_forecast = "ccs4" 
-    
-    if in_msg.rapid_scan_modeForecast == False:
-          in_msg.dt_forecast1 = 15
-          in_msg.dt_forecast2 = 30
-    else:
-          in_msg.dt_forecast1 = 5
-          in_msg.dt_forecast2 = 10 
              
     in_msg.integration_method_velocity = "euler"
     #in_msg.integration_method_velocity = "rk4" 
@@ -153,6 +143,7 @@ def input(in_msg):
                                    ## None -> automatic choise
 
     #in_msg.sat = "meteosat"  # default "meteosat"
+    in_msg.sat = "Meteosat"
     # 8=MSG1, 9=MSG2, 10=MSG3
     #in_msg.sat_nr=8
     #in_msg.RSS=False 
@@ -164,6 +155,15 @@ def input(in_msg):
     # switch off Rapid scan, if large areas are wanted 
     if ('fullearth' in in_msg.areas) or ('met09globe' in in_msg.areas) or ('met09globeFull' in in_msg.areas): 
        in_msg.RSS=False 
+
+    in_msg.forecasts_in_rapid_scan_mode = False #reccomended: easier to see development in 30-15-0 minutes comparisons   # for MSG3 the only possible
+    #in_msg.forecasts_in_rapid_scan_mode = True
+
+    if in_msg.RSS==False:
+        print "*** Warning: use TB forecast in 15min mode, as they are only available every 15min"
+        in_msg.forecasts_in_rapid_scan_mode = False
+    
+    in_msg.choose_forecast_times()
 
     #in_msg.outputDir='./pics/'
     in_msg.standardOutputName = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
@@ -179,12 +179,12 @@ def input(in_msg):
     #    in_msg.outputDir = "/opt/users/lel/PyTroll/scripts//Mecikalski/"
 
     #in_msg.postprocessing_areas=['ccs4']
-    in_msg.postprocessing_composite=["C2rgb-IR_108","C2rgb-HRV"]    
+    in_msg.postprocessing_composite=["C2rgb-ir108","C2rgb-HRV"]    
     
     in_msg.outputDirForecastsNrt = "/data/cinesat/out/" #'/opt/users/lel/PyTroll/scripts/nrt_test/' #
     in_msg.outputDirForecastsOffline = "/data/COALITION2/PicturesSatellite/LEL_results_wind/"
    
-    in_msg.scpOutput = False
+    in_msg.scpOutput = True
     in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
 

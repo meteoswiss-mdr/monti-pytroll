@@ -538,7 +538,7 @@ if __name__ == '__main__':
           data = global_data.project(area)
 
           if downscaling_data == True:
-               from Mecikalski_test_LEL import downscale          
+               from plot_coalition2 import downscale          
                data = downscale(data, mode = mode_downscaling)
 
    

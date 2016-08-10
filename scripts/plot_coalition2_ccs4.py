@@ -69,41 +69,9 @@ def force_to_observed_cloud_mask(mod, obs):
     mod.mask = obs
     return mod
     
-    
-def downscale(data,mode = 'gaussian_225_125'):
-    if mode != 'no_downscaling':
-        print "... DOWNSCALING: applying: ", mode
-        if mode == 'convolve_405_300': 
-            weights = np.ones([5,3])
-            weights = weights / weights.sum()
-            
-        elif mode == 'gaussian_150_100':
-            weights = 1/3.*np.array([4.5,3.0])  # conserves a bit better the maxima
-        else:
-            weights = 1/2.*np.array([4.5,3.0])  # no artefacts more for shifted fields
-            
-            
-        
-        if isinstance(data,np.ndarray):
-            if mode == 'convolve_405_300':
-                data = ndimage.convolve(data, weights, mode='nearest')
-            else:
-                data = ndimage.filters.gaussian_filter(data, weights, mode = 'nearest')  
-        
-        elif isinstance(data,mpop.scene.SatelliteInstrumentScene):          
-              channels = [chn.name for chn in data.loaded_channels()]
-              print channels
-              for c in range(len(channels)):
-                    
-                    rgb_id = channels[c]
-                    print rgb_id
-                    if rgb_id != "CloudType" and rgb_id != "CT" and rgb_id != "CTTH" and rgb_id != "CTP":
-                        if mode == 'convolve_405_300':
-                            data[rgb_id].data = ndimage.convolve(data[rgb_id].data, weights, mode='nearest')
-                        else:
-                            data[rgb_id].data = ndimage.filters.gaussian_filter(data[rgb_id].data, weights, mode = 'nearest')        
-    
-    return data
+# removed function 
+# def downscale(data,mode = 'gaussian_225_125'):
+# use the function in plot_coalition2.py instead everywhere
     
 def make_figure(values, obj_area, outputFile, colorbar = True, text_to_write = None, vmin = False, vmax = False, contour_value = None, linewidth = 1):
     import matplotlib as mpl

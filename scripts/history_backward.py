@@ -271,19 +271,20 @@ def add_history1(history_cell, cell_id, cells_to_correct, cells_known, t_to_corr
     
     labels_out_to_correctPlus1[labels_out_to_correctPlus1>0] = 1
 
-    if backward:
-        t = deepcopy(t_to_correct)
-    else:
-        t = deepcopy(t_known)
+    #if backward:
+    #    t = deepcopy(t_to_correct)
+    #else:
+    #    t = deepcopy(t_known)
 
-    t_interestPlus1 = t + timedelta(minutes=5)
-    t_interestMinus1 = t - timedelta(minutes=5)
-    
+    #t_interestPlus1 = t + timedelta(minutes=5)
+    #t_interestMinus1 = t - timedelta(minutes=5)
+    t_interestPlus1 = t_to_correct + timedelta(minutes=5)
+    t_interestMinus1 = t_to_correct - timedelta(minutes=5)    
     test_KnownHistory = 0
     
     #displacement between tInterest (t) and tInterest - 5 min
     labels_outKnownPlus1 = np.zeros(labels_out_to_correctPlus1.shape)
-    cells_to_use, data_container = find_ancestors(cells_to_correct,t,data_container,labels_dir)
+    cells_to_use, data_container = find_ancestors(cells_to_correct,t_to_correct,data_container,labels_dir)
 
     if cells_to_use == []:
         test_KnownHistory = 1 #there are no cells_to_correct of the current cells_to_correct! Displacement will be 0 and no image cells_to_correct
@@ -306,10 +307,12 @@ def add_history1(history_cell, cell_id, cells_to_correct, cells_known, t_to_corr
         centerKnown = ndimage.measurements.center_of_mass(labels_outKnownPlus1)
         #centerKnown = np.rint(centerKnown)   
         centerKnown = np.asarray(centerKnown) 
-        history_cell.center.append(center_to_correct-centerKnown)
+        history_cell.displacement.append(center_to_correct-centerKnown)
+        history_cell.center.append(center_to_correct)
     else:
         centerKnown = [0,0]    
-        history_cell.center.append([0,0])
+        history_cell.displacement.append([0,0])
+        history_cell.center.append([])
     
     area = "ccs4"
     obj_area = get_area_def(area)
@@ -511,9 +514,9 @@ def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t
         #from Cells import Cells
         print("history backward of cell ID",id_interesting_cell)
         print("labels_dir = ",labels_dir,)
-        verbose = False     
+        verbose = False   
         t1 = datetime(year, month, day, hour, minute)
-        
+        print("time: ",t1)
         data_container = {}
         data_container['all_connections'] = {}
         data_container['all_cell_properties'] = {}
@@ -547,7 +550,7 @@ def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t
         string_id, data_container = get_info_current_time(t1, data_container,labels_dir)
         
         if string_id == None:
-            return None, None, None, None
+            return None, None, None, None, None
         
         labels_id = np.unique(data_container['all_labels'][string_id])
         
@@ -569,7 +572,7 @@ def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t
         
         if check_if_CenterOfMass_outside(labels_tmp):
             print("center of mass outside")
-            return None, None, None, None
+            return None, None, None, None, None
         
         for i in range(len(labels_id)):
             if verbose:
@@ -590,7 +593,8 @@ def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t
                 history_cell["ID"+str(cell_id)].mean108 = np.array(history_cell["ID"+str(cell_id)].mean108)
                 history_cell["ID"+str(cell_id)].area_px = [history_cell["ID"+str(cell_id)].area_px]
                 history_cell["ID"+str(cell_id)].colors.append('b')
-                history_cell["ID"+str(cell_id)].center = []
+                history_cell["ID"+str(cell_id)].displacement = []
+                history_cell["ID"+str(cell_id)].center = [history_cell["ID"+str(cell_id)].center]
                 
                 #id_prev = current_cell.id_prev
                 
@@ -648,7 +652,9 @@ def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t
         
         color_list = history_cell[interesting_cell].colors
         
-        displacement = history_cell[interesting_cell].center
+        displacement = history_cell[interesting_cell].displacement
+        
+        center = history_cell[interesting_cell].center
     
         if rgbs.ndim >1:
             ind = np.zeros((rgbs.shape[0],11))
@@ -818,7 +824,7 @@ def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t
                     fig.savefig(outputDir +"Displacement.png",bbox_extra_artists=(lgd,), bbox_inches = 'tight')
                     plt.close(fig)
 
-        return ind, area, displ_array, time_save
+        return ind, area, displ_array, time_save, center
 
 
 

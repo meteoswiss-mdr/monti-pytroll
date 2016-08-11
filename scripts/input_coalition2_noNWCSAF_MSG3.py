@@ -41,7 +41,7 @@ def input(in_msg):
     #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
     #in_msg.areas.append('odysseyS25')      # Area of Odyssey composite (factor 2.5 smaller)
     in_msg.areas.append('ccs4')
-    in_msg.areas.append('EuropeCanaryS95') # "ccs4" "blitzortung" #"eurotv" # "eurotv"
+    #in_msg.areas.append('EuropeCanaryS95') # "ccs4" "blitzortung" #"eurotv" # "eurotv"
     #in_msg.areas.append("blitzortung")
     
     in_msg.properties_cells = True
@@ -54,7 +54,7 @@ def input(in_msg):
         
     in_msg.area_forecast = "ccs4c2" #reccomended: this way extra borders that allow to always have values within ccs4 area (but slower)
     #in_msg.area_forecast = "ccs4" 
-             
+                 
     in_msg.integration_method_velocity = "euler"
     #in_msg.integration_method_velocity = "rk4" 
     
@@ -70,7 +70,7 @@ def input(in_msg):
     in_msg.areasNoRapidScan = ['fullearth','met09globe','met09globeFull'] #should also be changed to coordinates check!!!!
       
     in_msg.settings = "default" # the settings will be automatically defined depending on the area chosen
-      #in_msg.settings == "manual"
+    # in_msg.settings == "manual"
     
     #near real time or offline (will be overwritten depending on the date) ###changed: should know, based on the date, where to look for things!!!
     in_msg.nrt = False
@@ -108,7 +108,7 @@ def input(in_msg):
     # choose production of results
     #-----------------------------
     in_msg.results = ['C2rgb']
-    #### in_msg.results.append('C2rgbHRV')  use now 
+    in_msg.results.append('C2rgbHRV')
     # --------------------------------------
     # choose production of auxiliary results
     # --------------------------------------
@@ -166,11 +166,10 @@ def input(in_msg):
     in_msg.choose_forecast_times()
 
     #in_msg.outputDir='./pics/'
-    in_msg.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
+    in_msg.standardOutputName = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
     #in_msg.outputDir = '/data/cinesat/out/'
     #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
-    #in_msg.outputDirOffline =  '/opt/users/lel/PyTroll/scripts//Mecikalski/'
-    in_msg.outputDirOffline =  '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
+    in_msg.outputDirOffline =  '/opt/users/lel/PyTroll/scripts//Mecikalski/'
     in_msg.outputDirNrt = '/data/cinesat/out/' #'/opt/users/lel/PyTroll/scripts/nrt_test/' #
     #if in_msg.only_obs_noForecast == True:
     #    in_msg.outputDir = "/opt/users/lel/PyTroll/scripts//Mecikalski_obs/"
@@ -180,15 +179,8 @@ def input(in_msg):
     #    in_msg.outputDir = "/opt/users/lel/PyTroll/scripts//Mecikalski/"
 
     #in_msg.postprocessing_areas=['ccs4']
-    #### in_msg.postprocessing_composite=["C2rgb-IR_108","C2rgb-HRV"]    not used anymore 
+    in_msg.postprocessing_composite=["C2rgb-IR_108","C2rgb-HRV"]    
     
-    in_msg.postprocessing_areas= []
-    in_msg.postprocessing_areas.append("ccs4")
-    #in_msg.postprocessing_areas=['EuropeCanaryS95']
-    
-    in_msg.postprocessing_composite1 = ["C2rgb-IR_108"]
-    in_msg.postprocessing_composite2 = ["C2rgb-Forecast-IR_108"]      
-
     in_msg.outputDirForecastsNrt = "/data/cinesat/out/" #'/opt/users/lel/PyTroll/scripts/nrt_test/' #
     in_msg.outputDirForecastsOffline = "/data/COALITION2/PicturesSatellite/LEL_results_wind/"
    
@@ -337,6 +329,12 @@ def input(in_msg):
     #in_msg.pickle_labels = False; in_msg.shelve_labels = True
     in_msg.pickle_labels = False; in_msg.shelve_labels = False
 
+    in_msg.postprocessing_areas= []
+    in_msg.postprocessing_areas.append("ccs4")
+    #in_msg.postprocessing_areas=['EuropeCanaryS95']
+    
+    in_msg.postprocessing_composite1=["C2rgb-IR_108"]
+    in_msg.postprocessing_composite2=["C2rgb-Forecast-IR_108"]      
     
     # load a few standard things 
     #in_msg.outputFile = 'WS_%(rgb)s-%(area)s_%y%m%d%H%M'
@@ -358,30 +356,7 @@ def input(in_msg):
     in_msg.channels15 = ['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134']
     in_msg.channels30 = ['WV_062','WV_073','IR_097','IR_108','IR_134']
 
-    nrt = True
-
-    in_msg.settingsLocal = {}
-    in_msg.settingsLocal['use_TB_forecast'] = False
-    in_msg.settingsLocal['mode_downscaling'] = 'gaussian_225_125'
-    in_msg.settingsLocal['mask_labelsSmall_lowUS'] = True
-    in_msg.settingsLocal['clean_mask'] = 'skimage' 
-    in_msg.settingsLocal['rapid_scan_mode'] = True
-    in_msg.settingsLocal['forth_mask'] = 'IR_039_minus_IR_108'
-    in_msg.settingsLocal['forced_mask'] = 'no_mask'
-    in_msg.settingsLocal['mask_cirrus'] = True
-    #in_msg.settingsLocal["reader_level="seviri-level4"
-
-    in_msg.settingsBroad = {}
-    in_msg.settingsBroad['use_TB_forecast'] = False
-    in_msg.settingsBroad['mode_downscaling'] = 'no_downscaling'
-    in_msg.settingsBroad['mask_labelsSmall_lowUS'] = False
-    in_msg.settingsBroad['clean_mask'] = 'no_cleaning'
-    in_msg.settingsBroad['rapid_scan_mode'] = True 
-    in_msg.settingsBroad['forth_mask'] = 'IR_039_minus_IR_108'
-    in_msg.settingsBroad['forced_mask'] = 'no_mask'
-    in_msg.settingsBroad['mask_cirrus'] = True            
-    #in_msg.settingsBroad['reader_level="seviri-level2"         
-    
+    nrt = True    
     
     # -------------   
     # input checks 

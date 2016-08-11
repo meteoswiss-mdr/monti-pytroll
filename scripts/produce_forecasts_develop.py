@@ -618,7 +618,7 @@ if __name__ == '__main__':
     #colormap='rainbow' 
     colormap='greys'
 
-    rapid_scan_mode = in_msg.rapid_scan_modeForecast
+    rapid_scan_mode = in_msg.forecasts_in_rapid_scan_mode
         
     dt_forecast1 = in_msg.dt_forecast1
     dt_forecast2 = in_msg.dt_forecast2

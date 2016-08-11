@@ -376,7 +376,7 @@ def plot_msg(in_msg):
    
       ## start postprocessing
       if area in in_msg.postprocessing_areas:
-         postprocessing(in_msg, RGBs_done, global_data.time_slot, int(data.sat_nr()), area)
+         postprocessing(in_msg, global_data.time_slot, int(data.sat_nr()), area)
 
    if in_msg.verbose:
       print " "

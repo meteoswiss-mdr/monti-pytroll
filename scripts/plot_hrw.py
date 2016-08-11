@@ -310,4 +310,4 @@ for level in levels:
         in_msg.datetime = global_data.time_slot
         in_msg.outputDir = output_dir
         in_msg.postprocessing_composite=["hrwdp"+level+"-streamd"+level+"-HRV", "hrwdp"+level+"-streamd"+level+"-ir108"]   
-        postprocessing(in_msg, '', global_data.time_slot, global_data.number, 'ccs4')
+        postprocessing(in_msg, global_data.time_slot, global_data.number, 'ccs4')

@@ -654,7 +654,7 @@ if __name__ == '__main__':
               quit()
 
           if downscaling_data == True:
-               from plot_coalition2_EuropeS95 import downscale          
+               from plot_coalition2 import downscale          
                data = downscale(data, mode = mode_downscaling)
 
    

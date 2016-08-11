@@ -26,19 +26,20 @@ cd $INSTALL_DIR
 
 
 export version=grib_api-1.15.0-Source
-wget https://software.ecmwf.int/wiki/download/attachments/3473437/$version.tar.gz
-gunzip $version.tar.gz
-tar xf $version.tar
-rm $version.tar
+#export version=grib_api-1.16.0-Source
+#wget https://software.ecmwf.int/wiki/download/attachments/3473437/$version.tar.gz
+#gunzip $version.tar.gz
+#tar xf $version.tar
+#rm $version.tar
 
 # configure, make and install 
 cd $version/
-
+export PREFIX=/opt/users/common/
 ## configure 
 #./configure --prefix=$PREFIX CFLAGS="-fPIC -m64"  --with-netcdf=$PREFIX --with-jasper=$PREFIX --disable-shared 
 ## configure with python interphase
 #./configure --prefix=$PREFIX CFLAGS="-fPIC -m64"  --with-netcdf=$PREFIX --with-jasper=$PREFIX --disable-shared --enable-python --disable-numpy
-./configure --prefix=$PREFIX CFLAGS="-fPIC -m64"  --with-netcdf=$PREFIX --with-jasper=$PREFIX --enable-python --disable-numpy
+./configure --prefix=$PREFIX CFLAGS="-fPIC"  --with-netcdf=$PREFIX --with-jasper=$PREFIX --enable-python 
 
 # using the python options, grib_api will be installed here:
 # /opt/users/common/lib/python3.5/site-packages/grib_api

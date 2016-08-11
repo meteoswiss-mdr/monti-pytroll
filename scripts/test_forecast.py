@@ -25,8 +25,13 @@ import glob
 import cProfile
 import pstats
 import time
+from time import strftime
 from matplotlib import colors, cm
 from PIL import Image
+from mpop.satellites import GeostationaryFactory
+from mpop.projector import get_area_def
+from plot_msg import load_products
+import pylab
 
 from postprocessing import postprocessing
 
@@ -111,7 +116,7 @@ def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=Non
               print "******** computing history backward (labels_dir = ",labels_dir,")"
               forecasted_labels["ID"+str(interesting_cell)]=[]
               
-              ind, area, displacement, time = history_backward(ttt.day,ttt.month,ttt.year,ttt.hour,ttt.minute,interesting_cell, True, ttt-timedelta(hours = 1),labels_dir = labels_dir) #-timedelta(minutes = 10))
+              ind, area, displacement, time, center = history_backward(ttt.day,ttt.month,ttt.year,ttt.hour,ttt.minute,interesting_cell, True, ttt-timedelta(hours = 1),labels_dir = labels_dir) #-timedelta(minutes = 10))
               
               if area == None or len(area)<=1:  
                   print "new cell or cell with COM outside domain"
@@ -129,7 +134,7 @@ def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=Non
               
               if False:
                     print "******** computing history forward"
-                    ind1, area1, displacement1, time1 = history_backward(ttt.day,ttt.month,ttt.year,ttt.hour,ttt.minute,interesting_cell, False, ttt+timedelta(hours = 1))
+                    ind1, area1, displacement1, time1, center = history_backward(ttt.day,ttt.month,ttt.year,ttt.hour,ttt.minute,interesting_cell, False, ttt+timedelta(hours = 1), labels_dir = labels_dir)
                     print "******** computed history forward"
             
                     t2 = time1 #[::-1]
@@ -156,7 +161,7 @@ def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=Non
       
               forecasted_areas.append(area_current)
       
-              indx = np.where(t==ttt)[0] #+ 1
+              indx = np.where(t==ttt)[0] + 1
       
               print "******** compute displacement"
               if displacement.shape[1]==2:
@@ -334,12 +339,32 @@ def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=Non
             currentRGB_im_filename = ForeGroundRGBFile
         
         currentRGB_im = glob.glob(currentRGB_im_filename)
-        im = plt.imread(background_im[0])
-        
+        if len(currentRGB_im)<1:  
+            print "No file found:", currentRGB_im_filename
+        if len(background_im)>0:
+            im = plt.imread(background_im[0])
+            back_exists = True
+        else:
+            back_exists = False
         #img1 = Image.imread(currentRGB_im[0])
         obj_area = get_area_def("ccs4")
         fig,ax = prepare_figure(obj_area)
-        #plt.imshow(np.flipud(im))   
+        if in_msg.nrt == False:
+              if back_exists:
+                  plt.imshow(np.flipud(im))   
+              else:
+                  # now read the data we would like to forecast
+                  global_data = GeostationaryFactory.create_scene(in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", ttt)
+                  #global_data_RGBforecast = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
+      
+                  # area we would like to read
+                  area2load = "EuropeCanary95" #"ccs4" #c2"#"ccs4" #in_windshift.ObjArea
+                  area_loaded = get_area_def(area2load )#(in_windshift.areaExtraction)  
+  
+                  # load product, global_data is changed in this step!
+                  area_loaded = load_products(global_data, ['IR_108'], in_msg, area_loaded ) 
+                  data = global_data.project("ccs4")                  
+                  plt.imshow(np.flipud(data['IR_108'].data),cmap = pylab.gray())
         
         if at_least_one_cell:      
               time_wanted_minutes = [5,20,40,60] 
@@ -383,18 +408,30 @@ def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=Non
         
         PIL_image = fig2img ( fig )
         
+        standardOutputName = in_msg.standardOutputName.replace('%y%m%d%H%M',strftime('%y%m%d%H%M',ttt.timetuple()))
+        
         #PIL_image.paste(img1, (0, 0), img1)
         if in_msg == None:
             PIL_image.save(create_dir(outputFile)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+".png")
             path = (outputFile)+yearS+monthS+dayS+hourS+minS+"Forecast.png"
         else:
             dic_figure={}
-            dic_figure['rgb']= 'Forecast' #'C2rgbForecastTMP-IR-108'
+            if in_msg.nrt == True:
+                dic_figure['rgb']= 'Forecast' #'C2rgbForecastTMP-IR-108'
+            else:
+                dic_figure['rgb']= 'Forecast-C2rgb'
             dic_figure['area']='ccs4'
-            PIL_image.save(create_dir(outputFile)+in_msg.standardOutputName%dic_figure)
-            path = (outputFile)+in_msg.standardOutputName%dic_figure
+            PIL_image.save(create_dir(outputFile)+standardOutputName%dic_figure)
+            path = (outputFile)+standardOutputName%dic_figure
+            if in_msg.nrt == False:
+                dic_figure={}
+                dic_figure['rgb']= 'C2rgb-Forecast-HRV' #'C2rgbForecastTMP-IR-108'
+                dic_figure['area']='ccs4'
+                path_output = (outputFile)+standardOutputName%dic_figure
+                print "creating composite: ",currentRGB_im[0],"+",path
+                subprocess.call("/usr/bin/composite "+currentRGB_im[0]+" "+path+" "+path_output, shell=True)
         
-        print "... display ",path," &"
+        print "... display ",path_output," &"
         plt.close( fig)                             
         if True:
             print "path foreground", currentRGB_im[0]
@@ -403,23 +440,24 @@ def plot_forecast_area(ttt, model, outputFile, current_labels = None, t_stop=Non
                 path_composite = (outputFile)+yearS+monthS+dayS+"_Obs"+hourS+minS+"Forecast_composite.png"     
             else:
                 dic_figure={}
-                dic_figure['rgb']='C2rgbForecast-IR-108'
+                dic_figure['rgb']='C2rgb-Forecast-HRV'
                 dic_figure['area']='ccs4'
-                path_composite = (outputFile)+in_msg.standardOutputName%dic_figure
-                dic_figure = {}
-                dic_figure['rgb'] = 'IR-108'
-                dic_figure['area']='ccs4'
-                path_IR108 = (outputFile)+in_msg.standardOutputName%dic_figure
+                path_composite = (outputFile)+standardOutputName%dic_figure
+                #dic_figure = {}
+                #dic_figure['rgb'] = "_HRV" #'IR-108'
+                #dic_figure['area']='ccs4'
+                #path_IR108 = (outputFile)+standardOutputName%dic_figure
                 
-            if False:
-                subprocess.call("/usr/bin/composite "+currentRGB_im[0]+" "+path+" "+path_IR108+" "+path_composite, shell=True)
-            else:
+            if in_msg.nrt == True:
                 print "---starting post processing"
                 #if area in in_msg.postprocessing_areas:
                 in_msg.postprocessing_composite = deepcopy(in_msg.postprocessing_composite2)
                 postprocessing(in_msg, [], ttt, in_msg.sat_nr, "ccs4")
+            #else:
+                #subprocess.call("/usr/bin/composite "+currentRGB_im[0]+" "+path+" "+background_im[0]+" "+path_composite, shell=True)
+                
             #print "... display",path_composite,"&"
-            if in_msg.scpOutput and False: 
+            if in_msg.scpOutput and in_msg.nrt == True and False: #not necessary because already done within postprocessing
                 print "... secure copy "+path_composite+ " to "+in_msg.scpOutputDir #
                 subprocess.call("scp "+in_msg.scpID+" "+path_composite  +" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)    #BackgroundFile   #
         

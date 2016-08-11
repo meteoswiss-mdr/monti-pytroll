@@ -38,10 +38,10 @@ def input(in_msg):
     ##in_msg.RGBs.append('WV_073')       # black and white
     ##in_msg.RGBs.append('IR_087')       # black and white
     ##in_msg.RGBs.append('IR_097')       # black and white
-    #in_msg.RGBs.append('IR_108')       # black and white
+    in_msg.RGBs.append('IR_108')       # black and white
     ##in_msg.RGBs.append('IR_120')       # black and white
     ##in_msg.RGBs.append('IR_134')       # black and white
-    #in_msg.RGBs.append('HRV')          # black and white
+    in_msg.RGBs.append('HRV')          # black and white
     #in_msg.RGBs.append('VIS006c')      # colored version
     #in_msg.RGBs.append('VIS008c')      # colored version
     #in_msg.RGBs.append('IR_016c')      # colored version
@@ -50,7 +50,7 @@ def input(in_msg):
     #in_msg.RGBs.append('WV_073c')      # colored version
     #in_msg.RGBs.append('IR_087c')      # colored version
     #in_msg.RGBs.append('IR_097c')      # colored version
-    in_msg.RGBs.append('IR_108c')      # colored version
+    #in_msg.RGBs.append('IR_108c')      # colored version
     #in_msg.RGBs.append('IR_120c')      # colored version
     #in_msg.RGBs.append('IR_134c')      # colored version
     #in_msg.RGBs.append('HRVc')         # colored version
@@ -77,7 +77,7 @@ def input(in_msg):
     #in_msg.RGBs.append('dust')               # IR_120-IR_108  IR_108-IR_087  IR_108
     #in_msg.RGBs.append('fog')
     #in_msg.RGBs.append('green_snow')
-    #in_msg.RGBs.append('ir108')
+    in_msg.RGBs.append('ir108')
     #in_msg.RGBs.append('natural')            # IR_016         VIS008         VIS006
     #in_msg.RGBs.append('night_fog')          
     #in_msg.RGBs.append('night_microphysics') # IR_120-IR_108  IR_108-IR_039  IR_108
@@ -162,7 +162,7 @@ def input(in_msg):
     #in_msg.areas.append('EuroMercator')    # same projection as blitzortung.org
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
-    #in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
+    in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
     #in_msg.areas.append('alps95')          # area around Switzerland processed by NWCSAF software 349x151 
     #in_msg.areas.append('ticino')          # stereographic proj of Ticino 342x311
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
@@ -186,8 +186,8 @@ def input(in_msg):
        in_msg.RSS=False 
 
     in_msg.check_input = False
-    #in_msg.reader_level="seviri-level4" 
-    in_msg.parallax_correction = True
+    in_msg.reader_level="seviri-level4" 
+    in_msg.parallax_correction = False
     in_msg.parallax_gapfilling = 'bilinear' # 'False' (default), 'nearest'
     #in_msg.save_reprojected_data=['ccs4']
     in_msg.reprojected_data_filename='%(msg)s_%(area)s_%Y%m%d%H%M_nwcsaf.nc'
@@ -204,10 +204,10 @@ def input(in_msg):
     in_msg.HRV_enhancement = False
 
     in_msg.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
-    in_msg.outputDir='./pics/'
+    #in_msg.outputDir='./pics/'
     #in_msg.outputDir = "./%Y-%m-%d/%Y-%m-%d_%(rgb)s-%(area)s/"
     #in_msg.outputDir = '/data/cinesat/out/'
-    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
+    in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
 
     in_msg.compress_to_8bit=False
 

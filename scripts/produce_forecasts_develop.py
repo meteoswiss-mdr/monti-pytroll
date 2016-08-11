@@ -315,8 +315,11 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     Raises
     ----------
     """
-    
-    file1, file2 = get_cosmo_filenames ( datetime(year,month,day,hour,minute), nrt=nrt, runs_before = 0  )
+    if nrt == False and hour % 3 == 0 :
+        runs_before = 1
+    else:
+        runs_before = 0
+    file1, file2 = get_cosmo_filenames ( datetime(year,month,day,hour,minute), nrt=nrt, runs_before = runs_before  )
 
     print "... search for ", file1, " and ", file2
     filename1 = glob.glob(file1)
@@ -329,7 +332,7 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
             
     if len(filename1)<1 or len(filename2)<1:
         print "*** Warning, found no cosmo wind data "
-        file1, file2 = get_cosmo_filenames ( datetime(year,month,day,hour,minute),nrt = nrt, runs_before = 1 )
+        file1, file2 = get_cosmo_filenames ( datetime(year,month,day,hour,minute),nrt = nrt, runs_before = runs_before + 1 )
         print file1, file2
 
         print "... search for ", file1, " and ", file2
@@ -677,7 +680,8 @@ if __name__ == '__main__':
             minute = int(sys.argv[6])
             time_slot = datetime(year, month, day, hour, minute)
             nrt = False
-            
+            if year == 2015:
+                in_msg.reader_level = "seviri-level4"
             if len(sys.argv) > 7:
                 yearSTOP   = int(sys.argv[7])
                 monthSTOP  = int(sys.argv[8])

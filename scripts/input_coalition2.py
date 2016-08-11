@@ -33,7 +33,7 @@ def input(in_msg):
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('EuropeCanary')    # upper third of MSG disk, satellite at 0.0 deg East, full resolution 
     #in_msg.areas.append('EuropeCanary95')  # upper third of MSG disk, satellite at 9.5 deg East, full resolution 
-    in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
+    #in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
     #in_msg.areas.append('fullearth')       # full earth 600x300                    # does not yet work
@@ -139,7 +139,7 @@ def input(in_msg):
     #in_msg.aux_results.append('mature_mask')
     #in_msg.aux_results.append('developing_mask')
     #in_msg.aux_results.append('IR_108')
-    #in_msg.aux_results.append('labels_tracked')
+    in_msg.aux_results.append('labels_tracked')
     #in_msg.aux_results.append('forecast_channels')
     
 
@@ -169,7 +169,7 @@ def input(in_msg):
     in_msg.standardOutputName = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
     #in_msg.outputDir = '/data/cinesat/out/'
     #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
-    in_msg.outputDirOffline =  '/opt/users/lel/PyTroll/scripts//Mecikalski/'
+    in_msg.outputDirOffline =  '/opt/users/lel/PyTroll/scripts//output_coalition2/'
     in_msg.outputDirNrt = '/data/cinesat/out/' #'/opt/users/lel/PyTroll/scripts/nrt_test/' #
     #if in_msg.only_obs_noForecast == True:
     #    in_msg.outputDir = "/opt/users/lel/PyTroll/scripts//Mecikalski_obs/"

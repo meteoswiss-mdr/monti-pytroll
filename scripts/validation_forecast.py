@@ -20,7 +20,7 @@ from g_3dhist import plot_3d_histogram
 
 def validation_forecast(cell, t, t_end, t_stop_history, labels_dir):
     
-    verbose = True
+    verbose = False
     model = "linear_exp_exp"
     all_errors_area = []
     all_errors_center = []
@@ -102,13 +102,14 @@ def validation_forecast(cell, t, t_end, t_stop_history, labels_dir):
         
                  
         if displacement.shape[1]==2:
-            if len(displacement) == 0:
+            if len(displacement) < 2:
                 dx = 0
                 dy = 0
             else:
                 try:
-                    dx =  int(round(displacement[:,0].mean()))
-                    dy = int(round(displacement[:,1].mean()))
+                    dx =  int(round(displacement[:-1,0].mean())) #exclude last line because it's always 0,0 (new cell has no displacement)
+                    dy = int(round(displacement[:-1,1].mean())) #exclude last line because it's always 0,0 (new cell has no displacement)
+                    
                 except ValueError:
                     print("VALUE ERROR")
                     print(displacement)
@@ -221,8 +222,9 @@ def validation_forecast(cell, t, t_end, t_stop_history, labels_dir):
               print("end ", area_current)
           forecasted_areas.append(area_current)
           #add check to make sure the area you produced is more or less correct
-          print(len(area1))
-          print("indx1, i:",indx1,i)
+          if verbose:
+              print(len(area1))
+              print("indx1, i:",indx1,i)
           if indx1+i < len(area1): #if in reality the cell disappeared... not very nice that you just "kill" entire thing, but else what is distance centers??
               error_area.append((float((-area1[indx1+i] + area_current))/area1[indx1+i])*100)
               distance_centers = sqrt( (-center1[indx1+i][0]+center_before[0])*(-center1[indx1+i][0]+center_before[0]) + (-center1[indx1+i][1]+center_before[1])*(-center1[indx1+i][1]+center_before[1]) )
@@ -327,7 +329,7 @@ def plot_histogram(errors, str_cells, variable, th_history, longer_than_th):
                             orientation='vertical')
         cb1.set_label('Count')
         
-        fig.savefig("histograms/"+name_out+'%s_LeadTime.png'%variable, dpi=90, bbox_inches='tight')
+        fig.savefig("validation/"+name_out+'%s_LeadTime.png'%variable, dpi=90, bbox_inches='tight')
         plt.close(fig)
         
     
@@ -357,7 +359,6 @@ if __name__ == "__main__":
     for cell,t,t_end,t_stop in zip(interesting_cell,t_start,t_end,t_stop_history):
         str_cell = "ID"+str(cell)
         errors_area[str_cell],errors_COM[str_cell],errors_108[str_cell],errors_dx[str_cell], errors_dy[str_cell], length_history[str_cell] = validation_forecast(cell, t, t_end, t_stop, labels_dir)
-    print "done", cell
     x_axis = [0,5,10,15,20,25,30,35,40,45,50,55,60]
     str_cells = length_history.keys()
     
@@ -368,7 +369,9 @@ if __name__ == "__main__":
     plot_hist_AllLengthHistory = True
     plot_hist_ShortLongHistory = True
     
-    plot_dx_dy = False
+    plot_dx_dy = True
+    
+    plot_hexbin = True
     
     th_long_history = 30 # minutes of cell existence threshold between short and long history
                   
@@ -408,7 +411,7 @@ if __name__ == "__main__":
                                             norm=cNorm,
                                             orientation='vertical')
             cb1.set_label('Length History [min]')          
-            f.savefig("ScatterErrors.png")          
+            f.savefig("validation/ScatterErrors.png")          
         
         else:
           for id_cells in str_cells:
@@ -447,12 +450,9 @@ if __name__ == "__main__":
                                               norm=cNorm,
                                               orientation='vertical')
               cb1.set_label('Length History [min]')          
-              f.savefig("%s_ScatterErrors.png"%id_cells)  
+              f.savefig("validation/%s_ScatterErrors.png"%id_cells)  
                       
     if plot_hist_AllLengthHistory == True or plot_hist_ShortLongHistory == True:
-            
-            time_plot = [5, 10, 15, 20,25,30,35,40,45,50,55,60]
-           
             
             if plot_hist_AllLengthHistory:
                 plot_histogram(errors_area, str_cells, "area", None, None)
@@ -474,78 +474,87 @@ if __name__ == "__main__":
                 plot_histogram(errors_dy, str_cells, "dy", th_long_history, False)                  
                   
     if plot_dx_dy:
+          time_plot = [0,5,10,15,20,25,30,35,40,45,50,55,60]
           all_errors_dx_ShortHistory = {}
           all_errors_dx_LongHistory = {}
           all_errors_dy_ShortHistory = {}
           all_errors_dy_LongHistory = {}
           #plot with the errors on the area separated based on the length of the history (th_long_history)
-          for ind in range(1,len(x_axis)):
-                all_errors_dx_ShortHistory['%s'%x_axis[ind]]=[]
-                all_errors_dx_LongHistory['%s'%x_axis[ind]]=[]
-                all_errors_dy_ShortHistory['%s'%x_axis[ind]]=[]
-                all_errors_dy_LongHistory['%s'%x_axis[ind]]=[]
+          for ind in range(0,len(time_plot)):
+                all_errors_dx_ShortHistory['%s'%time_plot[ind]]=[]
+                all_errors_dx_LongHistory['%s'%time_plot[ind]]=[]
+                all_errors_dy_ShortHistory['%s'%time_plot[ind]]=[]
+                all_errors_dy_LongHistory['%s'%time_plot[ind]]=[]
                 for id_cell in str_cells:
                       for ind_each_cell in range(len(errors_dx[id_cell])):
                           if len(errors_area[id_cell][ind_each_cell])>ind :
                               if length_history[id_cell][ind_each_cell] < th_long_history/5:
-                                all_errors_dx_ShortHistory['%s'%x_axis[ind]].append(errors_dx[id_cell][ind_each_cell][ind]*(-1))
-                                all_errors_dy_ShortHistory['%s'%x_axis[ind]].append(errors_dy[id_cell][ind_each_cell][ind])
+                                all_errors_dx_ShortHistory['%s'%time_plot[ind]].append(errors_dx[id_cell][ind_each_cell][ind]*(-1))
+                                all_errors_dy_ShortHistory['%s'%time_plot[ind]].append(errors_dy[id_cell][ind_each_cell][ind])
                               else:
-                                all_errors_dx_LongHistory['%s'%x_axis[ind]].append(errors_dx[id_cell][ind_each_cell][ind]*(-1))   
-                                all_errors_dy_LongHistory['%s'%x_axis[ind]].append(errors_dy[id_cell][ind_each_cell][ind]) 
+                                all_errors_dx_LongHistory['%s'%time_plot[ind]].append(errors_dx[id_cell][ind_each_cell][ind]*(-1))   
+                                all_errors_dy_LongHistory['%s'%time_plot[ind]].append(errors_dy[id_cell][ind_each_cell][ind]) 
           
           blues = plt.get_cmap('Blues_r')
           cNorm = mpl.colors.Normalize(vmin = 0, vmax = 60)
           scalarMap = mpl.cm.ScalarMappable(norm=cNorm, cmap = blues)
   
-          fig = plt.figure()
-          plt.subplot(211)
-          print "short history"
+          f, axarr = plt.subplots(2, sharex=True, sharey=True) #fig = plt.figure()
+          #plt.subplot(211)
+          #print "short history"
           for i in range(len(time_plot)-1,-1,-1):   
               colorVal = scalarMap.to_rgba(i*5)
               #plt.scatter(all_errors_dx_LongHistory ['%s'%time_plot[i]], all_errors_dy_LongHistory ['%s'%time_plot[i]], color = colorVal) 
               color_current = [colorVal]*len(all_errors_dx_ShortHistory['%s'%time_plot[i]])
-              plt.scatter(all_errors_dy_ShortHistory['%s'%time_plot[i]],all_errors_dx_ShortHistory['%s'%time_plot[i]], color = color_current)#, edgecolor = 'none')
+              axarr[0].scatter(all_errors_dy_ShortHistory['%s'%time_plot[i]],all_errors_dx_ShortHistory['%s'%time_plot[i]], color = color_current)#, edgecolor = 'none')
               
-          plt.scatter(0,0,marker="*",color = 'r', s = 50)
+          axarr[0].scatter(0,0,marker="*",color = 'r', s = 50)
           
-          plt.ylabel('South-North displacement [km]')  
-          plt.xlabel('West-East displacement [km]')  
+          #plt.ylabel('South-North displacement [km]')  
+          #plt.xlabel('West-East displacement [km]')  
           blues = plt.get_cmap('Blues_r')
           cNorm = mpl.colors.Normalize(vmin = 0, vmax = 60)
           scalarMap = mpl.cm.ScalarMappable(norm=cNorm, cmap = blues)            
-          print "long history"                
-          plt.subplot(212)
+          #print "long history"                
+          #plt.subplot(212)
           for i in range(len(time_plot)-1,-1,-1):
               colorVal = scalarMap.to_rgba(i*5)
               color_current = [colorVal]*len(all_errors_dx_LongHistory['%s'%time_plot[i]]) #necessary to do this because colorVal is 4 numbers, if all_errors_dx_LongHistory is also 4 numbers it makes them 4 colors!!
-              plt.scatter(all_errors_dy_LongHistory['%s'%time_plot[i]], all_errors_dx_LongHistory['%s'%time_plot[i]],color = color_current)#, edgecolor = 'none')        
+              axarr[1].scatter(all_errors_dy_LongHistory['%s'%time_plot[i]], all_errors_dx_LongHistory['%s'%time_plot[i]],color = color_current)#, edgecolor = 'none')        
               
-          plt.scatter(0,0,marker="*",color = 'r', s = 50) 
-          plt.ylabel('South-North displacement [km]')  
-          plt.xlabel('West-East displacement [km]')              
-          fig.subplots_adjust(right=0.8)
+          axarr[1].scatter(0,0,marker="*",color = 'r', s = 50) 
+          #for ax in axarr:
+          #  ax.set_ylabel('South-North displacement [km]')  
+          #  ax.set_xlabel('West-East displacement [km]')              
+          f.add_subplot(111, frameon=False)
+          # hide tick and tick label of the big axes
+          plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+          plt.ylabel("South-North displacement [km]")
+          plt.xlabel("West-East displacement [km]")
+          
+          f.subplots_adjust(right=0.8)
   
-          cbar_ax = fig.add_axes([0.85, 0.2, 0.05, 0.6]) #left bottom width height
+          cbar_ax = f.add_axes([0.85, 0.2, 0.05, 0.6]) #left bottom width height
           cb1 = mpl.colorbar.ColorbarBase(cbar_ax, cmap=blues,
                           norm=cNorm,
                           orientation='vertical')
           cb1.set_label('Lead Time [min]')
+          #f.tight_layout()
+          f.savefig('validation/Validation_dx_dy.png')
+          plt.close(f)
           
-          fig.savefig('Validation_dx_dy.png')
-          plt.close(fig)
-          
-    all_dx = []
-    all_dy = []
-    for ind in range(1,len(x_axis)):
-        for id_cell in str_cells:
-              for ind_each_cell in range(len(errors_dx[id_cell])):
-                  if len(errors_area[id_cell][ind_each_cell])>ind :
-                      all_dx.append(errors_dx[id_cell][ind_each_cell][ind]*(-1))   
-                      all_dy.append(errors_dy[id_cell][ind_each_cell][ind]) 
-    fig = plt.figure()
-    plt.hexbin(all_dy,all_dx)
-    fig.savefig("test_hexbin.png")
+    if plot_hexbin:
+        all_dx = []
+        all_dy = []
+        for ind in range(1,len(x_axis)):
+            for id_cell in str_cells:
+                  for ind_each_cell in range(len(errors_dx[id_cell])):
+                      if len(errors_area[id_cell][ind_each_cell])>ind :
+                          all_dx.append(errors_dx[id_cell][ind_each_cell][ind]*(-1))   
+                          all_dy.append(errors_dy[id_cell][ind_each_cell][ind]) 
+        fig = plt.figure()
+        plt.hexbin(all_dy,all_dx)
+        fig.savefig("validation/test_hexbin.png")
                   
                 
                 

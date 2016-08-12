@@ -88,7 +88,7 @@ def figure_labels(labels, outputFile, timeObs, dt, area_plot="ccs4", add_name = 
 
 #if __name__ == '__main__':
 def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None, BackgroundFile=None, ForeGroundRGBFile=None, labels_dir = '/opt/users/lel/PyTroll/scripts/labels/', in_msg = None):
-    verbose = False
+    verbose = True
     if t_stop == None:
         t_stop = ttt
     
@@ -118,24 +118,27 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
         at_least_one_cell = False        
 
         for interesting_cell in unique_labels:
-              print "******** computing history backward (labels_dir = ",labels_dir,")"
+              if verbose:
+                    print "******** computing history backward (labels_dir = ",labels_dir,")"
               forecasted_labels["ID"+str(interesting_cell)]=[]
               
               ind, area, displacement, time, center = history_backward(ttt.day,ttt.month,ttt.year,ttt.hour,ttt.minute,interesting_cell, True, ttt-timedelta(hours = 1),labels_dir = labels_dir) #-timedelta(minutes = 10))
               
               if area == None or len(area)<=1:  
-                  print "new cell or cell with COM outside domain"
+                  if verbose:
+                        print "new cell or cell with COM outside domain"
                   continue
               at_least_one_cell = True    
-              print("******** computed history backward")
-              print("******** computing extrapolation")
+              if verbose:
+                    print("******** computed history backward")
+                    print("******** computing extrapolation")
               
               if len(area)<=3:
                     t, y = future_properties(time,area, ylabel, "linear")
               else:
                     t, y = future_properties(time,area, ylabel, model)
-              
-              print("******** computed extrapolation")
+              if verbose:
+                    print("******** computed extrapolation")
               
               if False:
                     print "******** computing history forward"
@@ -157,8 +160,8 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
               #pickle.dump(label_cell, open("test_label.p", "wb" ) )
               #quit()
               dt = 0
-      
-              print("******** produce label figures")
+              if verbose:
+                    print("******** produce label figures")
               if False:
                   figure_labels(label_cell, outputDir, ttt, dt, area_plot="ccs4",add_name = "_ID"+str(interesting_cell))
       
@@ -168,7 +171,8 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
       
               indx = np.where(t==ttt)[0] + 1
       
-              print "******** compute displacement"
+              if verbose:
+                    print "******** compute displacement"
               if displacement.shape[1]==2:
                     if len(displacement) == 0:
                         dx = 0
@@ -291,7 +295,8 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
                   #add check to make sure the area you produced is more or less correct
       
       
-              print("******** produce images")
+              if verbose:
+                print("******** produce images")
       
               t_temp = deepcopy(ttt)
               forecasted_time = []
@@ -371,7 +376,8 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
         if BackgroundFile == None:
             background_im_filename = '/data/COALITION2/PicturesSatellite/LEL_results_wind/'+yearS+'-'+monthS+'-'+dayS+'/RGB-HRV_dam/'+yearS+monthS+dayS+'_'+hourS+minS+'*.png'
         else:
-            print "... BackgroundFile ", BackgroundFile
+            if verbose:
+                print "... BackgroundFile ", BackgroundFile
             background_im_filename = BackgroundFile
             
         # searching background file (wildcards are possible)
@@ -477,7 +483,8 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
 
         plt.close( fig)                             
         if True:
-            print "path foreground", currentRGB_im[0]
+            if verbose:
+                print "path foreground", currentRGB_im[0]
             
             if in_msg == None:
                 path_composite = (outputFile)+yearS+monthS+dayS+"_Obs"+hourS+minS+"Forecast_composite.png"     
@@ -504,7 +511,8 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
 
                 
             if in_msg.nrt == True:
-                print "---starting post processing"
+                if verbose:
+                    print "---starting post processing"
                 #if area in in_msg.postprocessing_areas:
                 in_msg.postprocessing_composite = deepcopy(in_msg.postprocessing_composite2)
 

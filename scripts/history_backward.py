@@ -498,8 +498,8 @@ def get_info_current_time(time, data_container, labels_dir): # all_connections =
 
 def check_if_CenterOfMass_outside(labels_tmp):
     x, y = ndimage.measurements.center_of_mass(labels_tmp)
-    print("x", x)
-    print("y", y)
+    #print("x", x)
+    #print("y", y)
     px_cut = 70
     if x <= px_cut or x >= (640-px_cut) or y <= px_cut or y >= (710-px_cut):
         return True
@@ -513,10 +513,10 @@ def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t
         """
         #from Cells import Cells
         print("history backward of cell ID",id_interesting_cell)
-        print("labels_dir = ",labels_dir,)
+        #print("labels_dir = ",labels_dir,)
         verbose = False   
         t1 = datetime(year, month, day, hour, minute)
-        print("time: ",t1)
+        #print("time: ",t1)
         data_container = {}
         data_container['all_connections'] = {}
         data_container['all_cell_properties'] = {}

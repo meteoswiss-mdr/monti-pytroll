@@ -233,8 +233,8 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
           #    print "*** Warning, process only: ", RGBs
 
           #print "*** read data for ", in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot
-          
-          for i_try in range(30):
+          if in_msg.nrt == True:
+            for i_try in range(30):
               RGBs = check_input(in_msg, in_msg.sat_str()+in_msg.sat_nr_str(), in_msg.datetime, RGBs=in_msg.RGBs)
               if len(RGBs) > 0:
                   # exit loop, if input is found
@@ -319,7 +319,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     in_msg.name_ForcedMask = 'no'
                 
                 
-                if chosen_settings['scale'] == 'local' and in_msg.no_NWCSAF == False:
+                if chosen_settings['scale'] == 'local' and in_msg.no_NWCSAF == False and in_msg.nrt==True:
                     print "... check for CTH observation (scale=", chosen_settings['scale']," no_NWCSAF=", in_msg.no_NWCSAF, ")"
                     for i_try in range(30):
                         # check if 'CTH' file is present

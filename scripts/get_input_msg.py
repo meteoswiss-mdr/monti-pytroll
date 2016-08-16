@@ -8,8 +8,8 @@ class input_msg_class:
       self.delay = 0
       self.RGBs = []
       self.areas = []
-      self.sat = "meteosat"     # using the old config file: meteosat09.cfg
-      #self.sat = "Meteosat"      # using the new config file: Meteosat-9.cfg 
+      #self.sat = "meteosat"     # using the old config file: meteosat09.cfg
+      self.sat = "Meteosat"      # using the new config file: Meteosat-9.cfg 
       #self.sat = "Meteosat-"      # using the new config file: Meteosat-9.cfg 
       self.sat_nr = None  # rapid scan service
       self.RSS = True

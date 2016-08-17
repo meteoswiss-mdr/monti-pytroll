@@ -40,7 +40,7 @@ import aggdraw
 from numpy import where, zeros
 import numpy.ma as ma
 from os.path import dirname, exists, join
-from os import makedirs, chmod
+from os import makedirs, chmod, stat
 import subprocess
 from mpop.projector import get_area_def
 from copy import deepcopy
@@ -114,7 +114,7 @@ def plot_msg(in_msg):
    # check if input data is complete 
    if in_msg.verbose:
       print "*** check input data for ", in_msg.sat_str()
-   RGBs = check_input(in_msg, in_msg.sat_str()+in_msg.sat_nr_str(), in_msg.datetime)  
+   RGBs = check_input(in_msg, in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str(), in_msg.datetime)  
    # in_msg.sat_nr might be changed to backup satellite
 
    if len(RGBs) != len(in_msg.RGBs):
@@ -344,10 +344,13 @@ def plot_msg(in_msg):
                makedirs(path)
    
             # save file
-            if in_msg.verbose:
-               print '... save final file: ' + outputFile
-            PIL_image.save(outputFile, optimize=True)  # optimize -> minimize file size
-            chmod(outputFile, 0664)  ## FOR PYTHON3: 0o664  # give access read/write access to group members
+            if stat(outputFile).st_size > 0:
+               print '... outputFile '+outputFile+' already exists'
+            else:
+               if in_msg.verbose:
+                  print '... save final file: ' + outputFile
+               PIL_image.save(outputFile, optimize=True)  # optimize -> minimize file size
+               chmod(outputFile, 0664)  ## FOR PYTHON3: 0o664  # give access read/write access to group members
    
             if in_msg.compress_to_8bit:
                if in_msg.verbose:

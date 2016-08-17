@@ -350,7 +350,7 @@ def plot_msg(in_msg):
                if in_msg.verbose:
                   print '... save final file: ' + outputFile
                PIL_image.save(outputFile, optimize=True)  # optimize -> minimize file size
-               chmod(outputFile, 0664)  ## FOR PYTHON3: 0o664  # give access read/write access to group members
+               chmod(outputFile, 0777)  ## FOR PYTHON3: 0o664  # give access read/write access to group members
    
             if in_msg.compress_to_8bit:
                if in_msg.verbose:

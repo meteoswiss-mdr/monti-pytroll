@@ -121,7 +121,8 @@ def future_properties(time,property_values, property_name,model):
         #print (X)
         
         # Estimation
-        print ("*** Estimation")
+        if verbose:
+            print ("*** Estimation")
         #print ("y.shape ",y.shape,", X.shape ", X.shape)
         olsmod = sm.OLS(y, X)
         olsres = olsmod.fit()

@@ -38,10 +38,10 @@ def input(in_msg):
     ##in_msg.RGBs.append('WV_073')       # black and white
     ##in_msg.RGBs.append('IR_087')       # black and white
     ##in_msg.RGBs.append('IR_097')       # black and white
-    #in_msg.RGBs.append('IR_108')       # black and white
+    in_msg.RGBs.append('IR_108')       # black and white
     ##in_msg.RGBs.append('IR_120')       # black and white
     ##in_msg.RGBs.append('IR_134')       # black and white
-    #in_msg.RGBs.append('HRV')          # black and white
+    in_msg.RGBs.append('HRV')          # black and white
     #in_msg.RGBs.append('VIS006c')      # colored version
     #in_msg.RGBs.append('VIS008c')      # colored version
     #in_msg.RGBs.append('IR_016c')      # colored version
@@ -77,7 +77,7 @@ def input(in_msg):
     #in_msg.RGBs.append('dust')               # IR_120-IR_108  IR_108-IR_087  IR_108
     #in_msg.RGBs.append('fog')
     #in_msg.RGBs.append('green_snow')
-    #in_msg.RGBs.append('ir108')
+    in_msg.RGBs.append('ir108')
     #in_msg.RGBs.append('natural')            # IR_016         VIS008         VIS006
     #in_msg.RGBs.append('night_fog')          
     #in_msg.RGBs.append('night_microphysics') # IR_120-IR_108  IR_108-IR_039  IR_108
@@ -188,7 +188,11 @@ def input(in_msg):
        in_msg.RSS=False 
 
     in_msg.check_input = False
+<<<<<<< HEAD
+    in_msg.reader_level="seviri-level4" 
+=======
     #in_msg.reader_level="seviri-level4" 
+>>>>>>> 5759b2ff0872913fc3cd64227338f075754fbb98
     in_msg.parallax_correction = False
     in_msg.parallax_gapfilling = 'bilinear' # 'False' (default), 'nearest'
     #in_msg.save_reprojected_data=['ccs4']

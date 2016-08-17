@@ -1056,7 +1056,7 @@ if __name__ == '__main__':
               minuteSTOP = int(sys.argv[11])
               time_slotSTOP = datetime(yearSTOP, monthSTOP, daySTOP, hourSTOP, minuteSTOP)
               #nrt = False
-              #in_msg.reader_level="seviri-level4"
+              in_msg.reader_level="seviri-level4"
         
           else:
               time_slotSTOP = time_slot 

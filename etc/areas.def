@@ -585,6 +585,42 @@ REGION: opera_odyssey {
    AREA_EXTENT: (-1950000.0004161082, -2300000.0010312637, 1850000.0002276993, 2099999.999573728)
 };
 
+REGION: odysseyS2 {
+   NAME: OPERA Odyssey composite
+   PCS_ID: odyssey
+   PCS_DEF: proj=laea,lat_0=55.0,lon_0=10.0,ellps=WGS84,units='m'
+   XSIZE:  950
+   YSIZE: 1100
+   AREA_EXTENT: (-1950000.0004161082, -2300000.0010312637, 1850000.0002276993, 2099999.999573728)
+};
+
+REGION: odysseyS25 {
+   NAME: OPERA Odyssey composite
+   PCS_ID: odyssey
+   PCS_DEF: proj=laea,lat_0=55.0,lon_0=10.0,ellps=WGS84,units='m'
+   XSIZE:  760
+   YSIZE:  880
+   AREA_EXTENT: (-1950000.0004161082, -2300000.0010312637, 1850000.0002276993, 2099999.999573728)
+};
+
+REGION: odysseyS3 {
+   NAME: OPERA Odyssey composite
+   PCS_ID: odyssey
+   PCS_DEF: proj=laea,lat_0=55.0,lon_0=10.0,ellps=WGS84,units='m'
+   XSIZE:  633
+   YSIZE:  733
+   AREA_EXTENT: (-1950000.0004161082, -2300000.0010312637, 1850000.0002276993, 2099999.999573728)
+};
+
+REGION: odysseyS4 {
+   NAME: OPERA Odyssey composite
+   PCS_ID: odyssey
+   PCS_DEF: proj=laea,lat_0=55.0,lon_0=10.0,ellps=WGS84,units='m'
+   XSIZE:  475
+   YSIZE:  550
+   AREA_EXTENT: (-1950000.0004161082, -2300000.0010312637, 1850000.0002276993, 2099999.999573728)
+};
+
 REGION: SouthArabia {
         NAME:   SouthArabia
         PCS_ID: geos_50.0_0.0

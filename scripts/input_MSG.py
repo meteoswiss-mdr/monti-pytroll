@@ -1,7 +1,8 @@
 
 def input(in_msg):
 
-    print "*** read input from input_MSG.py"
+    import inspect
+    print "*** read input from ", inspect.getfile(inspect.currentframe()) 
 
     #------------------------------------------------------------------------
     # if not specified (False), current (last) observation time is chosen  
@@ -34,14 +35,14 @@ def input(in_msg):
     ##in_msg.RGBs.append('VIS008')       # black and white
     ##in_msg.RGBs.append('IR_016')       # black and white
     ##in_msg.RGBs.append('IR_039')       # black and white
-    in_msg.RGBs.append('WV_062')       # black and white
+    #in_msg.RGBs.append('WV_062')       # black and white
     ##in_msg.RGBs.append('WV_073')       # black and white
     ##in_msg.RGBs.append('IR_087')       # black and white
     ##in_msg.RGBs.append('IR_097')       # black and white
-    in_msg.RGBs.append('IR_108')       # black and white
+    #in_msg.RGBs.append('IR_108')       # black and white
     ##in_msg.RGBs.append('IR_120')       # black and white
     ##in_msg.RGBs.append('IR_134')       # black and white
-    in_msg.RGBs.append('HRV')          # black and white
+    #in_msg.RGBs.append('HRV')          # black and white
     #in_msg.RGBs.append('VIS006c')      # colored version
     #in_msg.RGBs.append('VIS008c')      # colored version
     #in_msg.RGBs.append('IR_016c')      # colored version
@@ -178,21 +179,17 @@ def input(in_msg):
     #in_msg.sat = "meteosat"
     #in_msg.sat_nr=8
     #in_msg.RSS=False 
-    #in_msg.sat_nr=9
-    #in_msg.RSS=True
-    in_msg.sat_nr=10
-    in_msg.RSS=False
+    in_msg.sat_nr=9
+    in_msg.RSS=True
+    #in_msg.sat_nr=10
+    #in_msg.RSS=False
     
     # switch off Rapid scan, if large areas are wanted 
     if ('fullearth' in in_msg.areas) or ('met09globe' in in_msg.areas) or ('met09globeFull' in in_msg.areas): 
        in_msg.RSS=False 
 
     in_msg.check_input = False
-<<<<<<< HEAD
-    in_msg.reader_level="seviri-level4" 
-=======
     #in_msg.reader_level="seviri-level4" 
->>>>>>> 5759b2ff0872913fc3cd64227338f075754fbb98
     in_msg.parallax_correction = False
     in_msg.parallax_gapfilling = 'bilinear' # 'False' (default), 'nearest'
     #in_msg.save_reprojected_data=['ccs4']
@@ -226,7 +223,7 @@ def input(in_msg):
 
     in_msg.postprocessing_areas=["ccs4"]
     #in_msg.postprocessing_areas=['EuropeCanaryS95']
-    #in_msg.postprocessing_composite=["h03-ir108"] 
+    in_msg.postprocessing_composite=["h03-ir108"] 
     #in_msg.postprocessing_composite=["hrwdp-ir108"] 
     #in_msg.postprocessing_composite=["CTT-ir108","CTH-ir108"] 
     #in_msg.postprocessing_composite=["hrwdp-ir108", "hrwdc-ir108","streamd-ir108","hrwdr-ir108", "hrwdcnwp-ir108", "hrwdcnnwp-ir108"]    
@@ -237,3 +234,5 @@ def input(in_msg):
     #in_msg.postprocessing_composite=["hrwdpL-streamdL-HRV","hrwdpL-streamdL-ir108"] 
     #in_msg.postprocessing_composite=["hrwdpH-streamdH-HRV","hrwdpH-streamdH-ir108"] 
     #in_msg.postprocessing_composite=["hrwdp-streamd-ir108","TRT-streamd-ir108"] 
+    #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03-ir108"],["MSG_radar-HRV","MSG_h03-HRV"],["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]]
+    in_msg.postprocessing_montage = [["MSG_h03-ir108","MSG_HRV"],["MSG_h03-ir108","MSG_test"]]

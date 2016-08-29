@@ -1,3 +1,4 @@
+from __future__ import print_function
 from datetime import datetime
 import sys, string, os
 import logging
@@ -16,7 +17,7 @@ from datetime import timedelta
 from plot_msg import create_PIL_image, add_border_and_rivers, add_title
 from pycoast import ContourWriterAGG
 from pydecorate import DecoratorAGG
-from my_msg_module import format_name, fill_with_closest_pixel
+from my_msg_module import check_near_real_time, format_name, fill_with_closest_pixel
 from copy import deepcopy 
 from my_msg_module import convert_NWCSAF_to_radiance_format, get_NWC_pge_name
 from mpop.imageo.palettes import convert_palette2colormap
@@ -56,7 +57,7 @@ def create_dir(outputFile):
     path = dirname(outputFile)
     if not exists(path):
         if in_msg.verbose:
-            print '... create output directory: ' + path
+            print('... create output directory: ' + path)
         makedirs(path)
     return outputFile
 
@@ -65,14 +66,14 @@ def create_dir(outputFile):
 def force_to_observed_cloud_mask(mod, obs):
     if np.any(mod.mask == True) == False:
         #if verbose:
-         #   print "NO MASK ACTIVE!!!!!!!!!"
+         #   print("NO MASK ACTIVE!!!!!!!!!")
         if np.any(np.isnan(mod)):
             mod = ma.masked_where(np.isnan(mod), mod)
-            #print "the invalid are NAN"
+            #print("the invalid are NAN")
         else:
             mod = ma.masked_where(mod <= 0, mod)
             #if verbose:
-            #    print "the invalid are <= 0"
+            #    print("the invalid are <= 0")
     mod[mod.mask==True] = np.nan
     mod = fill_with_closest_pixel(mod) 
     mod[obs==True] = np.nan
@@ -82,7 +83,7 @@ def force_to_observed_cloud_mask(mod, obs):
     
 def downscale(data,mode = 'gaussian_225_125'):
     if mode != 'no_downscaling':
-        print "... DOWNSCALING: applying: ", mode
+        print("... DOWNSCALING: applying: ", mode)
         if mode == 'convolve_405_300': 
             weights = np.ones([5,3])
             weights = weights / weights.sum()
@@ -102,11 +103,11 @@ def downscale(data,mode = 'gaussian_225_125'):
         
         elif isinstance(data,mpop.scene.SatelliteInstrumentScene):          
               channels = [chn.name for chn in data.loaded_channels()]
-              print channels
+              print(channels)
               for c in range(len(channels)):
                     
                     rgb_id = channels[c]
-                    print rgb_id
+                    print("    downscaling of channel: ", rgb_id)
                     if rgb_id != "CloudType" and rgb_id != "CT" and rgb_id != "CTTH" and rgb_id != "CTP" and rgb_id != "CTH":
                         if mode == 'convolve_405_300':
                             data[rgb_id].data = ndimage.convolve(data[rgb_id].data, weights, mode='nearest')
@@ -153,7 +154,7 @@ def make_figure(values, obj_area, outputFile, colorbar = True, text_to_write = N
     
     PIL_image = fig2img ( fig )
     PIL_image.save(create_dir(outputFile))
-    print "... display ",outputFile," &"
+    print("... display ",outputFile," &")
     plt.close( fig)
     
     
@@ -176,7 +177,7 @@ def check_area(area_wanted):
     else:
         scale = "broad"
     
-    print "the scale is being set to: ", scale
+    print("the scale is being set to: ", scale)
     
     return scale
 
@@ -195,7 +196,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
     while time_slot <= time_slotSTOP:
       
 
-          print "current time: ", time_slot
+          print("current time: ", str(time_slot))
           
           year = time_slot.year
           month = time_slot.month
@@ -224,15 +225,15 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
               if in_msg.sat[0:8]=="Meteosat":
                   sat_nr_str = str(int(sat_nr_str)) # get rid of leading zeros (0) 
           else:
-              print "*** Waring, unknown type of sat_nr", type(in_msg.sat_nr)
+              print ("*** Waring, unknown type of sat_nr", type(in_msg.sat_nr))
               sat_nr_str = in_msg.sat_nr
                 
           #RGBs = check_input(in_msg, in_msg.sat+sat_nr_str, in_msg.datetime)  # in_msg.sat_nr might be changed to backup satellite
           #if len(RGBs) != len(in_msg.RGBs):
-          #    print "*** Warning, input not complete."
-          #    print "*** Warning, process only: ", RGBs
+          #    print ("*** Warning, input not complete.")
+          #    print ("*** Warning, process only: ", RGBs)
 
-          #print "*** read data for ", in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot
+          #print ("*** read data for ", in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot)
           
           for i_try in range(30):
               RGBs = check_input(in_msg, in_msg.sat_str()+in_msg.sat_nr_str(), in_msg.datetime, RGBs=in_msg.RGBs)
@@ -253,33 +254,29 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
           area2load = "EuropeCanary95" #"ccs4" #c2"#"ccs4" #in_windshift.ObjArea
           area_loaded = get_area_def(area2load )#(in_windshift.areaExtraction)  
 
-          print "*** load data for ", in_msg.sat_str(), in_msg.sat_nr_str(), str(time_slot)
+          print ("*** load data for ", in_msg.sat_str(), in_msg.sat_nr_str(), str(time_slot))
           # load product, global_data is changed in this step!
           area_loaded = load_products(global_data, in_msg.RGBs, in_msg, area_loaded ) #
-          
-          print "Areas chosen:", in_msg.areas
-                    
+
           for area in in_msg.areas:
-          
-                print "producing output for area: ", area
 
                 chosen_settings = in_msg.choose_coalistion2_settings(area)
                 
-                print "  *******SETTINGS*******"
-                print "      nrt: ", in_msg.nrt
-                print "      area: ", area
-                print "      scale: ", chosen_settings['scale']
-                print "      use_TB_forecast: ", chosen_settings['use_TB_forecast']
-                print '      mode_downscaling: ', chosen_settings['mode_downscaling']
-                print '      mask_labelsSmall_lowUS: ', chosen_settings['mask_labelsSmall_lowUS']
-                print '      clean_mask: ', chosen_settings['clean_mask']
-                print '      rapid_scan_mode: ', chosen_settings['rapid_scan_mode']
-                print '      forth_mask: ', chosen_settings['forth_mask']
-                print '      forced_mask: ', chosen_settings['forced_mask']
-                print '      mask_cirrus: ', chosen_settings['mask_cirrus']
-                print '      dt_forecast1: ', chosen_settings['dt_forecast1']
-                print '      dt_forecast2: ', chosen_settings['dt_forecast2']
-                  
+                print ("  *******SETTINGS*******")
+                print ("      nrt: ", in_msg.nrt)
+                print ("      area: ", area)
+                print ("      scale: ", chosen_settings['scale'])
+                print ("      use_TB_forecast: ", chosen_settings['use_TB_forecast'])
+                print ('      mode_downscaling: ', chosen_settings['mode_downscaling'])
+                print ('      mask_labelsSmall_lowUS: ', chosen_settings['mask_labelsSmall_lowUS'])
+                print ('      clean_mask: ', chosen_settings['clean_mask'])
+                print ('      rapid_scan_mode: ', chosen_settings['rapid_scan_mode'])
+                print ('      forth_mask: ', chosen_settings['forth_mask'])
+                print ('      forced_mask: ', chosen_settings['forced_mask'])
+                print ('      mask_cirrus: ', chosen_settings['mask_cirrus'])
+                print ('      dt_forecast1: ', chosen_settings['dt_forecast1'])
+                print ('      dt_forecast2: ', chosen_settings['dt_forecast2'])
+
                 obj_area = get_area_def(area)
                 
                 time_slot15 = time_slot - timedelta(minutes=chosen_settings['dt_forecast1'])
@@ -304,8 +301,8 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 elif chosen_settings['forth_mask'] == 'no_mask':
                     in_msg.name_4Mask = 'none'
                 else:
-                    print "*** Error in main (Mecikalski_test.py)"
-                    print "    unknown 4th mask", chosen_settings['forth_mask']
+                    print ("*** Error in main (Mecikalski_test.py)")
+                    print ("    unknown 4th mask", chosen_settings['forth_mask'])
                     quit() 
                 
                 if chosen_settings['forced_mask'] == 'IR_039_minus_IR_108':
@@ -315,12 +312,12 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 elif chosen_settings['forced_mask'] == 'no_mask':
                     in_msg.name_ForcedMask = 'no'
                 else:
-                    print "    unknown forcing mask -> applying no forcing mask", chosen_settings['forced_mask']
+                    print ("    unknown forcing mask -> applying no forcing mask", chosen_settings['forced_mask'])
                     in_msg.name_ForcedMask = 'no'
                 
                 
                 if chosen_settings['scale'] == 'local' and in_msg.no_NWCSAF == False:
-                    print "... check for CTH observation (scale=", chosen_settings['scale']," no_NWCSAF=", in_msg.no_NWCSAF, ")"
+                    print ("... check for CTH observation (scale=", chosen_settings['scale']," no_NWCSAF=", in_msg.no_NWCSAF, ")")
                     for i_try in range(30):
                         # check if 'CTH' file is present
                         RGBs = check_input(in_msg, in_msg.sat_str()+in_msg.sat_nr_str(), in_msg.datetime, RGBs="CTH")
@@ -334,14 +331,14 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     # load the cloud top height data
                     area_loaded = load_products(global_data, ['CTH'], in_msg, area_loaded )
           
-                print '... project data to desired area ', area
+                print ('... project data to desired area ', area)
                 data = global_data.project(area)
                 
                 # print type(data)
                 loaded_channels = [chn.name for chn in data.loaded_channels()]
-                print "... loaded_channels: ", loaded_channels                
+                print ("... loaded_channels: ", loaded_channels)               
                 
-                print '... downscaling', chosen_settings['mode_downscaling']
+                print ('... downscaling', chosen_settings['mode_downscaling'])
                 data = downscale(data,chosen_settings['mode_downscaling'])
 
                 if in_msg.nrt == True:
@@ -353,13 +350,13 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     in_msg.nowcastDir = in_msg.nowcastDirOffline
                     in_msg.labelsDir = in_msg.labelsDirOffline
                 if in_msg.nowcastDir == '/data/COALITION2/PicturesSatellite/LEL_results_wind/':
-                    print "      updated in_msg.nowcastDir"
                     in_msg.nowcastDir+= '/'+yearS+'-'+monthS+'-'+dayS+'/channels/'				
+                    print ("      updated in_msg.nowcastDir: ", in_msg.nowcastDir)
                 # create a cloud mask: if scale local based on CTH, else based on  where CTP can be derived 
                 # -------------------
             
                 nx,ny = data['IR_108'].data.shape
-                print "    nx, ny= ", nx,ny
+                print ("    nx, ny= ", nx,ny)
       
                 #print type(data['CTP'].data)
                 if chosen_settings['scale'] != 'local' or in_msg.no_NWCSAF == True:
@@ -371,9 +368,9 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 # read old brightness temperatures (if possible shifted by lagrangian cell movement)
                 if chosen_settings['use_TB_forecast'] == True:
       
-                    print "*** read forecasted brightness temperatures" 
-                    print "    ", in_msg.nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S) 
-                    print "    ", in_msg.nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S)                                   
+                    print ("*** read forecasted brightness temperatures")
+                    print ("    ", in_msg.nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S) )
+                    print ("    ", in_msg.nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S) )                               
                     wv_062_t15 = pickle.load( open( in_msg.nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) ) 
                     wv_062_t30 = pickle.load( open( in_msg.nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S), "rb" ) )
                             
@@ -400,12 +397,12 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     #check if downscaling you are applying matches with the downscaling applied when producing the forecasts
                     if True:
                         if any(bz != chosen_settings['mode_downscaling'] for bz in downscalings):
-                            print "The downscaling technique applied for the production of forecast differs from that chosen here"
-                            print "current technique: ", chosen_settings['mode_downscaling'], "; in input ", in_msg.chosen_settings['mode_downscaling']
-                            print "technique forecast: ", list(set(downscalings))
+                            print ("The downscaling technique applied for the production of forecast differs from that chosen here")
+                            print ("current technique: ", chosen_settings['mode_downscaling'], "; in input ", in_msg.chosen_settings['mode_downscaling'])
+                            print ("technique forecast: ", list(set(downscalings)) )
                             quit()
       
-                    print "...correct downscaling: ", chosen_settings['mode_downscaling']
+                    print("...correct downscaling: ", chosen_settings['mode_downscaling'])
                     wv_062_t15 = wv_062_t15 [0]
                     wv_062_t30 = wv_062_t30 [0]
                             
@@ -431,25 +428,22 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     # no forecasted brightness temperature available, use old observations 
                     
                     # now read the observations of the channels at -30 min
-                    print "*** read data for ", in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot30
+                    print ("*** read data for ", in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot30)
                     
                     global_data30 = GeostationaryFactory.create_scene(in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot30)
                     # area we would like to read
                     area_loaded = get_area_def(area2load)#(in_windshift.areaExtraction)  
                     # load product, global_data is changed in this step!
-                    print "*** load data for ", in_msg.sat_str(), in_msg.sat_nr_str(), str(time_slot30)
                     area_loaded = load_products(global_data30, in_msg.channels30, in_msg, area_loaded)
                     data30 = global_data30.project(area)           
                     data30 = downscale(data30,chosen_settings['mode_downscaling'])      
                     
                     # read the observations of the channels at -15 min
-                    print "*** read data for ", in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot15
-                    
+                    print ("*** read data for ", in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot15)
                     global_data15 = GeostationaryFactory.create_scene(in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot15)
                     # area we would like to read
                     area_loaded15 = get_area_def(area2load)#(in_windshift.areaExtraction)  
                     # load product, global_data is changed in this step!
-                    print "*** load data for ", in_msg.sat_str(), in_msg.sat_nr_str(), str(time_slot15)
                     area_loaded15 = load_products(global_data15, in_msg.channels15, in_msg, area_loaded15)
                     data15 = global_data15.project(area)              
                     data15 = downscale(data15,chosen_settings['mode_downscaling'])
@@ -554,14 +548,14 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                           item[mask_NoClouds==True] = np.nan
                           outputFile = in_msg.outputDir +"/cosmo/Channels/indicators_in_time/all_indicators/%s_%s_Cloud_depth%s.png"%(yearS+monthS+dayS,hourS+minS,str(i+1))
                           make_figure(item, obj_area,  outputFile,colorbar = True,text_to_write = "Cloud depth %s"%(str(i+1)), vmin = vmin_cd[i], vmax = vmax_cd[i], contour_value = [th_cd[i]], linewidth = 1)
-                          print "... display ", outputFile, " &"
+                          print ("... display ", outputFile, " &")
        
                     item = cloud_depth[5,:,:]
                     item[mask_NoClouds==True] = np.nan
                     
                     outputFile = in_msg.outputDir +"/cosmo/Channels/indicators_in_time/all_indicators/%s_%s_Cloud_depth%s_cirrus.png"%(yearS+monthS+dayS,hourS+minS,str(i+1))
                     make_figure(item, obj_area, outputFile, colorbar = True, text_to_write = "Cloud depth 6", vmin = vmin_cd[5], vmax = vmax_cd[5], contour_value = [th_cirrus], linewidth = 1)
-                    print "... display ", outputFile, " &"     
+                    print ("... display ", outputFile, " &")   
                 
                 if 'indicator_optical_thickness' in in_msg.aux_results:
                     outputFile = in_msg.outputDir +"/cosmo/Channels/indicators_in_time/CloudDepthTH/%s_%s_Cloud_Depth.png"%(yearS+monthS+dayS,hourS+minS)
@@ -614,7 +608,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                         make_figure(item,obj_area,  outputFile, colorbar = True, text_to_write = "Glaciation_Indicators%s"%(str(i+1)), vmin = vmin_gi[i], vmax = vmax_gi[i], contour_value = contour_value) 
                         #fig.savefig( create_dir(outputFile) ) 
                         #plt.close(fig)
-                        #print "... display ", outputFile, " &" 
+                        #print ("... display ", outputFile, " &")
             
                 if 'indicator_glationation' in in_msg.aux_results:
                     outputFile = in_msg.outputDir +"/cosmo/Channels/indicators_in_time/GlaciationIndicatorTH/%s_%s_Glaciation_indicators.png"%(yearS+monthS+dayS,hourS+minS)
@@ -735,7 +729,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                               
                 cw = ContourWriterAGG( in_msg.mapDir)
             
-                print "... create the false color composite (r-g-b) = (", rgb_display,")"
+                print ("... create the false color composite (r-g-b) = (", rgb_display,")")
       
                 if rgb_display == 'us-cd-gi':
                     r = cmin_us + (us/n_tests_us) * (cmax_us - cmin_us)
@@ -746,8 +740,8 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     g = cmin_us + (us/n_tests_us) * (cmax_us - cmin_us)
                     b = cmin_gi + (gi/n_tests_gi) * (cmax_gi - cmin_gi)
                 else: 
-                    print "*** Error in main (Mecikalski_test.py)"
-                    print "    unknown rgb illustration", rgb_display
+                    print ("*** Error in main (Mecikalski_test.py)")
+                    print ("    unknown rgb illustration", rgb_display)
                     quit()
                 
                 mask_black = np.where(np.logical_and(np.logical_and(us<=2, cd<=2),gi<=2),0,1) #np.ones(us.shape) #
@@ -770,8 +764,8 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 elif chosen_settings['forced_mask'] == 'IR_039_minus_IR_108':  
                         force_mask = np.where(IR_039_minus_IR_108 >= force_th_chDiff,1,0)
                 elif chosen_settings['forced_mask'] !='no_mask': 
-                    print "*** Error in main (Mecikalski_test.py)"
-                    print "    unknown forcing mask -> applying no forcing mask", chosen_settings['forced_mask']     
+                    print ("*** Error in main (Mecikalski_test.py)")
+                    print ("    unknown forcing mask -> applying no forcing mask", chosen_settings['forced_mask'])     
             
                 if 'forced_mask' in in_msg.aux_results:
                     outputFile = in_msg.outputDir +"/cosmo/Channels/indicators_in_time/masks/"+yearS+monthS+dayS+"_"+hourS+minS+"_4th"+in_msg.name_4Mask+"_Forced_mask.png"
@@ -791,8 +785,8 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     mask  = np.logical_or(mature_mask==1,developing_mask==1)
                     maskS = '_dam'
                 else:
-                    print "*** Error in main (plot_coalition2.py)"
-                    print "    unknown show_clouds: ", in_msg.show_clouds
+                    print ("*** Error in main (plot_coalition2.py)")
+                    print ("    unknown show_clouds: ", in_msg.show_clouds)
                     quit()
                 
                 mask = np.logical_or(mask==1,force_mask==1)
@@ -829,12 +823,12 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                         # Remove small black hole
                         mask = ndimage.binary_closing(mask) 
                 elif chosen_settings['clean_mask'] != 'no_cleaning':
-                    print "*** Error in main (Mecikalski.py)"
-                    print "    unknown clean_mask: ", chosen_settings['clean_mask']
+                    print ("*** Error in main (Mecikalski.py)")
+                    print ("    unknown clean_mask: ", chosen_settings['clean_mask'])
                     quit()          
                 
       
-                print "-------------------     r min-max",(r.min(),r.max())
+                print ("-------------------     r min-max",(r.min(),r.max()))
                 
               
                 # copy red, green, blue to the rgbArray and apply mask  
@@ -904,7 +898,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 if in_msg.shelve_labels==True and properties_cells == False:
                       labels = labels.astype('uint32') 
                       filename = 'labels/Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)
-                      print "*** writing variables ", filename
+                      print ("*** writing variables ", filename)
                       myShelve = shelve.open(filename)
                       # write data as dictionary into the shelve
                       dict_labels = {'labels': labels, 'metadata': metadata}
@@ -932,13 +926,13 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 if 'C2rgb' in in_msg.results:
                     img1 = Image.fromarray( rgbArray,'RGBA')
                     #add_border_and_rivers( img1, cw, area_tuple, in_msg)
-                    print "... save image: display ", c2File, " &"
+                    print ("... save image: display ", c2File, " &")
                     img1.save( create_dir(c2File) ) 
                     
                     #pickle.dump( img1, open("RGB"+yearS+monthS+dayS+hourS+minS+".p", "wb" ) )
                 
-                if area in in_msg.postprocessing_areas:
-                    print "... post-processing for area ", area
+                if area in in_msg.postprocessing_areas:                        
+                    print ("... post-processing for area ", area)
                     in_msg.postprocessing_composite = deepcopy(in_msg.postprocessing_composite1)
                     postprocessing(in_msg, time_slot, int(data.sat_nr()), area)
 
@@ -958,28 +952,28 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     dic_figure={}
                     dic_figure['rgb']='C2rgb-'+type_image[1:] #-IR-108'
                     dic_figure['area']=area
-                    print outputFile
+                    print (outputFile)
                     out_file1 = create_dir( in_msg.outputDir+outputFile%dic_figure)
-                    print "!!! out_file1: ", out_file1
+                    print ("!!! out_file1: ", out_file1)
                     #quit()
 
                     if in_msg.nrt == False:
 
                         hrvFile = "/data/COALITION2/PicturesSatellite//"+yearS+"-"+monthS+"-"+dayS+"/"+yearS+"-"+monthS+"-"+dayS+type_image+"_"+area+"/MSG"+type_image+"-"+area+"_"+yearS[2:]+monthS+dayS+hourS+minS+".png"
-                        print "...creating composite", out_file1
-                        print "... create composite "+c2File+" "+hrvFile+" "+out_file1
+                        print ("...creating composite", out_file1)
+                        print ("... create composite "+c2File+" "+hrvFile+" "+out_file1)
                         subprocess.call("/usr/bin/composite "+c2File+" "+hrvFile+" "+out_file1, shell=True)
-                        print "... saved composite: display ", out_file1, " &"
+                        print ("... saved composite: display ", out_file1, " &")
                 
                     ## start postprocessing
                     elif area in in_msg.postprocessing_areas:
-                       print "area in post processing"
+                       print ("area in post processing")
                        in_msg.postprocessing_composite = deepcopy(in_msg.postprocessing_composite1)
                        postprocessing(in_msg, [], time_slot, int(data.sat_nr()), area)
                 """
           
                 if area == "ccs4" and in_msg.properties_cells == True:
-                    print "**** Computing properties of the cells"
+                    print ("**** Computing properties of the cells")
                     outputDir_labels = in_msg.outputDir+'/labels/'
                     """
                     if 'labels_tracked' in in_msg.aux_results:               !!!! UH this might give very hard to find bugs
@@ -990,18 +984,17 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     labels_corrected, first_time_step = properties_cells(time_slot, time_slot, current_labels=labels, metadata=metadata,
                                                                         labels_dir=in_msg.labelsDir, outputDir_labels=outputDir_labels, in_msg=in_msg, sat_data=data)
                     if first_time_step:
-                        print "no history to follow, first timestep"
+                        print ("no history to follow, first timestep")
                     if in_msg.plot_forecast == True and first_time_step == False:
-                        print "**** Forecasting Area"
+                        print ("**** Forecasting Area")
                         if in_msg.nrt == False:
                             add_path = "/new_forecasted_area/"
                         else:
                             add_path = ""
                         #plot_forecast_area(time_slot, in_msg.model_fit_area, outputFile=in_msg.outputDir+add_path, current_labels=labels_corrected,
                         #                  t_stop=time_slot, BackgroundFile=out_file1, ForeGroundRGBFile=c2File, labels_dir=in_msg.labelsDir, in_msg=in_msg)
-                        plot_forecast_area(time_slot, in_msg.model_fit_area, outputFile=in_msg.outputDir+add_path, current_labels=labels_corrected,
+                        plot_forecast_area(time_slot, in_msg.model_fit_area, outputDir=in_msg.outputDir+add_path, current_labels=labels_corrected,
                                           t_stop=time_slot, BackgroundFile=c2File, ForeGroundRGBFile=c2File, labels_dir=in_msg.labelsDir, in_msg=in_msg)
-
             
           # add 5min and do the next time step
           f4p = in_msg.labelsDir+"/Labels*"
@@ -1022,18 +1015,16 @@ if __name__ == '__main__':
         input_file=input_file[:-3]
     in_msg = get_input_msg(input_file)
 
-    print "in_msg.areas ", in_msg.areas
-    
     from coalition2_settings import *
     
-    print "input imported"
+    print ("input imported")
     
     if len(sys.argv) > 2:
     	if len(sys.argv) < 7:
-          print "***           "
-          print "*** Warning, please specify date and time completely, e.g."
-          print "***          python plot_coalition2.py input_coalition2  2014 07 23 16 10 "
-          print "***           "
+          print ("***           ")
+          print ("*** Warning, please specify date and time completely, e.g.")
+          print ("***          python plot_coalition2.py input_coalition2  2014 07 23 16 10 ")
+          print ("***           ")
           quit() # quit at this point
     	else:
           year   = int(sys.argv[2])
@@ -1041,12 +1032,12 @@ if __name__ == '__main__':
           day    = int(sys.argv[4])
           hour   = int(sys.argv[5])
           minute = int(sys.argv[6])
-          time_slot = datetime(year, month, day, hour, minute)
+          in_msg.update_datetime(year, month, day, hour, minute)
           #if time_slot.year < 2016:
           #    in_msg.nrt = False
           #else:
           #    in_msg.nrt = True #bad fix, different place cosmo and similar
-          in_msg.nrt = False
+          #in_msg.nrt = False    # no this is not nice !!! !HAU!
           
           if len(sys.argv) > 7:
               yearSTOP   = int(sys.argv[7])
@@ -1056,22 +1047,27 @@ if __name__ == '__main__':
               minuteSTOP = int(sys.argv[11])
               time_slotSTOP = datetime(yearSTOP, monthSTOP, daySTOP, hourSTOP, minuteSTOP)
               #nrt = False
-              in_msg.reader_level="seviri-level4"
+              #in_msg.reader_level="seviri-level4"
         
           else:
-              time_slotSTOP = time_slot 
+              time_slotSTOP = in_msg.datetime
     else:
       if True:  # automatic choise of last 5min 
           in_msg.get_last_SEVIRI_date()
           time_slot     = in_msg.datetime
           time_slotSTOP = in_msg.datetime 
-          in_msg.nrt = True
-      else: # fixed date for text reasons
+      else: # fixed date for test reasons
           year   = 2015          # 2014 09 15 21 35
           month  =  7           # 2014 07 23 18 30
           day    =  7
           hour   = 13
           minute = 00
-    print "*** start plot_coalition2 "
-    plot_coalition2(in_msg, time_slot, time_slotSTOP)
+          in_msg.update_datetime(year, month, day, hour, minute)
+          time_slotSTOP = in_msg.datetime 
+
+    # second argument is tolerance in minutes
+    in_msg.nrt = check_near_real_time(in_msg.datetime, 120)
+
+    print ("*** start plot_coalition2 ")
+    plot_coalition2(in_msg, in_msg.datetime, time_slotSTOP)
 

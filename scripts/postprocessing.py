@@ -95,7 +95,7 @@ def get_file_list(composite, in_msg, sat, sat_nr, time_slot, area, n=None):
     return file_list
 
 # ---
-def n_file_composite(composite, in_msg, sat_nr, time_slot, area):
+def n_file_composite(composite, in_msg, sat_nr, time_slot, area, composites_done=[]):
 
     n_rgb = composite.count('-') + 1
 
@@ -114,7 +114,7 @@ def n_file_composite(composite, in_msg, sat_nr, time_slot, area):
     # get the filename of the last two files to compose  
     file_list = get_file_list(composite, in_msg, sat, sat_nr, time_slot, area, n=2)
     if file_list == None:  # if not all files are found 
-        return None        # return None as error marker 
+        return composites_done   # return [] as error marker 
 
     # get result filename 
     comp_file = get_sat_filename(in_msg, composite, sat, sat_nr, time_slot, area) 
@@ -122,13 +122,17 @@ def n_file_composite(composite, in_msg, sat_nr, time_slot, area):
     if in_msg.verbose:
         print "    composite "+file_list[0]+" "+file_list[1]+" "+comp_file
     subprocess.call("/usr/bin/composite "+file_list[0]+" "+file_list[1]+" "+comp_file, shell=True) #+" 2>&1 &"
+    # check if file is produced
+    if isfile(comp_file):
+        composites_done.append(composite)
 
     if in_msg.scpOutput and composite in in_msg.postprocessing_composite:
         if in_msg.verbose:
             print "... secure copy "+comp_file+ " to "+in_msg.scpOutputDir
             subprocess.call("/usr/bin/scp "+in_msg.scpID+" "+comp_file+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
 
-    return True
+
+    return composites_done
 
 #-----------------------------------------------------------------------------------------
 #-----------------------------------------------------------------------------------------
@@ -136,8 +140,12 @@ def n_file_composite(composite, in_msg, sat_nr, time_slot, area):
 
 def postprocessing (in_msg, time_slot, sat_nr, area):
 
-    print ""
-    print "*** start post processing for area: ", area
+    if in_msg.verbose:
+        print ""
+        print "*** start post processing for area: ", area, ', time: ', str(time_slot)
+        print "... desired composites: ", in_msg.postprocessing_composite
+        print "... desired montages: ", in_msg.postprocessing_montage
+        print ""
 
     ## search for lightning file 
     #yearS  = str(in_msg.datetime.year)
@@ -151,18 +159,27 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
     #    products_needed = products_needed |  set(comp.split("-"))  # | == union of two sets
     ##print products_needed
 
+    composites_done = []
     if hasattr(in_msg, 'postprocessing_composite'):
         for composite in in_msg.postprocessing_composite:
 
             print "... creating composite: ", composite
+            composites_done = n_file_composite(composite, in_msg, sat_nr, time_slot, area, composites_done=composites_done)
 
-            n_file_composite(composite, in_msg, sat_nr, time_slot, area)
+        if in_msg.verbose:
+            if len(composites_done) > 0:
+                print "... produced composites: "
+                for comp in composites_done:
+                    print "   ", comp
+            else:
+                print "*** Warning, no composites produced "
 
     # ----------------------------------------------
-
-    print ""
-    print "*** start montage_pictures for area: ", area
-
+    if in_msg.verbose:
+        print ""
+        print "*** start montage_pictures for area: ", area
+    
+    montage_done = []
     if hasattr(in_msg, 'postprocessing_montage'):
 
         for montage in in_msg.postprocessing_montage:
@@ -182,22 +199,38 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
                 tile = "3x1"
             if n_pics == 4:
                 tile = "2x2"
-            if n_pics == 4:
+            if n_pics == 5:
                 tile = "5x1"
             if n_pics == 6:
                 tile = "3x2"
+            if n_pics == 8:
+                tile = "4x2"
+            if n_pics == 9:
+                tile = "3x3"
+            if n_pics == 10:
+                tile = "5x2"
+            if n_pics == 12:
+                tile = "4x3"
 
             files = ""
             outfile = ""
             files_exist=True
+            files_complete=True
             for mfile in montage:
                 next_file = outputDir+"/"+format_name(mfile+'-'+area+'_%y%m%d%H%M.png', time_slot, area=area)
                 if not isfile(next_file):
-                    print "*** ERROR, can not find "+mfile+" file: "+next_file
-                    print "*** skip montage: ", montage
-                    files_exist=False
-                files += " "+outputDir+"/"+format_name(mfile+'-'+area+'_%y%m%d%H%M.png', time_slot, area=area)
-                outfile += mfile[mfile.index("_")+1:]+"-"
+                    files_complete=False
+                    if area == "ccs4" or area == 'EuropeCanaryS95':
+                        # produce image with placeholder for missing product
+                        files += " "+"/opt/users/common/logos/missing_product_textbox_"+area+".png"
+                        outfile += mfile[mfile.index("_")+1:]+"-"
+                    else:
+                        print "*** ERROR, can not find "+mfile+" file: "+next_file
+                        print "*** skip montage: ", montage
+                        files_exist=False
+                else:
+                    files += " "+outputDir+"/"+format_name(mfile+'-'+area+'_%y%m%d%H%M.png', time_slot, area=area)
+                    outfile += mfile[mfile.index("_")+1:]+"-"
 
             outfile = outputDir+"/"+format_name( "MSG_"+ outfile[:-1] + '-'+area + '_%y%m%d%H%M.png', time_slot, area=area)
 
@@ -211,11 +244,102 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
             #outfile = outputDir + outfilename
 
             if files_exist:
-                print "/usr/bin/montage -tile "+tile+" -geometry +0+0 "+files + " " + outfile  +" 2>&1 "+sleep_str
+                if in_msg.verbose:
+                    print "/usr/bin/montage -tile "+tile+" -geometry +0+0 "+files + " " + outfile  +" 2>&1 "+sleep_str
                 subprocess.call("/usr/bin/montage -tile "+tile+" -geometry +0+0 "+files + " " + outfile  +" 2>&1 "+sleep_str, shell=True)
+
+                # check if file is produced
+                if isfile(outfile) and files_complete:
+                    montage_done.append(montage)
 
                 if in_msg.scpOutput:
                     if in_msg.verbose:
                         print "... secure copy "+outfile+ " to "+in_msg.scpOutputDir
-                        subprocess.call("/usr/bin/scp "+in_msg.scpID+" "+outfile+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
+                    subprocess.call("/usr/bin/scp "+in_msg.scpID+" "+outfile+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
 
+        if in_msg.verbose:
+            if len(montage_done) > 0:
+                print "... produced montages: "
+                for montage in montage_done:
+                    print "   ", montage
+            else:
+                print "*** Warning, no montages produced "
+
+    return composites_done, montage_done
+
+#------- ----------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
+
+def print_usage():
+         print "***           "
+         print "*** Error, not enough command line arguments"
+         print "***        please specify at least an input file"
+         print "***        possible calls are:"
+         print "*** python postprocessing.py input_MSG "
+         print "*** python postprocessing.py input_MSG 2014 07 23 16 10 "
+         print "                                 date and time must be completely given"
+         print "*** python postprocessing.py input_MSG 2014 07 23 16 10 'h03-ir108' (use this as postprocessing_composite, not those written in the input file)"
+         print "*** python postprocessing.py input_MSG 2014 07 23 16 10 'IR_108' 'ccs4' (use this as postprocessing_areas, not those written in the input file)"
+         print "*** python postprocessing.py input_MSG 2014 07 23 16 10 ['HRoverview','fog'] ['ccs4','euro4'] (several composites and areas)"
+         print "***           "
+         quit() # quit at this point
+
+#-----------------------------------------------------------------------------------------
+
+if __name__ == '__main__':
+
+   import sys
+   from get_input_msg import get_input_msg
+
+   # get command line arguments, e.g. 
+   # $: python postprocessing.py input_MSG or
+   # $: python postprocessing.py input_MSG 2014 07 23 16 10 or
+   # $: python postprocessing.py input_MSG 2014 07 23 16 10 'h03-ir108' 'ccs4' or
+   # $: python postprocessing.py input_MSG 2014 07 23 16 10 ['HRoverview','fog'] ['ccs4','euro4']
+   # and overwrite arguments given in the initialization in get_input_msg
+   if len(sys.argv) < 2:
+      print_usage()
+   else:
+      # read input file 
+      input_file=sys.argv[1]
+      if input_file[-3:] == '.py': 
+         input_file=input_file[:-3]
+      in_msg = get_input_msg(input_file)
+      in_msg.get_last_SEVIRI_date()
+
+      # check for more arguments 
+      if len(sys.argv) > 2:
+         if len(sys.argv) < 7:
+            print_usage()
+         else:
+            year   = int(sys.argv[2])
+            month  = int(sys.argv[3])
+            day    = int(sys.argv[4])
+            hour   = int(sys.argv[5])
+            minute = int(sys.argv[6])
+            # update time slot in in_msg class
+            in_msg.update_datetime(year, month, day, hour, minute)
+         if len(sys.argv) > 7:
+            if type(sys.argv[7]) is str:
+               in_msg.postprocessing_composite = [sys.argv[7]]
+            else:
+               in_msg.postprocessing_composite = sys.argv[7]
+            if len(sys.argv) > 8:
+               if type(sys.argv[8]) is str:
+                  in_msg.postprocessing_areas = [sys.argv[8]]
+               else:
+                  in_msg.postprocessing_areas = sys.argv[8]
+
+   # loop over all processed areas
+   for area in in_msg.areas:
+
+      ## start postprocessing for postprocessing areas
+      if area in in_msg.postprocessing_areas:
+         postprocessing(in_msg, in_msg.datetime, int(in_msg.sat_nr), area)
+
+   if in_msg.verbose:
+      print " "
+
+   #RGBs_done = plot_msg(in_msg)
+   #print "*** Satellite pictures produced for ", RGBs_done 
+   #print " "

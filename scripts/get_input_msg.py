@@ -95,6 +95,10 @@ class input_msg_class:
 
       self.verbose = True
 
+      import getpass
+      self.user = getpass.getuser()
+      print "*** working with username \'"+self.user+"\'"
+
 
    def add_rgb(self, rgb):
       self.RGBs.append(rgb)
@@ -115,6 +119,7 @@ class input_msg_class:
       #print "... use time delay of ", self.delay, " minutes"
       #if self.delay != 0:
       #   self.datetime -= timedelta(minutes=self.delay)
+      return self.datetime
 
    def sat_nr_str(self):
       # returns a string for the satellite number according to the convection of the satellite name

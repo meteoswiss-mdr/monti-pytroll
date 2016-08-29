@@ -22,7 +22,8 @@ from mpop.imageo.HRWimage import HRW_2dfield # , HRWstreamplot, HRWimage
 from datetime import timedelta
 from plot_msg import create_PIL_image, add_border_and_rivers, add_title
 from pycoast import ContourWriterAGG
-from my_msg_module import format_name, fill_with_closest_pixel
+from my_msg_module import check_near_real_time, format_name, fill_with_closest_pixel
+from my_msg_module import check_loaded_channels
 from copy import deepcopy 
 from my_msg_module import convert_NWCSAF_to_radiance_format, get_NWC_pge_name
 from mpop.imageo.palettes import convert_palette2colormap
@@ -41,6 +42,9 @@ import scp_settings
 scpOutputDir = scp_settings.scpOutputDir
 scpID = scp_settings.scpID 
 import glob
+import inspect
+
+current_file = inspect.getfile(inspect.currentframe())
 
 # debug_on()
 
@@ -161,7 +165,6 @@ def get_cosmo_filenames (t_sat, nrt=True, runs_before = 0 ):
 
 def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure', area='ccs4', cosmo = None, nrt = False, rapid_scan_mode_satellite = True):
 
-    
     file1, file2 = get_cosmo_filenames ( datetime(year,month,day,hour,minute) )
 
     print "... search for ", file1, " and ", file2
@@ -187,7 +190,7 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
             print "Files t1", filename1
             print "Files t2", filename2
         elif len(filename1)<1 or len(filename2)<1:
-            print "*** Error, no cosmo wind data with model start ", str(t_run)
+            print "*** Error, no cosmo wind data for time: ", str(datetime(year,month,day,hour,minute))
             print file1
             print file2
             quit()
@@ -435,9 +438,7 @@ if __name__ == '__main__':
     min_conf_no_nwp = 80 #in_windshift.min_conf_no_nwp
     cloud_type = [5,6,7,8,9,10,11,12,13,14] #in_windshift.cloud_type
 
-
     delta_t = 5 #in_windshift.ForecastTime
-    delay = 5
 
     # satellite for HRW winds
     sat_nr = "08" #in_windshift.sat_nr
@@ -518,7 +519,7 @@ if __name__ == '__main__':
         elif zlevel == 'modellevel':
             layers=[36,24,16] #cosmo model layers
         else:
-            print "*** Error in main (functionWSFN.py)"
+            print "*** Error in main ("+current_file+")"
             print "    unknown zlevel", zlevel
             quit()
         
@@ -545,8 +546,7 @@ if __name__ == '__main__':
             day    = int(sys.argv[3])
             hour   = int(sys.argv[4])
             minute = int(sys.argv[5])
-            time_slot = datetime(year, month, day, hour, minute)
-            nrt = False
+            in_msg.update_datetime(year, month, day, hour, minute)
             
             if len(sys.argv) > 6:
                 yearSTOP   = int(sys.argv[6])
@@ -556,15 +556,11 @@ if __name__ == '__main__':
                 minuteSTOP = int(sys.argv[10])
                 time_slotSTOP = datetime(yearSTOP, monthSTOP, daySTOP, hourSTOP, minuteSTOP) 
             else:
-                time_slotSTOP = time_slot 
+                time_slotSTOP = in_msg.datetime 
     else:
         if True:  # automatic choise of last 5min 
-            from my_msg_module import get_last_SEVIRI_date
-            time_slot = get_last_SEVIRI_date(True)
-            if delay != 0:
-                time_slot -= timedelta(minutes=delay)
-            nrt = True
-            time_slotSTOP = time_slot 
+            in_msg.get_last_SEVIRI_date()
+            time_slotSTOP = in_msg.datetime 
             print "... chose time (automatically): ", str(time_slotSTOP)
         else: # fixed date for text reasons
             year=2014          # 2014 09 15 21 35
@@ -572,14 +568,18 @@ if __name__ == '__main__':
             day= 23
             hour= 18
             minute=00
+            in_msg.update_datetime(year, month, day, hour, minute)
     
+    # second argument is tolerance in minutes
+    in_msg.nrt = check_near_real_time(in_msg.datetime, 120)
+    time_slot = in_msg.datetime
     
     #outputDir="/data/COALITION2/PicturesSatellite/LEL_results_wind/"
     outputDir="/data/cinesat/out/"
     
     while time_slot <= time_slotSTOP:
     
-          print time_slot
+          print str(time_slot)
           in_msg.datetime = time_slot
 
           year = time_slot.year
@@ -633,12 +633,19 @@ if __name__ == '__main__':
           [nx,ny]=data_CTP['CTP'].data.shape
 
           # read all rgbs
-          print "*** read all other channels for ", in_msg.sat, in_msg.sat_nr_str(), "seviri", str(time_slot)
+          print "*** read all other channels for ", in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", str(time_slot)
           global_data = GeostationaryFactory.create_scene(in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", time_slot)
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
           area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
           area_loaded = load_products(global_data, rgbs, in_msg, area_loaded)
           data = global_data.project(area)
+
+          # check if all needed channels are loaded
+          #for rgb in rgbs:
+          if not check_loaded_channels(rgbs, data):
+              print "*** Error in produce_forecast_nrt ("+current_file+")"
+              print "    missing data"
+              quit()
 
           if False:
               from trollimage.image import Image as trollimage
@@ -685,9 +692,10 @@ if __name__ == '__main__':
                   u_d[level,:,:], v_d[level,:,:] = HRW_2dfield( hrw_detbas, obj_area )
       
           elif wind_source=="cosmo":
-              u_d, v_d = interpolate_cosmo(year,month,day,hour,minute,layers,zlevel,area,nrt = nrt, rapid_scan_mode_satellite = True)
+              print "year, month, day, hour, minute", year, month, day, hour, minute
+              u_d, v_d = interpolate_cosmo(year, month, day, hour, minute, layers, zlevel, area, nrt=in_msg.nrt, rapid_scan_mode_satellite=True)
           else:
-              print "*** Error in main (functionWSFN.py)"
+              print "*** Error in main ("+current_file+")"
               print "    unknown wind source ", wind_source
               quit()
       
@@ -780,7 +788,7 @@ if __name__ == '__main__':
                             forecasts_out[channel_nr[rgb],ind_time,:,:] = ma.masked_invalid(forecasts_out[channel_nr[rgb],ind_time,:,:])
 
                             # time_slot.strftime( outputDir )
-                            if not nrt:
+                            if not in_msg.nrt:
                                 outputDir = outputDir+"/"+ yearS+"-"+monthS+"-"+dayS+"/channels/"
                             outputFile = outputDir +"/"+ "%s_%s_%s_t%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime))
                             #outputFile = "/opt/users/lel/PyTroll/scripts/channels/%s_%s_%s_t%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime))

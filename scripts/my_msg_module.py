@@ -60,6 +60,39 @@ def get_last_SEVIRI_date(RSS, delay=0):
 
     return t1
 
+
+def check_near_real_time(time_slot, minutes):
+
+    """
+    purpose: checks if specified time is within a certain time window with respect to the current time 
+    input:
+    * minutes [int]: number of minutes, that the input data is there 
+    output:
+    * nrt_flag [boolean]:
+      True, if specified time is not older than "minutes" minutes (with respect to current time)
+      False, if older
+    """ 
+
+    print "*** start check_near_real_time: ", # no new line
+
+    # check if specified time is older than 2 hours 
+    from time import gmtime
+    import datetime
+
+    # get the current time
+    gmt = gmtime()
+    t0 = datetime.datetime(gmt.tm_year, gmt.tm_mon, gmt.tm_mday, gmt.tm_hour, gmt.tm_min, 0) 
+    #print "    current time ", str(t0)
+    #print "    time of interest ", str(time_slot)
+
+    # if specified time is older than current time 'minutes' min 
+    if time_slot < (t0 - datetime.timedelta(seconds=minutes*60)):
+        print (" near_real_time = False")
+        return False
+    else:
+        print (" near_real_time = True")
+        return True
+
 '''
 input:  
   rgb  -> rgb  you want to check for the existence of the input files
@@ -312,37 +345,48 @@ def format_name (folder, time_slot, rgb=None, sat=None, sat_nr=None, area=None, 
 
 '''
 input:
-  rgb  -> rgb  you want to check for the existence of the input files
+  rgb [string] or [string array]  -> rgb (or array of rgb) you want to check for the existence of the input files
   data -> satellite scene created by GeostationaryFactory.create_scene
 output:
   True -> if all prerequisits are loaded  
   False otherwise  
 '''
 
-def check_loaded_channels(rgb, data):
+def check_loaded_channels(rgbs, data):
 
     from my_composites import get_image
 
-    print "... check if all needed channels are loaded for ", rgb
+    print "... check if all needed channels are loaded for ", rgbs
 
     # check if all prerequisites are loaded
     all_loaded = True
     loaded_channels = [chn.name for chn in data.loaded_channels()]
 
-    if rgb in products.RGBs_buildin or rgb in products.RGBs_user:
-        obj_image = get_image(data, rgb)
-        for pre in channel_num2str(obj_image.prerequisites):
-            if pre not in loaded_channels:
-                print "*** Warning: missing channel ", pre, ", skip ", rgb
+    # replace string with one element string array
+    if isinstance(rgbs, str):
+        rgbs = [rgbs]
+
+    if (type(rgbs) is not list):
+        print "*** Error in check_loaded_channels" 
+        print "    unknown type for rgbs ", type(rgbs), rgbs
+        quit()
+
+    for rgb in rgbs:
+ 
+        if rgb in products.RGBs_buildin or rgb in products.RGBs_user:
+            obj_image = get_image(data, rgb)
+            for pre in channel_num2str(obj_image.prerequisites):
+                if pre not in loaded_channels:
+                    print "*** Warning: missing channel ", pre, ", skip ", rgb
+                    all_loaded = False
+        elif rgb in products.MSG_color:
+            if rgb.replace("c","") not in loaded_channels:
+                print "*** Warning: missing channel ", rgb.replace("c",""), ", skip ", rgb
                 all_loaded = False
-    elif rgb in products.MSG_color:
-        if rgb.replace("c","") not in loaded_channels:
-            print "*** Warning: missing channel ", rgb.replace("c",""), ", skip ", rgb
-            all_loaded = False
-    else:
-        if rgb not in loaded_channels:
-            print "*** Warning: missing channel ", rgb, ", skip ", rgb
-            all_loaded = False
+        else:
+            if rgb not in loaded_channels:
+                print "*** Warning: missing channel ", rgb, ", skip ", rgb
+                all_loaded = False
 
     return all_loaded
 
@@ -416,6 +460,9 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
     channels_complete=[False,False,False,False,False,False,False,False,False,False,False,False]
     pro_file_checked=False
 
+    print "... read config file ", os.path.join(CONFIG_PATH, fullname + ".cfg")
+    print "... use satellite "+in_msg.msg_str()
+
     for rgb in RGBs:
 
         if in_msg.verbose:
@@ -425,14 +472,12 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
 
             conf = ConfigParser()
             conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
-            print os.path.join(CONFIG_PATH, fullname + ".cfg")
             inputDirectory = time_slot.strftime(conf.get("seviri-level1", "dir"))
             #inputDirectory='/data/OWARNA/hau/database/meteosat/radiance/2014/11/04/'
             #inputDirectory="/data/cinesat/in/eumetcast1/"
 
             if in_msg.verbose:
-                print '... check input in directory '
-                print '    '+inputDirectory
+                print '... check input in directory '+inputDirectory
 
             if not pro_file_checked:
                 #check prologues file 
@@ -482,7 +527,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
             channels_needed = rgb_prerequisites(rgb, sat_nr=str(in_msg.sat_nr), verbose=False)
         
             if in_msg.verbose:
-                print "    check input files for ", rgb, ', channels needed: ', channels_needed
+                print "    check input files for "+ rgb+ ', channels needed: ', list(channels_needed)
         
             fname1= "?-000-"+MSG+"__-"+MSG+"_???____-"
             # channel
@@ -564,8 +609,6 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
         
             if input_complete:
                 rgb_complete.append(rgb)
-
-            print "... use satellite MSG"+str(in_msg.sat_nr)
 
         elif rgb in products.NWCSAF:
 

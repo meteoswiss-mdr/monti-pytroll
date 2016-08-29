@@ -10,22 +10,47 @@ from os import remove
 if __name__ == '__main__':
 
     from get_input_msg import get_input_msg
-    from plot_msg import plot_msg
+    from plot_msg import plot_msg, print_usage
+    #from postprocessing import postprocessing, print_usage
     import sys
 
+    print len(sys.argv), "arguments given"
+
     if len(sys.argv) < 2:
-        input_file="input_rad_pngfiles"
+        print_usage()
     else:
         # read input file 
         input_file=sys.argv[1]
+        if input_file[-3:] == '.py': 
+            input_file=input_file[:-3]
+        in_msg = get_input_msg(input_file)
 
-    # initialize input dictionary
-    print " "
-    print "*** use input file: ", input_file
-    in_msg = get_input_msg(input_file)
-
-    # chose last SEVIRI date
-    in_msg.get_last_SEVIRI_date()
+        # check for more arguments 
+        if len(sys.argv) > 2:
+            if len(sys.argv) < 7:
+                print_usage()
+            else:
+                year   = int(sys.argv[2])
+                month  = int(sys.argv[3])
+                day    = int(sys.argv[4])
+                hour   = int(sys.argv[5])
+                minute = int(sys.argv[6])
+            # update time slot in in_msg class
+            in_msg.update_datetime(year, month, day, hour, minute)
+            print "... specified date: ", str(in_msg.datetime)
+            if len(sys.argv) > 7:
+                if type(sys.argv[7]) is str:
+                    in_msg.RGBs = [sys.argv[7]]
+                else:
+                    in_msg.RGBs = sys.argv[7]
+            if len(sys.argv) > 8:
+                if type(sys.argv[8]) is str:
+                    in_msg.area = [sys.argv[8]]
+                else:
+                    in_msg.area = sys.argv[8]
+        else:
+            # chose last SEVIRI date
+            in_msg.get_last_SEVIRI_date()
 
     delta_time =  10             # time in seconds to wait between the tries
     total_time = 600             # maximum total time in seconds trying to get images

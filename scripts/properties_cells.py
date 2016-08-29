@@ -202,11 +202,11 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None, labels_dir
     rapid_scan_mode = True
     
     if only_obs_noForecast == True:
-        in_dir = "/opt/users/lel/PyTroll/scripts//Mecikalski_obs/cosmo/Channels/labels/"
+        in_dir = '/opt/users/'+in_msg.user+'/PyTroll/scripts//Mecikalski_obs/cosmo/Channels/labels/'
     elif rapid_scan_mode == True:
-        in_dir = "/opt/users/lel/PyTroll/scripts//Mecikalski_RapidScan/cosmo/Channels/labels//"
+        in_dir = '/opt/users/'+in_msg.user+'/PyTroll/scripts//Mecikalski_RapidScan/cosmo/Channels/labels//'
     else:
-        in_dir = "/opt/users/lel/PyTroll/scripts//Mecikalski/cosmo/Channels/labels/"    
+        in_dir = '/opt/users/'+in_msg.user+'/PyTroll/scripts//Mecikalski/cosmo/Channels/labels/'   
        
     # load a few standard things 
     if in_msg == None:
@@ -220,7 +220,6 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None, labels_dir
         in_msg.fill_value = [0,0,0] # black    
         in_msg.reader_level = "seviri-level4"
       
-        
     
         # satellite for HRW winds
         sat_nr = "08" #in_windshift.sat_nr
@@ -253,7 +252,7 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None, labels_dir
     
     #labels_dir = '/data/cinesat/out/labels/'
     if labels_dir == None:
-          labels_dir = '/opt/users/lel/PyTroll/scripts/labels/' #compatible to all users
+          labels_dir = '/opt/users/'+in_msg.user+'/PyTroll/scripts/labels/' #compatible to all users
 
     
     while t1 <= tStop:

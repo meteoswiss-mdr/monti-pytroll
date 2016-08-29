@@ -33,7 +33,7 @@ def validation_forecast(cell, t, t_end, t_stop_history, labels_dir):
     
         print "starting history backward"
         
-        ind, area, displacement, time, center = history_backward(t.day,t.month,t.year,t.hour,t.minute,cell, True, t-timedelta(hours = 1),labels_dir = labels_dir)
+        ind, area, displacement, time, center = history_backward(t, cell, True, t-timedelta(hours=1), labels_dir=labels_dir)
         
         length_history.append(len(area)-1)
         
@@ -57,7 +57,7 @@ def validation_forecast(cell, t, t_end, t_stop_history, labels_dir):
             t_forecast, forecast108 = future_properties(time,history108,'IR_108',model)
         print "starting history forward, ", t     
         t_temp_stop = min ((t+timedelta(hours = 1)+timedelta(minutes = 5)), (t_stop_history+timedelta(minutes = 5)))    
-        ind1, area1, displacement1, time1, center1 = history_backward(t.day,t.month,t.year,t.hour,t.minute,cell, False, t_temp_stop,labels_dir = labels_dir)
+        ind1, area1, displacement1, time1, center1 = history_backward(t, cell, False, t_temp_stop, labels_dir=labels_dir)
         print "history forward Done"        
         t2 = time1 #[::-1]
         y2 = area1 #[::-1]

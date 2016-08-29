@@ -1,6 +1,7 @@
 def input(in_msg):
 
-    print "*** read input from input_coalition2.py"
+    import inspect
+    print "*** read input from ", inspect.getfile(inspect.currentframe()) 
 
     #------------------------------------------------------------------------
     # if not specified (False), current (last) observation time is chosen  
@@ -41,25 +42,25 @@ def input(in_msg):
     #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
     #in_msg.areas.append('odysseyS25')      # Area of Odyssey composite (factor 2.5 smaller)
     in_msg.areas.append('ccs4')
-    #in_msg.areas.append('EuropeCanaryS95') # "ccs4" "blitzortung" #"eurotv" # "eurotv"
-    #in_msg.areas.append("blitzortung")
+    #in_msg.areas.append('EuropeCanaryS95') # 'ccs4' 'blitzortung' #'eurotv' # 'eurotv'
+    #in_msg.areas.append('blitzortung')
     
     in_msg.properties_cells = True
     in_msg.plot_forecast = True
     
     #model which will be used to fit the history of the cells and extrapolate the future area
-    #in_msg.model_fit_area = "linear_exp" #reccomended
-    in_msg.model_fit_area = "linear_exp_exp" #reccomended
-    #in_msg.model_fit_area = "linear"
+    #in_msg.model_fit_area = 'linear_exp' #reccomended
+    in_msg.model_fit_area = 'linear_exp_exp' #reccomended
+    #in_msg.model_fit_area = 'linear'
         
-    in_msg.area_forecast = "ccs4c2" #reccomended: this way extra borders that allow to always have values within ccs4 area (but slower)
-    #in_msg.area_forecast = "ccs4" 
+    in_msg.area_forecast = 'ccs4c2' #reccomended: this way extra borders that allow to always have values within ccs4 area (but slower)
+    #in_msg.area_forecast = 'ccs4' 
                  
-    in_msg.integration_method_velocity = "euler"
-    #in_msg.integration_method_velocity = "rk4" 
+    in_msg.integration_method_velocity = 'euler'
+    #in_msg.integration_method_velocity = 'rk4' 
     
-    #in_msg.wind_source = "HRV"
-    in_msg.wind_source = "cosmo"
+    #in_msg.wind_source = 'HRV'
+    in_msg.wind_source = 'cosmo'
     in_msg.zlevel = 'pressure' 
     #in_msg.zlevel = 'modellevel'
     
@@ -69,8 +70,8 @@ def input(in_msg):
     
     in_msg.areasNoRapidScan = ['fullearth','met09globe','met09globeFull'] #should also be changed to coordinates check!!!!
       
-    in_msg.settings = "default" # the settings will be automatically defined depending on the area chosen
-    # in_msg.settings == "manual"
+    in_msg.settings = 'default' # the settings will be automatically defined depending on the area chosen
+    # in_msg.settings == 'manual'
     
     #near real time or offline (will be overwritten depending on the date) ###changed: should know, based on the date, where to look for things!!!
     in_msg.nrt = False
@@ -84,14 +85,14 @@ def input(in_msg):
     in_msg.show_clouds = 'developing_and_mature'
 
     # directory containing the forecasted brightness temperatures
-    in_msg.nowcastDirNrt= "/data/cinesat/out/" #'/opt/users/lel/PyTroll/scripts/nrt_test/' #
+    in_msg.nowcastDirNrt= '/data/cinesat/out/' #'/opt/users/'+in_msg.user+'/PyTroll/scripts/nrt_test/' #
     in_msg.nowcastDirOffline= '/data/COALITION2/PicturesSatellite/LEL_results_wind/'
-    ###in_msg.nowcastDir="/opt/users/lel/PyTroll/scripts/channels_new//" 
+    ###in_msg.nowcastDir='/opt/users/'+in_msg.user+'/PyTroll/scripts/channels_new//' 
     ###in_msg.nowcastDir= '/data/COALITION2/PicturesSatellite/LEL_results_wind/'
     
     #directors with labels
-    in_msg.labelsDirNrt = '/data/cinesat/out/labels/' #'/opt/users/lel/PyTroll/scripts/labels_nrt/' #
-    in_msg.labelsDirOffline = '/opt/users/lel/PyTroll/scripts/labels/'
+    in_msg.labelsDirNrt = '/data/cinesat/out/labels/' #'/opt/users/'+in_msg.user+'/PyTroll/scripts/labels_nrt/' #
+    in_msg.labelsDirOffline = '/opt/users/'+in_msg.user+'/PyTroll/scripts/labels/'
 
     # channels needed to produce the coalition2 product
     in_msg.RGBs=[]
@@ -142,8 +143,8 @@ def input(in_msg):
                                    ## c  crude resolution: Another ~80 % reduction. 
                                    ## None -> automatic choise
 
-    #in_msg.sat = "meteosat"   # old format: "meteosat" uses meteosat09.cfg files
-    in_msg.sat = "Meteosat"  # new format: "Meteosat" uses Meteosat-9.cfg files
+    #in_msg.sat = 'meteosat'   # old format: 'meteosat' uses meteosat09.cfg files
+    in_msg.sat = 'Meteosat'  # new format: 'Meteosat' uses Meteosat-9.cfg files
     # 8=MSG1, 9=MSG2, 10=MSG3
     #in_msg.sat_nr=8
     #in_msg.RSS=False 
@@ -160,7 +161,7 @@ def input(in_msg):
     #in_msg.forecasts_in_rapid_scan_mode = True
 
     if in_msg.RSS==False:
-        print "*** Warning: use TB forecast in 15min mode, as they are only available every 15min"
+        print '*** Warning: use TB forecast in 15min mode, as they are only available every 15min'
         in_msg.forecasts_in_rapid_scan_mode = False
     
     in_msg.choose_forecast_times()
@@ -169,28 +170,28 @@ def input(in_msg):
     in_msg.standardOutputName = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
     #in_msg.outputDir = '/data/cinesat/out/'
     #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
-    in_msg.outputDirOffline =  '/opt/users/lel/PyTroll/scripts//Mecikalski/'
-    in_msg.outputDirNrt = '/data/cinesat/out/' #'/opt/users/lel/PyTroll/scripts/nrt_test/' #
+    in_msg.outputDirOffline =  '/opt/users/'+in_msg.user+'/PyTroll/scripts//Mecikalski/'
+    in_msg.outputDirNrt = '/data/cinesat/out/' #'/opt/users/'+in_msg.user+'/PyTroll/scripts/nrt_test/' #
     #if in_msg.only_obs_noForecast == True:
-    #    in_msg.outputDir = "/opt/users/lel/PyTroll/scripts//Mecikalski_obs/"
+    #    in_msg.outputDir = '/opt/users/'+in_msg.user+'/PyTroll/scripts//Mecikalski_obs/'
     #elif in_msg.RSS == True:
-    #    in_msg.outputDir = "/opt/users/lel/PyTroll/scripts//Mecikalski_RapidScan/"
+    #    in_msg.outputDir = '/opt/users/'+in_msg.user+'/PyTroll/scripts//Mecikalski_RapidScan/'
     #else:
-    #    in_msg.outputDir = "/opt/users/lel/PyTroll/scripts//Mecikalski/"
+    #    in_msg.outputDir = '/opt/users/'+in_msg.user+'/PyTroll/scripts//Mecikalski/'
 
     #in_msg.postprocessing_areas=['ccs4']
-    in_msg.postprocessing_composite=["C2rgb-IR_108","C2rgb-HRV"]    
+    in_msg.postprocessing_composite=['C2rgb-IR_108','C2rgb-HRV']    
     
-    in_msg.outputDirForecastsNrt = "/data/cinesat/out/" #'/opt/users/lel/PyTroll/scripts/nrt_test/' #
-    in_msg.outputDirForecastsOffline = "/data/COALITION2/PicturesSatellite/LEL_results_wind/"
+    in_msg.outputDirForecastsNrt = '/data/cinesat/out/' #'/opt/users/'+in_msg.user+'/PyTroll/scripts/nrt_test/' #
+    in_msg.outputDirForecastsOffline = '/data/COALITION2/PicturesSatellite/LEL_results_wind/'
    
     in_msg.scpOutput = True
-    #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
-    #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
+    #default: in_msg.scpOutputDir='las@lomux240:/www/proj/OTL/WOL/cll/satimages'
+    #default: in_msg.scpID='-i /home/cinesat/.ssh/id_dsa_las'
 
     in_msg.chosen_settings={}
     #settings: set to None for automatic choice
-    if in_msg.settings == "manual":
+    if in_msg.settings == 'manual':
         
         check_overwriting = 0; current_setting = 'use_TB_forecast'
         
@@ -200,7 +201,7 @@ def input(in_msg):
         #in_msg.chosen_settings['use_TB_forecast'] = None; check_overwriting+=1 
         
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print 'you are overwriting your settings!!!! Check: ', current_setting
             quit()
             
         
@@ -214,7 +215,7 @@ def input(in_msg):
         #in_msg.chosen_settings['mode_downscaling'] = None; check_overwriting+=1
         
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print 'you are overwriting your settings!!!! Check: ', current_setting
             quit()
                     
         
@@ -226,7 +227,7 @@ def input(in_msg):
         #in_msg.chosen_settings['mask_labelsSmall_lowUS'] = None; check_overwriting+=1
         
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print 'you are overwriting your settings!!!! Check: ', current_setting
             quit()
                     
         
@@ -240,7 +241,7 @@ def input(in_msg):
         #in_msg.chosen_settings['clean_mask'] = None; check_overwriting+=1
         
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print 'you are overwriting your settings!!!! Check: ', current_setting
             quit()
                 
         
@@ -252,7 +253,7 @@ def input(in_msg):
         #in_msg.chosen_settings['rapid_scan_mode'] = None; check_overwriting+=1
         
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print 'you are overwriting your settings!!!! Check: ', current_setting
             quit()
                     
         
@@ -265,7 +266,7 @@ def input(in_msg):
         #in_msg.chosen_settings['forth_mask'] = None; check_overwriting+=1
         
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print 'you are overwriting your settings!!!! Check: ', current_setting
             quit()
                     
         
@@ -277,7 +278,7 @@ def input(in_msg):
         #in_msg.chosen_settings['forced_mask'] = 'CloudType'; check_overwriting+=1
         #in_msg.chosen_settings['forced_mask'] = None; check_overwriting+=1
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print 'you are overwriting your settings!!!! Check: ', current_setting
             quit()
                     
         
@@ -289,19 +290,19 @@ def input(in_msg):
         #in_msg.chosen_settings['mask_cirrus'] = None; check_overwriting+=1
         
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print 'you are overwriting your settings!!!! Check: ', current_setting
             quit()
                     
         
         #check_overwriting = 0; current_setting = 'reader_level'
         
         #9) SETTING: choose one
-        #in_msg.chosen_settings['reader_level']="seviri-level2"; check_overwriting+=1
-        #in_msg.chosen_settings['reader_level']="seviri-level4" ; check_overwriting+=1
+        #in_msg.chosen_settings['reader_level']='seviri-level2'; check_overwriting+=1
+        #in_msg.chosen_settings['reader_level']='seviri-level4' ; check_overwriting+=1
         #in_msg.chosen_settings['reader_level']= None; check_overwriting+=1
         
         #if check_overwriting > 1:
-        #    print "you are overwriting your settings!!!! Check: ", current_setting
+        #    print 'you are overwriting your settings!!!! Check: ', current_setting
         #    quit()
             
     else:
@@ -330,11 +331,11 @@ def input(in_msg):
     in_msg.pickle_labels = False; in_msg.shelve_labels = False
 
     in_msg.postprocessing_areas= []
-    in_msg.postprocessing_areas.append("ccs4")
+    in_msg.postprocessing_areas.append('ccs4')
     #in_msg.postprocessing_areas=['EuropeCanaryS95']
     
-    in_msg.postprocessing_composite1=["C2rgb-IR_108"]
-    in_msg.postprocessing_composite2=["C2rgb-Forecast-IR_108"]      
+    in_msg.postprocessing_composite1=['C2rgb-IR_108']
+    in_msg.postprocessing_composite2=['C2rgb-Forecast-IR_108']      
     
     # load a few standard things 
     #in_msg.outputFile = 'WS_%(rgb)s-%(area)s_%y%m%d%H%M'
@@ -344,14 +345,14 @@ def input(in_msg):
 
     #INPUT NEEDED FOR PRODUCE_FORECASTS!!!!!!!!!!!
     #in_msg.ntimes = 2 #in_windshift.ntimes
-    #print "... aggregate winddata for ", ntimes, " timesteps" 
+    #print '... aggregate winddata for ', ntimes, ' timesteps' 
     #min_correlation = 85 #in_windshift.min_correlation
     #min_conf_nwp = 80 #in_windshift.min_conf_nwp
     #min_conf_no_nwp = 80 #in_windshift.min_conf_no_nwp
     #cloud_type = [5,6,7,8,9,10,11,12,13,14] #in_windshift.cloud_type
 
     # satellite for HRW winds
-    ##sat_nr = "08" #in_windshift.sat_nr
+    ##sat_nr = '08' #in_windshift.sat_nr
     
     in_msg.channels15 = ['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134']
     in_msg.channels30 = ['WV_062','WV_073','IR_097','IR_108','IR_134']
@@ -361,33 +362,33 @@ def input(in_msg):
     # -------------   
     # input checks 
     # -------------   
-    """
+    '''
     if in_msg.area in broad_areas:
         if in_msg.use_TB_forecast == True:
-            print "*** Error in plot_coalition2.py"
-            print "    currently no brightness temperature forecast"
-            print "    implemented for areas outside Switzerland"
+            print '*** Error in plot_coalition2.py'
+            print '    currently no brightness temperature forecast'
+            print '    implemented for areas outside Switzerland'
             quit()
 
     # -------------   
     # input checks 
     # -------------   
     if in_msg.verbose:
-        print "*** Given input:"
-        print "    in_msg.sat: ", in_msg.sat, in_msg.sat_nr
-        print "    in_msg.area: ", in_msg.area
-        print "    in_msg.delay: ", in_msg.delay
-        print "    in_msg.show_clouds: ", in_msg.show_clouds
-        print "    in_msg.use_TB_forecast: ", in_msg.use_TB_forecast
+        print '*** Given input:'
+        print '    in_msg.sat: ', in_msg.sat, in_msg.sat_nr
+        print '    in_msg.area: ', in_msg.area
+        print '    in_msg.delay: ', in_msg.delay
+        print '    in_msg.show_clouds: ', in_msg.show_clouds
+        print '    in_msg.use_TB_forecast: ', in_msg.use_TB_forecast
         if in_msg.use_TB_forecast:
-            print "    in_msg.nowcastDir: ", in_msg.nowcastDir
-        print "    in_msg.rapid_scan_mode: ", in_msg.rapid_scan_mode
-        print "    in_msg.results: ", in_msg.results
-        print "    in_msg.aux_results: ", in_msg.aux_results
-        print "    in_msg.outputDir: ", in_msg.outputDir
-        print "    in_msg.postprocessing_areas: ", in_msg.postprocessing_areas
-        print "    in_msg.postprocessing_composite: ", in_msg.postprocessing_composite
-    """
+            print '    in_msg.nowcastDir: ', in_msg.nowcastDir
+        print '    in_msg.rapid_scan_mode: ', in_msg.rapid_scan_mode
+        print '    in_msg.results: ', in_msg.results
+        print '    in_msg.aux_results: ', in_msg.aux_results
+        print '    in_msg.outputDir: ', in_msg.outputDir
+        print '    in_msg.postprocessing_areas: ', in_msg.postprocessing_areas
+        print '    in_msg.postprocessing_composite: ', in_msg.postprocessing_composite
+    '''
     #in_msg.check_input = False
 
     #in_msg.make_plots=True

@@ -2,7 +2,8 @@
 def input(in_msg):
 
     import inspect
-    print "*** read input from ", inspect.getfile(inspect.currentframe()) 
+    in_msg.input_file = inspect.getfile(inspect.currentframe()) 
+    print "*** read input from ", in_msg.input_file
 
     #------------------------------------------------------------------------
     # if not specified (False), current (last) observation time is chosen  

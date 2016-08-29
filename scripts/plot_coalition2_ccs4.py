@@ -432,8 +432,8 @@ if __name__ == '__main__':
           dateS = yearS+'-'+monthS+'-'+dayS
           timeS = hourS+':'+minS+" UTC"
       
-          #nowcastDir="/data/COALITION2/PicturesSatellite/LEL_results_wind//"+yearS+"-"+monthS+"-"+dayS+"/channels/" #/opt/users/lel/PyTroll/scripts/channels_new//" #"2
-          nowcastDir="/data/cinesat/out/" #/opt/users/lel/PyTroll/scripts/channels_new//" #"2
+          #nowcastDir="/data/COALITION2/PicturesSatellite/LEL_results_wind//"+yearS+"-"+monthS+"-"+dayS+"/channels/" #'/opt/users/'+in_msg.user+'/PyTroll/scripts/channels_new//' #"2
+          nowcastDir="/data/cinesat/out/" #'/opt/users/'+in_msg.user+'/PyTroll/scripts/channels_new//' #"2
           
 
           time_slot15 = time_slot - timedelta(minutes=dt_forecast1)
@@ -539,11 +539,11 @@ if __name__ == '__main__':
           #out_dir = "/data/COALITION2/PicturesSatellite//"+yearS+"-"+monthS+"-"+dayS+"/Mecikalski2/"
           
           if only_obs_noForecast == True:
-              out_dir = "/opt/users/lel/PyTroll/scripts//Mecikalski_obs/"
+              out_dir = '/opt/users/'+in_msg.user+'/PyTroll/scripts//Mecikalski_obs/'
           elif rapid_scan_mode == True:
-              out_dir = "/opt/users/lel/PyTroll/scripts//Mecikalski_RapidScan/"
+              out_dir = '/opt/users/'+in_msg.user+'/PyTroll/scripts//Mecikalski_RapidScan/'
           else:
-              out_dir = "/opt/users/lel/PyTroll/scripts//Mecikalski/"
+              out_dir = '/opt/users/'+in_msg.user+'/PyTroll/scripts//Mecikalski/'
               
               
           if False:

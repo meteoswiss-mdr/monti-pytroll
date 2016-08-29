@@ -1,7 +1,8 @@
 
 def input(in_msg):
 
-    print "*** read input from input_rad_pngfiles.py"
+    import inspect
+    print "*** read input from ", inspect.getfile(inspect.currentframe()) 
 
     #------------------------------------------------------------------------
     # choose (default) observation time 

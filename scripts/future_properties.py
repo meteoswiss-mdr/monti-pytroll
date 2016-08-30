@@ -7,7 +7,13 @@ import matplotlib.dates as mdates
 from datetime import timedelta
 from Cells import Cells
 
-def future_properties(time,property_values, property_name,model):
+import inspect
+current_file = inspect.getfile(inspect.currentframe())
+
+def future_properties(time, property_values, property_name,model):
+
+        print("*** computing future cell properties ("+current_file+")")
+
         verbose = False
         
         possible_models = ["example","linear","2nd_degree_polynom","3rd_degree_polynom","5th_degree_polynom","linear_exp","linear_exp_exp"]
@@ -25,9 +31,8 @@ def future_properties(time,property_values, property_name,model):
                 model = "linear"
          
         if model not in possible_models:
-            print "test"
-            print 'The chosen fitting model is not implemented'
-            print model
+            print ('*** Error in future_properties ('+current_file+")")
+	    print ('    The chosen fitting model is not implemented: '+model)
             quit()
         
         # Getting back the objects:

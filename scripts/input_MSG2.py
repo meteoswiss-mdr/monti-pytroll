@@ -1,7 +1,8 @@
 
 def input(in_msg):
 
-    print "*** read input from input_template.py"
+    import inspect
+    print "*** read input from ", inspect.getfile(inspect.currentframe()) 
 
     #------------------------------------------------------------------------
     # if not specified (False), current (last) observation time is chosen  

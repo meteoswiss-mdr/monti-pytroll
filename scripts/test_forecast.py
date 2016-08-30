@@ -35,12 +35,14 @@ from mpop.satellites import GeostationaryFactory
 from mpop.projector import get_area_def
 from plot_msg import load_products
 import pylab
+import getpass
 
 from my_msg_module import format_name
-
 from postprocessing import postprocessing
 
-def resize_array(array,dx,dy, nx, ny):
+
+def resize_array(array, dx, dy, nx, ny):
+
     temp_array=np.zeros_like(array)
     array_out = np.zeros_like(array)
     
@@ -60,7 +62,11 @@ def resize_array(array,dx,dy, nx, ny):
 
     return array_out
 
-def figure_labels(labels, outputFile, timeObs, dt, area_plot="ccs4", add_name = None):
+def figure_labels(labels, outputFile, timeObs, dt, area_plot="ccs4", add_name = None, verbose=True):
+
+    if verbose:
+        print("*** produce label figures")
+
     yearS, monthS, dayS, hourS, minS = string_date(timeObs)
     data_time = timeObs + timedelta(minutes = dt)
     yearSf, monthSf, daySf, hourSf, minSf = string_date(data_time)
@@ -87,13 +93,13 @@ def figure_labels(labels, outputFile, timeObs, dt, area_plot="ccs4", add_name = 
 # ----------------------------------------------------------------------
 
 #if __name__ == '__main__':
-def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None, BackgroundFile=None, ForeGroundRGBFile=None, labels_dir = '/opt/users/lel/PyTroll/scripts/labels/', in_msg = None):
+def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None, BackgroundFile=None, ForeGroundRGBFile=None, labels_dir = '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/', in_msg = None):
     verbose = True
     if t_stop == None:
         t_stop = ttt
     
     ylabel = "area"
-    
+
     while ttt <= t_stop:
         yearS, monthS, dayS, hourS, minS = string_date(ttt)
         if verbose:
@@ -111,59 +117,53 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
         
         unique_labels = np.unique(labels_all[labels_all>0])
         if verbose:
-            print("... cells with unique labels: "+unique_labels)
+            print("... cells with unique labels: ", unique_labels)
                 
         forecasted_labels = {}
         forecasted_areas = []    
         at_least_one_cell = False        
 
+        if verbose:
+            print "*** computing history backward (", labels_dir, ")"
+
         for interesting_cell in unique_labels:
-              if verbose:
-                    print "******** computing history backward (labels_dir = ",labels_dir,")"
+
               forecasted_labels["ID"+str(interesting_cell)]=[]
               
-              ind, area, displacement, time, center = history_backward(ttt.day,ttt.month,ttt.year,ttt.hour,ttt.minute,interesting_cell, True, ttt-timedelta(hours = 1),labels_dir = labels_dir) #-timedelta(minutes = 10))
-              
+              # calculate backward history for 1 hour and save it in labels_dir
+              ind, area, displacement, time, center = history_backward(ttt,  interesting_cell, True, ttt-timedelta(hours = 1), labels_dir=labels_dir) #-timedelta(minutes = 10))
+              #                                                        current time, cell_id, backward?   time_stop
               if area == None or len(area)<=1:  
                   if verbose:
                         print "new cell or cell with COM outside domain"
                   continue
-              at_least_one_cell = True    
-              if verbose:
-                    print("******** computed history backward")
-                    print("******** computing extrapolation")
-              
+              at_least_one_cell = True 
+                 
               if len(area)<=3:
-                    t, y = future_properties(time,area, ylabel, "linear")
+                    # if history is too short, use linear extrapolation
+                    t, y = future_properties(time, area, ylabel, "linear")
               else:
-                    t, y = future_properties(time,area, ylabel, model)
-              if verbose:
-                    print("******** computed extrapolation")
+                    t, y = future_properties(time, area, ylabel, model)
               
               if False:
-                    print "******** computing history forward"
-                    ind1, area1, displacement1, time1, center = history_backward(ttt.day,ttt.month,ttt.year,ttt.hour,ttt.minute,interesting_cell, False, ttt+timedelta(hours = 1), labels_dir = labels_dir)
+                    ind1, area1, displacement1, time1, center = history_backward(ttt, interesting_cell, False, ttt+timedelta(hours=1), labels_dir=labels_dir)
                     print "******** computed history forward"
             
                     t2 = time1 #[::-1]
                     y2 = area1 #[::-1]
             
             
-            
               nx,ny = labels_all.shape
-              if verbose:
-                  print(nx,ny)
-      
+              #if verbose:
+              #    print(nx,ny)
       
               label_cell = np.zeros(labels_all.shape)
               label_cell[labels_all==interesting_cell] = 1
               #pickle.dump(label_cell, open("test_label.p", "wb" ) )
               #quit()
               dt = 0
-              if verbose:
-                    print("******** produce label figures")
               if False:
-                  figure_labels(label_cell, outputDir, ttt, dt, area_plot="ccs4",add_name = "_ID"+str(interesting_cell))
+                  figure_labels(label_cell, outputDir, ttt, dt, area_plot="ccs4", add_name = "_ID"+str(interesting_cell), verbose=verbose)
       
               area_current = sum(sum(label_cell))
       
@@ -172,20 +172,21 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
               indx = np.where(t==ttt)[0] + 1
       
               if verbose:
-                    print "******** compute displacement"
+                    print "*** compute displacement "
+
               if displacement.shape[1]==2:
                     if len(displacement) == 0:
                         dx = 0
                         dy = 0
                     else:
                         try:
-                            dx =  int(round(displacement[:,0].mean()))
+                            dx = int(round(displacement[:,0].mean()))
                             dy = int(round(displacement[:,1].mean()))
                         except ValueError:
                             print("VALUE ERROR")
                             print(displacement)
                             quit()
-                    print dx, dy
+                    print "    computed displacement dx, dy = ", dx, dy
       
               else:
                     print("wrong displacement")
@@ -196,25 +197,30 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
               index_stop = 12
               
               
-              print("******** calculate forecasts")
+              print("*** calculate forecasts for cell ID"+str(interesting_cell))
+              if verbose:
+                  print("index   time    area  growth")
+                  print("----------------------------")
+
               for i in range(13):
                   
                   dt += 5
-                  if verbose:
-                      print("... for time ", dt ,", index ", indx + i)
+                  #if verbose:
+                  #    print("... for time ", dt ,", index ", indx + i)
+
                   if indx+i >= len(y):
                       index_stop = deepcopy(i)
                       break
                   else:    
-                      area_new = y[indx+i]
+                      area_new  = y[indx+i]
                       area_prev = y[indx+i-1]
-                  if verbose:
-                      print("area px that will be grown ", area_current)
-                  
-                      print("area forecasted ", area_new)
-                  
-                      print("area forecasted prev ", area_prev)
-                  #growth = sqrt(float(area_new)/float(area_current))
+
+                  #if verbose:
+                  #    print("area px that will be grown ", area_current)
+                  #    print("area forecasted ", area_new)
+                  #    print("area forecasted prev ", area_prev)
+
+                  ###growth = sqrt(float(area_new)/float(area_current))
                   
                   if area_new < 0 or len(area_new)==0 or len(area_prev)==0:
                       if verbose:
@@ -223,21 +229,24 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
                       break
                   
                   growth = sqrt(float(area_new)/float(area_prev))
+                  #if verbose:
+                  #    print("growing by ", growth)
+                  #    print("dx ", dx)
+                  #    print("dy ", dy)
+
                   if verbose:
-                      print("growing by ", growth)
-                      print("dx ", dx)
-                      print("dy ", dy)
-      
+                      print(indx + i, dt, area_new, growth) 
+
                   #figure_labels(label_cell, outputDir, ttt, dt, area_plot="ccs4", add_name = "before")
 
-                  shifted_label = resize_array(label_cell,dx,dy, nx, ny)
+                  shifted_label = resize_array(label_cell, dx, dy, nx, ny)
 
                   #figure_labels(shifted_label, outputDir, ttt, dt, area_plot="ccs4", add_name = "before_shifted")
                   #quit()
                   if verbose:
                       print("   after shift ", sum(sum(shifted_label)))
                   
-                  if sum(sum(shifted_label))==0:#the cell is outside the domain
+                  if sum(sum(shifted_label))==0: #the cell is outside the domain
                       break
                   
                   #center of mass before resizing
@@ -245,6 +254,7 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
                   center_before = np.rint(center_before)        
                   if verbose:
                       print("   after shift ", sum(sum(shifted_label)))
+
                   resized_label = scipy.misc.imresize(shifted_label,float(growth),'nearest')
       
                   resized_label[resized_label >0] = 1
@@ -262,6 +272,7 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
                   if verbose:
                       print(np.unique(temp_label))
                       print("   after resize ", sum(sum(temp_label)))
+
                   #figure_labels(resized_label, outputDir, ttt, dt, area_plot="ccs4", add_name = "before_shifted_resized")
       
                   #center of mass after resizing
@@ -295,9 +306,6 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
                   #add check to make sure the area you produced is more or less correct
       
       
-              if verbose:
-                print("******** produce images")
-      
               t_temp = deepcopy(ttt)
               forecasted_time = []
       
@@ -306,6 +314,9 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
                   t_temp+=timedelta(minutes = 5)
       
               """
+              if verbose:
+                print("******** produce images")
+
               if False:
                   t_composite = deepcopy(ttt)
                   for i in range(min(len(y),index_stop)):
@@ -339,20 +350,30 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
 
         t_composite = deepcopy(ttt)
         
+        # merge coalition2 file with 
         if ForeGroundRGBFile == None:
-            currentRGB_im_filename = "/opt/users/lel/PyTroll/scripts/Mecikalski/cosmo/Channels/indicators_in_time/RGB_dam/"+yearS+monthS+dayS+"_"+hourS+minS+"*ccs4.png"
+            currentRGB_im_filename = "/opt/users/"+getpass.getuser()+"/PyTroll/scripts/Mecikalski/cosmo/Channels/indicators_in_time/RGB_dam/"+yearS+monthS+dayS+"_"+hourS+minS+"*ccs4.png"
         else:
             currentRGB_im_filename = ForeGroundRGBFile
         
         currentRGB_im = glob.glob(currentRGB_im_filename)
         if len(currentRGB_im)<1:  
             print "No file found:", currentRGB_im_filename
+
+        # get background file 
+        if BackgroundFile == None:
+            background_im_filename = '/data/COALITION2/PicturesSatellite/LEL_results_wind/'+yearS+'-'+monthS+'-'+dayS+'/RGB-HRV_dam/'+yearS+monthS+dayS+'_'+hourS+minS+'*.png'
+        else:
+            background_im_filename = BackgroundFile
+        background_im = glob.glob(background_im_filename)
+
         if len(background_im)>0:
             im = plt.imread(background_im[0])
             back_exists = True
         else:
             back_exists = False
         #img1 = Image.imread(currentRGB_im[0])
+
         obj_area = get_area_def("ccs4")
         fig,ax = prepare_figure(obj_area)
         if in_msg.nrt == False:
@@ -583,7 +604,7 @@ if __name__ == '__main__':
     
     ttt = datetime(2015,7,7,13,0)
     interesting_cell = 67
-    outputFile = "/opt/users/lel/PyTroll/scripts/forecasting_labels/"    
+    outputFile = "/opt/users/"+getpass.getuser()+"/PyTroll/scripts/forecasting_labels/"    
                 
     model = "linear_exp_exp"
     #model = "linear"; ylabel = "channel"

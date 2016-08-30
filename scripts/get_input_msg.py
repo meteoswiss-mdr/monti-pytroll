@@ -95,6 +95,10 @@ class input_msg_class:
 
       self.verbose = True
 
+      import getpass
+      self.user = getpass.getuser()
+      print "*** working with username \'"+self.user+"\'"
+
 
    def add_rgb(self, rgb):
       self.RGBs.append(rgb)
@@ -103,8 +107,9 @@ class input_msg_class:
       self.areas.append(area)
 
    def update_datetime(self, year, month, day, hour, minute):
+      from datetime import datetime
       if year != None and month != None and day != None and hour != None and minute != None: 
-         self.datetime=datetime(year, month, day, hour, minute, 0)
+         self.datetime = datetime(year, month, day, hour, minute, 0)
       else:
          print "*** WARNING: cannot update time!"
 
@@ -114,6 +119,7 @@ class input_msg_class:
       #print "... use time delay of ", self.delay, " minutes"
       #if self.delay != 0:
       #   self.datetime -= timedelta(minutes=self.delay)
+      return self.datetime
 
    def sat_nr_str(self):
       # returns a string for the satellite number according to the convection of the satellite name
@@ -147,6 +153,14 @@ class input_msg_class:
          return sat_nr_str
 
    def sat_str(self, layout="%(sat)s-%(sat_nr)s"):
+
+      """
+         layout only for other satellites than meteosat
+         for meteosat return "meteosat"   as needed by geostationary factory
+         for Meteosat return "Meteosat-9" as needed by geostationary factory
+         for others, return according to layout
+      """
+
       if self.sat[0:8] == "meteosat":
          #print "sat_str meteosat"
          return "meteosat"
@@ -154,8 +168,9 @@ class input_msg_class:
          #print "sat_str "+"Meteosat-"+str(int(self.sat_nr))
          return "Meteosat-"+str(int(self.sat_nr))
       else:
+         d={'sat':self.sat, 'sat_nr':str(int(self.sat_nr)),'0sat_nr':str(self.sat_nr).zfill(2)}
          #print "sat_str "+self.sat+str(int(self.sat_nr))
-         return self.sat+str(int(self.sat_nr))
+         return layout % d
 
    def msg_str(self, layout="%(msg)s-%(msg_nr)s"):
       """

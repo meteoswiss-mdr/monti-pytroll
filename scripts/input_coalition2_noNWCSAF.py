@@ -1,6 +1,7 @@
 def input(in_msg):
 
-    print "*** read input from input_coalition2.py"
+    import inspect
+    print "*** read input from ", inspect.getfile(inspect.currentframe()) 
 
     #------------------------------------------------------------------------
     # if not specified (False), current (last) observation time is chosen  
@@ -84,14 +85,14 @@ def input(in_msg):
     in_msg.show_clouds = 'developing_and_mature'
 
     # directory containing the forecasted brightness temperatures
-    in_msg.nowcastDirNrt= "/data/cinesat/out/" #'/opt/users/lel/PyTroll/scripts/nrt_test/' #
+    in_msg.nowcastDirNrt= "/data/cinesat/out/" #'/opt/users/'+in_msg.user+'/PyTroll/scripts/nrt_test/' #
     in_msg.nowcastDirOffline= '/data/COALITION2/PicturesSatellite/LEL_results_wind/'
-    ###in_msg.nowcastDir="/opt/users/lel/PyTroll/scripts/channels_new//" 
-    ###in_msg.nowcastDir= '/data/COALITION2/PicturesSatellite/LEL_results_wind/'
+    ###in_msg.nowcastDir = '/opt/users/'+in_msg.user+'/PyTroll/scripts/channels_new//'
+    ###in_msg.nowcastDir = '/data/COALITION2/PicturesSatellite/LEL_results_wind/'
     
     #directors with labels
-    in_msg.labelsDirNrt = '/data/cinesat/out/labels/' #'/opt/users/lel/PyTroll/scripts/labels_nrt/' #
-    in_msg.labelsDirOffline = '/opt/users/lel/PyTroll/scripts/labels/'
+    in_msg.labelsDirNrt = '/data/cinesat/out/labels/' #'/opt/users/'+in_msg.user+'/PyTroll/scripts/labels_nrt/' #
+    in_msg.labelsDirOffline = '/opt/users/'+in_msg.user+'/PyTroll/scripts/labels/'
 
     # channels needed to produce the coalition2 product
     in_msg.RGBs=[]
@@ -147,10 +148,10 @@ def input(in_msg):
     # 8=MSG1, 9=MSG2, 10=MSG3
     #in_msg.sat_nr=8
     #in_msg.RSS=False 
-    #in_msg.sat_nr=9
-    #in_msg.RSS=True
-    in_msg.sat_nr=10
-    in_msg.RSS=False 
+    in_msg.sat_nr=9
+    in_msg.RSS=True
+    #in_msg.sat_nr=10
+    #in_msg.RSS=False 
 
     # switch off Rapid scan, if large areas are wanted 
     if ('fullearth' in in_msg.areas) or ('met09globe' in in_msg.areas) or ('met09globeFull' in in_msg.areas): 
@@ -166,30 +167,32 @@ def input(in_msg):
     in_msg.choose_forecast_times()
 
     #in_msg.outputDir='./pics/'
+    in_msg.standardOutputName = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'   # is this the same as in_msg.outputFile !HAU! ???
     in_msg.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
     #in_msg.outputDir = '/data/cinesat/out/'
     #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
-    #in_msg.outputDirOffline =  '/opt/users/lel/PyTroll/scripts//Mecikalski/'
+    #in_msg.outputDirOffline =  '/opt/users/'+in_msg.user+'/PyTroll/scripts//Mecikalski/'
     in_msg.outputDirOffline =  '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
-    in_msg.outputDirNrt = '/data/cinesat/out/' #'/opt/users/lel/PyTroll/scripts/nrt_test/' #
+    in_msg.outputDirNrt = '/data/cinesat/out/' #'/opt/users/'+in_msg.user+'/PyTroll/scripts/nrt_test/' #
     #if in_msg.only_obs_noForecast == True:
-    #    in_msg.outputDir = "/opt/users/lel/PyTroll/scripts//Mecikalski_obs/"
+    #    in_msg.outputDir = '/opt/users/'+in_msg.user+'/PyTroll/scripts//Mecikalski_obs/'
     #elif in_msg.RSS == True:
-    #    in_msg.outputDir = "/opt/users/lel/PyTroll/scripts//Mecikalski_RapidScan/"
+    #    in_msg.outputDir = '/opt/users/'+in_msg.user+'/PyTroll/scripts//Mecikalski_RapidScan/'
     #else:
-    #    in_msg.outputDir = "/opt/users/lel/PyTroll/scripts//Mecikalski/"
+    #    in_msg.outputDir = '/opt/users/'+in_msg.user+'/PyTroll/scripts//Mecikalski/'
 
     #in_msg.postprocessing_areas=['ccs4']
     #### in_msg.postprocessing_composite=["C2rgb-IR_108","C2rgb-HRV"]    not used anymore 
     
     in_msg.postprocessing_areas= []
     in_msg.postprocessing_areas.append("ccs4")
-    #in_msg.postprocessing_areas=['EuropeCanaryS95']
+    in_msg.postprocessing_areas=['EuropeCanaryS95']
     
     in_msg.postprocessing_composite1 = ["C2rgb-IR_108"]
     in_msg.postprocessing_composite2 = ["C2rgb-Forecast-IR_108"]      
 
-    in_msg.outputDirForecastsNrt = "/data/cinesat/out/" #'/opt/users/lel/PyTroll/scripts/nrt_test/' #
+
+    in_msg.outputDirForecastsNrt = "/data/cinesat/out/" #'/opt/users/'+in_msg.user+'/PyTroll/scripts/nrt_test/' #
     in_msg.outputDirForecastsOffline = "/data/COALITION2/PicturesSatellite/LEL_results_wind/"
    
     in_msg.scpOutput = True

@@ -30,6 +30,7 @@ import numpy.ma as ma
 import netCDF4
 import pickle
 import subprocess
+import getpass
 
 import glob
  
@@ -467,11 +468,32 @@ def find_relatives(cellInterest, t1, t2, data_container,labels_dir): # tHistory,
      
 def get_info_current_time(time, data_container, labels_dir): # all_connections = None, all_cell_properties = None, all_labels = None)
     
+    """
+    comment on general purpose, input and output of this function !HAU!
+
+    input:
+    * time [datetime object]: specifies current time
+    * labels_dir [string]:    specifies where the shelves are saved
+
+    input/output:
+    * data_container [dictionary]:
+         contains following keys:
+         data_container['all_connections'][string_id]
+         data_container['all_cell_properties'][string_id]
+         data_container['all_labels'][string_id]
+
+    output:
+    * string_id [string]: id string the current time 
+
+    """
+
     yearS, monthS, dayS, hourS, minS = string_date(time)
     string_id = yearS+monthS+dayS+hourS+minS
     
+    # if information of current time "string_id" is not yet saved in data_container
     if string_id not in data_container['all_connections'].keys():
         
+        # read/get information from the shelve 
         filename = labels_dir+'/Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)
         check_file_exists = glob.glob(filename+"*")
         if len(check_file_exists)>0:
@@ -493,6 +515,7 @@ def get_info_current_time(time, data_container, labels_dir): # all_connections =
         else:
               print("File doesn't exist: ",filename)
               return None, None  
+
     # !!!!!!!!! some can be returned as NONE if None as input ---> should always have all as output even if not needed/used/known !!!!!!!!!!    
     return string_id, data_container
 
@@ -506,95 +529,116 @@ def check_if_CenterOfMass_outside(labels_tmp):
     else:
         return False
         
-def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t_stop = None, labels_dir = '/opt/users/lel/PyTroll/scripts/labels/'):
+
+def history_backward(time1, id_interesting_cell, backward, t_stop = None, labels_dir = '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/'):
 
         """                                          
         --------------------------------------------------
+        please describe the function a bit more. !HAU!
+        general purpose
+        input variables
+        output variables
         """
+
         #from Cells import Cells
-        print("history backward of cell ID",id_interesting_cell)
+        if backward:
+            direction='backward'
+        else:
+            direction='foreward'
+        print("*** compute "+direction+" history of cell ID", id_interesting_cell)
+
         #print("labels_dir = ",labels_dir,)
         verbose = False   
-        t1 = datetime(year, month, day, hour, minute)
-        #print("time: ",t1)
+        #print("time: ",time1)
         data_container = {}
         data_container['all_connections'] = {}
         data_container['all_cell_properties'] = {}
         data_container['all_labels'] = {}
         
         interesting_cell = "ID"+str(id_interesting_cell)
-        t_requestHist = deepcopy(t1)
+        t_requestHist = deepcopy(time1)
         
+        # comment what exactly is t_startDay and t_stopDay !HAU!
         if backward:
             if t_stop != None:
-                t_startDay = t_stop
-            elif day == 6 and month == 6:
-                t_startDay = datetime(2015,6,6,11,25)
-            elif day == 7 and month == 7:
-                t_startDay = datetime(2015,7,7,11,50)
-            t_stopDay = deepcopy(t1) + timedelta(minutes = 5)
+                t_startDay = t_stop 
+            else:
+                # t_startDay might be undefined !HAU!
+                # default start in the morning, 07:00 UTC
+                t_startDay = datetime(time1.year, time1.month, time1.day, 7, 00)
+                if   time1.day == 6 and time1.month == 6 and time1.year == 2015:  # avoid specific exceptions, that may produce hard to find bugs !HAU!
+                    t_startDay = datetime(2015,6,6,11,25)
+                elif time1.day == 7 and time1.month == 7 and time1.year == 2015:  # avoid specific exceptions, that may produce hard to find bugs !HAU!
+                    t_startDay = datetime(2015,7,7,11,50)
+            t_stopDay = deepcopy(time1) + timedelta(minutes = 5)
         else:
-            t_startDay = deepcopy(t1) - timedelta(minutes = 5)
+            t_startDay = deepcopy(time1) - timedelta(minutes = 5)
             
             if t_stop != None:
-                  t_stopDay = t_stop
+                t_stopDay = t_stop
             else:
-                  t_stopDay = datetime(2015,7,7,16,30)
+                # default stop time is 19:00 UTC
+                t_stopDay = datetime(time1.year, time1.month, time1.day, 19, 00)
+                if   time1.day == 7 and time1.month == 7 and time1.year == 2015:  # avoid specific exceptions, that may produce hard to find bugs !HAU!
+                    t_stopDay = datetime(2015,7,7,16,30)
                         
-        yearS  = str(t1.year)
-        monthS = "%02d" % t1.month
-        dayS   = "%02d" % t1.day
-        hourS  = "%02d" % t1.hour
-        minS   = "%02d" % t1.minute
+        yearS  = str(time1.year)
+        monthS = "%02d" % time1.month
+        dayS   = "%02d" % time1.day
+        hourS  = "%02d" % time1.hour
+        minS   = "%02d" % time1.minute
     
-        string_id, data_container = get_info_current_time(t1, data_container,labels_dir)
+        # add some information from the shelve to the data_container
+        string_id, data_container = get_info_current_time(time1, data_container, labels_dir)
         
         if string_id == None:
             return None, None, None, None, None
         
         labels_id = np.unique(data_container['all_labels'][string_id])
         
-        if verbose:
-          print("labels_id including 0",labels_id)
-        
+        #if verbose:
+        #  print("labels_id including 0",labels_id) 
         labels_id = labels_id[labels_id>0]
+        #if verbose:
+        #    print("labels_id",labels_id)
         
-        if verbose:
-            print("labels_id",labels_id)
-        
-        history_cell ={}
+        history_cell = {}
     
         rgb_load = ['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134'] #,'CTP','CTT']
             
-        names = ["WV_062minusIR_108","WV_062minusWV_073","IR_108","WV_073minusIR_134","WV_062minusIR_097","IR_087minusIR_120","IR_087minus2IR_108plusIR_120","IR_087minusIR_108","IR_120minusIR_108","IR_097minusIR_134","WV_062minusIR_120","CloudTopPressure","CloudTopTemperature"]
+        names = ["WV_062minusIR_108","WV_062minusWV_073","IR_108","WV_073minusIR_134","WV_062minusIR_097",\
+                 "IR_087minusIR_120","IR_087minus2IR_108plusIR_120","IR_087minusIR_108","IR_120minusIR_108",\
+                 "IR_097minusIR_134","WV_062minusIR_120","CloudTopPressure","CloudTopTemperature"]
         
         labels_tmp = np.where(data_container['all_labels'][string_id]==id_interesting_cell,1,0)
-        
+
         if check_if_CenterOfMass_outside(labels_tmp):
-            print("center of mass outside")
+            print("*** center of mass outside for cell ID", id_interesting_cell)
             return None, None, None, None, None
         
+        # loop over cells ... !HAU! is it nessesary to loop over the cells, cant you go directly to the interesting cell?
         for i in range(len(labels_id)):
-            if verbose:
-                print("history for cell: ", "ID"+str(labels_id[i]))
-                print(labels_id[i])
+            #if verbose:
+            #    print("history for cell: ", "ID"+str(labels_id[i]))
+            #    print(labels_id[i])
+
             if "ID"+str(labels_id[i]) == interesting_cell:
                 if verbose:
                     print("processing interesting cell")
                 
-                t = deepcopy(t1)
+                t = deepcopy(time1)
                 
                 cell_id = labels_id[i]
                 if verbose:
-                    print("----cell ID",cell_id)
+                    print("----cell ID", cell_id)
                 
                 current_cell = data_container['all_cell_properties'][string_id]["ID"+str(cell_id)]
-                history_cell["ID"+str(cell_id)] = deepcopy(current_cell)
-                history_cell["ID"+str(cell_id)].mean108 = np.array(history_cell["ID"+str(cell_id)].mean108)
-                history_cell["ID"+str(cell_id)].area_px = [history_cell["ID"+str(cell_id)].area_px]
+                history_cell["ID"+str(cell_id)]                   = deepcopy(current_cell)
+                history_cell["ID"+str(cell_id)].mean108           = np.array(history_cell["ID"+str(cell_id)].mean108)  # convert to np.array
+                history_cell["ID"+str(cell_id)].area_px           = [history_cell["ID"+str(cell_id)].area_px]          # convert to list
                 history_cell["ID"+str(cell_id)].colors.append('b')
-                history_cell["ID"+str(cell_id)].displacement = []
-                history_cell["ID"+str(cell_id)].center = [history_cell["ID"+str(cell_id)].center]
+                history_cell["ID"+str(cell_id)].displacement      = []                                                 # initialize with empty list
+                history_cell["ID"+str(cell_id)].center            = [history_cell["ID"+str(cell_id)].center]           # convert to list
                 
                 #id_prev = current_cell.id_prev
                 
@@ -608,7 +652,7 @@ def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t
                          t = t - timedelta (minutes = 5)
                     else:
                          t = t + timedelta (minutes = 5)
-                         t_temp = deepcopy(t1)
+                         t_temp = deepcopy(time1)
                          while t_temp < t:
                             children, data_container = find_children(children, t_temp, data_container,labels_dir)
                             t_temp += timedelta(minutes = 5) 
@@ -626,9 +670,11 @@ def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t
                               if verbose:
                                   print("after finding relatives \n Children",children, "\n Ancestors", ancestors)
                               if backward:
-                                    history_cell["ID"+str(cell_id)], data_container = add_history1(history_cell["ID"+str(cell_id)], cell_id, ancestors, children, t, t_requestHist, len(rgb_load), interesting_cell, backward, data_container,labels_dir)
+                                    history_cell["ID"+str(cell_id)], data_container = add_history1(history_cell["ID"+str(cell_id)], cell_id, ancestors, children, t, t_requestHist, 
+                                                                                                   len(rgb_load), interesting_cell, backward, data_container,labels_dir)
                               else:
-                                    history_cell["ID"+str(cell_id)], data_container = add_history1(history_cell["ID"+str(cell_id)], cell_id, children, ancestors, t, t_requestHist, len(rgb_load), interesting_cell, backward, data_container,labels_dir)
+                                    history_cell["ID"+str(cell_id)], data_container = add_history1(history_cell["ID"+str(cell_id)], cell_id, children, ancestors, t, t_requestHist, 
+                                                                                                   len(rgb_load), interesting_cell, backward, data_container,labels_dir)
                               
                               if verbose:
                                   print("history written for: ","ID",str(cell_id))
@@ -638,12 +684,12 @@ def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t
                               break                                                          
                 if verbose:
                     print("----is now a new cell", t, t_startDay)
-            else:
-                if verbose:
-                    print("no match chosen ", interesting_cell, "and ID",str(labels_id[i]))
+            #else:
+            #    if verbose:
+            #        print("no match chosen ", interesting_cell, "and ID",str(labels_id[i]))
+
         if verbose:
-            print("----beginning plotting")
-            
+            print("----beginning plotting")            
             print("*** cell chosen: ",interesting_cell)
         
         rgbs = history_cell[interesting_cell].mean108
@@ -696,7 +742,7 @@ def history_backward(day,month,year,hour,minute,id_interesting_cell, backward, t
               
               #ind[11] = rgbs[rgb_load.index('CTP')]
               #ind[12] = rgbs[rgb_load.index('CTT')]        
-        t_end = deepcopy(t1)
+        t_end = deepcopy(time1)
 
         
         n_timestep = rgbs.shape[0]

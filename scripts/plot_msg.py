@@ -344,8 +344,13 @@ def plot_msg(in_msg):
                makedirs(path)
    
             # save file
-            if stat(outputFile).st_size > 0:
-               print '... outputFile '+outputFile+' already exists'
+            if exists(outputFile):
+               if stat(outputFile).st_size > 0:
+                  print '... outputFile '+outputFile+' already exists (keep old file)'
+               else: 
+                  print '*** Warning, outputFile'+outputFile+' already exists, but is empty (overwrite file)'
+                  PIL_image.save(outputFile, optimize=True)  # optimize -> minimize file size
+                  chmod(outputFile, 0777)  ## FOR PYTHON3: 0o664  # give access read/write access to group members
             else:
                if in_msg.verbose:
                   print '... save final file: ' + outputFile

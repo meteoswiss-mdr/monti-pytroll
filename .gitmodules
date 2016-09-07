@@ -24,7 +24,7 @@
 	branch = develop
 [submodule "packages/trollimage"]
 	path = packages/trollimage
-	url = https://github.com/pytroll/trollimage.git
+	url = https://github.com/meteoswiss-mdr/trollimage.git
 	branch = develop
 [submodule "packages/mipp"]
 	path = packages/mipp

@@ -92,6 +92,8 @@ class input_msg_class:
       self.postprocessing_areas     = []
       self.postprocessing_composite = []
       self.postprocessing_montage   = [[]]
+      self.resize_composite = 100
+      self.resize_montage   = 100
 
       self.verbose = True
 

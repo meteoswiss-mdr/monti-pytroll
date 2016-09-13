@@ -76,9 +76,7 @@ if len(sys.argv) > 1:
 else:
     if True:  # automatic choise of last 5min 
         from my_msg_module import get_last_SEVIRI_date
-        datetime1 = get_last_SEVIRI_date(True)
-        if delay != 0:
-            datetime1 -= timedelta(minutes=delay)
+        datetime1 = get_last_SEVIRI_date(False, delay=delay)
         year  = datetime1.year
         month = datetime1.month
         day   = datetime1.day
@@ -285,9 +283,9 @@ for area in areas:
         dc.align_right()
         if add_colorscale:
             dc.write_vertically()
-        dc.add_logo("../logos/meteoSwiss3.jpg",height=60.0)
-        dc.add_logo("../logos/pytroll3.jpg",height=60.0)
-        #dc.add_logo("../logos/EUMETSAT_logo2_tiny_white.png",height=60.0)
+        dc.add_logo("/opt/users/common/logos/meteoSwiss3.jpg",height=60.0)
+        dc.add_logo("/opt/users/common/logos/pytroll3.jpg",height=60.0)
+        #dc.add_logo("/opt/users/common/logos/EUMETSAT_logo2_tiny_white.png",height=60.0)
 
     if add_colorscale:
         print '... add colorscale ranging from min_data (',min_data,') to max_data (',max_data,')'

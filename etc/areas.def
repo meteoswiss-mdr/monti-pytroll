@@ -283,6 +283,46 @@ REGION: SeviriDiskFull00 {
         AREA_EXTENT:   (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
 };
 
+REGION: SeviriDiskFull00S2 {
+        NAME:          Full globe MSG image 0 degrees
+        PCS_ID:        geos0
+        PCS_DEF:       proj=geos, lon_0=0.0, a=6378169.00, b=6356583.80, h=35785831.0
+        #PCS_DEF:       proj=geos, lon_0=0.0, a=6378144.0, b=6356759.0, h=35785831.0, rf=295.49
+        XSIZE:         1856
+        YSIZE:         1856
+        AREA_EXTENT:   (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
+};
+
+REGION: SeviriDiskFull00S3 {
+        NAME:          Full globe MSG image 0 degrees
+        PCS_ID:        geos0
+        PCS_DEF:       proj=geos, lon_0=0.0, a=6378169.00, b=6356583.80, h=35785831.0
+        #PCS_DEF:       proj=geos, lon_0=0.0, a=6378144.0, b=6356759.0, h=35785831.0, rf=295.49
+        XSIZE:         1237
+        YSIZE:         1237
+        AREA_EXTENT:   (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
+};
+
+REGION: SeviriDiskFull00S4 {
+        NAME:          Full globe MSG image 0 degrees
+        PCS_ID:        geos0
+        PCS_DEF:       proj=geos, lon_0=0.0, a=6378169.00, b=6356583.80, h=35785831.0
+        #PCS_DEF:       proj=geos, lon_0=0.0, a=6378144.0, b=6356759.0, h=35785831.0, rf=295.49
+        XSIZE:         928
+        YSIZE:         928
+        AREA_EXTENT:   (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
+};
+
+REGION: SeviriDiskFull00S5 {
+        NAME:          Full globe MSG image 0 degrees
+        PCS_ID:        geos0
+        PCS_DEF:       proj=geos, lon_0=0.0, a=6378169.00, b=6356583.80, h=35785831.0
+        #PCS_DEF:       proj=geos, lon_0=0.0, a=6378144.0, b=6356759.0, h=35785831.0, rf=295.49
+        XSIZE:         742
+        YSIZE:         742
+        AREA_EXTENT:   (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
+};
+
 REGION: SeviriDisk35 {
         NAME:          Cropped globe MSG image 3.5 degrees
         PCS_ID:        geos3
@@ -325,6 +365,45 @@ REGION: SeviriDiskFull95 {
         AREA_EXTENT:   (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
 };
 
+REGION: SeviriDiskFull95S {
+        NAME:          Full globe MSG image 9.5 degrees half resolution
+        PCS_ID:        geos3
+        PCS_DEF:       proj=geos, lon_0=9.5, a=6378169.00, b=6356583.80, h=35785831.0
+        #PCS_DEF:       proj=geos, lon_0=0.0, a=6378144.0, b=6356759.0, h=35785831.0, rf=295.49
+        XSIZE:         1856
+        YSIZE:         1856
+        AREA_EXTENT:   (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
+};
+
+REGION: SeviriDiskFull95S3 {
+        NAME:          Full globe MSG image 9.5 degrees one third resolution
+        PCS_ID:        geos3
+        PCS_DEF:       proj=geos, lon_0=9.5, a=6378169.00, b=6356583.80, h=35785831.0
+        #PCS_DEF:       proj=geos, lon_0=0.0, a=6378144.0, b=6356759.0, h=35785831.0, rf=295.49
+        XSIZE:         1237
+        YSIZE:         1237
+        AREA_EXTENT:   (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
+};
+
+REGION: SeviriDiskFull95S4 {
+        NAME:          Full globe MSG image 9.5 degrees one fourth resolution
+        PCS_ID:        geos3
+        PCS_DEF:       proj=geos, lon_0=9.5, a=6378169.00, b=6356583.80, h=35785831.0
+        #PCS_DEF:       proj=geos, lon_0=0.0, a=6378144.0, b=6356759.0, h=35785831.0, rf=295.49
+        XSIZE:         928
+        YSIZE:         928
+        AREA_EXTENT:   (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
+};
+
+REGION: SeviriDiskFull95S5 {
+        NAME:          Full globe MSG image 9.5 degrees one fifth resolution
+        PCS_ID:        geos3
+        PCS_DEF:       proj=geos, lon_0=9.5, a=6378169.00, b=6356583.80, h=35785831.0
+        #PCS_DEF:       proj=geos, lon_0=0.0, a=6378144.0, b=6356759.0, h=35785831.0, rf=295.49
+        XSIZE:         742
+        YSIZE:         742
+        AREA_EXTENT:   (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
+};
 
 REGION: met07globe {
         NAME:          Full globe IODC image 57 degrees

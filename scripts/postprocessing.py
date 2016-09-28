@@ -220,6 +220,7 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
                 next_file = outputDir+"/"+format_name(mfile+'-'+area+'_%y%m%d%H%M.png', time_slot, area=area)
                 if not isfile(next_file):
                     files_complete=False
+                    print "*** Warning, can not find "+mfile+" file: "+next_file
                     if area == "ccs4" or area == 'EuropeCanaryS95':
                         # produce image with placeholder for missing product
                         files += " "+"/opt/users/common/logos/missing_product_textbox_"+area+".png"
@@ -247,6 +248,12 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
                 if in_msg.verbose:
                     print "/usr/bin/montage -tile "+tile+" -geometry +0+0 "+files + " " + outfile  +" 2>&1 "+sleep_str
                 subprocess.call("/usr/bin/montage -tile "+tile+" -geometry +0+0 "+files + " " + outfile  +" 2>&1 "+sleep_str, shell=True)
+
+                if hasattr(in_msg, 'resize_montage'):
+                    if in_msg.resize_montage != 100:
+                        if in_msg.verbose:
+                            print "/usr/bin/convert -resize "+str(in_msg.resize_montage)+"% " + outfile  +" tmp.png 2>&1 "+sleep_str
+                        subprocess.call("/usr/bin/convert -resize "+str(in_msg.resize_montage)+"% " + outfile  +" tmp.png; mv tmp.png "+ outfile+" 2>&1 ", shell=True)
 
                 # check if file is produced
                 if isfile(outfile) and files_complete:

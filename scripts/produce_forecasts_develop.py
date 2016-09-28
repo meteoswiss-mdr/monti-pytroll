@@ -35,14 +35,18 @@ import pickle
 from scipy import ndimage
 from my_msg_module import check_input
 from Cells import Cells
-
+import imp
 
 import scp_settings
 scpOutputDir = scp_settings.scpOutputDir 
 scpID = scp_settings.scpID 
 import glob
 
+from pycoast import ContourWriterAGG
+from plot_msg import add_border_and_rivers
 # debug_on()
+
+import trollimage
 
 
 def read_HRW(sat, sat_nr, instrument, time_slot, ntimes, dt=5, read_basic_or_detailed='detailed', 
@@ -86,13 +90,13 @@ def read_HRW(sat, sat_nr, instrument, time_slot, ntimes, dt=5, read_basic_or_det
          """
 
     #print time_slot
-    data = GeostationaryFactory.create_scene(sat, sat_nr, instrument, time_slot)
+    data = GeostationaryFactory.create_scene(in_msg.sat_str(),in_msg.sat_nr_str(), "seviri",  time_slot)
     data.load(['HRW'], reader_level="seviri-level5", read_basic_or_detailed=read_basic_or_detailed)
   
     # read data for previous time steps if needed
     for it in range(1,ntimes):
         time_slot_i = time_slot - timedelta( minutes = it*5 )
-        data_i = GeostationaryFactory.create_scene(sat, "9", "seviri", time_slot_i)
+        data_i = GeostationaryFactory.create_scene(in_msg.sat_str(),9, "seviri", time_slot_i)
         data_i.load(['HRW'], reader_level="seviri-level5", read_basic_or_detailed=read_basic_or_detailed)
         # merge all datasets
         data['HRW'].HRW_detailed = data['HRW'].HRW_detailed + data_i['HRW'].HRW_detailed
@@ -230,7 +234,7 @@ def check_cosmo_area (nc_cosmo, area):
  
     return x_min_cut, x_max_cut, y_min_cut, y_max_cut
 
-def get_cosmo_filenames (t_sat, nrt=True, runs_before = 0 ):
+def get_cosmo_filenames (t_sat, nrt=True, runs_before = 0, area = "ccs4c2" ):
     
     """ Provides the cosmo filename.
     
@@ -310,16 +314,17 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     Returns
     ----------
     u_d, v_d : dict
-        dictionaries containing the u and v cosmo wind components. The 
+        dictionaries containing the u and v cosmo wind components. !!!!! THE ORDER OF THE PRESSURE IS OPPOSITE OF THOSE IN INPUT: u_d[0,:,:] corresponds to the last pressure in the input "layers"
     
     Raises
     ----------
     """
+    #print "WARNING: the output wind levels will be in order opposite to that in the input 'layers' "
     if nrt == False and hour % 3 == 0 :
         runs_before = 1
     else:
         runs_before = 0
-    file1, file2 = get_cosmo_filenames ( datetime(year,month,day,hour,minute), nrt=nrt, runs_before = runs_before  )
+    file1, file2 = get_cosmo_filenames ( datetime(year,month,day,hour,minute), nrt=nrt, runs_before = runs_before, area = area  )
 
     print "... search for ", file1, " and ", file2
     filename1 = glob.glob(file1)
@@ -332,7 +337,7 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
             
     if len(filename1)<1 or len(filename2)<1:
         print "*** Warning, found no cosmo wind data "
-        file1, file2 = get_cosmo_filenames ( datetime(year,month,day,hour,minute),nrt = nrt, runs_before = runs_before + 1 )
+        file1, file2 = get_cosmo_filenames ( datetime(year,month,day,hour,minute),nrt = nrt, runs_before = runs_before + 1, area = area )
         print file1, file2
 
         print "... search for ", file1, " and ", file2
@@ -384,12 +389,18 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     x_min_cut1, x_max_cut1, y_min_cut1, y_max_cut1 = check_cosmo_area (nc_cosmo_1, area)
     x_min_cut2, x_max_cut2, y_min_cut2, y_max_cut2 = check_cosmo_area (nc_cosmo_2, area) 
     
-    p_chosen = np.sort(layers)[::-1]  
+    if len(layers)>1:
+        p_chosen = np.sort(layers)[::-1]  
+        print layers
+        print p_chosen
+        #quit()
+    else:
+        p_chosen = layers
     #if nrt:
     #    p_chosen *= 100 # 100 == convert hPa to Pa
         
-    u_d = np.zeros((len(p_chosen),nx,ny))
-    v_d = np.zeros((len(p_chosen),nx,ny))
+    u_d = np.zeros((len(p_chosen),nx1,ny1))
+    v_d = np.zeros((len(p_chosen),nx1,ny1))
 
     if rapid_scan_mode_satellite:
         dt = 2
@@ -403,7 +414,7 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
         print "no value in: ", pressure1, "is equal to p_chosen: ",p_chosen[0]
         for elem in range(len(p_chosen)):
             p_chosen[elem]*=100
-
+    
     for g in range(len(p_chosen)):
         print np.where(pressure1==p_chosen[g])
         print pressure1
@@ -421,7 +432,7 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
 
     print "*** u_d[0].shape", u_d.shape[1], u_d.shape[2]
     print "previous ", previous
-    return u_d, v_d
+    return u_d, v_d, p_chosen
     
 
 def calculate_displacement(u_d,v_d,n_levels,size_x,size_y,ForecastTime,NumComputationSteps):
@@ -436,7 +447,7 @@ def calculate_displacement(u_d,v_d,n_levels,size_x,size_y,ForecastTime,NumComput
     for level in range(n_levels):   # !!!!!!!
     #for level in [0]:
 
-          print "... calculate displacement for level ", level
+          print "... calculate displacement for level ", level, n_levels
           u = u_d[level,:,:]
           v = v_d[level,:,:]
 
@@ -512,7 +523,7 @@ def load_rgb(satellite, satellite_nr, satellites_name, time_slot, rgb, area, in_
 
     if rgb != 'CTP':
       # read the data we would like to forecast
-      global_data_RGBforecast = GeostationaryFactory.create_scene(satellite, satellite_nr, satellites_name, time_slot)
+      global_data_RGBforecast = GeostationaryFactory.create_scene(in_msg.sat_str(),in_msg.sat_nr_str(), "seviri",  time_slot)
       #global_data_RGBforecast = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
 
       # area we would like to read
@@ -577,6 +588,8 @@ def mask_rgb_based_pressure(data,p_min,p_max,data_CTP):
     data = np.where(np.logical_or(data_CTP['CTP'].data>=p_max,data_CTP['CTP'].data<p_min),no_data,data)
     
     return data
+
+
 # ------------------------------------------
 
 #def wind_shiftFun(in_windshift):
@@ -592,7 +605,8 @@ if __name__ == '__main__':
     if input_file[-3:] == '.py': 
         input_file=input_file[:-3]
     in_msg = get_input_msg(input_file)
-
+    print in_msg.dt_forecast1
+    print in_msg.dt_forecast2
     
     area = in_msg.area_forecast
  
@@ -605,10 +619,10 @@ if __name__ == '__main__':
 
     delay = 5
 
-    rgbs = ['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134']  #in_windshift.rgb
+    rgbs = ['CTT'] #['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134','CTT']  #in_windshift.rgb
     rgbs_only15min = ['IR_039','IR_087','IR_120']
     #channel = rgb.replace("c","")
-
+    name_tmp = "3layer"
     # load a few standard things 
     #from get_input_msg import get_input_msg
     #in_msg = get_input_msg('input_coalition2')
@@ -623,6 +637,9 @@ if __name__ == '__main__':
     dt_forecast1 = in_msg.dt_forecast1
     dt_forecast2 = in_msg.dt_forecast2
     
+    print in_msg.dt_forecast1
+    print in_msg.dt_forecast2
+        
     if rapid_scan_mode == True:
         print "... RAPID SCAN MODE"
     else:
@@ -651,7 +668,8 @@ if __name__ == '__main__':
 
     if wind_source=="cosmo":
         if zlevel == 'pressure':
-            layers=[800,500,300]#[700,500,300]#[900,800,700,600,500,400,300,200,100] #[700,500,300]#[100] # [400,300,100]#[600,300,100]##pressure layers 
+            #layers= [800,500,300]#[700,500,300]#[900,800,700,600,500,400,300,200,100] #[700,500,300]#[100] # [400,300,100]#[600,300,100]##pressure layers 
+            layers= [800,700,600]
         elif zlevel == 'modellevel':
             layers=[36,24,16] #cosmo model layers
         else:
@@ -722,6 +740,16 @@ if __name__ == '__main__':
     
     outDir_completed = 0
     
+    in_msg.mapDir = "/opt/users/common/shapes/"
+    cw = ContourWriterAGG(in_msg.mapDir)
+    # define area
+    obj_area = get_area_def("ccs4")
+    proj4_string = obj_area.proj4_string            
+    # e.g. proj4_string = '+proj=geos +lon_0=0.0 +a=6378169.00 +b=6356583.80 +h=35785831.0'
+    area_extent = obj_area.area_extent              
+    # e.g. area_extent = (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
+    area_tuple = (proj4_string, area_extent)    
+    
     while time_slot <= time_slotSTOP:
         
           print time_slot
@@ -729,20 +757,21 @@ if __name__ == '__main__':
           
           in_msg.datetime = time_slot
           
-          if type(in_msg.sat_nr) is int:
-              if in_msg.sat[0:8]=="meteosat":
-                  sat_nr_str = str(in_msg.sat_nr).zfill(2)
-              elif in_msg.sat[0:8]=="Meteosat":
-                  sat_nr_str = str(in_msg.sat_nr)
-          elif type(in_msg.sat_nr) is str:
-              sat_nr_str = in_msg.sat_nr
-              if in_msg.sat[0:8]=="Meteosat":
-                  sat_nr_str = str(int(sat_nr_str)) # get rid of leading zeros (0) 
-          else:
-              print "*** Waring, unknown type of sat_nr", type(in_msg.sat_nr)
-              sat_nr_str = in_msg.sat_nr
-          print in_msg.sat, " and ", sat_nr_str
-          in_msg.sat_nr_str = sat_nr_str
+          if False:
+              if type(in_msg.sat_nr) is int:
+                  if in_msg.sat[0:8]=="meteosat":
+                      sat_nr_str = str(in_msg.sat_nr).zfill(2)
+                  elif in_msg.sat[0:8]=="Meteosat":
+                      sat_nr_str = str(in_msg.sat_nr)
+              elif type(in_msg.sat_nr) is str:
+                  sat_nr_str = in_msg.sat_nr
+                  if in_msg.sat[0:8]=="Meteosat":
+                      sat_nr_str = str(int(sat_nr_str)) # get rid of leading zeros (0) 
+              else:
+                  print "*** Waring, unknown type of sat_nr", type(in_msg.sat_nr)
+                  sat_nr_str = in_msg.sat_nr
+          #print in_msg.sat, " and ", sat_nr_str
+          #in_msg.sat_nr_str = sat_nr_str
           year = time_slot.year
           month = time_slot.month
           day = time_slot.day
@@ -777,7 +806,7 @@ if __name__ == '__main__':
           
           for i_try in range(30):
               # check if 'CTH' file is present
-              RGBs = check_input(in_msg, in_msg.sat+sat_nr_str, in_msg.datetime, RGBs=in_msg.RGBs)
+              RGBs = check_input(in_msg, in_msg.sat_str()+in_msg.sat_nr_str(), in_msg.datetime, RGBs=in_msg.RGBs)
               if len(RGBs) > 0:
                   # exit loop, if input is found
                   break
@@ -788,7 +817,7 @@ if __name__ == '__main__':
           
           for i_try in range(30):
               # check if 'CTH' file is present
-              RGBs = check_input(in_msg, in_msg.sat+sat_nr_str, in_msg.datetime, RGBs="CTP")
+              RGBs = check_input(in_msg, in_msg.sat_str()+in_msg.sat_nr_str(), in_msg.datetime, RGBs="CTP")
               if len(RGBs) > 0:
                   # exit loop, if input is found
                   break
@@ -798,8 +827,8 @@ if __name__ == '__main__':
                   time.sleep(25)          
           
           # read CTP to distinguish high, medium and low clouds
-          print "*** read CTP for ", in_msg.sat, in_msg.sat_nr_str, "seviri", str(time_slot)
-          global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, in_msg.sat_nr_str, "seviri", time_slot)
+          print ("*** read data for ", in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot)
+          global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot)
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
           #area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
           area_loaded = load_products(global_data_CTP, ['CTP'], in_msg, get_area_def("ccs4"))
@@ -807,14 +836,78 @@ if __name__ == '__main__':
               
           [nx,ny]=data_CTP['CTP'].data.shape
           
+          if 'pressure_levels' in in_msg.aux_results:
+                tmp_press = deepcopy(in_msg.pressure_limits)
+                tmp_press.append(1001)
+                tmp_press.sort() #ordered decreasing
+                
+                print tmp_press
+                n_levels_pressure = len(tmp_press)
+                p_levels = np.zeros(data_CTP['CTP'].data.shape)
+                p_levels[:,:]=np.nan
+                p_min = 0
+                print("n_levels_pressure (should be 3): ", n_levels_pressure)
+                print "unique: ",np.unique(p_levels)
+                for i_plot_press in range(n_levels_pressure):
+                    p_max = tmp_press[i_plot_press]
+                    print("p_min: ", p_min, "p_max: ",p_max)
+                    p_levels[np.where(np.logical_and(data_CTP['CTP'].data>p_min,data_CTP['CTP'].data<=p_max))] = i_plot_press + 2
+                    print "unique: ",np.unique(p_levels)
+                    print "index: ", i_plot_press
+                    p_min = deepcopy(p_max)
+                if True:
+                    fig = plt.figure()
+                    plt.imshow(p_levels[20:nx-40,85:ny-135],cmap = plt.get_cmap("Blues"), vmin = 0)
+                    plt.axis('off')
+                    plt.colorbar()
+                    plt.show()
+                    plt.savefig("test_Pressure.png")
+                    #plt.savefig("/data/COALITION2/PicturesSatellite/LEL_results_wind//"+yearS+"-"+monthS+"-"+dayS+"/channels_fig//PressureLevels_"+yearS+monthS+dayS+hourS+minS+".png")
+                    plt.close(fig)
+                    quit()
+                else:
+                    img = trollimage.image.Image(p_levels[20:nx-40,85:ny-135], mode="L", fill_value=None) #fill_value,[1,1,1], None
+                    from trollimage.colormap import rdbu
+                    #jet.set_range(
+                    img.colorize(rdbu)
+                    pil_im = img.pil_image()                    
+                    
+                    #pil_im = array2PIL(p_levels[20:nx-40,85:ny-135], p_levels[20:nx-40,85:ny-135].size)
+                    pil_im = add_border_and_rivers(pil_im, cw, area_tuple, in_msg)
+                    
+                    pil_im.save("test_Pressure.png")#"/data/COALITION2/PicturesSatellite/LEL_results_wind//"+yearS+"-"+monthS+"-"+dayS+"/channels_fig//PressureLevels_"+yearS+monthS+dayS+hourS+minS+".png")
+                    quit()
+
+                    
+                
+                fig = plt.figure()
+                plt.imshow(data_CTP['CTP'].data[20:nx-40,85:ny-135],cmap = plt.get_cmap("Blues_r"))
+                plt.axis('off')
+                plt.colorbar()
+                plt.show()
+                plt.savefig("/data/COALITION2/PicturesSatellite/LEL_results_wind//"+yearS+"-"+monthS+"-"+dayS+"/channels_fig//Pressure_"+yearS+monthS+dayS+hourS+minS+".png")
+                plt.close(fig)
+                print np.unique(p_levels)
+          print in_msg.nwcsaf_calibrate
+          
           # read all rgbs
-          print "*** read all other channels for ", in_msg.sat, in_msg.sat_nr_str, "seviri", str(time_slot)
-          global_data = GeostationaryFactory.create_scene(in_msg.sat, in_msg.sat_nr_str, "seviri", time_slot)
+          print ("*** read data for ", in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot)
+          global_data = GeostationaryFactory.create_scene(in_msg.sat_str(),in_msg.sat_nr_str(), "seviri",  time_slot)
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
           area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
           area_loaded = load_products(global_data, rgbs, in_msg, area_loaded)
           data = global_data.project(area)
-
+          
+          if 'forecast_channels' in in_msg.aux_results:
+              for rgb_plot in rgbs:
+                  fig = plt.figure()
+                  plt.imshow(data[rgb_plot].data[20:nx-40,85:ny-135],vmin = 220, vmax = 290) #forecasts_out[channel_nr[rgb],ind_time,:,:]>0)
+                  plt.axis('off')
+                  plt.colorbar()
+                  plt.show()
+                  plt.savefig("/data/COALITION2/PicturesSatellite/LEL_results_wind//"+yearS+"-"+monthS+"-"+dayS+"/channels_fig//"+rgb_plot+"_"+yearS+monthS+dayS+hourS+minS+"_Obs.png")
+                  plt.close(fig)
+          
           if False:
               from trollimage.image import Image as trollimage
               from trollimage.colormap import rainbow
@@ -829,11 +922,28 @@ if __name__ == '__main__':
               quit()
 
           if downscaling_data == True:
-               from plot_coalition2 import downscale          
-               data = downscale(data, mode = mode_downscaling)
-
-   
+               from plot_coalition2 import downscale  
+               if "CTT" in rgbs:
+                    mask_Safe = deepcopy(data['CTT'].data.mask)
+               elif "CTP" in rgbs:
+                    mask_Safe = deepcopy(data['CTP'].data.mask)
+               else:
+                    mask_Safe = deepcopy(data[rgbs[0]].data.mask)
+               data = downscale(deepcopy(data), mode = mode_downscaling, mask = mask_Safe)
+                         
+          if 'forecast_channels' in in_msg.aux_results:
+              for rgb_plot in rgbs:
+                  fig = plt.figure()
+                  plt.imshow(data[rgb_plot].data[20:nx-40,85:ny-135],vmin = 220, vmax = 290) #forecasts_out[channel_nr[rgb],ind_time,:,:]>0)
+                  plt.axis('off')
+                  plt.colorbar()
+                  plt.show()
+                  plt.savefig("/data/COALITION2/PicturesSatellite/LEL_results_wind//"+yearS+"-"+monthS+"-"+dayS+"/channels_fig//"+rgb_plot+"_"+yearS+monthS+dayS+hourS+minS+"_ObsDownscaled.png")
+                  plt.close(fig)
+          
+          
           # read wind field
+          
           if wind_source=="HRW":
               u_d=np.zeros((n_levels,nx,ny))
               v_d=np.zeros((n_levels,nx,ny))
@@ -860,7 +970,7 @@ if __name__ == '__main__':
                   u_d[level,:,:], v_d[level,:,:] = HRW_2dfield( hrw_detbas, obj_area )
       
           elif wind_source=="cosmo":
-              u_d, v_d = interpolate_cosmo(year,month,day,hour,minute,layers,zlevel,area,nrt = nrt, rapid_scan_mode_satellite = True)
+              u_d, v_d, pressures_wind = interpolate_cosmo(year,month,day,hour,minute,layers,zlevel,area,nrt = nrt, rapid_scan_mode_satellite = True)
           else:
               print "*** Error in main (functionWSFN.py)"
               print "    unknown wind source ", wind_source
@@ -899,6 +1009,13 @@ if __name__ == '__main__':
                   p_min = 0
               else:
                   p_min = pressure_limits[len(pressure_limits)-1-level]              
+              
+              if p_min == p_max:
+                continue
+              
+              if pressures_wind[level] > p_max or pressures_wind[level] < p_min:
+                    print "ERROR: you are moving the clouds at a certain level (%s-%s) with wind from another level (%s)"%(str(p_min),str(p_max),str(pressures_wind[level]))
+                    quit()
               
               u = u_d[level,:,:]
               v = v_d[level,:,:]  
@@ -949,7 +1066,7 @@ if __name__ == '__main__':
                           temp [forecast2!=no_data] = forecast2[forecast2!=no_data]
                           print "temp ",temp.shape
                           forecasts_out[channel_nr[rgb],ind_time,:,:] = deepcopy(temp) #np.where(forecast2!=no_data,forecast2,forecasts_out)
-                          if level == (n_levels-1):
+                          if level == (n_levels-1) or p_min == 0:
                             
                             forecasts_out[channel_nr[rgb],ind_time,forecasts_out[channel_nr[rgb],ind_time,:,:]==no_data] = np.nan
                             forecasts_out[channel_nr[rgb],ind_time,:,:] = ma.masked_invalid(forecasts_out[channel_nr[rgb],ind_time,:,:])
@@ -960,6 +1077,7 @@ if __name__ == '__main__':
                                 outDir_completed = 1
                             outputFile = outputDir +"/"+ "%s_%s_%s_t%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime))
                             #outputFile = "/opt/users/lel/PyTroll/scripts/channels/%s_%s_%s_t%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime))
+                            #####outputFile = "pickles/%s_%s_%s_t%s_%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime),name_tmp)
                             
                             
                             print "... pickle data to file: ", outputFile
@@ -975,14 +1093,15 @@ if __name__ == '__main__':
                                 
                             PIK.append(mode_downscaling)
                             print mode_downscaling
+                            
                             pickle.dump(PIK, open(outputFile,"wb"))
                             
                             plot_fore = forecasts_out[channel_nr[rgb],ind_time,:,:]
                             plot_fore = np.where (plot_fore>0,plot_fore,np.nan)
-                            
+                            print("makes it before plot")
                             if 'forecast_channels' in in_msg.aux_results:
                                 fig = plt.figure()
-                                plt.imshow(plot_fore) #forecasts_out[channel_nr[rgb],ind_time,:,:]>0)
+                                plt.imshow(plot_fore[20:nx-40,85:ny-135],vmin = 220, vmax = 290) #forecasts_out[channel_nr[rgb],ind_time,:,:]>0)
                                 plt.colorbar()
                                 if wind_source=="HRW":
                                     plt.title("%s, %s, New Velocity every step,\n Displacement in Meters, (HRW %s min):\n t0 + %s"%(rgb,method,ntimes*5,str(t*ForecastTime)))
@@ -996,13 +1115,22 @@ if __name__ == '__main__':
                                     name_to_save = "cosmoPL"
                                 else:
                                     name_to_save = "cosmoML"
-                                
+                                plt.axis('off')
+                                #plt.tick_params(
+                                #                axis='both',       # changes apply to both axis
+                                #                which='both',      # both major and minor ticks are affected
+                                #                bottom='off',      # ticks along the bottom edge are off
+                                #                top='off',         # ticks along the top edge are off
+                                #                labelbottom='off') # labels along the bottom edge are off
                                 time_string = "%02d" % (t*ForecastTime)    
-                                outputFig = "/data/COALITION2/PicturesSatellite/LEL_results_wind//"+yearS+"-"+monthS+"-"+dayS+"/channels_fig//%s_%s_t%s_%s_DisplMeter_%s.png"%(rgb,yearS+dayS+hourS+minS,time_string,method,name_to_save) #time_string,
+                                ####outputFig = "/data/COALITION2/PicturesSatellite/LEL_results_wind//"+yearS+"-"+monthS+"-"+dayS+"/channels_fig//%s_%s_t%s_%s_DisplMeter_%s.png"%(rgb,yearS+dayS+hourS+minS,time_string,method,name_to_save) #time_string,
+                                outputFig = "/data/COALITION2/PicturesSatellite/LEL_results_wind//"+yearS+"-"+monthS+"-"+dayS+"/channels_fig//%s_%s_t%s_%s.png"%(rgb,yearS+dayS+hourS+minS,time_string,name_tmp) #time_string,
+                                
                                 fig.savefig(outputFig) 
                                 plt.close(fig)
       
           print "TOTAL TIME: ", time.time()-time_start_TOT
-          
+          print "Final check lead time:", dt_forecast1
+          print dt_forecast2
           time_slot = time_slot + timedelta(minutes=5)
 

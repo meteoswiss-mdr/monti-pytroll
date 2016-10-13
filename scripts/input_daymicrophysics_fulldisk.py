@@ -209,6 +209,7 @@ def input(in_msg):
     in_msg.compress_to_8bit=False
 
     in_msg.scpOutput = True
+    in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages/SeviriDiskFull00S4"
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
 

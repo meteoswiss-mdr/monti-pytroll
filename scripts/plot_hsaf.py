@@ -240,7 +240,9 @@ for area in areas:
     dc = DecoratorAGG(PIL_image)
 
     # define contour write for coasts, borders, rivers
-    cw = ContourWriterAGG('/data/OWARNA/hau/maps_pytroll/')
+    #cw = ContourWriterAGG('/data/OWARNA/hau/maps_pytroll/')
+    cw = ContourWriterAGG('/opt/users/common/shapes/')
+
 
     resolution='l'
     if area.find("EuropeCanary") != -1:

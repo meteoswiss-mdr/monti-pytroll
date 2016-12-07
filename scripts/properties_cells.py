@@ -193,7 +193,7 @@ def save_all_cells(all_cells):
 ...
 """
     
-def properties_cells(t1,tStop,current_labels = None, metadata = None, labels_dir = None, outputDir_labels = None, in_msg = None, sat_data = None):
+def properties_cells(t1, tStop, current_labels=None, metadata=None, labels_dir=None, outputDir_labels=None, in_msg=None, sat_data=None):
     
     
     rgb_load = ['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134'] #,'CTP','CTT']
@@ -201,15 +201,18 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None, labels_dir
     only_obs_noForecast = False
     rapid_scan_mode = True
     
-    if only_obs_noForecast == True:
-        in_dir = '/opt/users/'+in_msg.user+'/PyTroll/scripts//Mecikalski_obs/cosmo/Channels/labels/'
-    elif rapid_scan_mode == True:
-        in_dir = '/opt/users/'+in_msg.user+'/PyTroll/scripts//Mecikalski_RapidScan/cosmo/Channels/labels//'
-    else:
-        in_dir = '/opt/users/'+in_msg.user+'/PyTroll/scripts//Mecikalski/cosmo/Channels/labels/'   
+    #if only_obs_noForecast == True:
+    #    in_dir = '/opt/users/'+in_msg.user+'/PyTroll/scripts//Mecikalski_obs/cosmo/Channels/labels/'
+    #elif rapid_scan_mode == True:
+    #    in_dir = '/opt/users/'+in_msg.user+'/PyTroll/scripts//Mecikalski_RapidScan/cosmo/Channels/labels//'
+    #else:
+    #    in_dir = '/opt/users/'+in_msg.user+'/PyTroll/scripts//Mecikalski/cosmo/Channels/labels/'   
        
     # load a few standard things 
     if in_msg == None:
+        print "*** Error, in property_cells (property_cells)"
+        print "    no input class passed as argument"
+        quit()
         from get_input_msg import get_input_msg
         in_msg = get_input_msg('input_template')
         in_msg.resolution = 'i'
@@ -220,7 +223,6 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None, labels_dir
         in_msg.fill_value = [0,0,0] # black    
         in_msg.reader_level = "seviri-level4"
       
-    
         # satellite for HRW winds
         sat_nr = "08" #in_windshift.sat_nr
     
@@ -252,9 +254,10 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None, labels_dir
     
     #labels_dir = '/data/cinesat/out/labels/'
     if labels_dir == None:
-          labels_dir = '/opt/users/'+in_msg.user+'/PyTroll/scripts/labels/' #compatible to all users
+        labels_dir = '/opt/users/'+in_msg.user+'/PyTroll/scripts/labels/' #compatible to all users
+        print "... use default directory to save labels: " + labels_dir
 
-    
+    # loop over time
     while t1 <= tStop:
           
           print in_msg.sat, str(in_msg.sat_nr), "seviri", t1
@@ -284,8 +287,10 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None, labels_dir
           
           nx,ny = data[rgb_load[0]].data.shape
           
+          # create array for all channel values
           values_rgb = np.zeros((len(rgb_load),nx,ny))
           
+          # copy all observations/channels into one large numpy array
           for rrgb in range(len(rgb_load)):
               values_rgb[rrgb,:,:] =  deepcopy(data[rgb_load[rrgb]].data) #-data_108[rgb_load[1]].data
           
@@ -305,6 +310,7 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None, labels_dir
           data_new = np.zeros (data1.shape)
           all_cells = {}
           
+          # t0 is 5min before t1
           t0 = t1 - timedelta(minutes=5)
           year0S  = str(t0.year)
           month0S = "%02d" % t0.month
@@ -335,23 +341,25 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None, labels_dir
               id_data = yearS+monthS+dayS+hourS+minS
               #list_id = []
       
+              # loop over all cell labels
               for i in range(1,len(labels0)+1):
                   
                   #create a mask which has 1s only where the current cell is
                   mask_current_label = np.zeros(data1.shape)
                   mask_current_label = np.where(data1 == i, 1, 0)                              
                   
-                  #store coordinates center of mass
+                  # calculate: coordinates center of mass
                   center = ndimage.measurements.center_of_mass(mask_current_label)
-                  
                   center = np.rint(center)                  
                   
+                  # calculate means of the satellite channels (brightness temperatures)
                   values1 =[]
                   for rrgb in range(len(rgb_load)):
                       these = values_rgb[rrgb,:,:]
                       values_cell = these[np.where(mask_current_label == 1)]
                       values1.append(values_cell.mean())
                       
+                  # take i as cell id and save cells properties
                   all_cells["ID"+str(i)] = Cells()
                   all_cells["ID"+str(i)].t_start        = [t1.year, t1.month, t1.day, t1.hour, t1.minute] # True
                   all_cells["ID"+str(i)].origin         = "t0"  # "start_programm", "day_before", "merge", "split", "enters_area", "appear"
@@ -360,35 +368,38 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None, labels_dir
               data_new = deepcopy(data0)    
           
           else:
-              
+          
+              # read cell labels from previous time step t0
               id_data0 = year0S+month0S+day0S+hour0S+min0S
               file_previous_labels = labels_dir +  'Labels_%s.shelve'%(year0S+month0S+day0S+hour0S+min0S)
               myShelve = shelve.open(file_previous_labels)  
               data0 = deepcopy(myShelve['labels'])
               myShelve.close()
 
-              #these labels correspond to the ID at t0
+              # extract unique cell labels corresponding to the ID at t0
               data0 = np.array(data0,'uint32')
-              labels0 = np.unique(data0[data0>0])
+              labels0 = np.unique(data0[data0>0])   # this might be an empty tuple [] !HAU!
               
               print "this should match with output previous step \n", labels0
               
               connections = []
-              
               for con in labels0:
                   connections.append(["ID"+str(con)])
+
+              # total number of cell at t0
+              if len(labels0) == 0:
+                  new_id_num=0
+              else:
+                  new_id_num = labels0.max()+1              # this does not work for []
               
               #these labels are random numbers assigned in COALITION2 (different number for each cell)
               data1 = np.array(data1,'uint32')
-              labels1 = np.unique(data1)
-              
-              
-              # new id number for the new cells at t1
-              new_id_num = labels0.max()+1
-              
+              labels1 = np.unique(data1)    # this might be an empty [] !HAU!
+
               #list to make sure you record every split
               list_previous = []
-              #loop through cells at t1
+
+              # loop through cells at t1
               for i in labels1: #range(1,len(labels1)+1):
                 
                 if i != 0:  
@@ -591,7 +602,7 @@ def properties_cells(t1,tStop,current_labels = None, metadata = None, labels_dir
                     os.chmod(file_per, 0664)  ## FOR PYTHON3: 0o664               
               
           print("....starting updating cells")
-          filename =labels_dir +  'Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)
+          filename = create_dir( labels_dir +  'Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS) )
           myShelve = shelve.open(filename)
           dict_cells = {'cells': all_cells, 'labels':data_new , 'metadata': metadata}
           myShelve.update(dict_cells)

@@ -81,9 +81,9 @@ def force_to_observed_cloud_mask(mod, obs):
     return mod
     
     
-def downscale(data,mode = 'gaussian_225_125'):
+def downscale(data,mode = 'gaussian_225_125',mask = None):
+    
     if mode != 'no_downscaling':
-        print("... DOWNSCALING: applying: ", mode)
         if mode == 'convolve_405_300': 
             weights = np.ones([5,3])
             weights = weights / weights.sum()
@@ -92,28 +92,53 @@ def downscale(data,mode = 'gaussian_225_125'):
             weights = 1/3.*np.array([4.5,3.0])  # conserves a bit better the maxima
         else:
             weights = 1/2.*np.array([4.5,3.0])  # no artefacts more for shifted fields
-            
-            
-        
         if isinstance(data,np.ndarray):
             if mode == 'convolve_405_300':
+                if mask != None:
+                    data[mask]=np.nan
                 data = ndimage.convolve(data, weights, mode='nearest')
             else:
+                if mask != None:
+                    data[mask]=np.nan
                 data = ndimage.filters.gaussian_filter(data, weights, mode = 'nearest')  
         
         elif isinstance(data,mpop.scene.SatelliteInstrumentScene):          
-              channels = [chn.name for chn in data.loaded_channels()]
-              print(channels)
-              for c in range(len(channels)):
-                    
-                    rgb_id = channels[c]
-                    print("    downscaling of channel: ", rgb_id)
-                    if rgb_id != "CloudType" and rgb_id != "CT" and rgb_id != "CTTH" and rgb_id != "CTP" and rgb_id != "CTH":
-                        if mode == 'convolve_405_300':
-                            data[rgb_id].data = ndimage.convolve(data[rgb_id].data, weights, mode='nearest')
-                        else:
-                            data[rgb_id].data = ndimage.filters.gaussian_filter(data[rgb_id].data, weights, mode = 'nearest')        
+
+            channels = [chn.name for chn in data.loaded_channels()]
+            print(channels)
+            for c in range(len(channels)):
+                rgb_id = channels[c]
+                print("    downscaling of channel: ", rgb_id)
+                if rgb_id != "CloudType" and rgb_id != "CT" and rgb_id != "CTTH" and rgb_id != "CTP" and rgb_id != "CTH":
+                    if mode == 'convolve_405_300':
+                        if mask != None:
+                            data[rgb_id].data[mask]= np.nan
+                            data[rgb_id].data = fill_with_closest_pixel(data[rgb_id].data)
+                        data[rgb_id].data = ndimage.convolve(data[rgb_id].data, weights, mode='nearest')
+                    else:
+                        if mask != None:
+                            data[rgb_id].data[mask]= np.nan          
+                            data[rgb_id].data = fill_with_closest_pixel(data[rgb_id].data)
+                        data[rgb_id].data = ndimage.filters.gaussian_filter(data[rgb_id].data, weights, mode = 'nearest')     
+                        print("downscaling data", rgb_id)
+        if isinstance(data, np.ndarray):
+            data[mask]=np.nan
+        elif isinstance(data,mpop.scene.SatelliteInstrumentScene):
+            for chn in channels:
+                if chn != "CloudType" and chn != "CT" and chn != "CTTH" and chn != "CTP" and chn != "CTH":
+                    data[chn].data[mask]= np.nan 
+
     
+    """
+    if mask != None:
+        if isinstance(data, np.ndarray):
+            np.ma.masked_array(data, mask)
+        elif isinstance(data,mpop.scene.SatelliteInstrumentScene):
+            for chn in channels:
+                if chn != "CloudType" and chn != "CT" and chn != "CTTH" and chn != "CTP" and chn != "CTH":
+                    print("masking ", chn)
+                    np.ma.masked_array(data[chn].data, mask)
+    """
     return data
     
 
@@ -332,16 +357,19 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                             time.sleep(25)
                     # load the cloud top height data
                     area_loaded = load_products(global_data, ['CTH'], in_msg, area_loaded )
-          
+                
                 print ('... project data to desired area ', area)
                 data = global_data.project(area)
                 
                 # print type(data)
                 loaded_channels = [chn.name for chn in data.loaded_channels()]
                 print ("... loaded_channels: ", loaded_channels)               
-                
+                if "CTH" in loaded_channels:
+                    mask_downscale = data['CTH'].data.mask
+                else:
+                    mask_downscale = data[loaded_channels[0]].data.mask #to avoid error on Europe, anyway on Europe there shouldn't be downscaling
                 print ('... downscaling', chosen_settings['mode_downscaling'])
-                data = downscale(data,chosen_settings['mode_downscaling'])
+                data = downscale(data,chosen_settings['mode_downscaling'], mask = mask_downscale)
 
                 if in_msg.nrt == True:
                     in_msg.outputDir = in_msg.outputDirNrt
@@ -438,7 +466,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     # load product, global_data is changed in this step!
                     area_loaded = load_products(global_data30, in_msg.channels30, in_msg, area_loaded)
                     data30 = global_data30.project(area)           
-                    data30 = downscale(data30,chosen_settings['mode_downscaling'])      
+                    data30 = downscale(data30,chosen_settings['mode_downscaling'],mask = mask_NoClouds) #mask = data30[in_msg.channels30[0].data.mask)      
                     
                     # read the observations of the channels at -15 min
                     print ("*** read data for ", in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot15)
@@ -448,7 +476,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     # load product, global_data is changed in this step!
                     area_loaded15 = load_products(global_data15, in_msg.channels15, in_msg, area_loaded15)
                     data15 = global_data15.project(area)              
-                    data15 = downscale(data15,chosen_settings['mode_downscaling'])
+                    data15 = downscale(data15,chosen_settings['mode_downscaling'],mask = mask_NoClouds) #mask = data30[in_msg.channels30[0].data.mask)
                     
                     wv_062_t15 = deepcopy(data15['WV_062'].data)
                     wv_062_t30 = deepcopy(data30['WV_062'].data)
@@ -990,7 +1018,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     if in_msg.plot_forecast == True and first_time_step == False:
                         print ("**** Forecasting Area")
                         if in_msg.nrt == False:
-                            add_path = "/new_forecasted_area/"
+                            add_path = "" #"/new_forecasted_area/"
                         else:
                             add_path = ""
                         #plot_forecast_area(time_slot, in_msg.model_fit_area, outputFile=in_msg.outputDir+add_path, current_labels=labels_corrected,

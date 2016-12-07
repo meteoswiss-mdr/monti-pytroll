@@ -51,6 +51,9 @@ from mpop.imageo.TRTimage import fig2img
 from mpop.imageo.HRWimage import prepare_figure
 from properties_cells import create_dir
 from Cells import Cells
+import matplotlib.dates as mdates
+from get_input_msg import get_input_msg
+
 
 def string_date(t):
     yearS  = str(t.year)
@@ -61,21 +64,21 @@ def string_date(t):
     
     return yearS, monthS, dayS, hourS, minS
 
-class Cells:
-        def __init__(self):
-            self.idCell         = []
-            self.mean108        = []
-            self.t_start        = []
-            self.id_prev        = []
-            self.split          = []
-            self.t_end          = []
-            self.origin         = []
-            self.end            = []
-            self.area_px        = []
-            self.center         = []   
-            self.merge          = []
-            self.colors         = []
-        from Cells import Cells
+#class Cells:
+#        def __init__(self):
+#            self.idCell         = []
+#            self.mean108        = []
+#            self.t_start        = []
+#            self.id_prev        = []
+#            self.split          = []
+#            self.t_end          = []
+#            self.origin         = []
+#            self.end            = []
+#            self.area_px        = []
+#            self.center         = []   
+#            self.merge          = []
+#            self.colors         = []
+#        from Cells import Cells
         
 
 def make_figureLabels(values, all_cells, obj_area, outputFile, colorbar = True, vmin = False, vmax = False, center = None):
@@ -177,7 +180,15 @@ def add_history(history_cell, t, id_prev, num_mean108, labels_dir):
     myShelve.close()
     return history_cell, id_prev_new
 
-def add_history1(history_cell, cell_id, cells_to_correct, cells_known, t_to_correct, t_known, num_rgb, interesting_cell, backward, data_container,labels_dir): #(ancestors).(children)
+def add_history1(history_cell, cell_id, cells_to_correct, cells_known, t_to_correct, t_known, num_rgb, interesting_cell, backward, data_container,labels_dir,in_msg,history_correction): #(ancestors).(children)
+    
+    if backward == True:
+        stop_history_when_small = in_msg.stop_history_when_smallForward
+    else:
+        stop_history_when_small = in_msg.stop_history_when_smallBackward
+    
+    threshold_stop_history_when_small = in_msg.threshold_stop_history_when_small
+    
     verbose = False
     year2S, month2S, day2S, hour2S, min2S = string_date(t_known)
     year1S, month1S, day1S, hour1S, min1S = string_date(t_to_correct)
@@ -202,11 +213,15 @@ def add_history1(history_cell, cell_id, cells_to_correct, cells_known, t_to_corr
     except KeyError:
         print("string_id1 ", string_id1)
         print("string_id2 ", string_id2)
+        print("quitting in history_backward line 213")
         quit()
     labelsKnown = deepcopy(data_container['all_labels'][string_id2]) #deepcopy(myShelve2['labels'])
     
     labels_out_to_correct = np.zeros(labels_to_correct.shape)
     labels_outKnown = np.zeros(labelsKnown.shape)
+    
+    if cells_to_correct[0] == "I":
+            cells_to_correct = [cells_to_correct]
     
     for ids in cells_to_correct:
         label = int(ids[2:])
@@ -215,7 +230,10 @@ def add_history1(history_cell, cell_id, cells_to_correct, cells_known, t_to_corr
         for i in range(num_rgb):
             tmp_check = data_container['all_cell_properties'][string_id1][ids].mean108[i] * data_container['all_cell_properties'][string_id1][ids].area_px
             AT_to_correct[i] += tmp_check
-                    
+    
+    if cells_known[0] == "I":
+            cells_known = [cells_known]    
+            
     for ids in cells_known:
         label = int(ids[2:])
         labels_outKnown[labelsKnown==label] = label
@@ -260,7 +278,18 @@ def add_history1(history_cell, cell_id, cells_to_correct, cells_known, t_to_corr
     Temp_known = data_container['all_cell_properties'][string_id2]["ID"+str(cell_id)].mean108
     Temp_to_correct = Temp_known + AT_to_correct/Atot_to_correct - AT_known/Atot_known
     
-   
+    """
+    if float(A2)/float(Atot_known) >= threshold_stop_history_when_small:
+        history_cell.test_size.append(True)
+        if verbose:
+            print("the test of the size gave: ",float(A2)/float(Atot_known))
+    else:
+        if verbose:
+            print("The area was smaller than %s the total"%str(threshold_stop_history_when_small))
+        history_cell.test_size.append(False)
+    """
+    #if np.logical_and(stop_history_when_small == True, history_cell.test_size[-1]==True) or stop_history_when_small == False:
+    history_cell.test_size.append(True)
     history_cell.colors.append('k')
     history_cell.area_px.append(A1) 
     history_cell.mean108 = np.vstack([history_cell.mean108, Temp_to_correct])
@@ -285,7 +314,10 @@ def add_history1(history_cell, cell_id, cells_to_correct, cells_known, t_to_corr
     
     #displacement between tInterest (t) and tInterest - 5 min
     labels_outKnownPlus1 = np.zeros(labels_out_to_correctPlus1.shape)
-    cells_to_use, data_container = find_ancestors(cells_to_correct,t_to_correct,data_container,labels_dir)
+    if history_correction != "follow_id":
+        cells_to_use, data_container = find_ancestors(cells_to_correct,t_to_correct,data_container,labels_dir)
+    else:
+        cells_to_use = "ID"+str(cell_id)
 
     if cells_to_use == []:
         test_KnownHistory = 1 #there are no cells_to_correct of the current cells_to_correct! Displacement will be 0 and no image cells_to_correct
@@ -293,6 +325,8 @@ def add_history1(history_cell, cell_id, cells_to_correct, cells_known, t_to_corr
     else:
         string_idMinus1, data_container = get_info_current_time(t_interestMinus1, data_container, labels_dir)
         labels = deepcopy(data_container['all_labels'][string_idMinus1]) #deepcopy(myShelveMinus1['labels'])
+        if cells_to_use[0] == "I": #not isinstance(cells_to_use,list):
+            cells_to_use = [cells_to_use]
             
     
     if test_KnownHistory == 0:    
@@ -315,30 +349,32 @@ def add_history1(history_cell, cell_id, cells_to_correct, cells_known, t_to_corr
         history_cell.displacement.append([0,0])
         history_cell.center.append([])
     
-    area = "ccs4"
-    obj_area = get_area_def(area)
-    #outputFile = "/data/COALITION2/PicturesSatellite/LEL_results_wind//"+year0S+"-"+month0S+"-"+day0S+"/cell_properties/"+interesting_cell+"/_to_correctestor/"+hour0S+min0S+"cells_to_correct.png"
-    outputFile = year1S+"-"+month1S+"-"+day1S+"/cell_properties/"+interesting_cell+"/_to_correctestor/"+hour1S+min1S+"cells_to_correct.png"
-    
-    if verbose:
-        print("in: ",outputFile)
-    #make_figureLabels(labels_out_to_correct, None, obj_area, outputFile, colorbar = False, vmin = False, vmax = False, center = center_to_correct)
-    #
-    
-    outputFile = "/data/COALITION2/PicturesSatellite/LEL_results_wind//"+year1S+"-"+month1S+"-"+day1S+"/cell_properties/"+interesting_cell+"/cells_known/"+hour1S+min1S+"cells_known_"+hour2S+min2S+".png"
-    outputFile = year1S+"-"+month1S+"-"+day1S+"/cell_properties/"+interesting_cell+"/cells_known/"+hour1S+min1S+"cells_known_"+hour2S+min2S+".png"
-    if verbose:
-        print("in: ",outputFile)
-    #make_figureLabels(labels_outKnown, None, obj_area, outputFile, colorbar = False, vmin = False, vmax = False)
-    
+
     if False:
-            #outputFile = "/data/COALITION2/PicturesSatellite/LEL_results_wind//"+year0S+"-"+month0S+"-"+day0S+"/cell_properties/"+interesting_cell+"/evolution_CoM/"+hour0S+min0S+"cells_known.png"
-            outputFile = year1S+"-"+month1S+"-"+day1S+"/cell_properties/"+interesting_cell+"/evolution_CoM/"+hour1S+min1S+"cells_known.png"
-            make_figureLabels(labels_out_to_correctPlus1, None, obj_area, outputFile, colorbar = False, vmin = False, vmax = False, center = center_to_correct)
-            #outputFile = "/data/COALITION2/PicturesSatellite/LEL_results_wind//"+year0S+"-"+month0S+"-"+day0S+"/cell_properties/"+interesting_cell+"/evolution_CoM/"+hour0S+min0S+"cells_to_correct.png"
-            if test_KnownHistory != 2:
-                outputFile = year1S+"-"+month1S+"-"+day1S+"/cell_properties/"+interesting_cell+"/evolution_CoM/"+hour1S+min1S+"cells_to_correct.png"
-                make_figureLabels(labels_outKnownPlus1, None, obj_area, outputFile, colorbar = False, vmin = False, vmax = False, center = centerKnown)
+            area = "ccs4"
+            obj_area = get_area_def(area)
+            #outputFile = "/data/COALITION2/PicturesSatellite/LEL_results_wind//"+year0S+"-"+month0S+"-"+day0S+"/cell_properties/"+interesting_cell+"/_to_correctestor/"+hour0S+min0S+"cells_to_correct.png"
+            outputFile = year1S+"-"+month1S+"-"+day1S+"/cell_properties/"+interesting_cell+"/_to_correctestor/"+hour1S+min1S+"cells_to_correct.png"
+            
+            if verbose:
+                print("in: ",outputFile)
+            #make_figureLabels(labels_out_to_correct, None, obj_area, outputFile, colorbar = False, vmin = False, vmax = False, center = center_to_correct)
+            #
+            
+            outputFile = "/data/COALITION2/PicturesSatellite/LEL_results_wind//"+year1S+"-"+month1S+"-"+day1S+"/cell_properties/"+interesting_cell+"/cells_known/"+hour1S+min1S+"cells_known_"+hour2S+min2S+".png"
+            outputFile = year1S+"-"+month1S+"-"+day1S+"/cell_properties/"+interesting_cell+"/cells_known/"+hour1S+min1S+"cells_known_"+hour2S+min2S+".png"
+            if verbose:
+                print("in: ",outputFile)
+            #make_figureLabels(labels_outKnown, None, obj_area, outputFile, colorbar = False, vmin = False, vmax = False)
+            
+            if False:
+                    #outputFile = "/data/COALITION2/PicturesSatellite/LEL_results_wind//"+year0S+"-"+month0S+"-"+day0S+"/cell_properties/"+interesting_cell+"/evolution_CoM/"+hour0S+min0S+"cells_known.png"
+                    outputFile = year1S+"-"+month1S+"-"+day1S+"/cell_properties/"+interesting_cell+"/evolution_CoM/"+hour1S+min1S+"cells_known.png"
+                    make_figureLabels(labels_out_to_correctPlus1, None, obj_area, outputFile, colorbar = False, vmin = False, vmax = False, center = center_to_correct)
+                    #outputFile = "/data/COALITION2/PicturesSatellite/LEL_results_wind//"+year0S+"-"+month0S+"-"+day0S+"/cell_properties/"+interesting_cell+"/evolution_CoM/"+hour0S+min0S+"cells_to_correct.png"
+                    if test_KnownHistory != 2:
+                        outputFile = year1S+"-"+month1S+"-"+day1S+"/cell_properties/"+interesting_cell+"/evolution_CoM/"+hour1S+min1S+"cells_to_correct.png"
+                        make_figureLabels(labels_outKnownPlus1, None, obj_area, outputFile, colorbar = False, vmin = False, vmax = False, center = centerKnown)
         
     return history_cell, data_container
 
@@ -365,6 +401,7 @@ def find_ancestors(cell, t, data_container,labels_dir):
         except KeyError: 
             print("current cells", cell_curr)
             print("all cells available:, ",data_container['all_cell_properties'][string_id].keys()) #myShelve['cells'].keys())
+            print("key error in line 382 of history_backward")
             quit()
         
     
@@ -388,10 +425,14 @@ def find_children(cell,t,data_container,labels_dir) :
     
     connections = data_container['all_connections'][string_id]
     
-    if cell[0] == "I":
-        cell1 = []
-        cell1.append(cell)
-        cell = deepcopy(cell1)
+    try:
+        if cell[0] == "I":
+            cell1 = []
+            cell1.append(cell)
+            cell = deepcopy(cell1)
+    except IndexError:
+        print("cell", cell)
+        quit()
     for cell_curr in cell: 
         
         for con in range(len(connections)):
@@ -503,7 +544,7 @@ def get_info_current_time(time, data_container, labels_dir): # all_connections =
               except KeyError:
                   1+2
               except EOFError:
-                  print("EOFError: ",filename)
+                  print("EOFError: ",filename, "quitting history_backward line 525")
                   quit()
                   #if you try to read the current timestep it won't find the connections yet!!! COULD BE DANGEROUS, could give error later
               try:
@@ -519,18 +560,62 @@ def get_info_current_time(time, data_container, labels_dir): # all_connections =
     # !!!!!!!!! some can be returned as NONE if None as input ---> should always have all as output even if not needed/used/known !!!!!!!!!!    
     return string_id, data_container
 
-def check_if_CenterOfMass_outside(labels_tmp):
+def check_if_CenterOfMass_outside(labels_tmp, in_msg):
     x, y = ndimage.measurements.center_of_mass(labels_tmp)
     #print("x", x)
     #print("y", y)
-    px_cut = 70
+    px_cut = in_msg.px_cut
     if x <= px_cut or x >= (640-px_cut) or y <= px_cut or y >= (710-px_cut):
         return True
     else:
         return False
-        
 
-def history_backward(time1, id_interesting_cell, backward, t_stop = None, labels_dir = '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/'):
+def check_area_stop_history_when_small(threshold, cell_id, cells_known, t_known, data_container, labels_dir):
+    verbose = False
+    #year2S, month2S, day2S, hour2S, min2S = string_date(t_known)
+    #year1S, month1S, day1S, hour1S, min1S = string_date(t_to_correct)
+    
+    #string_id1, data_container = get_info_current_time(t_to_correct, data_container, labels_dir)
+    string_id2, data_container = get_info_current_time(t_known, data_container, labels_dir)
+    #Atot_to_correct = 0
+    Atot_known = 0
+    
+    #AT_known = np.zeros(num_rgb)
+    #AT_to_correct = np.zeros(num_rgb)
+    
+    if verbose:
+        print("string_id cells_known", string_id2)
+        print(cells_known)
+    
+    try:
+        labels_to_correct = deepcopy(data_container['all_labels'][string_id2]) #deepcopy(myShelve1['labels'])
+    except KeyError:
+        print("string_id2 ", string_id2)
+        print("quitting in history_backward line 213")
+        quit()
+    labelsKnown = deepcopy(data_container['all_labels'][string_id2]) #deepcopy(myShelve2['labels'])
+    
+    #labels_out_to_correct = np.zeros(labels_to_correct.shape)
+    #labels_outKnown = np.zeros(labelsKnown.shape)
+    
+    if cells_known[0] == "I":
+            cells_known = [cells_known]    
+            
+    for ids in cells_known:
+        #label = int(ids[2:])
+        #labels_outKnown[labelsKnown==label] = label
+        Atot_known += data_container['all_cell_properties'][string_id2][ids].area_px
+    A2 = data_container['all_cell_properties'][string_id2]["ID"+str(cell_id)].area_px
+    #A1 = A2 * Atot_to_correct/Atot_known
+    #Temp_known = data_container['all_cell_properties'][string_id2]["ID"+str(cell_id)].mean108
+    #Temp_to_correct = Temp_known + AT_to_correct/Atot_to_correct - AT_known/Atot_known
+    
+    if float(A2)/float(Atot_known) >= threshold:
+        return True, data_container
+    else:
+        return False, data_container
+
+def history_backward(time1, id_interesting_cell, backward, in_msg, t_stop = None, labels_dir = '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/',history_correction = True):
 
         """                                          
         --------------------------------------------------
@@ -539,17 +624,20 @@ def history_backward(time1, id_interesting_cell, backward, t_stop = None, labels
         input variables
         output variables
         """
-
-        #from Cells import Cells
-        if backward:
+        
+        if backward == True:
             direction='backward'
+            stop_history_when_small = in_msg.stop_history_when_smallForward
         else:
             direction='foreward'
+            stop_history_when_small = in_msg.stop_history_when_smallBackward
+        
+        threshold_stop_history_when_small = in_msg.threshold_stop_history_when_small
+        
         print("*** compute "+direction+" history of cell ID", id_interesting_cell)
 
-        #print("labels_dir = ",labels_dir,)
-        verbose = False   
-        #print("time: ",time1)
+        verbose = False
+        
         data_container = {}
         data_container['all_connections'] = {}
         data_container['all_cell_properties'] = {}
@@ -579,7 +667,7 @@ def history_backward(time1, id_interesting_cell, backward, t_stop = None, labels
             else:
                 # default stop time is 19:00 UTC
                 t_stopDay = datetime(time1.year, time1.month, time1.day, 19, 00)
-                if   time1.day == 7 and time1.month == 7 and time1.year == 2015:  # avoid specific exceptions, that may produce hard to find bugs !HAU!
+                if time1.day == 7 and time1.month == 7 and time1.year == 2015:  # avoid specific exceptions, that may produce hard to find bugs !HAU!
                     t_stopDay = datetime(2015,7,7,16,30)
                         
         yearS  = str(time1.year)
@@ -612,15 +700,15 @@ def history_backward(time1, id_interesting_cell, backward, t_stop = None, labels
         
         labels_tmp = np.where(data_container['all_labels'][string_id]==id_interesting_cell,1,0)
 
-        if check_if_CenterOfMass_outside(labels_tmp):
+        if check_if_CenterOfMass_outside(labels_tmp,in_msg):
             print("*** center of mass outside for cell ID", id_interesting_cell)
             return None, None, None, None, None
         
         # loop over cells ... !HAU! is it nessesary to loop over the cells, cant you go directly to the interesting cell?
         for i in range(len(labels_id)):
             #if verbose:
-            #    print("history for cell: ", "ID"+str(labels_id[i]))
-            #    print(labels_id[i])
+            #print("history for cell: ", "ID"+str(labels_id[i]))
+            #print(labels_id[i])
 
             if "ID"+str(labels_id[i]) == interesting_cell:
                 if verbose:
@@ -639,49 +727,142 @@ def history_backward(time1, id_interesting_cell, backward, t_stop = None, labels
                 history_cell["ID"+str(cell_id)].colors.append('b')
                 history_cell["ID"+str(cell_id)].displacement      = []                                                 # initialize with empty list
                 history_cell["ID"+str(cell_id)].center            = [history_cell["ID"+str(cell_id)].center]           # convert to list
+                history_cell["ID"+str(cell_id)].test_size         = [True]
+                
+                print ("you made it here ", history_cell["ID"+str(cell_id)].test_size)
                 
                 #id_prev = current_cell.id_prev
-                
-                while t > t_startDay and t < t_stopDay: # and len(id_prev) > 0: 
-                
-                    children = "ID"+str(cell_id)
-                    if verbose:
-                        print("children ", children)
-                    #print "inside cycle"
-                    if backward:
-                         t = t - timedelta (minutes = 5)
-                    else:
-                         t = t + timedelta (minutes = 5)
-                         t_temp = deepcopy(time1)
-                         while t_temp < t:
-                            children, data_container = find_children(children, t_temp, data_container,labels_dir)
-                            t_temp += timedelta(minutes = 5) 
-                    
-                    if verbose:
-                        print("TIMESTEP ", t)
+                count_stopped_hist = 0
+                cell_large_enough = True
+                while t > t_startDay and t < t_stopDay and cell_large_enough == True: # and len(id_prev) > 0: 
+                    if np.logical_and(stop_history_when_small == True, history_cell["ID"+str(cell_id)].test_size[-1]==True) or stop_history_when_small == False:
+                        children = "ID"+str(cell_id)
+                        if verbose:
+                            print("children ", children)
+                        #print "inside cycle"
+                        if backward:
+                             t = t - timedelta (minutes = 5)
+                        else:
+                             t = t + timedelta (minutes = 5)
+                             t_temp = deepcopy(time1)
+                             while t_temp < t:
+                                children, data_container = find_children(children, t_temp, data_container,labels_dir)
+                                t_temp += timedelta(minutes = 5) 
+                        
+                        if verbose:
+                            print("TIMESTEP ", t)
+                        
+                        """
+                        if backward:
+                                  children, ancestors, data_container = find_relatives(children, t, t_requestHist, data_container, labels_dir)
+                        elif children!=[]:
+                                  children, ancestors, data_container = find_relatives(children, t_requestHist, t, data_container, labels_dir)
 
-                    
-                    if backward:
-                              children, ancestors, data_container = find_relatives(children, t, t_requestHist, data_container, labels_dir)
-                    elif children!=[]:
-                              children, ancestors, data_container = find_relatives(children, t_requestHist, t, data_container, labels_dir) 
-                    
-                    if len(children)>0 and len(ancestors)>0:
-                              if verbose:
-                                  print("after finding relatives \n Children",children, "\n Ancestors", ancestors)
-                              if backward:
+                        if len(children)>0 and len(ancestors)>0:
+                                  if verbose:
+                                      print("after finding relatives \n Children",children, "\n Ancestors", ancestors)
+                                  if backward:
+                                        history_cell["ID"+str(cell_id)], data_container = add_history1(history_cell["ID"+str(cell_id)], cell_id, ancestors, children, t, t_requestHist,len(rgb_load), interesting_cell, backward,data_container,labels_dir,in_msg)
+                                  else:
+                                        history_cell["ID"+str(cell_id)], data_container = add_history1(history_cell["ID"+str(cell_id)], cell_id, children, ancestors, t, t_requestHist,len(rgb_load), interesting_cell, backward,data_container,labels_dir,in_msg)
+
+                                  if verbose:
+                                      print("history written for: ","ID",str(cell_id))
+                        else:
+                                  if verbose:
+                                      print("no ancestors or children")
+                                  break
+
+
+                        """
+                        
+                        if backward:
+                            children, ancestors, data_container = find_relatives(children, t, t_requestHist, data_container, labels_dir)
+                            children_check = deepcopy(children)
+                            ancestors_check = deepcopy(ancestors)  
+                            if verbose:
+                                print("done correct history")
+                            if history_correction!=True:
+                                t_no_correction = deepcopy(t_requestHist)
+                                ancestors = deepcopy(interesting_cell)
+                                children = deepcopy(interesting_cell)
+                                if ancestors not in ancestors_check:
+                                    ancestors = []
+                                if verbose:
+                                        print("Beginning \n children", children, "\n Ancestors:" ,ancestors)
+                                        print("done history follow id")
+                                if history_correction == False:
+                                    ancestors = deepcopy(interesting_cell)
+                                    children = deepcopy(interesting_cell)
+                                    while t_no_correction > t:
+                                        if verbose:
+                                            print(t_no_correction)
+                                            print("Before \n children", children, "\n Ancestors:", ancestors)
+                                        ancestors, data_container = find_ancestors(ancestors, t_no_correction, data_container,labels_dir)
+                                        if verbose:
+                                            print("After \n children", children, "\n Ancestors:", ancestors)
+                                        t_no_correction-=timedelta(minutes = 5)
+                                    if verbose:
+                                        print("Done history incorrect multiple ancestors/children")
+                        elif children!=[]:
+                            children, ancestors, data_container = find_relatives(children, t_requestHist, t, data_container, labels_dir) 
+                            ancestors_check = deepcopy(ancestors)  
+                            children_check = deepcopy(children)                            
+                            if history_correction != True:
+                                t_no_correction = deepcopy(t_requestHist)
+                                ancestors = deepcopy(interesting_cell)
+                                children = deepcopy(interesting_cell)
+                                if children not in children_check:
+                                    children = []
+                                if history_correction == False:
+                                    ancestors = deepcopy(interesting_cell)
+                                    children = deepcopy(interesting_cell)                               
+                                    while t_no_correction < t:
+                                        if children != []:
+                                            if verbose:
+                                                print("looking for children of %s at "%(children), t_no_correction)
+                                            children, data_container = find_children(children,t_no_correction, data_container,labels_dir)
+                                            if verbose:
+                                                print("children found are: ", children)
+                                        else:
+                                            print(interesting_cell,". requested: ",t_requestHist, "current time: ", t_no_correction)
+                                            quit()
+                                        t_no_correction+=timedelta(minutes = 5)
+                                
+                        if len(children)>0 and len(ancestors)>0 and len(children_check)>0 and len(ancestors_check)>0:
+                            if verbose:
+                              print("after finding relatives \n Children",children, "\n Ancestors", ancestors)
+                            if backward:
+
+                                cell_large_enough, data_container = check_area_stop_history_when_small(in_msg.threshold_stop_history_when_small, cell_id, children_check, t_requestHist, data_container, labels_dir)
+                                
+                                if cell_large_enough:
+                                    if verbose:
+                                        print("adding history: \n Children=", children, "at time:", t_requestHist, "\n Ancestors =", ancestors, "at time:", t) 
+                                        print("To check you used: \n Children=", children_check, "at time:", t_requestHist, "The ancestors check are: ", ancestors_check, "at ", t)
                                     history_cell["ID"+str(cell_id)], data_container = add_history1(history_cell["ID"+str(cell_id)], cell_id, ancestors, children, t, t_requestHist, 
-                                                                                                   len(rgb_load), interesting_cell, backward, data_container,labels_dir)
-                              else:
+                                                                                                   len(rgb_load), interesting_cell, backward, data_container,labels_dir,in_msg,history_correction)
+                                else:
+                                    count_stopped_hist+=1
+                                #quit()
+                            else:
+                                cell_large_enough, data_container = check_area_stop_history_when_small(in_msg.threshold_stop_history_when_small, cell_id, ancestors_check, t_requestHist, data_container, labels_dir)
+                                if cell_large_enough:
+                                    if verbose:
+                                        print("adding history: \n Children=", children, "at time:", t, "\n Ancestors =", ancestors, "at time:", t_requestHist) 
+                                        print("To check you used: \n Ancestors=", ancestors_check, "at time:", t_requestHist)                                    
                                     history_cell["ID"+str(cell_id)], data_container = add_history1(history_cell["ID"+str(cell_id)], cell_id, children, ancestors, t, t_requestHist, 
-                                                                                                   len(rgb_load), interesting_cell, backward, data_container,labels_dir)
-                              
-                              if verbose:
-                                  print("history written for: ","ID",str(cell_id))
+                                                                                                   len(rgb_load), interesting_cell, backward, data_container,labels_dir,in_msg,history_correction)
+                                else:
+                                    count_stopped_hist += 1
+                            if verbose:
+                              print("history written for: ","ID",str(cell_id))
+                        else:
+                            if verbose:
+                              print("no ancestors or children")
+                            break 
                     else:
-                              if verbose:
-                                  print("no ancestors or children")
-                              break                                                          
+                        break
                 if verbose:
                     print("----is now a new cell", t, t_startDay)
             #else:
@@ -692,8 +873,12 @@ def history_backward(time1, id_interesting_cell, backward, t_stop = None, labels
             print("----beginning plotting")            
             print("*** cell chosen: ",interesting_cell)
         
-        rgbs = history_cell[interesting_cell].mean108
-        
+        try:
+            rgbs = history_cell[interesting_cell].mean108
+        except KeyError:
+            print(labels_id)
+            print("quitting line 726 of history_backward")
+            quit()
         area = history_cell[interesting_cell].area_px
         
         color_list = history_cell[interesting_cell].colors
@@ -707,7 +892,7 @@ def history_backward(time1, id_interesting_cell, backward, t_stop = None, labels
         else:
             ind = np.zeros((11))
         
-
+        print("The number of times the history was not added because of the relative size of the cell is: ",count_stopped_hist)
         if ind.size>13:
               ind[:,0]  = rgbs[:,rgb_load.index('WV_062')] - rgbs[:,rgb_load.index('IR_108')] # cd 1 also us 6
               ind[:,1]  = rgbs[:,rgb_load.index('WV_062')] - rgbs[:,rgb_load.index('WV_073')] # cd 2 also us 1 & 4
@@ -872,8 +1057,164 @@ def history_backward(time1, id_interesting_cell, backward, t_stop = None, labels
 
         return ind, area, displ_array, time_save, center
 
+def plot_results_history(t1,value1,label1,t2,value2,label2,t3,value3,label3,time1,variable, interesting_cell, times = None, split = None, merge = None):
+    
+    if times != None:
+        minimum_data = min(min(value1),min(value2),min(value3))
+        val_to_subtract = (max(max(value1),max(value2),max(value3)) - minimum_data)/15
+        min_value_split = [minimum_data - val_to_subtract]
+        min_value_merge = [minimum_data - (val_to_subtract/2)]
+        
+        times = np.array(times)
+        split = np.array(split)
+        merge = np.array(merge)
+        
+        t_split = times[split>0]
+        t_merge = times[merge>0]
+    
+    fig, ax = plt.subplots()
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+    ax.plot_date(t1,value1, "*", markeredgewidth=1,markeredgecolor='red',markerfacecolor = 'None',label=label1)           
+    ax.plot_date(t2,value2, "^", markeredgewidth=1,markeredgecolor='magenta',markerfacecolor = 'None',label=label2)  
+    ax.plot_date(t3, value3, 'o',markeredgewidth=1,markeredgecolor='black', markerfacecolor = 'None',label=label3)           
+    if times != None:
+        ax.plot_date(t_split, min_value_split*t_split.size, 'o',markersize = 4, color = "cyan",label="Split")
+        ax.plot_date(t_merge, min_value_merge*t_merge.size, 'o',markersize = 4, color = "blue",label="Merge")
+    
+    if variable != "dx" and variable != "dy":
+        ax.plot_date(t1[0],value1[0], color = "green", label = "Starting point")
+    plt.xlim(t1[-1]-timedelta(minutes = 5), t1[0]+timedelta(minutes = 5))
+    ax.legend(loc='best'); # upper left ##"best");
+    
+    yearS, monthS, dayS, hourS, minS = string_date(time1)
+    
+    filename="plot_history_back/"+variable+yearS+monthS+dayS+"_"+hourS+minS+"_ID"+str(id_interesting_cell)+'.png'
+    #print (filename)
+    plt.xlabel("time")
+    if variable == "area":
+        ylabel = "Area [km2]"
+    elif variable == "IR108":
+        ylabel = "Brightness temperature IR10.8 [K]"
+    elif variable == "dx":
+        ylabel = "South-North displacement [km]"
+    elif variable == "dy":
+        ylabel = "East-West displacement [km]"    
+    elif variable == "COM":
+        ylabel = "Coordinates Center of Mass"
+    else:
+        ylabel = "unknown variable"
+    plt.title("ID"+str(interesting_cell)+" "+dayS+"."+monthS+"."+yearS)
+    plt.ylabel(ylabel)
+    plt.show()
+    fig.savefig(filename)
+    plt.close(fig)    #plt.plot(time_save, area, color = "red")
 
+def find_split_and_merge(id_cell, times,labels_dir):
+    data_container = {}
+    data_container['all_connections'] = {}
+    data_container['all_cell_properties'] = {}
+    data_container['all_labels'] = {}
+    times.sort()
+    split = []
+    merge = []
+    
+    for time in times:
+        string_id, data_container = get_info_current_time(time, data_container, labels_dir)
+        string_id_before, data_container = get_info_current_time(time-timedelta(minutes=5), data_container, labels_dir)
+        
+        connections = data_container['all_connections'][string_id_before]
+        
+        #find ancestors of cell at time-5min
+        ancestors = data_container['all_cell_properties'][string_id][id_cell].id_prev
+        
+        if len(ancestors)==0:
+            #no ancestors, new cell
+            split.append(0)
+            merge.append(0)
+        else:
+            if len(ancestors)==1: 
+                merge.append(0) #if only one ancestors, there was no merge
+                #ancestors = [ancestors] #allow to loop over ancestors even if only one (avoid looping over the letters of "IDXX")
+            else:
+                merge.append(1) #if more than one ancestors, there was a merge
+            
+            split_tmp = 0
+            for ancestor in ancestors:
+                if split_tmp == 0:
+                    for con in range(len(connections)): 
+                        if connections[con][0] == id_cell:
+                            
+                            children = connections[con][1:]
+                            
+                            if len(children)>1:
+                                split_tmp = 1 #if one of the ancestors has more than one children, is a split
+                                split.append(1) #as soon as there is one split just count and break
+                                
+                else:
+                    break
+            if split_tmp == 0:
+                split.append(0)
+        if len(split)!=len(merge):
+            print(len(split))
+            print(split)
+            print(len(merge))
+            print("len different")
+            quit()
+        
+    if len(split)!=len(times) or len(merge)!=len(times):
+        print(len(split))
+        print(split)
+        print(len(merge))
+        print(len(times))
+        print("Quitting because something went wrong with the splitting and merging count,history_backward line 1132")
+        quit()
+    else:
+        return times, split, merge
 
+            
 
-
-
+if __name__=="__main__":
+       
+    #id_interesting_cell = 54
+    id_interesting_cell = 233
+    backward = True
+    input_file = sys.argv[1]
+    if input_file[-3:] == '.py': 
+        input_file=input_file[:-3]
+    in_msg = get_input_msg(input_file)
+    import seaborn
+    print ("input imported: ", input_file)
+    if len(sys.argv)<6:
+        time1 = datetime(2015,6,7,15,10) 
+    else:
+        print(sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6])
+        year = int(sys.argv[2])
+        month = int(sys.argv[3])
+        day = int(sys.argv[4])
+        hour = int(sys.argv[5])
+        minutes =  int(sys.argv[6])
+        id_interesting_cell = int(sys.argv[7])
+        #time1 = datetime(sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6])
+        time1 = datetime(year, month, day, hour, minutes)
+    t_Stop = time1-timedelta(minutes = 65) #None #
+    history_correction =False
+    ind, area, displ_array, time_save, center = history_backward(time1, id_interesting_cell, backward, in_msg, t_stop = t_Stop, labels_dir = '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/', history_correction = history_correction)
+    history_correction = True
+    ind_corr, area_corr, displ_array_corr, time_save_corr, center_corr = history_backward(time1, id_interesting_cell, backward, in_msg, t_stop = t_Stop , labels_dir = '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/', history_correction = history_correction)
+    history_correction = "follow_id"
+    ind_id, area_id, displ_array_id, time_save_id, center_id = history_backward(time1, id_interesting_cell, backward, in_msg, t_stop = t_Stop, labels_dir = '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/', history_correction = history_correction)
+    
+    times, split, merge = find_split_and_merge("ID"+str(id_interesting_cell), deepcopy(time_save), '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/')
+    print("start plotting")
+    plot_results_history(time_save,area,"Direct ancestors",time_save_id, area_id, "Follow ID",time_save_corr,area_corr,"Corrected",time1,"area", id_interesting_cell, times, split, merge)
+    plot_results_history(time_save,ind[:,2],"Direct ancestors",time_save_id, ind_id[:,2], "Follow ID",time_save_corr,ind_corr[:,2],"Corrected",time1,"IR108", id_interesting_cell, times, split, merge)
+    plot_results_history(time_save[1:],displ_array[:,0],"Direct ancestors",time_save_id[1:], displ_array_id[:,0], "Follow ID",time_save_corr[1:],displ_array_corr[:,0],"Corrected",time1,"dx", id_interesting_cell, times[:-1], split[:-1], merge[:-1])
+    plot_results_history(time_save[1:],displ_array[:,1],"Direct ancestors",time_save_id[1:], displ_array_id[:,1], "Follow ID",time_save_corr[1:],displ_array_corr[:,1],"Corrected",time1,"dy", id_interesting_cell, times[:-1], split[:-1], merge[:-1])
+    
+    #plot_results_history(time_save,area,"Not corrected",time_save_id, area_id, "Not corrected, follow ID",time_save_corr,area_corr,"Corrected",time1,"COM")
+    
+    
+    
+    
+    
+    

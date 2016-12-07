@@ -321,6 +321,8 @@ def properties_cells(t1, tStop, current_labels=None, metadata=None, labels_dir=N
           file_previous_labels = labels_dir +  'Labels_%s*'%(year0S+month0S+day0S+hour0S+min0S)
           filename1 = glob.glob(file_previous_labels)
           
+          print "the previous filename is: ", filename1
+          
           if t0.hour == 0 and t0.minute == 0:
               check_date = True
           else:
@@ -394,8 +396,20 @@ def properties_cells(t1, tStop, current_labels=None, metadata=None, labels_dir=N
               
               #these labels are random numbers assigned in COALITION2 (different number for each cell)
               data1 = np.array(data1,'uint32')
-              labels1 = np.unique(data1)    # this might be an empty [] !HAU!
-
+              labels1 = np.unique(data1)    # this might be an empty [] !HAU!              
+              
+              # new id number for the new cells at t1
+              if labels0.size == 0:
+                    new_id_num = 1
+              else:
+                    try:
+                        new_id_num = labels0.max()+1
+                    except ValueError:
+                        print "labels0: ", labels0
+                        print type(labels0)
+                        print "quitting in properties_cells line 397"
+                        quit()
+              
               #list to make sure you record every split
               list_previous = []
 

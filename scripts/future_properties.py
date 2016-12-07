@@ -6,6 +6,12 @@ from copy import deepcopy
 import matplotlib.dates as mdates
 from datetime import timedelta
 from Cells import Cells
+import sys, string, os
+
+from get_input_msg import get_input_msg
+from datetime import datetime, timedelta
+from history_backward import history_backward, string_date
+import getpass
 
 import inspect
 current_file = inspect.getfile(inspect.currentframe())
@@ -220,8 +226,105 @@ def future_properties(time, property_values, property_name,model):
         
 
         return t_save, y_save
+        
+if __name__ == "__main__":
+        import seaborn
+        input_file = sys.argv[1]
+        if input_file[-3:] == '.py': 
+            input_file=input_file[:-3]
+        in_msg = get_input_msg(input_file)
+        import seaborn
+        print ("input imported: ", input_file)
+        if len(sys.argv)<6:
+            time_start = datetime(2015,6,7,15,10) 
+            time_end = deepcopy(time_start)
+        else:
+            print(sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6])
+            year = int(sys.argv[2])
+            month = int(sys.argv[3])
+            day = int(sys.argv[4])
+            hour = int(sys.argv[5])
+            minutes =  int(sys.argv[6])
+            #time1 = datetime(sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6])
+            time_start = datetime(year, month, day, hour, minutes)
+            time_start_save = deepcopy(time_start)
+            id_interesting_cell = int(sys.argv[7])
+            if len(sys.argv)>8:
+                year = int(sys.argv[8])
+                month = int(sys.argv[9])
+                day = int(sys.argv[10])
+                hour = int(sys.argv[11])
+                minutes =  int(sys.argv[10])
+                time_end = datetime(year, month, day, hour, minutes)
+                
+            else:
+                time_end = deepcopy(time_start)
+                    
+        
+        history_correction = True
+        
+        while time_start <= time_end:
+            
+            backward = True
+            ind, area, displacement, time, center = history_backward(time_start, id_interesting_cell, backward, in_msg, time_start-timedelta(hours=1), labels_dir= '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/',history_correction = history_correction)
+                    
+            history108 = ind[:,2]
+            
+            if len(area)<=3:
+                t_forecast, y_forecast = future_properties(time, area, 'area', "linear")
+                t_forecast, forecast108 = future_properties(time, history108, 'IR_108', "linear")
+                
+            else:
+                t_forecast, y_forecast = future_properties(time, area, 'area', "linear_exp_exp") 
+                t_forecast, forecast108 = future_properties(time,history108,'IR_108', "linear_exp_exp")
+            
+            print "starting history forward, ", time_start    
+            t_temp_stop = time_start+timedelta(hours = 1)+timedelta(minutes = 5) 
+            
+            backward = False
+            ind1, area1, displacement1, time1, center1 = history_backward(time_start, id_interesting_cell, backward, in_msg, t_temp_stop, labels_dir= '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/',history_correction = history_correction)
+            print "history forward Done"        
+            
+            future108 = ind1[:,2]
 
+            fig, ax = plt.subplots()
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+            ax.plot_date(time, area, color = "red",label="History backward")           # noisy data
+            ax.plot_date(time1[:12], area1[:12], color = "blue", label="History forward")           # noisy data time2[1:]
+            ax.plot_date(t_forecast, y_forecast, '-', color = "green", label = "Fit and Extrapolation")
+            plt.xlim(time[-1]-timedelta(minutes = 5), time1[-1]+timedelta(minutes = 5))
+            ax.legend(loc="best") #ax.legend(loc=2); # upper left ##"best");
+            yearS, monthS, dayS, hourS, minS = string_date(time_start)
+            filename="extrapolation/Area"+yearS+monthS+dayS+"_"+hourS+minS+"_ID"+str(id_interesting_cell)+'_'+str(history_correction)+'.png'
+            #print (filename)
+            plt.xlim(time_start_save-timedelta(minutes=65), time_end+timedelta(minutes=65))
+            plt.ylim(0,60000)
+            plt.xlabel("time")
+            plt.ylabel("area [km2]")
+            #plt.show()
+            fig.savefig(filename)
+            plt.close(fig)    #plt.plot(time_save, area, color = "red")
 
+            fig, ax = plt.subplots()
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+            ax.plot_date(time, history108, color = "red",label="History backward")           # noisy data
+            ax.plot_date(time1[:12], future108[:12], color = "blue", label="History forward")           # noisy data time2[1:]
+            ax.plot_date(t_forecast, forecast108, '-', color = "green", label = "Fit and Extrapolation")
+            plt.xlim(time[-1]-timedelta(minutes = 5), time1[-1]+timedelta(minutes = 5))
+            ax.legend(loc="best") #2); # upper left ##"best");
+            #yearS, monthS, dayS, hourS, minS = string_date(time_start)
+
+            filename="extrapolation/IR108"+yearS+monthS+dayS+"_"+hourS+minS+"_ID"+str(id_interesting_cell)+'_'+str(history_correction)+'.png'
+            #print (filename)
+            plt.xlim(time_start_save-timedelta(minutes=65), time_end+timedelta(minutes=65))
+            plt.ylim(210,230)
+            plt.xlabel("time")
+            plt.ylabel("Brightness Temperature IR10.8 [K]")
+            #plt.show()
+            fig.savefig(filename)
+            plt.close(fig)    #plt.plot(time_save, area, color = "red")
+            
+            time_start += timedelta(minutes = 5)
 
 
 

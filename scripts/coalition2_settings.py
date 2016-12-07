@@ -29,21 +29,22 @@ background_alpha =   50      # transparent
 #background_alpha = 255     # opaque
 
 # threshold of the interest field tests 
-# -------------------------------------
-vmin_cd =    [-50.,    -20.,    210.,    -14.,    -32.,    - 3.]
-vmax_cd =    [ 1.,      2.,    300.,      3.,      6.,     15.]
+# (see plot_coalition2.py for definition of the tests and to check if tests are active)
+# -------------------------------------------------------------------------------------
+# cloud depth tests 
+vmin_cd =    [-50.,    -20.,    210.,    -14.,    -32.,    - 3.]   # colorbar range for the diagram showing the current test 
+vmax_cd =    [  1.,      2.,    300.,      3.,      6.,     15.]   # colorbar range for the diagram showing the current test 
+th_cd   =    [-16.,    - 7.5,   250.,    - 2.,    -12.5,    2.2]   # threshold of the tests
 
-th_cd   =    [-16.,    - 7.5,   250.,    - 2.,    -12.5,    2.2]
+# glaciation indicator tests
+vmin_gi =    [- 6.,    - 8.,    - 5.,    - 3.,   - 6.,     -32.,    -10.]  # colorbar range for the diagram showing the current test 
+vmax_gi =    [ 10.,      4.,      8.,      6.,     6.,      32.,      2.]  # colorbar range for the diagram showing the current test 
+th_gi   =    [  2.,    - 1.5,    1.5,    - 1.,   - 1.,       0.,    - 1.]  # threshold of the tests
 
-vmin_gi =    [- 6.,    - 8.,    - 5.,    - 3.,   - 6.,     -32.,    -10.]
-vmax_gi =    [ 10.,      4.,      8.,      6.,     6.,      32.,      2.]
-
-th_gi   =    [  2.,    - 1.5,    1.5,    - 1.,   - 1.,       0.,    - 1.]
-
-vmin_us =    [-12.,    -50.,    -60.,    -15.,   - 8.,     -40.,    -40.,    -12.]
-vmax_us =    [ 20.,     50.,     60.,     20.,    10.,      50.,     40.,     12.]
-
-th_us   =    [  2.5,   -12.,    -10.,      2.5,    2.,      13.,     10.,    - 7.]    
+# updraft strength tests
+vmin_us =    [-12.,    -50.,    -60.,    -15.,   - 8.,     -40.,    -40.,    -12.] # colorbar range for the diagram showing the current test 
+vmax_us =    [ 20.,     50.,     60.,     20.,    10.,      50.,     40.,     12.] # colorbar range for the diagram showing the current test 
+th_us   =    [  2.5,   -12.,    -10.,      2.5,    2.,      13.,     10.,    - 7.] # threshold of the tests
 
 
 # settings of the forth_mask (test to pass in addition to cloud depth, updraft strength and glaciation)

@@ -9,6 +9,7 @@ Bottleneck
 Cython
 dynd
 Flask
+h5netcdf
 inotify
 ipython-genutils
 Jinja2

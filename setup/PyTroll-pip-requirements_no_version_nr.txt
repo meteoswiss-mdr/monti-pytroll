@@ -35,6 +35,7 @@ gevent
 gevent-websocket
 greenlet
 grin
+h5netcdf
 h5py
 idna
 inotify

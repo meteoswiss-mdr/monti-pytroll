@@ -708,3 +708,22 @@ REGION: SouthArabia {
         YSIZE:  629
         AREA_EXTENT:    (-1091701.7912749145, 877278.435346408, 1091701.7912749113, 2135859.5476465565)
 };
+
+REGION: cosmo7 {
+        NAME:           Cosmo 7
+        PCS_ID:         cosmo7
+    PCS_DEF:    proj=ob_tran, ellps=WGS84, lat_0=46, lon_0=4.535, o_proj=stere, o_lat_p=90, o_lon_p=-5.465
+        XSIZE:          597
+        YSIZE:          510
+        AREA_EXTENT:    (-1812933.5656552943, -1003565.2518504434, 814056.0017955909, 1243448.9654948832)
+};
+
+REGION: cosmo1 {
+        NAME:           Cosmo 1
+        PCS_ID:         cosmo1
+    PCS_DEF:    proj=ob_tran, ellps=WGS84, lat_0=46.15, lon_0=8.435, o_proj=stere, o_lat_p=90, o_lon_p=-1.565
+        XSIZE:          584
+        YSIZE:          398
+        AREA_EXTENT:    (-754225.3130887491, -412056.2370343627, 531392.9480190033, 465627.48114979145)
+};
+

@@ -9,6 +9,8 @@ Bottleneck
 Cython
 dynd
 Flask
+Glymur
+python-geotiepoints
 h5netcdf
 inotify
 ipython-genutils

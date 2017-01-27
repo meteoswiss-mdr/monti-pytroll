@@ -31,8 +31,10 @@ enum34
 fastcache
 Flask
 funcsigs
+python-geotiepoints
 gevent
 gevent-websocket
+Glymur
 greenlet
 grin
 h5netcdf

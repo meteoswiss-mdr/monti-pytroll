@@ -39,6 +39,7 @@ freetype=2.5.5=0
 funcsigs=0.4=py27_0
 gevent=1.0.1=py27_0
 gevent-websocket=0.9.3=py27_0
+glymur=0.8.8=py27_0
 greenlet=0.4.9=py27_0
 grin=1.2.1=py27_1
 h5py=2.5.0=np110py27_4
@@ -92,6 +93,7 @@ numexpr=2.4.4=np110py27_0
 numpy=1.10.4=py27_0
 odo=0.3.4=py27_0
 openblas=0.2.14=3
+openjpeg=2.1.2=0
 openpyxl=2.2.6=py27_0
 openssl=1.0.2f=0
 pandas=0.17.1=np110py27_0
@@ -161,6 +163,7 @@ theano=0.7.0=np110py27_0
 tk=8.5.18=0
 toolz=0.7.4=py27_0
 tornado=4.3=py27_0
+tqdm=4.10.0=py27_0
 traitlets=4.1.0=py27_0
 ujson=1.33=py27_0
 unicodecsv=0.14.1=py27_0

@@ -20,7 +20,7 @@ from mpop.imageo.HRWimage import HRW_2dfield # , HRWstreamplot, HRWimage
 from datetime import timedelta
 from plot_msg import create_PIL_image, add_border_and_rivers, add_title
 from pycoast import ContourWriterAGG
-from my_msg_module import format_name, fill_with_closest_pixel
+from my_msg_module import check_near_real_time, format_name, fill_with_closest_pixel
 from copy import deepcopy 
 from my_msg_module import convert_NWCSAF_to_radiance_format, get_NWC_pge_name
 from mpop.imageo.palettes import convert_palette2colormap
@@ -41,6 +41,7 @@ import scp_settings
 scpOutputDir = scp_settings.scpOutputDir 
 scpID = scp_settings.scpID 
 import glob
+import inspect
 
 from pycoast import ContourWriterAGG
 from plot_msg import add_border_and_rivers
@@ -56,9 +57,9 @@ def read_HRW(sat, sat_nr, instrument, time_slot, ntimes, dt=5, read_basic_or_det
 
     Parameters
     ----------
-    sat : 
-    sat_nr : 
-    instrument : 
+    sat : satellite (string e.g. 'Meteosat') 
+    sat_nr : satellite number (string e.g. '09')
+    instrument : satellite instrument (string e.g. 'seviri')
     time_slot : datetime object
         the time of interest for which the extraction is wanted
     ntimes : int           
@@ -90,15 +91,15 @@ def read_HRW(sat, sat_nr, instrument, time_slot, ntimes, dt=5, read_basic_or_det
          """
 
     #print time_slot
-    data = GeostationaryFactory.create_scene(in_msg.sat_str(),in_msg.sat_nr_str(), "seviri",  time_slot)
+    data = GeostationaryFactory.create_scene(sat, sat_nr, instrument,  time_slot)
     data.load(['HRW'], reader_level="seviri-level5", read_basic_or_detailed=read_basic_or_detailed)
   
     # read data for previous time steps if needed
     for it in range(1,ntimes):
         time_slot_i = time_slot - timedelta( minutes = it*5 )
-        data_i = GeostationaryFactory.create_scene(in_msg.sat_str(),9, "seviri", time_slot_i)
+        data_i = GeostationaryFactory.create_scene(in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", time_slot_i)
         data_i.load(['HRW'], reader_level="seviri-level5", read_basic_or_detailed=read_basic_or_detailed)
-        # merge all datasets
+        # merge all datasets (addition of datasets defined in class HRW_class, see mpop/mpop/satin/nwcsaf_hrw_hdf.py)
         data['HRW'].HRW_detailed = data['HRW'].HRW_detailed + data_i['HRW'].HRW_detailed
         data['HRW'].HRW_basic    = data['HRW'].HRW_basic    + data_i['HRW'].HRW_basic
   
@@ -110,7 +111,7 @@ def read_HRW(sat, sat_nr, instrument, time_slot, ntimes, dt=5, read_basic_or_det
 
 # ------------------------------------------
 
-def m_to_pixel(value,size,conversion): #,coordinate):
+def m_to_pixel(value, size, conversion): #,coordinate):
     
     """ Converts coordinates from meters to pixels.
 
@@ -119,14 +120,14 @@ def m_to_pixel(value,size,conversion): #,coordinate):
     value : sequence
         coordinate to convert (in px or m)
     size : int
-        number corresponding to the m in one px
+        number corresponding to the meter in one satellite pixel
     conversion : "to_pixel" or other
         conversion to apply, either px to m or viceversa
 
     Returns
     ----------
-    ms or px : number
-        coordinate converted into m or px
+    m or px : number
+        coordinate converted into meter or px
 
     Raises
     ----------
@@ -140,7 +141,7 @@ def m_to_pixel(value,size,conversion): #,coordinate):
     else:
         m = (value*size)+size/2
         m[value==np.nan] = np.nan
-        return ms
+        return m
 
 def string_date(t):
     
@@ -155,7 +156,7 @@ def string_date(t):
     ----------
     yearS, monthS, dayS, hourS, minS : strings
         string corresponding to year, month, day, hour and minute.
-        month,day,hour,minute all have 2 characters.
+        month, day, hour, minute all have 2 characters (with leading 0 if necessary).
 
     Raises
     ----------
@@ -199,6 +200,7 @@ def check_cosmo_area (nc_cosmo, area):
     y = nc_cosmo.variables['x_1'][:]
     
     #obtains the coordinates corner pixels (+-500 because cosmo coordinates center of cell)
+    # !!! !hau! improve this: does assume fixed pixel size of 1000m !!!  
     x_min_cosmo = x.min()-500
     x_max_cosmo = x.max()+500
     y_min_cosmo = y.min()-500
@@ -234,7 +236,7 @@ def check_cosmo_area (nc_cosmo, area):
  
     return x_min_cut, x_max_cut, y_min_cut, y_max_cut
 
-def get_cosmo_filenames (t_sat, nrt=True, runs_before = 0, area = "ccs4c2" ):
+def get_cosmo_filenames (t_sat, nrt=True, runs_before=0, area = "ccs4c2" ):
     
     """ Provides the cosmo filename.
     
@@ -257,7 +259,7 @@ def get_cosmo_filenames (t_sat, nrt=True, runs_before = 0, area = "ccs4c2" ):
     ----------
     """
     
-    # get COSMO model start time
+    # get COSMO model start time (assuming COSMO start each 3h, 0,3,6,9...UTC)
     hour_run = t_sat.hour //3 * 3 
     t_run = datetime(t_sat.year, t_sat.month, t_sat.day, hour_run, 0)
 
@@ -279,7 +281,8 @@ def get_cosmo_filenames (t_sat, nrt=True, runs_before = 0, area = "ccs4c2" ):
         cosmoDir='/data/cinesat/in/cosmo/' #2016052515_05_cosmo-1_UV_swissXXL
     elif t_sat.year < 2016:
         cosmo = "cosmo2"
-        cosmoDir='/data/COALITION2/database/cosmo/test_wind/'+yearS+monthS+dayS+"_"+cosmo+"_"+area+"/" #20150515_cosmo2_ccs4c2 / 2015051506_00_cosmo2_UVccs4c2.nc or 2015070706_00_cosmo2_UV_ccs4c2.nc
+        cosmoDir='/data/COALITION2/database/cosmo/test_wind/'+yearS+monthS+dayS+"_"+cosmo+"_"+area+"/" 
+           #20150515_cosmo2_ccs4c2 / 2015051506_00_cosmo2_UVccs4c2.nc or 2015070706_00_cosmo2_UV_ccs4c2.nc
     else:
         cosmo = "cosmo-1"
         cosmoDir='/data/COALITION2/database/cosmo/wind/'+yearS+"/"+monthS+"/"+dayS+"/"
@@ -291,7 +294,7 @@ def get_cosmo_filenames (t_sat, nrt=True, runs_before = 0, area = "ccs4c2" ):
 
 def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure', area='ccs4', cosmo = None, nrt = False, rapid_scan_mode_satellite = True):
     
-    """ Provides the cosmo filename.
+    """ Calculate linearly interpolated wind fields for a specific time of interest 
     
     Parameters
     ----------
@@ -306,7 +309,7 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     cosmo : str
         identifier of the cosmo model wanted
     nrt: boolean
-        True if the system is run real time, false else (depending on realtime or not it will look for the
+        True if the system is run real time, false else (depending on realtime or not, it will look for the
         cosmo data in different paths, and look for different cosmo models
     rapid_scan_mode_satellite: boolean
         True if the satellite is in rapid scan mode (scans every 5 minutes) and False else (every 15 minutes)
@@ -320,10 +323,13 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     ----------
     """
     #print "WARNING: the output wind levels will be in order opposite to that in the input 'layers' "
-    if nrt == False and hour % 3 == 0 :
+
+    # rough rule, if latest COSMO run is already available
+    if nrt == False and hour % 3 == 0 :  # !!! !hau! this suggest to use 3 and 4h forecast, instead of Analysis and 1h forecast. Should it be like this?
         runs_before = 1
     else:
         runs_before = 0
+
     file1, file2 = get_cosmo_filenames ( datetime(year,month,day,hour,minute), nrt=nrt, runs_before = runs_before, area = area  )
 
     print "... search for ", file1, " and ", file2
@@ -337,10 +343,10 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
             
     if len(filename1)<1 or len(filename2)<1:
         print "*** Warning, found no cosmo wind data "
+        # look for the result of the COSMO run before
         file1, file2 = get_cosmo_filenames ( datetime(year,month,day,hour,minute),nrt = nrt, runs_before = runs_before + 1, area = area )
-        print file1, file2
 
-        print "... search for ", file1, " and ", file2
+        print "... search for preveous COSMO run: ", file1, " and ", file2
         filename1 = glob.glob(file1)
         filename2 = glob.glob(file2)
         
@@ -372,27 +378,28 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     pressure2 = pressure2.astype(int)    
     
     print "    pressure levels in file1: ", pressure1
-    print "    pressure levels in file1: ", pressure2
+    print "    pressure levels in file2: ", pressure2
     
     print "    pressures chosen: ", layers
-    u_all1 = nc_cosmo_1.variables['U'][:] 
+    u_all1 = nc_cosmo_1.variables['U'][:]
     v_all1 = nc_cosmo_1.variables['V'][:]
-    u_all2 = nc_cosmo_2.variables['U'][:] 
+    u_all2 = nc_cosmo_2.variables['U'][:]
     v_all2 = nc_cosmo_2.variables['V'][:]
 
     nx1 = u_all1.shape[2]
     ny1 = u_all1.shape[3] 
     
     nx2 = u_all2.shape[2]
-    ny2 = u_all2.shape[3]  
+    ny2 = u_all2.shape[3]
     
+    # check if data in COSMO file covers the whole area of interest
     x_min_cut1, x_max_cut1, y_min_cut1, y_max_cut1 = check_cosmo_area (nc_cosmo_1, area)
     x_min_cut2, x_max_cut2, y_min_cut2, y_max_cut2 = check_cosmo_area (nc_cosmo_2, area) 
     
     if len(layers)>1:
-        p_chosen = np.sort(layers)[::-1]  
-        print layers
-        print p_chosen
+        p_chosen = np.sort(layers)[::-1]
+        print "layers ", layers
+        print "p_chosen ", p_chosen
         #quit()
     else:
         p_chosen = layers
@@ -402,6 +409,7 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     u_d = np.zeros((len(p_chosen),nx1,ny1))
     v_d = np.zeros((len(p_chosen),nx1,ny1))
 
+    # time it takes to scan the disk
     if rapid_scan_mode_satellite:
         dt = 2
     else:
@@ -410,15 +418,17 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     position_t = (minute+dt)/5
     previous   = 1-(1./12*position_t)
 
+    # !!! !hau! this is not nice
     if p_chosen[0] not in pressure1: # pressure1.all() != p_chosen[0]:
         print "no value in: ", pressure1, "is equal to p_chosen: ",p_chosen[0]
         for elem in range(len(p_chosen)):
-            p_chosen[elem]*=100
+            p_chosen[elem]*=100   # convert hPa to Pa
     
     for g in range(len(p_chosen)):
-        print np.where(pressure1==p_chosen[g])
-        print pressure1
-        print p_chosen[g ]
+        #print "    interpolate wind for ", p_chosen[g]
+        #print np.where(pressure1==p_chosen[g])
+        #print pressure1
+        # search index, where the pressure is equal to the pressure of interest (might be different for file1 and file2)
         i1 = np.where(pressure1==p_chosen[g])[0][0]
         i2 = np.where(pressure2==p_chosen[g])[0][0]
         print "... temporal interpolation for wind field at", p_chosen[g]
@@ -590,24 +600,89 @@ def mask_rgb_based_pressure(data,p_min,p_max,data_CTP):
     return data
 
 
-# ------------------------------------------
+########################################################################################## 
+########################################################################################## 
+
+def print_usage():
+         print "***           "
+         print "*** Error, not enough command line arguments"
+         print "***        please specify at least an input file"
+         print "***        possible calls are:"
+         print "*** python "+inspect.getfile(inspect.currentframe())+" input_coalition2 "
+         print "*** python "+inspect.getfile(inspect.currentframe())+" input_coalition2 2014 07 23 16 10 "
+         print "                                 date and time must be completely given"
+         print "***           "
+         quit() # quit at this point
 
 #def wind_shiftFun(in_windshift):
 if __name__ == '__main__':
     # input 
-    
+    print "" 
+    print "" 
+    print "*** interpret input" 
+
     time_start_TOT = time.time()
     detailed = True 
     
-    from get_input_msg import get_input_msg
-    
-    input_file = sys.argv[1]
-    if input_file[-3:] == '.py': 
-        input_file=input_file[:-3]
-    in_msg = get_input_msg(input_file)
-    print in_msg.dt_forecast1
-    print in_msg.dt_forecast2
-    
+    # interpretation of the command line arguments 
+    if len(sys.argv) < 2:
+        print_usage()
+    else:
+        # read input file 
+        input_file = sys.argv[1]
+        if input_file[-3:] == '.py': 
+            input_file=input_file[:-3]
+        from get_input_msg import get_input_msg
+        in_msg = get_input_msg(input_file)
+
+        print in_msg.dt_forecast1
+        print in_msg.dt_forecast2
+
+        if len(sys.argv) < 3:
+            if True:  # automatic choise of last 5min 
+                in_msg.get_last_SEVIRI_date()
+                time_slotSTOP = in_msg.datetime 
+                print "... chose time (automatically): ", str(time_slotSTOP)
+            else: # fixed date for text reasons
+                year = 2015          # 2014 09 15 21 35
+                month  =  7           # 2014 07 23 18 30
+                day    =  7            # 2014 07 23 18 00
+                hour   = 18
+                minute = 00
+                in_msg.update_datetime(year, month, day, hour, minute)
+        else:
+            if len(sys.argv) < 7:
+                print_usage()
+            else:
+                year   = int(sys.argv[2])
+                month  = int(sys.argv[3])
+                day    = int(sys.argv[4])
+                hour   = int(sys.argv[5])
+                minute = int(sys.argv[6])
+                in_msg.update_datetime(year, month, day, hour, minute)
+            if len(sys.argv) > 7:
+                if len(sys.argv) <12:
+                    print_usage()
+                else:
+                    yearSTOP   = int(sys.argv[7])
+                    monthSTOP  = int(sys.argv[8])
+                    daySTOP    = int(sys.argv[9])
+                    hourSTOP   = int(sys.argv[10])
+                    minuteSTOP = int(sys.argv[11])
+                    time_slotSTOP = datetime(yearSTOP, monthSTOP, daySTOP, hourSTOP, minuteSTOP) 
+            else:
+                time_slotSTOP = in_msg.datetime 
+  
+    ############################################################################
+    ############################################################################
+
+    # check if real time data is still there, second argument is time window for nrt data in minutes
+    in_msg.nrt = check_near_real_time(in_msg.datetime, 120)
+    time_slot = in_msg.datetime
+
+    print "" 
+    print "*** define more input parameters" 
+
     area = in_msg.area_forecast
  
     ntimes=2 #in_windshift.ntimes
@@ -620,6 +695,8 @@ if __name__ == '__main__':
     delay = 5
 
     rgbs = ['CTT'] #['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134','CTT']  #in_windshift.rgb
+    # in_msg.nwcsaf_calibrate = True
+
     rgbs_only15min = ['IR_039','IR_087','IR_120']
     #channel = rgb.replace("c","")
     name_tmp = "3layer"
@@ -636,9 +713,6 @@ if __name__ == '__main__':
         
     dt_forecast1 = in_msg.dt_forecast1
     dt_forecast2 = in_msg.dt_forecast2
-    
-    print in_msg.dt_forecast1
-    print in_msg.dt_forecast2
         
     if rapid_scan_mode == True:
         print "... RAPID SCAN MODE"
@@ -648,9 +722,9 @@ if __name__ == '__main__':
     dt_forecast1S = "%02d" % dt_forecast1
     dt_forecast2S = "%02d" % dt_forecast2
     
-    ForecastTime=5 #time in minutes from observation at t=0 when you want each observation (first forecast after ForecastTime, second after 2*ForecastTime...)
-    NumComputationSteps=1 #number of computation time steps: the number of steps when the velocity should be updated within each ForecastTime
-    NumForecast=dt_forecast2/ForecastTime #number of forecasts you want to produce from observation at t=0
+    ForecastTime        = 5                 #time in minutes from observation at t=0 when you want each observation (first forecast after ForecastTime, second after 2*ForecastTime...)
+    NumComputationSteps = 1                 #number of computation time steps: the number of steps when the velocity should be updated within each ForecastTime
+    NumForecast = dt_forecast2/ForecastTime #number of forecasts you want to produce from observation at t=0
 
     
     mode_downscaling = in_msg.settingsLocal['mode_downscaling']
@@ -673,59 +747,13 @@ if __name__ == '__main__':
         elif zlevel == 'modellevel':
             layers=[36,24,16] #cosmo model layers
         else:
-            print "*** Error in main (functionWSFN.py)"
+            print "*** Error in main ("+inspect.getfile(inspect.currentframe())+")"
             print "    unknown zlevel", zlevel
             quit()
         
     # ------------------------------------------
-
-    ############################################################################
-
-    ############################################################################
-    
-    if len(sys.argv) > 2:
-        if len(sys.argv) < 7:
-            print "***           "
-            print "*** Warning, please specify date and time completely, e.g."
-            print "***          python plot_radar.py 2014 07 23 16 10 "
-            print "***           "
-            quit() # quit at this point
-        else:
-            year   = int(sys.argv[2])
-            month  = int(sys.argv[3])
-            day    = int(sys.argv[4])
-            hour   = int(sys.argv[5])
-            minute = int(sys.argv[6])
-            time_slot = datetime(year, month, day, hour, minute)
-            nrt = False
-            if year == 2015:
-                in_msg.reader_level = "seviri-level4"
-            if len(sys.argv) > 7:
-                yearSTOP   = int(sys.argv[7])
-                monthSTOP  = int(sys.argv[8])
-                daySTOP    = int(sys.argv[9])
-                hourSTOP   = int(sys.argv[10])
-                minuteSTOP = int(sys.argv[11])
-                time_slotSTOP = datetime(yearSTOP, monthSTOP, daySTOP, hourSTOP, minuteSTOP) 
-            else:
-                time_slotSTOP = time_slot 
-    else:
-        if True:  # automatic choise of last 5min 
-            from my_msg_module import get_last_SEVIRI_date
-            time_slot = get_last_SEVIRI_date(True)
-            if delay != 0:
-                time_slot -= timedelta(minutes=delay)
-            nrt = True
-            time_slotSTOP = time_slot 
-            print "... chose time (automatically): ", str(time_slotSTOP)
-        else: # fixed date for text reasons
-            year=2014          # 2014 09 15 21 35
-            month= 7           # 2014 07 23 18 30
-            day= 23
-            hour= 18
-            minute=00
-    
-    if nrt:
+  
+    if in_msg.nrt:
         outputDir = in_msg.outputDirForecastsNrt
         #in_msg.reader_level = "seviri-level2"
         #in_msg.sat="Meteosat-"
@@ -749,11 +777,16 @@ if __name__ == '__main__':
     area_extent = obj_area.area_extent              
     # e.g. area_extent = (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
     area_tuple = (proj4_string, area_extent)    
-    
+
+    print "in_msg.nwcsaf_calibrate ", in_msg.nwcsaf_calibrate
+
+    print "" 
+    print "*** start production of forecasts" 
+
+
     while time_slot <= time_slotSTOP:
         
           print time_slot
-          
           
           in_msg.datetime = time_slot
           
@@ -772,20 +805,20 @@ if __name__ == '__main__':
                   sat_nr_str = in_msg.sat_nr
           #print in_msg.sat, " and ", sat_nr_str
           #in_msg.sat_nr_str = sat_nr_str
-          year = time_slot.year
-          month = time_slot.month
-          day = time_slot.day
-          hour = time_slot.hour
+          year   = time_slot.year
+          month  = time_slot.month
+          day    = time_slot.day
+          hour   = time_slot.hour
           minute = time_slot.minute
                     
-          yearS = str(year)
+          yearS  = str(year)
           #yearS = yearS[2:]
           monthS = "%02d" % month
           dayS   = "%02d" % day
           hourS  = "%02d" % hour
           minS   = "%02d" % minute
-          dateS = yearS+'-'+monthS+'-'+dayS
-          timeS = hourS+':'+minS+" UTC"
+          dateS  = yearS+'-'+monthS+'-'+dayS
+          timeS  = hourS+':'+minS+" UTC"
           
           # define area object 
           obj_area = get_area_def(area)#(in_windshift.ObjArea)
@@ -793,10 +826,9 @@ if __name__ == '__main__':
           size_y = obj_area.pixel_size_y  
           
           #print obj_area
-          print "area extent:\n",obj_area.area_extent
-          
-          print "x min ", obj_area.area_extent[0]
-          print "x size ", obj_area.pixel_size_x
+          print "area extent:\n", obj_area.area_extent
+          print "x min  ",        obj_area.area_extent[0]
+          print "x size ",        obj_area.pixel_size_x
           
           # check if input data is complete 
           if in_msg.verbose:
@@ -827,7 +859,7 @@ if __name__ == '__main__':
                   time.sleep(25)          
           
           # read CTP to distinguish high, medium and low clouds
-          print ("*** read data for ", in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot)
+          print ("*** read data for ", in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", time_slot)
           global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot)
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
           #area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
@@ -846,14 +878,16 @@ if __name__ == '__main__':
                 p_levels = np.zeros(data_CTP['CTP'].data.shape)
                 p_levels[:,:]=np.nan
                 p_min = 0
-                print("n_levels_pressure (should be 3): ", n_levels_pressure)
-                print "unique: ",np.unique(p_levels)
+
+                print("    n_levels_pressure (should be 3): ", n_levels_pressure)
+                print "    unique pressure levels: ",np.unique(p_levels)
+
                 for i_plot_press in range(n_levels_pressure):
                     p_max = tmp_press[i_plot_press]
-                    print("p_min: ", p_min, "p_max: ",p_max)
+                    print("    p_min: ", p_min, "p_max: ",p_max)
                     p_levels[np.where(np.logical_and(data_CTP['CTP'].data>p_min,data_CTP['CTP'].data<=p_max))] = i_plot_press + 2
-                    print "unique: ",np.unique(p_levels)
-                    print "index: ", i_plot_press
+                    print "    unique: ",np.unique(p_levels)
+                    print "    index: ", i_plot_press
                     p_min = deepcopy(p_max)
                 if True:
                     fig = plt.figure()
@@ -877,8 +911,7 @@ if __name__ == '__main__':
                     
                     pil_im.save("test_Pressure.png")#"/data/COALITION2/PicturesSatellite/LEL_results_wind//"+yearS+"-"+monthS+"-"+dayS+"/channels_fig//PressureLevels_"+yearS+monthS+dayS+hourS+minS+".png")
                     quit()
-
-                    
+    
                 
                 fig = plt.figure()
                 plt.imshow(data_CTP['CTP'].data[20:nx-40,85:ny-135],cmap = plt.get_cmap("Blues_r"))
@@ -888,11 +921,10 @@ if __name__ == '__main__':
                 plt.savefig("/data/COALITION2/PicturesSatellite/LEL_results_wind//"+yearS+"-"+monthS+"-"+dayS+"/channels_fig//Pressure_"+yearS+monthS+dayS+hourS+minS+".png")
                 plt.close(fig)
                 print np.unique(p_levels)
-          print in_msg.nwcsaf_calibrate
           
           # read all rgbs
           print ("*** read data for ", in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot)
-          global_data = GeostationaryFactory.create_scene(in_msg.sat_str(),in_msg.sat_nr_str(), "seviri",  time_slot)
+          global_data = GeostationaryFactory.create_scene(in_msg.sat_str(), in_msg.sat_nr_str(), "seviri",  time_slot)
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
           area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
           area_loaded = load_products(global_data, rgbs, in_msg, area_loaded)
@@ -901,7 +933,7 @@ if __name__ == '__main__':
           if 'forecast_channels' in in_msg.aux_results:
               for rgb_plot in rgbs:
                   fig = plt.figure()
-                  plt.imshow(data[rgb_plot].data[20:nx-40,85:ny-135],vmin = 220, vmax = 290) #forecasts_out[channel_nr[rgb],ind_time,:,:]>0)
+                  plt.imshow(data[rgb_plot].data[20:nx-40,85:ny-135], vmin=220, vmax=290) #forecasts_out[channel_nr[rgb],ind_time,:,:]>0)
                   plt.axis('off')
                   plt.colorbar()
                   plt.show()
@@ -942,7 +974,8 @@ if __name__ == '__main__':
                   plt.close(fig)
           
           
-          # read wind field
+          print "" 
+          print "*** read wind fields"  
           
           if wind_source=="HRW":
               u_d=np.zeros((n_levels,nx,ny))
@@ -954,7 +987,7 @@ if __name__ == '__main__':
                   else:
                       p_min=pressure_limits[len(pressure_limits)-1-level]  
       
-                  hrw_data = read_HRW(in_msg.sat, in_msg.sat_nr_str, "seviri", time_slot, ntimes, \
+                  hrw_data = read_HRW(in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", time_slot, ntimes, \
                                        min_correlation=min_correlation, min_conf_nwp=min_conf_nwp, \
                                        min_conf_no_nwp=min_conf_no_nwp, cloud_type=cloud_type, p_limits=[p_min,p_max])
       
@@ -970,9 +1003,10 @@ if __name__ == '__main__':
                   u_d[level,:,:], v_d[level,:,:] = HRW_2dfield( hrw_detbas, obj_area )
       
           elif wind_source=="cosmo":
-              u_d, v_d, pressures_wind = interpolate_cosmo(year,month,day,hour,minute,layers,zlevel,area,nrt = nrt, rapid_scan_mode_satellite = True)
+              u_d, v_d, pressures_wind = interpolate_cosmo(year, month, day, hour, minute,
+                                                layers, zlevel, area, nrt=in_msg.nrt, rapid_scan_mode_satellite = True)
           else:
-              print "*** Error in main (functionWSFN.py)"
+              print "*** Error in main ("+inspect.getfile(inspect.currentframe())+")"
               print "    unknown wind source ", wind_source
               quit()
       
@@ -1072,7 +1106,7 @@ if __name__ == '__main__':
                             forecasts_out[channel_nr[rgb],ind_time,:,:] = ma.masked_invalid(forecasts_out[channel_nr[rgb],ind_time,:,:])
 
                             # time_slot.strftime( outputDir )
-                            if not nrt and outDir_completed == 0:
+                            if not in_msg.nrt and outDir_completed == 0:
                                 outputDir = outputDir+"/"+ yearS+"-"+monthS+"-"+dayS+"/channels/"
                                 outDir_completed = 1
                             outputFile = outputDir +"/"+ "%s_%s_%s_t%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime))

@@ -1,6 +1,7 @@
 
 from my_msg_module import format_name
-from os.path import isfile, join, exists
+from os.path import isfile, join, exists, dirname
+from os import makedirs
 import subprocess
 
 def get_THX_filename(in_msg, time_slot, area):
@@ -118,6 +119,11 @@ def n_file_composite(composite, in_msg, sat_nr, time_slot, area, composites_done
 
     # get result filename 
     comp_file = get_sat_filename(in_msg, composite, sat, sat_nr, time_slot, area) 
+    comp_dir = dirname(comp_file)
+    if not exists(comp_dir):
+        if in_msg.verbose:
+            print '... create output directory: ' + comp_dir
+        makedirs(comp_dir)
 
     if in_msg.verbose:
         print "    composite "+file_list[0]+" "+file_list[1]+" "+comp_file

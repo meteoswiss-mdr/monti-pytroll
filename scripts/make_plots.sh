@@ -22,7 +22,7 @@ MM="$(printf "%02d" $month)"
 export python=/opt/users/common/packages/anaconda3/envs/PyTroll_$LOGNAME/bin/python
 #export python=/usr/bin/python
 
-. /opt/users/hau/PyTroll/setup/bashrc_offline
+. /opt/users/$LOGNAME/PyTroll/setup/bashrc_offline
 
 if [ -z "$rgbs" ]; then 
     if [ -n "$areas" ]; then 

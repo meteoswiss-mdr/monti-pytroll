@@ -2,16 +2,13 @@
 ### ### #!/bin/bash
 
 # go to operational pytroll folder  
-#export PYTHONPATH=/opt/users/common/packages/anaconda2/bin:/opt/users/hau/PyTroll//scripts
-#export XRIT_DECOMPRESS_PATH=/opt/users/common/bin/xRITDecompress
-#export PPP_CONFIG_DIR=/opt/users/hau/PyTroll//etc/
 #echo ''
-. /opt/users/hau/PyTroll/setup/bashrc
+. /opt/users/$LOGNAME/PyTroll/setup/bashrc
 #export python=/usr/bin/python
-export python=/opt/users/common/packages/anaconda3/envs/PyTroll_hau/bin/python
+export python=/opt/users/common/packages/anaconda3/envs/PyTroll_$LOGNAME/bin/python
 
 
-export dir1=/opt/users/hau/PyTroll/scripts
+export dir1=/opt/users/$LOGNAME/PyTroll/scripts
 cd ${dir1}
 
 echo "*** Start to make seviri pictures (loop until all data is there)"

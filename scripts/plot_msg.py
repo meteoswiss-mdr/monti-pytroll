@@ -516,8 +516,8 @@ def choose_map_resolution(area, resolution, MapResolutionInputfile):
 #----------------------------------------------------------------------------------------------------------------
 
 def save_reprojected_data(data, area, in_msg, concatenate_bands=False):
-   
-   _sat_nr = int(data.number)-7 if int(data.number)-7 > 0 else 0
+
+   _sat_nr = int(data.sat_nr())-7 if int(data.sat_nr())-7 > 0 else 0  # use data.sat_nr() instead of data.number
    # directory / path 
    nc_dir  = (data.time_slot.strftime(in_msg.reprojected_data_dir)
               % {"area": area,

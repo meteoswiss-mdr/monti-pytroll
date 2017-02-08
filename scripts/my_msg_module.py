@@ -833,11 +833,11 @@ def convert_NWCSAF_to_radiance_format(satscene, area, rgb, nwcsaf_calibrate, IS_
 
     if isinstance(prop, ndarray): # normal array as CT
         data = ma.asarray(prop)
-        print "(my_msg_module) Mask NWF array (org np array=), min/max = ", prop.min(), prop.max(), ', no_data = ', no_data 
+        print "(my_msg_module) Mask NWCSAF array (org: unmasked numpy array), min/max = ", prop.min(), prop.max(), ', no_data = ', no_data 
         data.mask = (data == no_data) # create mask 
     elif isinstance(prop, ma.core.MaskedArray):
         data = ma.asarray(prop.data)  # already a masked array
-        print "(my_msg_module) Mask NWF array (org masked array), min/max:", prop.data.min(), prop.data.max()
+        print "(my_msg_module) Mask NWCSAF array (org: masked array), min/max:", prop.data.min(), prop.data.max(), ', no_data = ', no_data 
         data.mask = (data == no_data) # create mask 
 #    elif isinstance(prop, MsgSPhRData):
 #        data = ma.asarray(prop.data)  # already a masked array

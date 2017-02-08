@@ -51,10 +51,10 @@ min_conf_no_nwp = 80
 #cloud_type = [5,6,7,8,9,10,11,12,13,14]
 cloud_type = None
 #levels = ['L','M','H']
-levels = ['A']
+#levels = ['A']
 #levels = ['H']
 #levels = ['M']
-#levels = ['L']
+levels = ['L']
 
 area="ccs4"
 #area="alps95"

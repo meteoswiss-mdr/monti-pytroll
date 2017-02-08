@@ -35,7 +35,7 @@ def input(in_msg):
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('EuropeCanary')    # upper third of MSG disk, satellite at 0.0 deg East, full resolution 
     #in_msg.areas.append('EuropeCanary95')  # upper third of MSG disk, satellite at 9.5 deg East, full resolution 
-    #in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
+    in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
     #in_msg.areas.append('fullearth')       # full earth 600x300                    # does not yet work
@@ -88,8 +88,7 @@ def input(in_msg):
     # directory containing the forecasted brightness temperatures
     in_msg.nowcastDirNrt= "/data/cinesat/out/" #'/opt/users/"+in_msg.user+"/PyTroll/scripts/nrt_test/' #
     #in_msg.nowcastDirOffline= '/data/COALITION2/PicturesSatellite/LEL_results_wind/'
-    #in_msg.nowcastDirOffline= '/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels_LEL/'
-    in_msg.nowcastDirOffline= '/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels/'
+    in_msg.nowcastDirOffline= '/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels_LEL/'
     ###in_msg.nowcastDir="/opt/users/"+in_msg.user+"/PyTroll/scripts/channels_new//" 
     ###in_msg.nowcastDir= '/data/COALITION2/PicturesSatellite/LEL_results_wind/'
     

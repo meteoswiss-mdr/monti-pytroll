@@ -16,7 +16,7 @@ import numpy as np
 from pydecorate import DecoratorAGG
 import aggdraw
 from PIL import ImageFont, ImageDraw
-from os.path import exists
+from os.path import exists, dirname
 from os import makedirs
 from mpop.imageo.HRWimage import HRW_2dfield # , HRWstreamplot, HRWimage
 from datetime import timedelta
@@ -151,8 +151,9 @@ def get_cosmo_filenames (t_sat, nrt=True, runs_before = 0 ):
     if nrt:          
         cosmoDir='/data/cinesat/in/cosmo/' #2016052515_05_cosmo-1_UV_swissXXL
     else:
-        cosmoDir='/data/COALITION2/database/cosmo/' #20150515_cosmo2_ccs4c2 / 2015051506_00_cosmo2_UVccs4c2.nc or 2015070706_00_cosmo2_UV_ccs4c2.nc
-            
+        #cosmoDir='/data/COALITION2/database/cosmo/' #20150515_cosmo2_ccs4c2 / 2015051506_00_cosmo2_UVccs4c2.nc or 2015070706_00_cosmo2_UV_ccs4c2.nc
+        cosmoDir='/data/COALITION2/database/cosmo/test_wind/'
+
     if nrt:
         cosmoDir += "/"
     else:
@@ -165,7 +166,7 @@ def get_cosmo_filenames (t_sat, nrt=True, runs_before = 0 ):
 
 def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure', area='ccs4', cosmo = None, nrt = False, rapid_scan_mode_satellite = True):
 
-    file1, file2 = get_cosmo_filenames ( datetime(year,month,day,hour,minute) )
+    file1, file2 = get_cosmo_filenames ( datetime(year,month,day,hour,minute), nrt=nrt )
 
     print "... search for ", file1, " and ", file2
     filename1 = glob.glob(file1)
@@ -207,13 +208,27 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     nc_cosmo_2 = netCDF4.Dataset(file_cosmo_2,'r',format='NETCDF4') 
     
     pressure1 = nc_cosmo_1.variables['z_1'][:]
-    pressure1 = pressure1.astype(int)
+    if nc_cosmo_1.variables['z_1'].units=='hPa':
+        fpress1 = 100
+    elif nc_cosmo_1.variables['z_1'].units=='Pa':
+        fpress1 = 1
+    else:
+        print "*** Warning, unknown unit for wind in ", file_cosmo_1
+        fpress1 = 1
+    pressure1 = pressure1.astype(int) * fpress1
     
     pressure2 = nc_cosmo_2.variables['z_1'][:]
-    pressure2 = pressure2.astype(int)    
+    if nc_cosmo_2.variables['z_1'].units=='hPa':
+        fpress2 = 100
+    elif nc_cosmo_2.variables['z_1'].units=='Pa':
+        fpress2 = 1
+    else:
+        print "*** Warning, unknown unit for wind in ", file_cosmo_2
+        fpress2 = 1
+    pressure2 = pressure2.astype(int) * fpress2
     
     print "    pressure levels in file1: ", pressure1
-    print "    pressure levels in file1: ", pressure2
+    print "    pressure levels in file2: ", pressure2
 
     u_all1 = nc_cosmo_1.variables['U'][:] 
     v_all1 = nc_cosmo_1.variables['V'][:]
@@ -243,9 +258,9 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     previous   = 1-(1./12*position_t)
 
     for g in range(len(p_chosen)):
+        print "... temporal interpolation for wind field at", p_chosen[g], "(",p_chosen,")"
         i1 = np.where(pressure1==p_chosen[g])[0][0]
         i2 = np.where(pressure2==p_chosen[g])[0][0]
-        print "... temporal interpolation for wind field at", p_chosen[g]
         print g, len(p_chosen), np.where(pressure1==p_chosen[g])[0][0]
         u1 = u_all1[0, i1, x_max_cut1 : nx1-x_min_cut1, y_min_cut1 : ny1 - y_max_cut1] #20:nx-40,85:ny-135
         u2 = u_all2[0, i2, x_max_cut2 : nx2-x_min_cut2, y_min_cut2 : ny2 - y_max_cut2]     #### UH index changed i1 -> i2 !!! ###
@@ -515,6 +530,7 @@ if __name__ == '__main__':
 
     if wind_source=="cosmo":
         if zlevel == 'pressure':
+            ### !!! check this, HAU !!!
             layers=[800,500,300]#[700,500,300]#[900,800,700,600,500,400,300,200,100] #[700,500,300]#[100] # [400,300,100]#[600,300,100]##pressure layers 
         elif zlevel == 'modellevel':
             layers=[36,24,16] #cosmo model layers
@@ -537,7 +553,7 @@ if __name__ == '__main__':
         if len(sys.argv) < 6:
             print "***           "
             print "*** Warning, please specify date and time completely, e.g."
-            print "***          python plot_radar.py 2014 07 23 16 10 "
+            print "***          python "+current_file+" 2014 07 23 16 10 "
             print "***           "
             quit() # quit at this point
         else:
@@ -570,13 +586,17 @@ if __name__ == '__main__':
             minute=00
             in_msg.update_datetime(year, month, day, hour, minute)
     
-    # second argument is tolerance in minutes
+    # second argument is tolerance in minutes for near real time processing
     in_msg.nrt = check_near_real_time(in_msg.datetime, 120)
+    print "... in_msg.nrt", in_msg.nrt
     time_slot = in_msg.datetime
     
-    #outputDir="/data/COALITION2/PicturesSatellite/LEL_results_wind/"
-    outputDir="/data/cinesat/out/"
-    
+    if in_msg.nrt:
+        outputDir="/data/cinesat/out/"
+    else:
+        # old outputDir="/data/COALITION2/PicturesSatellite/LEL_results_wind/"
+        outputDir=time_slot.strftime("/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels/")
+
     while time_slot <= time_slotSTOP:
     
           print str(time_slot)
@@ -788,11 +808,8 @@ if __name__ == '__main__':
                             forecasts_out[channel_nr[rgb],ind_time,:,:] = ma.masked_invalid(forecasts_out[channel_nr[rgb],ind_time,:,:])
 
                             # time_slot.strftime( outputDir )
-                            if not in_msg.nrt:
-                                outputDir = outputDir+"/"+ yearS+"-"+monthS+"-"+dayS+"/channels/"
                             outputFile = outputDir +"/"+ "%s_%s_%s_t%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime))
                             #outputFile = "/opt/users/lel/PyTroll/scripts/channels/%s_%s_%s_t%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime))
-                            
                             
                             print "... pickle data to file: ", outputFile
                             
@@ -806,7 +823,12 @@ if __name__ == '__main__':
                                     PIK.append( forecasts_out[channel_nr[rgb],ind_time,:,:])
                                 
                             PIK.append(mode_downscaling)
-                            print mode_downscaling
+                            print "mode_downscaling: ", mode_downscaling
+                            path = dirname(outputFile)
+                            if not exists(path):
+                                if in_msg.verbose:
+                                    print '... create output directory: ' + path
+                                makedirs(path)
                             pickle.dump(PIK, open(outputFile,"wb"))
                             
                             plot_fore = forecasts_out[channel_nr[rgb],ind_time,:,:]

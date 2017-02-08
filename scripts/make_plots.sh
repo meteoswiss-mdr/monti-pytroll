@@ -19,7 +19,7 @@ y2=$(echo "$year-2000" | bc)
 month=7
 MM="$(printf "%02d" $month)"
 
-export python=/opt/users/common/packages/anaconda3/envs/PyTroll_hau/bin/python
+export python=/opt/users/common/packages/anaconda3/envs/PyTroll_$LOGNAME/bin/python
 #export python=/usr/bin/python
 
 . /opt/users/hau/PyTroll/setup/bashrc_offline

@@ -50,6 +50,8 @@ from my_msg_module import check_input
 
 from postprocessing import postprocessing
 
+import inspect 
+
 # ===============================
 
 def create_dir(outputFile):
@@ -80,65 +82,113 @@ def force_to_observed_cloud_mask(mod, obs):
     mod.mask = obs
     return mod
     
-    
-def downscale(data,mode = 'gaussian_225_125',mask = None):
-    
+
+def downscale_array(array, mode='gaussian_225_125', mask=None):
+
+    print ("    downscale with mode: ", mode)
+
+    if not isinstance( array, (np.ndarray, np.generic) ):
+        print ("*** Warning in downscale_array ("+inspect.getfile(inspect.currentframe())+")")
+        print ("    unexpected data format ", type(array), ", expected array format np.ndarray")
+        return array
+
+    # if no_downscaling return unmodified array
     if mode != 'no_downscaling':
-        if mode == 'convolve_405_300': 
-            weights = np.ones([5,3])
-            weights = weights / weights.sum()
-            
-        elif mode == 'gaussian_150_100':
-            weights = 1/3.*np.array([4.5,3.0])  # conserves a bit better the maxima
-        else:
-            weights = 1/2.*np.array([4.5,3.0])  # no artefacts more for shifted fields
-        if isinstance(data,np.ndarray):
-            if mode == 'convolve_405_300':
-                if mask != None:
-                    data[mask]=np.nan
-                data = ndimage.convolve(data, weights, mode='nearest')
-            else:
-                if mask != None:
-                    data[mask]=np.nan
-                data = ndimage.filters.gaussian_filter(data, weights, mode = 'nearest')  
-        
-        elif isinstance(data,mpop.scene.SatelliteInstrumentScene):          
+        return array
+    # else define downscale function and weights 
+    elif mode == 'convolve_405_300': 
+        weights = np.ones([5,3])
+        weights = weights / weights.sum()   
+        downscale_func = ndimage.convolve
+    elif mode == 'gaussian_150_100':
+        weights = 1/3.*np.array([4.5,3.0])  # conserves a bit better the maxima
+        downscale_func = ndimage.filters.gaussian_filter
+    elif mode == 'gaussian_225_125':
+        weights = 1/2.*np.array([4.5,3.0])  # no artefacts more for shifted fields
+        downscale_func = ndimage.filters.gaussian_filter
+    else:
+        print ("*** Error in downscale_array ("+inspect.getfile(inspect.currentframe())+")")
+        print ("    unknown downscaling mode: "+mode)
+        quit()
 
-            channels = [chn.name for chn in data.loaded_channels()]
-            print(channels)
-            for c in range(len(channels)):
-                rgb_id = channels[c]
-                print("    downscaling of channel: ", rgb_id)
-                if rgb_id != "CloudType" and rgb_id != "CT" and rgb_id != "CTTH" and rgb_id != "CTP" and rgb_id != "CTH":
-                    if mode == 'convolve_405_300':
-                        if mask != None:
-                            data[rgb_id].data[mask]= np.nan
-                            data[rgb_id].data = fill_with_closest_pixel(data[rgb_id].data)
-                        data[rgb_id].data = ndimage.convolve(data[rgb_id].data, weights, mode='nearest')
-                    else:
-                        if mask != None:
-                            data[rgb_id].data[mask]= np.nan          
-                            data[rgb_id].data = fill_with_closest_pixel(data[rgb_id].data)
-                        data[rgb_id].data = ndimage.filters.gaussian_filter(data[rgb_id].data, weights, mode = 'nearest')     
-                        print("downscaling data", rgb_id)
-        if isinstance(data, np.ndarray):
-            data[mask]=np.nan
-        elif isinstance(data,mpop.scene.SatelliteInstrumentScene):
-            for chn in channels:
-                if chn != "CloudType" and chn != "CT" and chn != "CTTH" and chn != "CTP" and chn != "CTH":
-                    data[chn].data[mask]= np.nan 
+    # get suitable no data flag depending on 
+    if (array.dtype == np.float):
+        print ("    downscale float array, no_data = np.nan")
+        no_data = np.nan
+    elif (array.dtype == np.int):    # for int or uint np.nan does not exists 
+        print ("    downscale integer array, no_data = -1")
+        no_data = -1
+    elif (array.dtype == np.uint8):
+        print ("    downscale unsigned integer array, no_data = 0")
+        no_data = 0
+    else:
+        print ("*** Error in downscale_array ("+inspect.getfile(inspect.currentframe())+")")
+        print ("    unknown data type: "+array.dtype)
+        quit()
+
+    # force mask and fill the whole array with closest pixel
+    if mask != None:
+        array[mask] = no_data
+        array = fill_with_closest_pixel(array)
+
+    # downscale array 
+    array = downscale_func(array, weights, mode='nearest')
+
+    # restore mask
+    if mask != None:
+        array[mask] = no_data
+
+    """
+    # convert to mask array and change array.mask 
+    if mask != None:
+        np.ma.masked_array(array, mask)
+    """
+
+    return array
 
     
-    """
-    if mask != None:
-        if isinstance(data, np.ndarray):
-            np.ma.masked_array(data, mask)
-        elif isinstance(data,mpop.scene.SatelliteInstrumentScene):
-            for chn in channels:
-                if chn != "CloudType" and chn != "CT" and chn != "CTTH" and chn != "CTP" and chn != "CTH":
-                    print("masking ", chn)
-                    np.ma.masked_array(data[chn].data, mask)
-    """
+def downscale(data, mode='gaussian_225_125', mask=None):
+    
+    """ downscales the data to a finer grid
+
+    Parameters
+    ----------
+    data : data to downscale 
+           either np.ndarray or mpop.scene.SatelliteInstrumentScene
+    mode : specific mode to downscale
+           'gaussian_150_100', 'gaussian_225_125' or 'convolve_405_300'
+    mask : optional, indices that should be masked
+    
+    Returns : 
+    ----------
+    data : downscaled version of the data
+        
+    Raises
+    ----------
+         """
+
+    # assymetric downscaling as SEVIRI pixel size is approx 3kmx4.5km for Europe
+
+
+    if isinstance(data, np.ndarray):
+        downscale_array(data, mode=mode, mask=mask)
+        
+    elif isinstance(data, mpop.scene.SatelliteInstrumentScene):  
+        
+        for chn in data.loaded_channels():
+
+            # do not downscale cloud classes 
+            if chn.name == "CT":
+                continue 
+            # comment: Shoud we downscale chn.name != "CTP", "CTH", "CTT"?
+
+            print ("... downscale "+chn.name)
+            if hasattr(data[chn.name], 'data'):
+                downscale_array(data[chn.name].data, mode=mode, mask=mask)
+            else:
+                print ("*** Warning in downscale ("+inspect.getfile(inspect.currentframe())+")")
+                print ("    skip downscaling of ", chn.name, ", as this channel has no attribute: data" )
+
     return data
     
 

@@ -1,6 +1,9 @@
 def input(in_msg):
 
-    print "*** read input from input_coalition2.py"
+    import inspect
+    in_msg.input_file = inspect.getfile(inspect.currentframe()) 
+    print "*** read input from ", in_msg.input_file
+    import getpass
 
     #------------------------------------------------------------------------
     # if not specified (False), current (last) observation time is chosen  
@@ -20,7 +23,7 @@ def input(in_msg):
     # e.g. current time               2015-05-31 12:33 UTC
     # delay 5 min                     2015-05-31 12:28 UTC
     # last Rapid Scan Service picture 2015-05-31 12:25 UTC (Scan start) 
-    in_msg.delay=3
+    in_msg.delay=3   # start 3, 8, 13, 18 ...
 
     in_msg.no_NWCSAF = False
 
@@ -72,7 +75,7 @@ def input(in_msg):
     in_msg.settings = "default" # the settings will be automatically defined depending on the area chosen
       #in_msg.settings == "manual"
     
-    #near real time or offline (will be overwritten depending on the date) ###changed: should know, based on the date, where to look for things!!!
+    # near real time or offline (will be overwritten depending on the date) ###changed: should know, based on the date, where to look for things!!!
     in_msg.nrt = False
     #in_msg.nrt = True 
     
@@ -83,26 +86,16 @@ def input(in_msg):
     #in_msg.show_clouds = 'mature'
     in_msg.show_clouds = 'developing_and_mature'
 
-    # directory containing the forecasted brightness temperatures
-    in_msg.nowcastDirNrt= "/data/cinesat/out/" #'/opt/users/lel/PyTroll/scripts/nrt_test/' #
-    in_msg.nowcastDirOffline= '/data/COALITION2/PicturesSatellite/LEL_results_wind/'
-    ###in_msg.nowcastDir="/opt/users/lel/PyTroll/scripts/channels_new//" 
-    ###in_msg.nowcastDir= '/data/COALITION2/PicturesSatellite/LEL_results_wind/'
-    
-    #directors with labels
-    in_msg.labelsDirNrt = '/data/cinesat/out/labels/'
-    in_msg.labelsDirOffline = '/opt/users/lel/PyTroll/scripts/labels/'
-
     # channels needed to produce the coalition2 product
     in_msg.RGBs=[]
-    in_msg.RGBs.append('IR_039c')      # colored version
-    in_msg.RGBs.append('WV_062c')      # colored version
-    in_msg.RGBs.append('WV_073c')      # colored version
-    in_msg.RGBs.append('IR_087c')      # colored version
-    in_msg.RGBs.append('IR_097c')      # colored version
-    in_msg.RGBs.append('IR_108c')      # colored version
-    in_msg.RGBs.append('IR_120c')      # colored version
-    in_msg.RGBs.append('IR_134c')      # colored version
+    in_msg.RGBs.append('IR_039')
+    in_msg.RGBs.append('WV_062')
+    in_msg.RGBs.append('WV_073')
+    in_msg.RGBs.append('IR_087')
+    in_msg.RGBs.append('IR_097')
+    in_msg.RGBs.append('IR_108')
+    in_msg.RGBs.append('IR_120')
+    in_msg.RGBs.append('IR_134')
 
     #-----------------------------
     # choose production of results
@@ -129,7 +122,7 @@ def input(in_msg):
     #in_msg.aux_results.append('mature_mask')
     #in_msg.aux_results.append('developing_mask')
     #in_msg.aux_results.append('IR_108')
-    in_msg.aux_results.append('labels_tracked')
+    #in_msg.aux_results.append('labels_tracked')
     #in_msg.aux_results.append('forecast_channels')
     
 
@@ -165,28 +158,39 @@ def input(in_msg):
     
     in_msg.choose_forecast_times()
 
-    #in_msg.outputDir='./pics/'
-    in_msg.standardOutputName = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
-    #in_msg.outputDir = '/data/cinesat/out/'
-    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
-    in_msg.outputDirOffline =  '/opt/users/lel/PyTroll/scripts//output_coalition2/'
-    in_msg.outputDirNrt = '/data/cinesat/out/' #'/opt/users/lel/PyTroll/scripts/nrt_test/' #
-    #if in_msg.only_obs_noForecast == True:
-    #    in_msg.outputDir = "/opt/users/lel/PyTroll/scripts//Mecikalski_obs/"
-    #elif in_msg.RSS == True:
-    #    in_msg.outputDir = "/opt/users/lel/PyTroll/scripts//Mecikalski_RapidScan/"
-    #else:
-    #    in_msg.outputDir = "/opt/users/lel/PyTroll/scripts//Mecikalski/"
 
-    #in_msg.postprocessing_areas=['ccs4']
-    in_msg.postprocessing_composite=["C2rgb-ir108","C2rgb-HRV"]    
+    # directory containing the forecasted brightness temperatures
+    in_msg.nowcastDirNrt= "/data/cinesat/out/" #'/opt/users/"+getpass.getuser()+"/PyTroll/scripts/nrt_test/' #
+    #in_msg.nowcastDirOffline= '/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels_LEL/'
+    in_msg.nowcastDirOffline= '/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels/'
     
-    in_msg.outputDirForecastsNrt = "/data/cinesat/out/" #'/opt/users/lel/PyTroll/scripts/nrt_test/' #
-    in_msg.outputDirForecastsOffline = "/data/COALITION2/PicturesSatellite/LEL_results_wind/"
-   
-    in_msg.scpOutput = True
-    in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
+    #directors with labels
+    in_msg.labelsDirNrt = '/data/cinesat/out/labels/'
+    #in_msg.labelsDirOffline = '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/'
+    in_msg.labelsDirOffline = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_labels_%(area)s/'
+
+    # directory for output files 
+    in_msg.standardOutputName = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
+    #in_msg.outputDir       = './pics/'
+    in_msg.outputDirNrt     = '/data/cinesat/out/' 
+    in_msg.outputDirOffline = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
+    #if in_msg.only_obs_noForecast == True:
+    #    in_msg.outputDir = "/opt/users/"+getpass.getuser()+"/PyTroll/scripts//Mecikalski_obs/"
+    #elif in_msg.RSS == True:
+    #    in_msg.outputDir = "/opt/users/"+getpass.getuser()+"/PyTroll/scripts//Mecikalski_RapidScan/"
+    #else:
+    #    in_msg.outputDir = "/opt/users/"+getpass.getuser()+"/PyTroll/scripts//Mecikalski/"
+
+    in_msg.outputDirForecastsNrt = "/data/cinesat/out/" #'/opt/users/'+getpass.getuser()+'/PyTroll/scripts/nrt_test/' # !!!HAU!!! same as nowcastDirNrt     ???
+    in_msg.outputDirForecastsOffline = "/data/COALITION2/PicturesSatellite/LEL_results_wind/"                         # !!!HAU!!! same as nowcastDirOffline ???
+    #in_msg.outputDirForecastsOffline =  '/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels/'
+
+    #in_msg.scpOutput = True
+    #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
+
+    # !!!!!!!!!!!!!!!!!! tmp !HAU! !!!!!!!!!!!!!!!!!!!!!!!!!
+    in_msg.reader_level = "seviri-level4"
 
     in_msg.chosen_settings={}
     #settings: set to None for automatic choice
@@ -297,7 +301,7 @@ def input(in_msg):
         
         #9) SETTING: choose one
         #in_msg.chosen_settings['reader_level']="seviri-level2"; check_overwriting+=1
-        #in_msg.chosen_settings['reader_level']="seviri-level4" ; check_overwriting+=1
+        in_msg.chosen_settings['reader_level']="seviri-level4" ; check_overwriting+=1
         #in_msg.chosen_settings['reader_level']= None; check_overwriting+=1
         
         #if check_overwriting > 1:
@@ -330,13 +334,16 @@ def input(in_msg):
     in_msg.pickle_labels = False; in_msg.shelve_labels = False
 
     in_msg.postprocessing_areas= []
+    #in_msg.postprocessing_areas.append('EuropeCanaryS95')
     in_msg.postprocessing_areas.append("ccs4")
-    #in_msg.postprocessing_areas=['EuropeCanaryS95']
     
-    in_msg.postprocessing_composite1=["C2rgb-ir108"]
-    in_msg.postprocessing_composite2=["C2rgb-Forecast-ir108"]  
+    #in_msg.postprocessing_composite1=["C2rgb-ir108"]
+    #in_msg.postprocessing_composite2=["C2rgb-Forecast-ir108"]  
+    in_msg.postprocessing_composite1=["C2rgb-IR_108"]                # used by plot_coalition2
+    in_msg.postprocessing_composite2=["C2rgb-Forecast-IR_108"]       # used by plot_coalition2
+    #in_msg.postprocessing_composite=["C2rgb-IR_108","C2rgb-HRV"]    
 
-    
+
     # load a few standard things 
     #in_msg.outputFile = 'WS_%(rgb)s-%(area)s_%y%m%d%H%M'
     #in_msg.fill_value = [0,0,0] # black
@@ -357,7 +364,7 @@ def input(in_msg):
     in_msg.channels15 = ['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134']
     in_msg.channels30 = ['WV_062','WV_073','IR_097','IR_108','IR_134']
 
-    nrt = True
+    nrt = True # !HAU! ???
 
     in_msg.settingsLocal = {}
     in_msg.settingsLocal['use_TB_forecast'] = True
@@ -379,7 +386,7 @@ def input(in_msg):
     in_msg.settingsBroad['forth_mask'] = 'IR_039_minus_IR_108'
     in_msg.settingsBroad['forced_mask'] = 'no_mask'
     in_msg.settingsBroad['mask_cirrus'] = True            
-    in_msg.settingsBroad['reader_level']="seviri-level2"         
+    in_msg.settingsBroad['reader_level']="seviri-level2"           
     
     
     # -------------   

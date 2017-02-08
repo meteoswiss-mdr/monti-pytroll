@@ -3,11 +3,12 @@ def input(in_msg):
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
     print "*** read input from ", in_msg.input_file
+    import getpass
 
     #------------------------------------------------------------------------
     # if not specified (False), current (last) observation time is chosen  
     # choose specification, if you want a default time without command line arguments 
-    # (the specified time is overwritte by the command line arguments of plot_msg.py)
+    # (the specified time is overwritten by the command line arguments of plot_msg.py)
     #------------------------------------------------------------------------
     if False:
         year=2015
@@ -86,16 +87,16 @@ def input(in_msg):
     in_msg.show_clouds = 'developing_and_mature'
 
     # directory containing the forecasted brightness temperatures
-    in_msg.nowcastDirNrt= "/data/cinesat/out/" #'/opt/users/"+in_msg.user+"/PyTroll/scripts/nrt_test/' #
+    in_msg.nowcastDirNrt= "/data/cinesat/out/" #'/opt/users/"+getpass.getuser()+"/PyTroll/scripts/nrt_test/' #
     #in_msg.nowcastDirOffline= '/data/COALITION2/PicturesSatellite/LEL_results_wind/'
     #in_msg.nowcastDirOffline= '/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels_LEL/'
     in_msg.nowcastDirOffline= '/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels/'
-    ###in_msg.nowcastDir="/opt/users/"+in_msg.user+"/PyTroll/scripts/channels_new//" 
+    ###in_msg.nowcastDir="/opt/users/"+getpass.getuser()+"/PyTroll/scripts/channels_new//" 
     ###in_msg.nowcastDir= '/data/COALITION2/PicturesSatellite/LEL_results_wind/'
     
     #directors with labels
     in_msg.labelsDirNrt = '/data/cinesat/out/labels/'
-    #in_msg.labelsDirOffline = '/opt/users/'+in_msg.user+'/PyTroll/scripts/labels/'
+    #in_msg.labelsDirOffline = '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/'
     in_msg.labelsDirOffline = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_labels_%(area)s/'
 
     # channels needed to produce the coalition2 product
@@ -174,18 +175,18 @@ def input(in_msg):
     in_msg.standardOutputName = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
     #in_msg.outputDir = '/data/cinesat/out/'
     #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
-    #in_msg.outputDirOffline =  '/opt/users/'+in_msg.user+'/PyTroll/scripts//output_coalition2/'
+    #in_msg.outputDirOffline =  '/opt/users/'+getpass.getuser()+'/PyTroll/scripts//output_coalition2/'
     in_msg.outputDirOffline =  '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
-    in_msg.outputDirNrt = '/data/cinesat/out/' #'/opt/users/'+in_msg.user+'/PyTroll/scripts/nrt_test/' #
+    in_msg.outputDirNrt = '/data/cinesat/out/' #'/opt/users/'+getpass.getuser()+'/PyTroll/scripts/nrt_test/' #
     #if in_msg.only_obs_noForecast == True:
-    #    in_msg.outputDir = "/opt/users/"+in_msg.user+"/PyTroll/scripts//Mecikalski_obs/"
+    #    in_msg.outputDir = "/opt/users/"+getpass.getuser()+"/PyTroll/scripts//Mecikalski_obs/"
     #elif in_msg.RSS == True:
-    #    in_msg.outputDir = "/opt/users/"+in_msg.user+"/PyTroll/scripts//Mecikalski_RapidScan/"
+    #    in_msg.outputDir = "/opt/users/"+getpass.getuser()+"/PyTroll/scripts//Mecikalski_RapidScan/"
     #else:
-    #    in_msg.outputDir = "/opt/users/"+in_msg.user+"/PyTroll/scripts//Mecikalski/"
+    #    in_msg.outputDir = "/opt/users/"+getpass.getuser()+"/PyTroll/scripts//Mecikalski/"
 
 
-    in_msg.outputDirForecastsNrt = "/data/cinesat/out/" #'/opt/users/'+in_msg.user+'/PyTroll/scripts/nrt_test/' #
+    in_msg.outputDirForecastsNrt = "/data/cinesat/out/" #'/opt/users/'+getpass.getuser()+'/PyTroll/scripts/nrt_test/' #
     in_msg.outputDirForecastsOffline = "/data/COALITION2/PicturesSatellite/LEL_results_wind/"
    
     in_msg.scpOutput = True

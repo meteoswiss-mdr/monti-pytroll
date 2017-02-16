@@ -821,7 +821,7 @@ def add_title(PIL_image, rgb, sat_nr, dateS, hourS, minS, area, dc, verbose ):
          outline=(255)
 
       # determine font size
-      if area == "EuropeCanary":
+      if "EuropeCanary" in area:
          fontsize=36
       elif area.find("ticino") != -1:
          fontsize=12
@@ -853,9 +853,9 @@ def add_title(PIL_image, rgb, sat_nr, dateS, hourS, minS, area, dc, verbose ):
                title= " 2nd layer: HSAF "+ rgb + " [mm/h]"
          draw.text((0, y_pos_title),title, title_color,font=font)
       else:
-         y1 =  5 # y1 = 10
-         dy = 20 # dy = 50
-         x1 =  0 # x1 = 10
+         y1 =  5             # y1 = 10
+         dy = 1.1 * fontsize # dy = 20 dy = 50
+         x1 =  0             # x1 = 10
          if not (rgb in products.CPP or rgb in products.HSAF) : # normal case  
             draw.text((x1, y1     ),' '+dateS+' '+hourS+':'+minS+'UTC', title_color, font=font)
             draw.text((x1, y1+  dy),' '+rgb.replace("_","-")+" (MSG-"+str(sat_nr-7) +' SEVIRI)',                title_color, font=font)

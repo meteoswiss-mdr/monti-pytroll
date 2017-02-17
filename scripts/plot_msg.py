@@ -334,7 +334,7 @@ def plot_msg(in_msg):
 
             # create output filename
             outputDir =              format_name(in_msg.outputDir,  data.time_slot, area=area, rgb=rgb, sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
-            outputFile = outputDir + format_name(in_msg.outputFile, data.time_slot, area=area, rgb=rgb, sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
+            outputFile = outputDir +"/"+ format_name(in_msg.outputFile, data.time_slot, area=area, rgb=rgb, sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
    
             # check if output directory exists, if not create it
             path= dirname(outputFile)
@@ -823,6 +823,8 @@ def add_title(PIL_image, rgb, sat_nr, dateS, hourS, minS, area, dc, verbose ):
       # determine font size
       if "EuropeCanary" in area:
          fontsize=36
+      if "eurotv" in area:
+         fontsize=24
       elif area.find("ticino") != -1:
          fontsize=12
       else:

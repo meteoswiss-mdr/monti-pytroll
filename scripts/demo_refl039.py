@@ -27,20 +27,40 @@
 from mpop.satellites import GeostationaryFactory
 from datetime import datetime
 from mpop.projector import get_area_def
+import sys
 
 europe = get_area_def("EuropeCanary")
 
-#tslot = datetime(2013, 10, 11, 11, 30)
-#tslot = datetime(2015, 7, 7, 15, 10)
-tslot = datetime(2015, 10, 15, 11, 00)
+if len(sys.argv) == 1:
+    from my_msg_module import get_last_SEVIRI_date
+    tslot = get_last_SEVIRI_date(True, delay=5)
+    #tslot = datetime(2013, 10, 11, 11, 30)
+    #tslot = datetime(2015, 7, 7, 15, 10)
+    #tslot = datetime(2015, 10, 15, 11, 00)
+elif len(sys.argv) == 6:
+    year   = int(sys.argv[1])
+    month  = int(sys.argv[2])
+    day    = int(sys.argv[3])
+    hour   = int(sys.argv[4])
+    minute = int(sys.argv[5])
+    tslot = datetime(year, month, day, hour, minute)
+else:
+    print "\n*** Error, wrong number of input arguments"
+    print "    usage:"
+    print "    python demo_refl039.py"
+    print "    or"
+    print "    python demo_refl039.py 2017 2 17 14 35\n"
+    quit()
+
 print "*** plot day microphysics RGB for ", str(tslot)
 
-glbd = GeostationaryFactory.create_scene("meteosat", "09", "seviri", tslot)
+#glbd = GeostationaryFactory.create_scene("meteosat", "09", "seviri", tslot)
+glbd = GeostationaryFactory.create_scene("Meteosat-9", "", "seviri", tslot)
 
 print "... load sat data"
 glbd.load(['VIS006','VIS008','IR_016','IR_039','IR_108','IR_134'], area_extent=europe.area_extent)
 #area="EuropeCanaryS95"
-area="blitzortung"
+area="EuroMercator" # blitzortung projection
 local_data = glbd.project(area)
 
 print "... read responce functions"

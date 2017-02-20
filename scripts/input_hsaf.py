@@ -142,9 +142,9 @@ def input(in_msg):
     #-------------------
     # H-SAF
     #-------------------
-    in_msg.sat = "hsaf"
-    in_msg.sat_nr=10
-    in_msg.RSS=False 
+    in_msg.sat = "Hsaf"
+    in_msg.sat_nr = 10
+    in_msg.RSS = False 
     in_msg.RGBs.append('h03')
     #-------------------
     # experimental
@@ -156,7 +156,7 @@ def input(in_msg):
     #----------------
     #in_msg.areas.append('EuropeCanary')
     #in_msg.areas.append('EuropeCanary95')
-    in_msg.areas.append('EuropeCanaryS95')
+    #in_msg.areas.append('EuropeCanaryS95')
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
@@ -195,9 +195,10 @@ def input(in_msg):
     in_msg.HRV_enhancement = False
 
     in_msg.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
-    in_msg.outputDir='./pics/'
+    #in_msg.outputDir='./pics/'
     #in_msg.outputDir = "./%Y-%m-%d/%Y-%m-%d_%(rgb)s-%(area)s/"
     #in_msg.outputDir = '/data/cinesat/out/'
+    in_msg.outputDir = '/data/COALITION2/PicturesSatellite/GPM/%Y-%m-%d/'
 
     in_msg.compress_to_8bit=False
 
@@ -208,5 +209,8 @@ def input(in_msg):
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
     
-    in_msg.postprocessing=False
-    in_msg.postprocessing_composite=["THX-IR_108","radar-convection","THX-radar-convection"]    
+    in_msg.postprocessing_areas=["ccs4"]
+    #in_msg.postprocessing=False
+    in_msg.postprocessing_composite=["h03-ir108"] 
+    #in_msg.postprocessing_composite=["THX-IR_108","radar-convection","THX-radar-convection"]    
+    #in_msg.postprocessing_montage = [["MSG_h03-ir108","MSG_HRV"]]

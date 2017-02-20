@@ -461,7 +461,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
     pro_file_checked=False
 
     print "... read config file ", os.path.join(CONFIG_PATH, fullname + ".cfg")
-    print "... use satellite "+in_msg.msg_str()
+    print "... use satellite "+in_msg.sat_str()
 
     for rgb in RGBs:
 

@@ -149,7 +149,7 @@ class input_msg_class:
          print "    unknown type of sat_nr", type(self.sat_nr)
          quit()
 
-      if self.sat[0:8] == "Meteosat":
+      if self.sat[0:8] == "Meteosat" or self.sat[0:4] == "Hsaf":
          return ""
       else:
          return sat_nr_str
@@ -169,6 +169,9 @@ class input_msg_class:
       elif self.sat[0:8].lower() == "meteosat":
          #print "sat_str "+"Meteosat-"+str(int(self.sat_nr))
          return "Meteosat-"+str(int(self.sat_nr))
+      elif self.sat[0:4].lower() == "hsaf":
+         #print "sat_str "+"Meteosat-"+str(int(self.sat_nr))
+         return "Hsaf-"+str(int(self.sat_nr))
       else:
          d={'sat':self.sat, 'sat_nr':str(int(self.sat_nr)),'0sat_nr':str(self.sat_nr).zfill(2)}
          #print "sat_str "+self.sat+str(int(self.sat_nr))
@@ -184,7 +187,7 @@ class input_msg_class:
           layout="%(msg)s-%(msg_nr)s"   (default)
           layout="%(msg)s-%(0msg_nr)s"  (with leading zero in for MSG numbers smaller than 10)
       """
-      if self.sat[0:8]=="meteosat" or self.sat[0:8]=="Meteosat":
+      if self.sat[0:8]=="meteosat" or self.sat[0:8]=="Meteosat" or self.sat[0:8]=="hsaf":
 
          if 8 <= self.sat_nr and self.sat_nr <=11:
             d={'msg':'MSG', 'msg_nr':str(int(self.sat_nr)-7), 'sat':self.sat, 'sat_nr':str(self.sat_nr),'0sat_nr':str(self.sat_nr).zfill(2)}

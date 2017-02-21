@@ -752,20 +752,7 @@ if __name__ == '__main__':
             quit()
         
     # ------------------------------------------
-  
-    if in_msg.nrt:
-        outputDir = in_msg.outputDirForecastsNrt
-        #in_msg.reader_level = "seviri-level2"
-        #in_msg.sat="Meteosat-"
-        #in_msg.sat_nr = 9
-    else:
-        outputDir = in_msg.outputDirForecastsOffline
-        #in_msg.reader_level = "seviri-level2"#"seviri-level4"   
-        #print "before ", in_msg.sat, in_msg.sat_nr
-        #in_msg.sat="Meteosat-"#"meteosat"
-        #in_msg.sat_nr = 9
-        #print "after ", in_msg.sat, in_msg.sat_nr
-    
+      
     outDir_completed = 0
     
     in_msg.mapDir = "/opt/users/common/shapes/"
@@ -785,9 +772,22 @@ if __name__ == '__main__':
 
 
     while time_slot <= time_slotSTOP:
-        
+
           print time_slot
-          
+
+          if in_msg.nrt:
+              outputDir = time_slot.strftime(in_msg.outputDirForecastsNrt)
+              #in_msg.reader_level = "seviri-level2"
+              #in_msg.sat="Meteosat-"
+              #in_msg.sat_nr = 9
+          else:
+              outputDir = time_slot.strftime(in_msg.outputDirForecastsOffline)
+              #in_msg.reader_level = "seviri-level2"#"seviri-level4"   
+              #print "before ", in_msg.sat, in_msg.sat_nr
+              #in_msg.sat="Meteosat-"#"meteosat"
+              #in_msg.sat_nr = 9
+              #print "after ", in_msg.sat, in_msg.sat_nr
+                  
           in_msg.datetime = time_slot
           
           if False:
@@ -1089,7 +1089,6 @@ if __name__ == '__main__':
                       if t*ForecastTime == dt_forecast1 or t*ForecastTime == dt_forecast2:
                           if t*ForecastTime == dt_forecast1:
                               ind_time = 0
-                              
                           else:
                               ind_time = 1
                           print "forecast 2: ",forecast2.shape
@@ -1109,6 +1108,7 @@ if __name__ == '__main__':
                             if not in_msg.nrt and outDir_completed == 0:
                                 outputDir = outputDir+"/"+ yearS+"-"+monthS+"-"+dayS+"/channels/"
                                 outDir_completed = 1
+
                             outputFile = outputDir +"/"+ "%s_%s_%s_t%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime))
                             #outputFile = "/opt/users/lel/PyTroll/scripts/channels/%s_%s_%s_t%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime))
                             #####outputFile = "pickles/%s_%s_%s_t%s_%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime),name_tmp)

@@ -54,6 +54,9 @@ from Cells import Cells
 import matplotlib.dates as mdates
 from get_input_msg import get_input_msg
 
+import inspect
+current_file = inspect.getfile(inspect.currentframe())
+
 
 def string_date(t):
     yearS  = str(t.year)
@@ -1057,7 +1060,9 @@ def history_backward(time1, id_interesting_cell, backward, in_msg, t_stop = None
 
         return ind, area, displ_array, time_save, center
 
-def plot_results_history(t1,value1,label1,t2,value2,label2,t3,value3,label3,time1,variable, interesting_cell, times = None, split = None, merge = None):
+def plot_results_history(t1, value1, label1, t2, value2, label2, t3, value3, label3, 
+                         time1, variable, interesting_cell, 
+                         times = None, split = None, merge = None):
     
     if times != None:
         minimum_data = min(min(value1),min(value2),min(value3))
@@ -1174,20 +1179,25 @@ def find_split_and_merge(id_cell, times,labels_dir):
             
 
 if __name__=="__main__":
+
+    import seaborn
        
     #id_interesting_cell = 54
     id_interesting_cell = 233
     backward = True
+
     input_file = sys.argv[1]
     if input_file[-3:] == '.py': 
         input_file=input_file[:-3]
     in_msg = get_input_msg(input_file)
-    import seaborn
     print ("input imported: ", input_file)
+
     if len(sys.argv)<6:
+        print ("*** Warning, default call:")
+        print (current_file+" 2015 6 7 15 10")
         time1 = datetime(2015,6,7,15,10) 
     else:
-        print(sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6])
+        print("time frame to process: ",sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6])
         year = int(sys.argv[2])
         month = int(sys.argv[3])
         day = int(sys.argv[4])
@@ -1197,19 +1207,28 @@ if __name__=="__main__":
         #time1 = datetime(sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6])
         time1 = datetime(year, month, day, hour, minutes)
     t_Stop = time1-timedelta(minutes = 65) #None #
-    history_correction =False
-    ind, area, displ_array, time_save, center = history_backward(time1, id_interesting_cell, backward, in_msg, t_stop = t_Stop, labels_dir = '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/', history_correction = history_correction)
+
+    history_correction = False
+    ind, area, displ_array, time_save, center = history_backward(time1, id_interesting_cell, backward, in_msg, t_stop = t_Stop, 
+                                                                 labels_dir = '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/', history_correction = history_correction)
     history_correction = True
-    ind_corr, area_corr, displ_array_corr, time_save_corr, center_corr = history_backward(time1, id_interesting_cell, backward, in_msg, t_stop = t_Stop , labels_dir = '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/', history_correction = history_correction)
+    ind_corr, area_corr, displ_array_corr, time_save_corr, center_corr = history_backward(time1, id_interesting_cell, backward, in_msg, t_stop = t_Stop , 
+                                                                 labels_dir = '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/', history_correction = history_correction)
     history_correction = "follow_id"
-    ind_id, area_id, displ_array_id, time_save_id, center_id = history_backward(time1, id_interesting_cell, backward, in_msg, t_stop = t_Stop, labels_dir = '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/', history_correction = history_correction)
+    ind_id, area_id, displ_array_id, time_save_id, center_id = history_backward(time1, id_interesting_cell, backward, in_msg, t_stop = t_Stop, 
+                                                                 labels_dir = '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/', history_correction = history_correction)
     
     times, split, merge = find_split_and_merge("ID"+str(id_interesting_cell), deepcopy(time_save), '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/')
+
     print("start plotting")
-    plot_results_history(time_save,area,"Direct ancestors",time_save_id, area_id, "Follow ID",time_save_corr,area_corr,"Corrected",time1,"area", id_interesting_cell, times, split, merge)
-    plot_results_history(time_save,ind[:,2],"Direct ancestors",time_save_id, ind_id[:,2], "Follow ID",time_save_corr,ind_corr[:,2],"Corrected",time1,"IR108", id_interesting_cell, times, split, merge)
-    plot_results_history(time_save[1:],displ_array[:,0],"Direct ancestors",time_save_id[1:], displ_array_id[:,0], "Follow ID",time_save_corr[1:],displ_array_corr[:,0],"Corrected",time1,"dx", id_interesting_cell, times[:-1], split[:-1], merge[:-1])
-    plot_results_history(time_save[1:],displ_array[:,1],"Direct ancestors",time_save_id[1:], displ_array_id[:,1], "Follow ID",time_save_corr[1:],displ_array_corr[:,1],"Corrected",time1,"dy", id_interesting_cell, times[:-1], split[:-1], merge[:-1])
+    plot_results_history(time_save,    area,            "Direct ancestors",time_save_id,     area_id,             "Follow ID",time_save_corr,     area_corr,    
+                         "Corrected", time1, "area",  id_interesting_cell, times,      split,      merge)
+    plot_results_history(time_save,ind[:,2],            "Direct ancestors",time_save_id,     ind_id[:,2],         "Follow ID",time_save_corr,     ind_corr[:,2],
+                         "Corrected", time1, "IR108", id_interesting_cell, times,      split,      merge)
+    plot_results_history(time_save[1:],displ_array[:,0],"Direct ancestors",time_save_id[1:], displ_array_id[:,0], "Follow ID",time_save_corr[1:], displ_array_corr[:,0],
+                         "Corrected", time1, "dx",    id_interesting_cell, times[:-1], split[:-1], merge[:-1])
+    plot_results_history(time_save[1:],displ_array[:,1],"Direct ancestors",time_save_id[1:], displ_array_id[:,1], "Follow ID",time_save_corr[1:], displ_array_corr[:,1],
+                         "Corrected", time1, "dy",    id_interesting_cell, times[:-1], split[:-1], merge[:-1])
     
     #plot_results_history(time_save,area,"Not corrected",time_save_id, area_id, "Not corrected, follow ID",time_save_corr,area_corr,"Corrected",time1,"COM")
     

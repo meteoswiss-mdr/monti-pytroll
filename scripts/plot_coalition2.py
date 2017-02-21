@@ -93,7 +93,7 @@ def downscale_array(array, mode='gaussian_225_125', mask=None):
         return array
 
     # if no_downscaling return unmodified array
-    if mode != 'no_downscaling':
+    if mode == 'no_downscaling':
         return array
     # else define downscale function and weights 
     elif mode == 'convolve_405_300': 

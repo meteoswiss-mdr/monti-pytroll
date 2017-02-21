@@ -107,11 +107,6 @@ def HRVir108(self, cos_scaled=True, use_HRV=False, smooth=False):
         mask = np.zeros(ir108.shape)
         mask[np.where( sza1 > sza1 )] = 1
 
-
-    print "*** AAA ", type(mask)
-    print "*** AAA ", mask
-    print "mask", mask.shape, type(mask)
-
     if not cos_scaled:
         ch1 = vis * (1-mask) 
     else:

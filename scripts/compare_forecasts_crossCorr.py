@@ -106,16 +106,24 @@ def plot_stat(time,var1layer,var3layer,y_label):
     plt.savefig("Comparison_Advections_Stats_"+y_label+".png")
     plt.close()
 
+#==========================================================================================================
+#==========================================================================================================
+
 if __name__ == "__main__":
 
-    from get_input_msg import get_input_msg
-    
-    input_file = sys.argv[1]
-    if input_file[-3:] == '.py': 
-        input_file=input_file[:-3]
-    in_msg = get_input_msg(input_file)
-    
-    time_slot0 = datetime(2015,10,15,5,0)
+    from get_input_msg import get_date_and_inputfile_from_commandline
+    in_msg = get_date_and_inputfile_from_commandline(print_usage=print_usage)
+
+    #from get_input_msg import get_input_msg    
+    #input_file = sys.argv[1]
+    #if input_file[-3:] == '.py': 
+    #    input_file=input_file[:-3]
+    #in_msg = get_input_msg(input_file)
+    #time_slot0 = datetime(2015,10,15,5,0)
+
+    in_msg.update_datetime(2015,10,15,5,0)
+    time_slot0 = in_msg.datetime
+
     year0S, month0S, day0S, hour0S, min0S = string_date(time_slot0)
     path = "/data/COALITION2/PicturesSatellite/LEL_results_wind//"+year0S+"-"+month0S+"-"+day0S+"/channels_fig//"
     

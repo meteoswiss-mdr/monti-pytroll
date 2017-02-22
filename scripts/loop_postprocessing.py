@@ -7,16 +7,31 @@ from time import time, sleep
 import os.path
 from os import remove
 
+#----------------------------------------------------------------------------------------------------------------
+def print_usage():
+   
+   print "***           "
+   print "*** Error, not enough command line arguments"
+   print "***        please specify at least an input file"
+   print "***        possible calls are:"
+   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG "
+   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 "
+   print "                                 date and time must be completely given"
+   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'IR_108'"
+   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'IR_108' 'ccs4'"
+   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ['HRoverview','fog'] ['ccs4','euro4']"
+   print "***           "
+   quit() # quit at this point
+#----------------------------------------------------------------------------------------------------------------
+
 if __name__ == '__main__':
 
-    from plot_msg import plot_msg, print_usage
-    #from postprocessing import postprocessing
+    from postprocessing import postprocessing
     import sys
 
     from get_input_msg import get_date_and_inputfile_from_commandline
     in_msg = get_date_and_inputfile_from_commandline(print_usage=print_usage)
 
-    # interpret additional command line arguments
     if len(sys.argv) > 7:
         if type(sys.argv[7]) is str:
             in_msg.RGBs = [sys.argv[7]]
@@ -27,7 +42,6 @@ if __name__ == '__main__':
                 in_msg.area = [sys.argv[8]]
             else:
                 in_msg.area = sys.argv[8]
-
 
     delta_time =  10             # time in seconds to wait between the tries
     total_time = 600             # maximum total time in seconds trying to get images

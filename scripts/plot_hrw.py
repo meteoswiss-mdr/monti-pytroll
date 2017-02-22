@@ -71,7 +71,7 @@ if len(sys.argv) > 1:
     if len(sys.argv) < 6:
         print "***           "
         print "*** Warning, please specify date and time completely, e.g."
-        print "***          python plot_radar.py 2014 07 23 16 10 "
+        print "***          python "+inspect.getfile(inspect.currentframe())+" 2014 07 23 16 10 "
         print "***           "
         quit() # quit at this point
     else:

@@ -1186,26 +1186,33 @@ if __name__=="__main__":
     id_interesting_cell = 233
     backward = True
 
-    input_file = sys.argv[1]
-    if input_file[-3:] == '.py': 
-        input_file=input_file[:-3]
-    in_msg = get_input_msg(input_file)
-    print ("input imported: ", input_file)
+    #input_file = sys.argv[1]
+    #if input_file[-3:] == '.py': 
+    #    input_file=input_file[:-3]
+    #in_msg = get_input_msg(input_file)
+    #print ("input imported: ", input_file)
+    #
+    #if len(sys.argv)<6:
+    #    print ("*** Warning, default call:")
+    #    print (current_file+" 2015 6 7 15 10")
+    #    time1 = datetime(2015,6,7,15,10) 
+    #else:
+    #    print("time frame to process: ",sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6])
+    #    year = int(sys.argv[2])
+    #    month = int(sys.argv[3])
+    #    day = int(sys.argv[4])
+    #    hour = int(sys.argv[5])
+    #    minutes =  int(sys.argv[6])
+    #    #time1 = datetime(sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6])
+    #    time1 = datetime(year, month, day, hour, minutes)
 
-    if len(sys.argv)<6:
-        print ("*** Warning, default call:")
-        print (current_file+" 2015 6 7 15 10")
-        time1 = datetime(2015,6,7,15,10) 
-    else:
-        print("time frame to process: ",sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6])
-        year = int(sys.argv[2])
-        month = int(sys.argv[3])
-        day = int(sys.argv[4])
-        hour = int(sys.argv[5])
-        minutes =  int(sys.argv[6])
+    from get_input_msg import get_date_and_inputfile_from_commandline
+    in_msg = get_date_and_inputfile_from_commandline()
+    time1 = in_msg.datetime
+
+    if len(sys.argv)>7:
         id_interesting_cell = int(sys.argv[7])
-        #time1 = datetime(sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6])
-        time1 = datetime(year, month, day, hour, minutes)
+
     t_Stop = time1-timedelta(minutes = 65) #None #
 
     history_correction = False

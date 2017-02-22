@@ -459,8 +459,7 @@ if __name__ == '__main__':
     sat_nr = "08" #in_windshift.sat_nr
 
     plot_DisplMeter = False #if you want to plot the forecast for each channel
-    
-    
+        
     rgbs = ['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134']  #in_windshift.rgb
     rgbs_only15min = ['IR_039','IR_087','IR_120']
     #channel = rgb.replace("c","")
@@ -468,6 +467,7 @@ if __name__ == '__main__':
     # load a few standard things 
     from get_input_msg import get_input_msg
     in_msg = get_input_msg('input_coalition2')
+
     in_msg.resolution = 'i'
     in_msg.sat="Meteosat-"
     in_msg.sat_nr = 9

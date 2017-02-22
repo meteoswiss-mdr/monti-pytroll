@@ -4,12 +4,30 @@ def input(in_msg):
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
     print "*** read input from ", in_msg.input_file
 
-    #------------------------------------------------------------------------
-    # if not specified (False), current (last) observation time is chosen  
-    # choose specification, if you want a default time without command line arguments 
-    # (the specified time is overwritten by the command line arguments of plot_msg.py)
-    #------------------------------------------------------------------------
-    if False:
+    #in_msg.sat = "meteosat"   # old format: "meteosat" uses meteosat09.cfg files
+    in_msg.sat = "Meteosat"  # new format: "Meteosat" uses Meteosat-9.cfg files
+    # 8=MSG1, 9=MSG2, 10=MSG3
+    #in_msg.sat_nr=8
+    #in_msg.RSS=False 
+    in_msg.sat_nr=9
+    in_msg.RSS=True
+    #in_msg.sat_nr=10
+    #in_msg.RSS=False 
+
+    # specify an delay (in minutes), when you like to process a time some minutes ago
+    # e.g. current time               2015-05-31 12:33 UTC
+    # delay 5 min                     2015-05-31 12:28 UTC
+    # last Rapid Scan Service picture 2015-05-31 12:25 UTC (Scan start) 
+    in_msg.delay=6
+
+    if True:
+        # choose timeslot of the satellite picture to process
+        # datetime according to command line arguments (if given)
+        # otherwise the last possible time of SEVIRI observation (depends on RSS mode and chosen delay)
+        # also sets the near real time marker: in_msg.nrt 
+        in_msg.init_datetime()
+    else:
+        # offline mode (always a fixed time) # ignores command line arguments
         year=2015
         month=2
         day=10
@@ -17,12 +35,6 @@ def input(in_msg):
         minute=45
         in_msg.update_datetime(year, month, day, hour, minute)
         # !!!  if archive is used, adjust meteosat09.cfg accordingly !!!
-
-    # specify an delay (in minutes), when you like to process a time some minutes ago
-    # e.g. current time               2015-05-31 12:33 UTC
-    # delay 5 min                     2015-05-31 12:28 UTC
-    # last Rapid Scan Service picture 2015-05-31 12:25 UTC (Scan start) 
-    in_msg.delay=6
 
     in_msg.no_NWCSAF = True
 
@@ -45,7 +57,8 @@ def input(in_msg):
     in_msg.areas.append('ccs4')
     in_msg.areas.append('EuropeCanaryS95') # "ccs4" "blitzortung" #"eurotv" # "eurotv"
     #in_msg.areas.append("blitzortung")
-    
+    in_msg.check_RSS_coverage()
+
     in_msg.properties_cells = True
     in_msg.plot_forecast = True
     
@@ -149,16 +162,6 @@ def input(in_msg):
                                    ## l  low resolution: Another ~80 % reduction.                   
                                    ## c  crude resolution: Another ~80 % reduction. 
                                    ## None -> automatic choise
-
-    #in_msg.sat = "meteosat"   # old format: "meteosat" uses meteosat09.cfg files
-    in_msg.sat = "Meteosat"  # new format: "Meteosat" uses Meteosat-9.cfg files
-    # 8=MSG1, 9=MSG2, 10=MSG3
-    #in_msg.sat_nr=8
-    #in_msg.RSS=False 
-    in_msg.sat_nr=9
-    in_msg.RSS=True
-    #in_msg.sat_nr=10
-    #in_msg.RSS=False 
 
     # switch off Rapid scan, if large areas are wanted 
     if ('fullearth' in in_msg.areas) or ('met09globe' in in_msg.areas) or ('met09globeFull' in in_msg.areas): 

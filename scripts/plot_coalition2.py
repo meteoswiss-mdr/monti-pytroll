@@ -17,7 +17,7 @@ from datetime import timedelta
 from plot_msg import create_PIL_image, add_border_and_rivers, add_title
 from pycoast import ContourWriterAGG
 from pydecorate import DecoratorAGG
-from my_msg_module import check_near_real_time, format_name, fill_with_closest_pixel
+from my_msg_module import format_name, fill_with_closest_pixel
 from copy import deepcopy 
 from my_msg_module import convert_NWCSAF_to_radiance_format, get_NWC_pge_name
 from mpop.imageo.palettes import convert_palette2colormap
@@ -1090,68 +1090,43 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 os.chmod(file_per, 0664)  ## FOR PYTHON3: 0o664           
           time_slot = time_slot + timedelta(minutes=5)
 
+#=================================================================================================
+#=================================================================================================
+def print_usage():
+   
+    inputFile="input_coalition2"
+    print "***           "
+    print "*** Error, not enough command line arguments"
+    print "***        please specify at least an input file"
+    print "***        possible calls are:"
+    print "*** python "+inspect.getfile(inspect.currentframe())+" "+inputFile+" "
+    print "*** python "+inspect.getfile(inspect.currentframe())+" "+inputFile+" 2014 07 23 16 10 "
+    print "                                 date and time must be completely given"
+    print "*** python "+inspect.getfile(inspect.currentframe())+" "+inputFile+" 2014 07 23 16 10 2014 07 23 16 30"
+    print "***           "
+    quit() # quit at this point
+#----------------------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
 
-    from get_input_msg import get_input_msg
-    
-    input_file = sys.argv[1]
-    if input_file[-3:] == '.py': 
-        input_file=input_file[:-3]
-    in_msg = get_input_msg(input_file)
+    from get_input_msg import get_date_and_inputfile_from_commandline
+    in_msg = get_date_and_inputfile_from_commandline(print_usage=print_usage)
+    time_slot = in_msg.datetime
 
-    from coalition2_settings import *
-    
-    print ("input imported")
-    
-    if len(sys.argv) > 2:
-    	if len(sys.argv) < 7:
-          print ("***           ")
-          print ("*** Warning, please specify date and time completely, e.g.")
-          print ("***          python plot_coalition2.py input_coalition2  2014 07 23 16 10 ")
-          print ("***           ")
-          quit() # quit at this point
-    	else:
-          year   = int(sys.argv[2])
-          month  = int(sys.argv[3])
-          day    = int(sys.argv[4])
-          hour   = int(sys.argv[5])
-          minute = int(sys.argv[6])
-          in_msg.update_datetime(year, month, day, hour, minute)
-          #if time_slot.year < 2016:
-          #    in_msg.nrt = False
-          #else:
-          #    in_msg.nrt = True #bad fix, different place cosmo and similar
-          #in_msg.nrt = False    # no this is not nice !!! !HAU!
-          
-          if len(sys.argv) > 7:
-              yearSTOP   = int(sys.argv[7])
-              monthSTOP  = int(sys.argv[8])
-              daySTOP    = int(sys.argv[9])
-              hourSTOP   = int(sys.argv[10])
-              minuteSTOP = int(sys.argv[11])
-              time_slotSTOP = datetime(yearSTOP, monthSTOP, daySTOP, hourSTOP, minuteSTOP)
-              #nrt = False
-              #in_msg.reader_level="seviri-level4"
-        
-          else:
-              time_slotSTOP = in_msg.datetime
+    from coalition2_settings import *    
+    print ("... input imported")
+              
+    if len(sys.argv) > 7:
+        yearSTOP   = int(sys.argv[7])
+        monthSTOP  = int(sys.argv[8])
+        daySTOP    = int(sys.argv[9])
+        hourSTOP   = int(sys.argv[10])
+        minuteSTOP = int(sys.argv[11])
+        time_slotSTOP = datetime(yearSTOP, monthSTOP, daySTOP, hourSTOP, minuteSTOP)
+        #nrt = False
+        #in_msg.reader_level="seviri-level4"        
     else:
-      if True:  # automatic choise of last 5min 
-          in_msg.get_last_SEVIRI_date()
-          time_slot     = in_msg.datetime
-          time_slotSTOP = in_msg.datetime 
-      else: # fixed date for test reasons
-          year   = 2015          # 2014 09 15 21 35
-          month  =  7           # 2014 07 23 18 30
-          day    =  7
-          hour   = 13
-          minute = 00
-          in_msg.update_datetime(year, month, day, hour, minute)
-          time_slotSTOP = in_msg.datetime 
-
-    # second argument is tolerance in minutes
-    in_msg.nrt = check_near_real_time(in_msg.datetime, 120)
+        time_slotSTOP = in_msg.datetime
 
     print ("*** start plot_coalition2 ")
     plot_coalition2(in_msg, in_msg.datetime, time_slotSTOP)

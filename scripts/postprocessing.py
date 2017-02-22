@@ -288,60 +288,42 @@ def print_usage():
          print "*** Error, not enough command line arguments"
          print "***        please specify at least an input file"
          print "***        possible calls are:"
-         print "*** python postprocessing.py input_MSG "
-         print "*** python postprocessing.py input_MSG 2014 07 23 16 10 "
+         print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG "
+         print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 "
          print "                                 date and time must be completely given"
-         print "*** python postprocessing.py input_MSG 2014 07 23 16 10 'h03-ir108' (use this as postprocessing_composite, not those written in the input file)"
-         print "*** python postprocessing.py input_MSG 2014 07 23 16 10 'IR_108' 'ccs4' (use this as postprocessing_areas, not those written in the input file)"
-         print "*** python postprocessing.py input_MSG 2014 07 23 16 10 ['HRoverview','fog'] ['ccs4','euro4'] (several composites and areas)"
+         print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'h03-ir108' (use this as postprocessing_composite, not those written in the input file)"
+         print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'h03-ir108' 'ccs4' (use this as postprocessing_areas, not those written in the input file)"
+         print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ['h03-ir108','h03-airmass'] ['ccs4','euro4'] (several composites and areas)"
          print "***           "
          quit() # quit at this point
-
 #-----------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
 
    import sys
-   from get_input_msg import get_input_msg
+   from get_input_msg import get_date_and_inputfile_from_commandline
+   in_msg = get_date_and_inputfile_from_commandline(print_usage=print_usage)
 
-   # get command line arguments, e.g. 
-   # $: python postprocessing.py input_MSG or
-   # $: python postprocessing.py input_MSG 2014 07 23 16 10 or
-   # $: python postprocessing.py input_MSG 2014 07 23 16 10 'h03-ir108' 'ccs4' or
-   # $: python postprocessing.py input_MSG 2014 07 23 16 10 ['HRoverview','fog'] ['ccs4','euro4']
-   # and overwrite arguments given in the initialization in get_input_msg
-   if len(sys.argv) < 2:
-      print_usage()
-   else:
-      # read input file 
-      input_file=sys.argv[1]
-      if input_file[-3:] == '.py': 
-         input_file=input_file[:-3]
-      in_msg = get_input_msg(input_file)
-      in_msg.get_last_SEVIRI_date()
-
-      # check for more arguments 
-      if len(sys.argv) > 2:
-         if len(sys.argv) < 7:
-            print_usage()
-         else:
-            year   = int(sys.argv[2])
-            month  = int(sys.argv[3])
-            day    = int(sys.argv[4])
-            hour   = int(sys.argv[5])
-            minute = int(sys.argv[6])
-            # update time slot in in_msg class
-            in_msg.update_datetime(year, month, day, hour, minute)
-         if len(sys.argv) > 7:
-            if type(sys.argv[7]) is str:
-               in_msg.postprocessing_composite = [sys.argv[7]]
-            else:
-               in_msg.postprocessing_composite = sys.argv[7]
-            if len(sys.argv) > 8:
-               if type(sys.argv[8]) is str:
-                  in_msg.postprocessing_areas = [sys.argv[8]]
-               else:
-                  in_msg.postprocessing_areas = sys.argv[8]
+   if len(sys.argv) > 7:
+       in_msg.postprocessing_composite = sys.argv[7]
+       print in_msg.postprocessing_composite
+       print in_msg.postprocessing_composite[0]
+       print "bbb"
+       if in_msg.postprocessing_composite[0] != '[':  #type(sys.argv[7]) is str
+           print '[[[[['
+           in_msg.postprocessing_composite = [sys.argv[7]]
+       else:
+           # convert (string representation of list) into a list
+           import re
+           junkers = re.compile('[[" \]]')
+           in_msg.postprocessing_composite = junkers.sub('', sys.argv[7]).split(',')
+       print "... produce composite: ", in_msg.postprocessing_composite, type(in_msg.postprocessing_composite)
+       print type(in_msg.postprocessing_composite)
+       if len(sys.argv) > 8:
+           if type(sys.argv[8]) is str:
+               in_msg.postprocessing_areas = [sys.argv[8]]
+           else:
+               in_msg.postprocessing_areas = sys.argv[8]
 
    # loop over all processed areas
    for area in in_msg.areas:

@@ -1,24 +1,37 @@
 
 def input(in_msg):
 
-    print "*** read input from input_rad_pngfiles.py"
+    import inspect
+    in_msg.input_file = inspect.getfile(inspect.currentframe()) 
+    print "*** read input from ", in_msg.input_file
 
-    #------------------------------------------------------------------------
-    # choose (default) observation time 
-    # (this time is overwritten by the command line arguments of plot_msg.py)
-    # (if no date is given in command line neither, 
-    # then last MSG observation date is chosen)
-    #------------------------------------------------------------------------
-    if False:
-        year=2014
-        month=7
-        day=23
-        hour=16
-        minute=10
-        in_msg.update_datetime(year, month, day, hour, minute)
-        # !!!  if archive is used, adjust meteosat09.cfg accordingly !!!
+    # 8=MSG1, 9=MSG2, 10=MSG3
+    #in_msg.sat_nr=0
+    #in_msg.RSS=True 
+    #in_msg.sat_nr=8
+    #in_msg.RSS=False 
+    in_msg.sat_nr=9
+    in_msg.RSS=True 
+    #in_msg.sat_nr=10
+    #in_msg.RSS=False 
 
     #in_msg.delay=5 # process image 'delay' minutes before now
+
+    if True:
+        # choose timeslot of the satellite picture to process
+        # datetime according to command line arguments (if given)
+        # otherwise the last possible time of SEVIRI observation (depends on RSS mode and chosen delay)
+        # also sets the near real time marker: in_msg.nrt 
+        in_msg.init_datetime()
+    else:
+        # offline mode (always a fixed time) # ignores command line arguments
+        year=2015
+        month=2
+        day=10
+        hour=11
+        minute=45
+        in_msg.update_datetime(year, month, day, hour, minute)
+        # !!!  if archive is used, adjust meteosat09.cfg accordingly !!!
 
     #----------------------
     # choose RGBs 
@@ -147,20 +160,7 @@ def input(in_msg):
     #in_msg.areas.append('fullearth')       # full earth 600x300                    # does not yet work
     #in_msg.areas.append('met09globe')      # Cropped globe MSG image 3620x3620     # does not yet work
     #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
-    
-    # 8=MSG1, 9=MSG2, 10=MSG3
-    #in_msg.sat_nr=0
-    #in_msg.RSS=True 
-    #in_msg.sat_nr=8
-    #in_msg.RSS=False 
-    in_msg.sat_nr=9
-    in_msg.RSS=True 
-    #in_msg.sat_nr=10
-    #in_msg.RSS=False 
-    
-    # switch off Rapid scan, if large areas are wanted 
-    if ('fullearth' in in_msg.areas) or ('met09globe' in in_msg.areas) or ('met09globeFull' in in_msg.areas): 
-       in_msg.RSS=False
+    in_msg.check_RSS_coverage()
         
     in_msg.check_input = True    # for radiances check always PRO and EPI files
     #in_msg.check_input = False    # for radiances check always PRO and EPI files

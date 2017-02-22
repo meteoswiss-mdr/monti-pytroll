@@ -60,6 +60,8 @@ from postprocessing import postprocessing
 
 import products 
 
+import inspect
+
 #from mpop.utils import debug_on
 #debug_on() 
 
@@ -415,7 +417,7 @@ def load_products(data_object, RGBs, in_msg, area_loaded):
       if 'CTH' not in RGBs:
          RGBs.append('CTH')
       if in_msg.nwcsaf_calibrate == False:
-         print "*** Error in plot_msg (plot_msg.py) "
+         print "*** Error in plot_msg ("+inspect.getfile(inspect.currentframe())+")"
          print "    in_msg.nwcsaf_calibrate = ", in_msg.nwcsaf_calibrate
          print "    parallax correction needs physical (calibrated) CTH values"
          quit()
@@ -595,7 +597,7 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
       from trollimage.colormap import greys
       colormap = deepcopy(greys)
    else:
-      print "Error, unknown colormap ", colormap ," in plot_msg.py"
+      print "*** ERROR, unknown colormap ", colormap ," in create_PIL_image ("+inspect.getfile(inspect.currentframe())+")"
       quit()
 
    # get the data array that you want to plot 
@@ -708,7 +710,7 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
       #if rgb == 'ndvi':
       #   in_msg.colormap[rgb] = rdylgn_r
    else:
-      print "*** Error in create_PIL_image (plot_msg.py)"
+      print "*** Error in create_PIL_image ("+inspect.getfile(inspect.currentframe())+")"
       print "    unknown plot_type ", plot_type
       quit()
 
@@ -755,7 +757,7 @@ def add_border_and_rivers(PIL_image, cw, area_tuple, in_msg):
       border_color = 'white'
       river_color  = 'white'
    else:
-      print "*** Error in add_border_and_rivers (plot_msg.py)"
+      print "*** Error in add_border_and_rivers ("+inspect.getfile(inspect.currentframe())+")"
       print "    Unknown image mode"
 
    if in_msg.add_rivers:
@@ -902,63 +904,39 @@ def add_colorscale(dc, rgb, in_msg, unit=None):
 # the main function get the command line arguments and start the function plot_msg
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
-
 def print_usage():
-         print "***           "
-         print "*** Error, not enough command line arguments"
-         print "***        please specify at least an input file"
-         print "***        possible calls are:"
-         print "*** python plot_msg.py input_MSG "
-         print "*** python plot_msg.py input_MSG 2014 07 23 16 10 "
-         print "                                 date and time must be completely given"
-         print "*** python plot_msg.py input_MSG 2014 07 23 16 10 'IR_108'"
-         print "*** python plot_msg.py input_MSG 2014 07 23 16 10 'IR_108' 'ccs4'"
-         print "*** python plot_msg.py input_MSG 2014 07 23 16 10 ['HRoverview','fog'] ['ccs4','euro4']"
-         print "***           "
-         quit() # quit at this point
+   
+   print "***           "
+   print "*** Error, not enough command line arguments"
+   print "***        please specify at least an input file"
+   print "***        possible calls are:"
+   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG "
+   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 "
+   print "                                 date and time must be completely given"
+   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'IR_108'"
+   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'IR_108' 'ccs4'"
+   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ['HRoverview','fog'] ['ccs4','euro4']"
+   print "***           "
+   quit() # quit at this point
+#----------------------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
 
    import sys
-   from get_input_msg import get_input_msg
+   from get_input_msg import get_date_and_inputfile_from_commandline
+   in_msg = get_date_and_inputfile_from_commandline(print_usage=print_usage)
 
-   # get command line arguments, e.g. 
-   # $: python plot_msg.py input_MSG or
-   # $: python plot_msg.py input_MSG 2014 07 23 16 10 or
-   # $: python plot_msg.py input_MSG 2014 07 23 16 10 'IR_108' 'ccs4' or
-   # $: python plot_msg.py input_MSG 2014 07 23 16 10 ['HRoverview','fog'] ['ccs4','euro4']
-   # and overwrite arguments given in the initialization in get_input_msg
-   if len(sys.argv) < 2:
-      print_usage()
-   else:
-      # read input file 
-      input_file=sys.argv[1]
-      if input_file[-3:] == '.py': 
-         input_file=input_file[:-3]
-      in_msg = get_input_msg(input_file)
-
-      # check for more arguments 
-      if len(sys.argv) > 2:
-         if len(sys.argv) < 7:
-            print_usage()
-         else:
-            year   = int(sys.argv[2])
-            month  = int(sys.argv[3])
-            day    = int(sys.argv[4])
-            hour   = int(sys.argv[5])
-            minute = int(sys.argv[6])
-            # update time slot in in_msg class
-            in_msg.update_datetime(year, month, day, hour, minute)
-         if len(sys.argv) > 7:
-            if type(sys.argv[7]) is str:
-               in_msg.RGBs = [sys.argv[7]]
+   # interpret additional command line arguments
+   if len(sys.argv) > 7:
+      if type(sys.argv[7]) is str:
+         in_msg.RGBs = [sys.argv[7]]
+      else:
+         in_msg.RGBs = sys.argv[7]
+         if len(sys.argv) > 8:
+            if type(sys.argv[8]) is str:
+               in_msg.area = [sys.argv[8]]
             else:
-               in_msg.RGBs = sys.argv[7]
-            if len(sys.argv) > 8:
-               if type(sys.argv[8]) is str:
-                  in_msg.area = [sys.argv[8]]
-               else:
-                  in_msg.area = sys.argv[8]
+               in_msg.area = sys.argv[8]
 
    RGBs_done = plot_msg(in_msg)
    print "*** Satellite pictures produced for ", RGBs_done 

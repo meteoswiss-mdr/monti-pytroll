@@ -807,13 +807,15 @@ def plot_pdf(str_cells,errors_area,errors_dx, errors_dy, length_history, history
 
     
 if __name__ == "__main__":
+
     import seaborn as sns    
+
     input_file = sys.argv[1]
     if input_file[-3:] == '.py': 
         input_file=input_file[:-3]
     in_msg = get_input_msg(input_file)
-    
     print ("input imported: ", input_file)
+
     history_correction = True
     print("history correction = ", history_correction)
     size_bin = 2.5 #kilometers in x and y dimension corresponding to desired size of the bins (in pdf of SN and WE displacement error)

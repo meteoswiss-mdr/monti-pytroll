@@ -131,7 +131,7 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
               forecasted_labels["ID"+str(interesting_cell)]=[]
               
               # calculate backward history for 1 hour and save it in labels_dir
-              ind, area, displacement, time, center = history_backward(ttt,  interesting_cell, True, ttt-timedelta(hours = 1), labels_dir=labels_dir) #-timedelta(minutes = 10))
+              ind, area, displacement, time, center = history_backward(ttt,  interesting_cell, True, in_msg, ttt-timedelta(hours = 1), labels_dir=labels_dir) #-timedelta(minutes = 10))
               #                                                        current time, cell_id, backward?   time_stop
               if area == None or len(area)<=1:  
                   if verbose:

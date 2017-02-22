@@ -602,7 +602,6 @@ def mask_rgb_based_pressure(data,p_min,p_max,data_CTP):
 
 ########################################################################################## 
 ########################################################################################## 
-
 def print_usage():
          print "***           "
          print "*** Error, not enough command line arguments"
@@ -613,71 +612,32 @@ def print_usage():
          print "                                 date and time must be completely given"
          print "***           "
          quit() # quit at this point
+#----------------------------------------------------------------------------------------------------------------
 
-#def wind_shiftFun(in_windshift):
 if __name__ == '__main__':
-    # input 
-    print "" 
-    print "" 
-    print "*** interpret input" 
 
     time_start_TOT = time.time()
     detailed = True 
-    
-    # interpretation of the command line arguments 
-    if len(sys.argv) < 2:
-        print_usage()
-    else:
-        # read input file 
-        input_file = sys.argv[1]
-        if input_file[-3:] == '.py': 
-            input_file=input_file[:-3]
-        from get_input_msg import get_input_msg
-        in_msg = get_input_msg(input_file)
 
-        print in_msg.dt_forecast1
-        print in_msg.dt_forecast2
+    from get_input_msg import get_date_and_inputfile_from_commandline
+    in_msg = get_date_and_inputfile_from_commandline(print_usage=print_usage)
 
-        if len(sys.argv) < 3:
-            if True:  # automatic choise of last 5min 
-                in_msg.get_last_SEVIRI_date()
-                time_slotSTOP = in_msg.datetime 
-                print "... chose time (automatically): ", str(time_slotSTOP)
-            else: # fixed date for text reasons
-                year = 2015          # 2014 09 15 21 35
-                month  =  7           # 2014 07 23 18 30
-                day    =  7            # 2014 07 23 18 00
-                hour   = 18
-                minute = 00
-                in_msg.update_datetime(year, month, day, hour, minute)
+    print in_msg.dt_forecast1
+    print in_msg.dt_forecast2
+
+    if len(sys.argv) > 7:
+        if len(sys.argv) <12:
+            print_usage()
         else:
-            if len(sys.argv) < 7:
-                print_usage()
-            else:
-                year   = int(sys.argv[2])
-                month  = int(sys.argv[3])
-                day    = int(sys.argv[4])
-                hour   = int(sys.argv[5])
-                minute = int(sys.argv[6])
-                in_msg.update_datetime(year, month, day, hour, minute)
-            if len(sys.argv) > 7:
-                if len(sys.argv) <12:
-                    print_usage()
-                else:
-                    yearSTOP   = int(sys.argv[7])
-                    monthSTOP  = int(sys.argv[8])
-                    daySTOP    = int(sys.argv[9])
-                    hourSTOP   = int(sys.argv[10])
-                    minuteSTOP = int(sys.argv[11])
-                    time_slotSTOP = datetime(yearSTOP, monthSTOP, daySTOP, hourSTOP, minuteSTOP) 
-            else:
-                time_slotSTOP = in_msg.datetime 
-  
-    ############################################################################
-    ############################################################################
+            yearSTOP   = int(sys.argv[7])
+            monthSTOP  = int(sys.argv[8])
+            daySTOP    = int(sys.argv[9])
+            hourSTOP   = int(sys.argv[10])
+            minuteSTOP = int(sys.argv[11])
+            time_slotSTOP = datetime(yearSTOP, monthSTOP, daySTOP, hourSTOP, minuteSTOP) 
+    else:
+        time_slotSTOP = in_msg.datetime 
 
-    # check if real time data is still there, second argument is time window for nrt data in minutes
-    in_msg.nrt = check_near_real_time(in_msg.datetime, 120)
     time_slot = in_msg.datetime
 
     print "" 

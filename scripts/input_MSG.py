@@ -5,12 +5,30 @@ def input(in_msg):
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
     print "*** read input from ", in_msg.input_file
 
-    #------------------------------------------------------------------------
-    # if not specified (False), current (last) observation time is chosen  
-    # chosse specification, if you want a default time without command line arguments 
-    # (the specified time is overwritten by the command line arguments of plot_msg.py)
-    #------------------------------------------------------------------------
-    if False:
+    # 8=MSG1, 9=MSG2, 10=MSG3
+    in_msg.sat = "Meteosat"
+    #in_msg.sat = "meteosat"
+    #in_msg.sat_nr=8
+    #in_msg.RSS=False 
+    in_msg.sat_nr=9
+    in_msg.RSS=True
+    #in_msg.sat_nr=10
+    #in_msg.RSS=False
+    
+    # specify an delay (in minutes), when you like to process a time some minutes ago
+    # e.g. current time               2015-05-31 12:33 UTC
+    # delay 5 min                     2015-05-31 12:28 UTC
+    # last Rapid Scan Service picture 2015-05-31 12:25 UTC (Scan start) 
+    in_msg.delay=5
+
+    if True:
+        # choose timeslot of the satellite picture to process
+        # datetime according to command line arguments (if given)
+        # otherwise the last possible time of SEVIRI observation (depends on RSS mode and chosen delay)
+        # also sets the near real time marker: in_msg.nrt 
+        in_msg.init_datetime()
+    else:
+        # offline mode (always a fixed time) # ignores command line arguments
         year=2015
         month=2
         day=10
@@ -18,12 +36,6 @@ def input(in_msg):
         minute=45
         in_msg.update_datetime(year, month, day, hour, minute)
         # !!!  if archive is used, adjust meteosat09.cfg accordingly !!!
-
-    # specify an delay (in minutes), when you like to process a time some minutes ago
-    # e.g. current time               2015-05-31 12:33 UTC
-    # delay 5 min                     2015-05-31 12:28 UTC
-    # last Rapid Scan Service picture 2015-05-31 12:25 UTC (Scan start) 
-    in_msg.delay=5
 
     #----------------------
     # choose RGBs 
@@ -70,21 +82,21 @@ def input(in_msg):
     # buil in RGBs, see http://mpop.readthedocs.org/en/latest/pp.html
     #                or  http://oiswww.eumetsat.int/~idds/html/doc/best_practices.pdf
     #-------------------      # RED            GREEN          BLUE
-    #in_msg.RGBs.append('airmass')           # WV_062-WV_073  IR_097-IR_108  -WV_062
+    in_msg.RGBs.append('airmass')           # WV_062-WV_073  IR_097-IR_108  -WV_062
     #in_msg.RGBs.append('ash')               
     #in_msg.RGBs.append('cloudtop')
-    #in_msg.RGBs.append('convection')         # WV_062-WV_073  IR_039-IR_108  IR_016-VIS006
+    in_msg.RGBs.append('convection')         # WV_062-WV_073  IR_039-IR_108  IR_016-VIS006
     ##in_msg.RGBs.append('convection_co2')
     #in_msg.RGBs.append('day_microphysics')   # VIS008         IR_039(solar)  IR_108     # requires the pyspectral modul 
     #in_msg.RGBs.append('dust')               # IR_120-IR_108  IR_108-IR_087  IR_108
     #in_msg.RGBs.append('fog')
     #in_msg.RGBs.append('green_snow')
     in_msg.RGBs.append('ir108')
-    #in_msg.RGBs.append('natural')            # IR_016         VIS008         VIS006
+    in_msg.RGBs.append('natural')            # IR_016         VIS008         VIS006
     #in_msg.RGBs.append('night_fog')          
     #in_msg.RGBs.append('night_microphysics') # IR_120-IR_108  IR_108-IR_039  IR_108
-    #in_msg.RGBs.append('night_overview')
-    #in_msg.RGBs.append('overview')
+    in_msg.RGBs.append('night_overview')
+    in_msg.RGBs.append('overview')
     ##in_msg.RGBs.append('overview_sun')
     #in_msg.RGBs.append('red_snow')
     ##in_msg.RGBs.append('refl39_chan')        # requires the pyspectral modul
@@ -94,7 +106,7 @@ def input(in_msg):
     #in_msg.RGBs.append('wv_low')
     #-------------------
     # user defined RGBs
-    #in_msg.RGBs.append('HRoverview')
+    in_msg.RGBs.append('HRoverview')
     ##in_msg.RGBs.append('sandwich')
     ##in_msg.RGBs.append('ndvi')
     #in_msg.RGBs.append('HRVir108')
@@ -164,6 +176,7 @@ def input(in_msg):
     #in_msg.areas.append('EuroMercator')    # same projection as blitzortung.org
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
+    #in_msg.areas.append('eurotv4n')        # Europe TV4 -  4.1x4.1km 2048x1152
     in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
     #in_msg.areas.append('alps95')          # area around Switzerland processed by NWCSAF software 349x151 
     #in_msg.areas.append('ticino')          # stereographic proj of Ticino 342x311
@@ -174,20 +187,7 @@ def input(in_msg):
     #in_msg.areas.append('SeviriDiskFull00')  # Full    globe MSG image 3712x3712     # does not yet work
     #in_msg.areas.append('SouthArabia')
     #in_msg.areas.append('opera_odyssey')
-
-    # 8=MSG1, 9=MSG2, 10=MSG3
-    in_msg.sat = "Meteosat"
-    #in_msg.sat = "meteosat"
-    #in_msg.sat_nr=8
-    #in_msg.RSS=False 
-    in_msg.sat_nr=9
-    in_msg.RSS=True
-    #in_msg.sat_nr=10
-    #in_msg.RSS=False
-    
-    # switch off Rapid scan, if large areas are wanted 
-    if ('fullearth' in in_msg.areas) or ('met09globe' in in_msg.areas) or ('met09globeFull' in in_msg.areas): 
-       in_msg.RSS=False 
+    in_msg.check_RSS_coverage()
 
     in_msg.check_input = False
     #in_msg.reader_level="seviri-level4" 
@@ -210,21 +210,24 @@ def input(in_msg):
     in_msg.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
     #in_msg.outputDir='./pics/'
     #in_msg.outputDir = "./%Y-%m-%d/%Y-%m-%d_%(rgb)s-%(area)s/"
-    in_msg.outputDir = '/data/cinesat/out/'
-    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
+    if in_msg.nrt:
+        in_msg.outputDir = '/data/cinesat/out/'
+    else:
+        in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
+    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/GPM/%Y-%m-%d/'
 
     in_msg.compress_to_8bit=False
 
-    in_msg.scpOutput = True
+    #in_msg.scpOutput = True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
 
     # please download the shape file 
     in_msg.mapDir='/opt/users/common/shapes/'
 
-    in_msg.postprocessing_areas=["ccs4"]
+    #in_msg.postprocessing_areas=["ccs4"]
     #in_msg.postprocessing_areas=['EuropeCanaryS95']
-    in_msg.postprocessing_composite=["h03-ir108"] 
+    #in_msg.postprocessing_composite=["h03-ir108"] 
     #in_msg.postprocessing_composite=["hrwdp-ir108"] 
     #in_msg.postprocessing_composite=["CTT-ir108","CTH-ir108"] 
     #in_msg.postprocessing_composite=["hrwdp-ir108", "hrwdc-ir108","streamd-ir108","hrwdr-ir108", "hrwdcnwp-ir108", "hrwdcnnwp-ir108"]    
@@ -236,4 +239,10 @@ def input(in_msg):
     #in_msg.postprocessing_composite=["hrwdpH-streamdH-HRV","hrwdpH-streamdH-ir108"] 
     #in_msg.postprocessing_composite=["hrwdp-streamd-ir108","TRT-streamd-ir108"] 
     #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03-ir108"],["MSG_radar-HRV","MSG_h03-HRV"],["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]]
-    in_msg.postprocessing_montage = [["MSG_h03-ir108","MSG_HRV"],["MSG_h03-ir108","MSG_test"]]
+    #in_msg.postprocessing_montage = [["MSG_h03-ir108","MSG_HRV"],["MSG_h03-ir108","MSG_test"]]
+    #in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-radar-convection"]]
+    #in_msg.postprocessing_montage = [["MSG_C2rgb-Forecast-IR_108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-radar-convection"]]
+
+    #in_msg.resize_composite = 100
+    #in_msg.resize_montage = 70
+

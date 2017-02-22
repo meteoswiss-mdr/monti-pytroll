@@ -733,63 +733,40 @@ def add_colorscale(dc, rgb, in_msg):
 # the main function get the command line arguments and start the function plot_msg
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
-
 def print_usage():
-         print "***           "
-         print "*** Error, not enough command line arguments"
-         print "***        please specify at least an input file"
-         print "***        possible calls are:"
-         print "*** python plot_msg.py input_MSG "
-         print "*** python plot_msg.py input_MSG 2014 07 23 16 10 "
-         print "                                 date and time must be completely given"
-         print "*** python plot_msg.py input_MSG 2014 07 23 16 10 'IR_108'"
-         print "*** python plot_msg.py input_MSG 2014 07 23 16 10 'IR_108' 'ccs4'"
-         print "*** python plot_msg.py input_MSG 2014 07 23 16 10 ['HRoverview','fog'] ['ccs4','euro4']"
-         print "***           "
-         quit() # quit at this point
+   
+   print "***           "
+   print "*** Error, not enough command line arguments"
+   print "***        please specify at least an input file"
+   print "***        possible calls are:"
+   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG "
+   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 "
+   print "                                 date and time must be completely given"
+   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'IR_108'"
+   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'IR_108' 'ccs4'"
+   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ['HRoverview','fog'] ['ccs4','euro4']"
+   print "***           "
+   quit() # quit at this point
+#----------------------------------------------------------------------------------------------------------------
+
 
 if __name__ == '__main__':
 
    import sys
-   from get_input_msg import get_input_msg
 
-   # get command line arguments, e.g. 
-   # $: python plot_msg.py input_MSG or
-   # $: python plot_msg.py input_MSG 2014 07 23 16 10 or
-   # $: python plot_msg.py input_MSG 2014 07 23 16 10 'IR_108' 'ccs4' or
-   # $: python plot_msg.py input_MSG 2014 07 23 16 10 ['HRoverview','fog'] ['ccs4','euro4']
-   # and overwrite arguments given in the initialization in get_input_msg
-   if len(sys.argv) < 2:
-      print_usage()
-   else:
-      # read input file 
-      input_file=sys.argv[1]
-      if input_file[-3:] == '.py': 
-         input_file=input_file[:-3]
-      in_msg = get_input_msg(input_file)
+   from get_input_msg import get_date_and_inputfile_from_commandline
+   in_msg = get_date_and_inputfile_from_commandline(print_usage=print_usage)
 
-      # check for more arguments 
-      if len(sys.argv) > 2:
-         if len(sys.argv) < 7:
-            print_usage()
+   if len(sys.argv) > 7:
+      if type(sys.argv[7]) is str:
+         in_msg.RGBs = [sys.argv[7]]
+      else:
+         in_msg.RGBs = sys.argv[7]
+      if len(sys.argv) > 8:
+         if type(sys.argv[8]) is str:
+            in_msg.area = [sys.argv[8]]
          else:
-            year   = int(sys.argv[2])
-            month  = int(sys.argv[3])
-            day    = int(sys.argv[4])
-            hour   = int(sys.argv[5])
-            minute = int(sys.argv[6])
-            # update time slot in in_msg class
-            in_msg.update_datetime(year, month, day, hour, minute)
-         if len(sys.argv) > 7:
-            if type(sys.argv[7]) is str:
-               in_msg.RGBs = [sys.argv[7]]
-            else:
-               in_msg.RGBs = sys.argv[7]
-            if len(sys.argv) > 8:
-               if type(sys.argv[8]) is str:
-                  in_msg.area = [sys.argv[8]]
-               else:
-                  in_msg.area = sys.argv[8]
+            in_msg.area = sys.argv[8]
 
    RGBs_done = plot_msg(in_msg)
    print "*** Satellite pictures produced for ", RGBs_done 

@@ -228,35 +228,46 @@ def future_properties(time, property_values, property_name,model):
         return t_save, y_save
         
 if __name__ == "__main__":
+
         import seaborn
-        input_file = sys.argv[1]
-        if input_file[-3:] == '.py': 
-            input_file=input_file[:-3]
-        in_msg = get_input_msg(input_file)
-        import seaborn
-        print ("input imported: ", input_file)
-        if len(sys.argv)<6:
-            time_start = datetime(2015,6,7,15,10) 
-            time_end = deepcopy(time_start)
-        else:
-            print(sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6])
-            year = int(sys.argv[2])
-            month = int(sys.argv[3])
-            day = int(sys.argv[4])
-            hour = int(sys.argv[5])
-            minutes =  int(sys.argv[6])
-            #time1 = datetime(sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6])
-            time_start = datetime(year, month, day, hour, minutes)
-            time_start_save = deepcopy(time_start)
+
+        #input_file = sys.argv[1]
+        #if input_file[-3:] == '.py': 
+        #    input_file=input_file[:-3]
+        #
+        #print ("input imported: ", input_file)
+        #if len(sys.argv)<6:
+        #    time_start = datetime(2015,6,7,15,10) 
+        #    time_end = deepcopy(time_start)
+        #else:
+        #    print(sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6])
+        #    year = int(sys.argv[2])
+        #    month = int(sys.argv[3])
+        #    day = int(sys.argv[4])
+        #    hour = int(sys.argv[5])
+        #    minutes =  int(sys.argv[6])
+        #    #time1 = datetime(sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6])
+        #    time_start = datetime(year, month, day, hour, minutes)
+        #    time_start_save = deepcopy(time_start)
+        #
+        #in_msg = get_input_msg(input_file, timeslot=time_start)
+
+	from get_input_msg import get_date_and_inputfile_from_commandline
+	in_msg = get_date_and_inputfile_from_commandline()
+
+	time_start = deepcopy(in_msg.datetime)
+	time_start_save = deepcopy(time_start)
+
+	if len(sys.argv)>7:
             id_interesting_cell = int(sys.argv[7])
-            if len(sys.argv)>8:
+
+	    if len(sys.argv)>8:
                 year = int(sys.argv[8])
                 month = int(sys.argv[9])
                 day = int(sys.argv[10])
                 hour = int(sys.argv[11])
                 minutes =  int(sys.argv[10])
-                time_end = datetime(year, month, day, hour, minutes)
-                
+                time_end = datetime(year, month, day, hour, minutes)                
             else:
                 time_end = deepcopy(time_start)
                     
@@ -266,7 +277,8 @@ if __name__ == "__main__":
         while time_start <= time_end:
             
             backward = True
-            ind, area, displacement, time, center = history_backward(time_start, id_interesting_cell, backward, in_msg, time_start-timedelta(hours=1), labels_dir= '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/',history_correction = history_correction)
+            ind, area, displacement, time, center = history_backward(time_start, id_interesting_cell, backward, in_msg, time_start-timedelta(hours=1), 
+                                                                     labels_dir= '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/',history_correction = history_correction)
                     
             history108 = ind[:,2]
             

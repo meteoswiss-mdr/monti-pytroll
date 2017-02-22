@@ -1,11 +1,14 @@
 
+from datetime import datetime, timedelta
+from my_msg_module import check_near_real_time
+
 class input_msg_class:
 
    def __init__(self):
       import scp_settings
 
-      self.datetime = None
       self.delay = 0
+      self.datetime = None
       self.RGBs = []
       self.areas = []
       #self.sat = "meteosat"     # using the old config file: meteosat09.cfg
@@ -108,20 +111,43 @@ class input_msg_class:
    def add_area(self, area):
       self.areas.append(area)
 
+   def init_datetime(self, timeslot=None):
+      # choose self.datetime (timeslot of the image to process)
+      if timeslot==None:
+         # get last possible SEVIRI observation
+         self.get_last_SEVIRI_date()
+      elif type(timeslot) is datetime:
+         # overwrite the input file by optional argument timeslot
+         self.update_datetime(timeslot.year, timeslot.month, timeslot.day, timeslot.hour, timeslot.minute)
+      else:
+         print "*** ERROR in input_msg_class (get_input_msg.py)"
+         print '    timeslot must be a datetime.date, not a %s' % type(timeslot)
+         raise TypeError('*** ERROR timeslot must be a datetime.date, not a %s' % type(timeslot))
+         quit()
+
    def update_datetime(self, year, month, day, hour, minute):
-      from datetime import datetime
       if year != None and month != None and day != None and hour != None and minute != None: 
          self.datetime = datetime(year, month, day, hour, minute, 0)
       else:
          print "*** WARNING: cannot update time!"
+      # first 120min are saved in the near real time archive
+      self.nrt = check_near_real_time(self.datetime, 120)
+      return self.datetime
 
    def get_last_SEVIRI_date(self):
       from my_msg_module import get_last_SEVIRI_date
       self.datetime = get_last_SEVIRI_date(self.RSS, delay=self.delay)
-      #print "... use time delay of ", self.delay, " minutes"
-      #if self.delay != 0:
-      #   self.datetime -= timedelta(minutes=self.delay)
+      # first 120min are saved in the near real time archive
+      self.nrt = check_near_real_time(self.datetime, 120)
       return self.datetime
+
+   def check_RSS_coverage(self):
+      # Warning, if large areas are wanted and RSS is specified
+      if self.RSS and (('fullearth' in self.areas) or ('met09globe' in self.areas) or ('met09globeFull' in self.areas)): 
+         print        "*** WARNING, large areas are requested: ", self.areas
+         print        "    as well as rapid scan service is selected, which covers only the uppermost 1/3 of the disk"
+         print        "    (1) continue with enter"
+         junk = input("    (2) abort with Ctrl+c")
 
    def sat_nr_str(self):
       # returns a string for the satellite number according to the convection of the satellite name
@@ -292,15 +318,13 @@ class input_msg_class:
       return chosen_settings
 
 # =====================================================================================================================
-# =====================================================================================================================
 
 
-def get_input_msg(input_file=None):
+def get_input_msg(input_file, timeslot=None):
 
-   from datetime import datetime, timedelta
    from os import getcwd
 
-   print "... read input file from :", getcwd()
+   print "... read input file from directory:", getcwd()
 
    # define input class
    in_msg = input_msg_class()
@@ -308,5 +332,49 @@ def get_input_msg(input_file=None):
    # get input from (user specified) file 
    input_module = __import__(input_file)
    input_module.input(in_msg)
+
+   return in_msg
+
+# =====================================================================================================================
+
+def get_date_and_inputfile_from_commandline(print_usage=None):
+
+   import sys
+
+   # get command line arguments, e.g. 
+   # $: python plot_msg.py input_MSG or
+   # $: python plot_msg.py input_MSG 2014 07 23 16 10 or
+   # $: python plot_msg.py input_MSG 2014 07 23 16 10 'IR_108' 'ccs4' or
+   # $: python plot_msg.py input_MSG 2014 07 23 16 10 ['HRoverview','fog'] ['ccs4','euro4']
+   # and overwrite arguments given in the initialization in get_input_msg
+
+   if len(sys.argv) < 2:
+      print_usage()
+   else:
+      # get input filename 
+      input_file=sys.argv[1]
+      if input_file[-3:] == '.py': 
+         input_file=input_file[:-3]
+
+      timeslot=None
+      # check for more arguments 
+      if len(sys.argv) > 2:
+         if len(sys.argv) < 7:
+            if print_usage==None:
+                  print "*** Error, not enough command line arguments"
+            else:
+               print_usage()
+         else:
+            year   = int(sys.argv[2])
+            month  = int(sys.argv[3])
+            day    = int(sys.argv[4])
+            hour   = int(sys.argv[5])
+            minute = int(sys.argv[6])
+            # update time slot in in_msg class
+            from datetime import datetime
+            timeslot = datetime(year, month, day, hour, minute)
+
+   # read input file and initialize in_msg
+   in_msg = get_input_msg(input_file, timeslot=timeslot)
 
    return in_msg

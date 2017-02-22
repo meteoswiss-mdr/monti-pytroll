@@ -54,6 +54,12 @@ def input(in_msg):
     in_msg.model_fit_area = "linear_exp_exp" #reccomended
     #in_msg.model_fit_area = "linear"
         
+    in_msg.stop_history_when_smallForward = False
+    in_msg.stop_history_when_smallBackward = False
+    in_msg.threshold_stop_history_when_small = 0.4
+
+    in_msg.px_cut = 70 #set to 0 in validation (want to track cells wherever they are?); else reccomended 70
+
     in_msg.area_forecast = "ccs4c2" #reccomended: this way extra borders that allow to always have values within ccs4 area (but slower)
     #in_msg.area_forecast = "ccs4" 
              

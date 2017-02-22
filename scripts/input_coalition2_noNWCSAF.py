@@ -1,7 +1,8 @@
 def input(in_msg):
 
     import inspect
-    print "*** read input from ", inspect.getfile(inspect.currentframe()) 
+    in_msg.input_file = inspect.getfile(inspect.currentframe()) 
+    print "*** read input from ", in_msg.input_file
 
     #------------------------------------------------------------------------
     # if not specified (False), current (last) observation time is chosen  
@@ -21,7 +22,7 @@ def input(in_msg):
     # e.g. current time               2015-05-31 12:33 UTC
     # delay 5 min                     2015-05-31 12:28 UTC
     # last Rapid Scan Service picture 2015-05-31 12:25 UTC (Scan start) 
-    in_msg.delay=3
+    in_msg.delay=6
 
     in_msg.no_NWCSAF = True
 
@@ -53,6 +54,12 @@ def input(in_msg):
     in_msg.model_fit_area = "linear_exp_exp" #reccomended
     #in_msg.model_fit_area = "linear"
         
+    in_msg.stop_history_when_smallForward = False
+    in_msg.stop_history_when_smallBackward = False
+    in_msg.threshold_stop_history_when_small = 0.4
+
+    in_msg.px_cut = 70 #set to 0 in validation (want to track cells wherever they are?); else reccomended 70
+
     in_msg.area_forecast = "ccs4c2" #reccomended: this way extra borders that allow to always have values within ccs4 area (but slower)
     #in_msg.area_forecast = "ccs4" 
              
@@ -96,14 +103,14 @@ def input(in_msg):
 
     # channels needed to produce the coalition2 product
     in_msg.RGBs=[]
-    in_msg.RGBs.append('IR_039c')      # colored version
-    in_msg.RGBs.append('WV_062c')      # colored version
-    in_msg.RGBs.append('WV_073c')      # colored version
-    in_msg.RGBs.append('IR_087c')      # colored version
-    in_msg.RGBs.append('IR_097c')      # colored version
-    in_msg.RGBs.append('IR_108c')      # colored version
-    in_msg.RGBs.append('IR_120c')      # colored version
-    in_msg.RGBs.append('IR_134c')      # colored version
+    in_msg.RGBs.append('IR_039')
+    in_msg.RGBs.append('WV_062')
+    in_msg.RGBs.append('WV_073')
+    in_msg.RGBs.append('IR_087')
+    in_msg.RGBs.append('IR_097')
+    in_msg.RGBs.append('IR_108')
+    in_msg.RGBs.append('IR_120')
+    in_msg.RGBs.append('IR_134')
 
     #-----------------------------
     # choose production of results
@@ -372,7 +379,7 @@ def input(in_msg):
     in_msg.settingsLocal['forth_mask'] = 'IR_039_minus_IR_108'
     in_msg.settingsLocal['forced_mask'] = 'no_mask'
     in_msg.settingsLocal['mask_cirrus'] = True
-    #in_msg.settingsLocal["reader_level="seviri-level4"
+    #in_msg.settingsLocal["reader_level"]="seviri-level4"
 
     in_msg.settingsBroad = {}
     in_msg.settingsBroad['use_TB_forecast'] = False
@@ -383,7 +390,7 @@ def input(in_msg):
     in_msg.settingsBroad['forth_mask'] = 'IR_039_minus_IR_108'
     in_msg.settingsBroad['forced_mask'] = 'no_mask'
     in_msg.settingsBroad['mask_cirrus'] = True            
-    #in_msg.settingsBroad['reader_level="seviri-level2"         
+    #in_msg.settingsBroad['reader_level']="seviri-level2"         
     
     
     # -------------   

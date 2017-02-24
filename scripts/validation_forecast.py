@@ -23,7 +23,7 @@ import sys
 
 def validation_forecast(cell, t, t_end, in_msg, history_correction):####LEL#validation_forecast(cell, t, t_end, t_stop_history, labels_dir):
     
-    labels_dir = in_msg.labelsDirOffline #'/opt/users/lel/PyTroll/scripts/labels/'
+    labels_dir = in_msg.labelsDir #'/opt/users/lel/PyTroll/scripts/labels/'
     verbose = False
     model = in_msg.model_fit_area
     all_errors_area = []

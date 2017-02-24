@@ -422,20 +422,9 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 print ('... downscaling', chosen_settings['mode_downscaling'])
                 data = downscale(data,chosen_settings['mode_downscaling'], mask = mask_downscale)
 
-                if in_msg.nrt == True:
-                    in_msg.outputDir = in_msg.outputDirNrt
-                    in_msg.nowcastDir = in_msg.nowcastDirNrt
-                    in_msg.labelsDir = in_msg.labelsDirNrt
-                else:
-                    in_msg.outputDir  = in_msg.outputDirOffline    
-                    in_msg.nowcastDir = format_name(in_msg.nowcastDirOffline, time_slot, area=area, rgb='channels', sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
-                    in_msg.labelsDir  = format_name(in_msg.labelsDirOffline,  time_slot, area=area, rgb='label',    sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change 
-
+                # fill placeholders in directory names with content
                 outputDir = format_name(in_msg.outputDir, time_slot, area=area, rgb='C2rgb', sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
-
-                if in_msg.nowcastDir == '/data/COALITION2/PicturesSatellite/LEL_results_wind/':
-                    in_msg.nowcastDir+= '/'+yearS+'-'+monthS+'-'+dayS+'/channels/'				
-                    print ("      updated in_msg.nowcastDir: ", in_msg.nowcastDir)
+                labelsDir = format_name(in_msg.labelsDir, time_slot, area=area, rgb='label', sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
 
                 # create a cloud mask: if scale local based on CTH, else based on  where CTP can be derived 
                 # -------------------
@@ -450,32 +439,34 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     data['CTH'].data = ma.masked_less(data['CTH'].data, 1) #1 to make sure 0 is also masked
                     mask_NoClouds = data['CTH'].data.mask
           
+                nowcastDir = format_name(in_msg.nowcastDir, time_slot, area=area, rgb='channels', sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
+
                 # read old brightness temperatures (if possible shifted by lagrangian cell movement)
                 if chosen_settings['use_TB_forecast'] == True:
       
                     print ("*** read forecasted brightness temperatures")
-                    print ("    ", in_msg.nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S) )
-                    print ("    ", in_msg.nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S) )                               
-                    wv_062_t15 = pickle.load( open( in_msg.nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) ) 
-                    wv_062_t30 = pickle.load( open( in_msg.nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S), "rb" ) )
+                    print ("    ", nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S) )
+                    print ("    ", nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S) )                               
+                    wv_062_t15 = pickle.load( open( nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) ) 
+                    wv_062_t30 = pickle.load( open( nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S), "rb" ) )
                             
-                    wv_073_t15 = pickle.load( open( in_msg.nowcastDir+"%s_%s_WV_073_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) )
-                    wv_073_t30 = pickle.load( open( in_msg.nowcastDir+"%s_%s_WV_073_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S), "rb" ) )           
+                    wv_073_t15 = pickle.load( open( nowcastDir+"%s_%s_WV_073_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) )
+                    wv_073_t30 = pickle.load( open( nowcastDir+"%s_%s_WV_073_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S), "rb" ) )           
                 
-                    ir_097_t15 = pickle.load( open( in_msg.nowcastDir+"%s_%s_IR_097_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) )
-                    ir_097_t30 = pickle.load( open( in_msg.nowcastDir+"%s_%s_IR_097_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S), "rb" ) )  
+                    ir_097_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_097_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) )
+                    ir_097_t30 = pickle.load( open( nowcastDir+"%s_%s_IR_097_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S), "rb" ) )  
                 
-                    ir_108_t15 = pickle.load( open( in_msg.nowcastDir+"%s_%s_IR_108_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) )
-                    ir_108_t30 = pickle.load( open( in_msg.nowcastDir+"%s_%s_IR_108_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S), "rb" ) )  
+                    ir_108_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_108_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) )
+                    ir_108_t30 = pickle.load( open( nowcastDir+"%s_%s_IR_108_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S), "rb" ) )  
                     
-                    ir_134_t15 = pickle.load( open( in_msg.nowcastDir+"%s_%s_IR_134_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) )
-                    ir_134_t30 = pickle.load( open( in_msg.nowcastDir+"%s_%s_IR_134_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S), "rb" ) ) 
+                    ir_134_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_134_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) )
+                    ir_134_t30 = pickle.load( open( nowcastDir+"%s_%s_IR_134_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S), "rb" ) ) 
                 
-                    ir_087_t15 = pickle.load( open( in_msg.nowcastDir+"%s_%s_IR_087_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) ) 
+                    ir_087_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_087_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) ) 
                     
-                    ir_120_t15 = pickle.load( open( in_msg.nowcastDir+"%s_%s_IR_120_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) ) 
+                    ir_120_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_120_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) ) 
                     
-                    ir_039_t15 = pickle.load( open( in_msg.nowcastDir+"%s_%s_IR_039_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) ) 
+                    ir_039_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_039_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) ) 
             
                     downscalings = [wv_062_t15[1],wv_062_t30[1],wv_073_t15[1],wv_073_t30[1],ir_097_t15[1],ir_097_t30[1],ir_108_t15[1],ir_108_t30[1],ir_134_t15[1],ir_134_t30[1],ir_087_t15[1],ir_120_t15[1],ir_039_t15[1]]
                     
@@ -1067,7 +1058,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                         outputDir_labels = None
                     """
                     labels_corrected, first_time_step = properties_cells(time_slot, time_slot, current_labels=labels, metadata=metadata,
-                                                                        labels_dir=in_msg.labelsDir, outputDir_labels=outputDir_labels, in_msg=in_msg, sat_data=data)
+                                                                        labels_dir=labelsDir, outputDir_labels=outputDir_labels, in_msg=in_msg, sat_data=data)
                     if first_time_step:
                         print ("no history to follow, first timestep")
                     if in_msg.plot_forecast == True and first_time_step == False:
@@ -1077,12 +1068,12 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                         else:
                             add_path = ""
                         #plot_forecast_area(time_slot, in_msg.model_fit_area, outputFile=outputDir+add_path, current_labels=labels_corrected,
-                        #                  t_stop=time_slot, BackgroundFile=out_file1, ForeGroundRGBFile=c2File, labels_dir=in_msg.labelsDir, in_msg=in_msg)
+                        #                  t_stop=time_slot, BackgroundFile=out_file1, ForeGroundRGBFile=c2File, labels_dir=labelsDir, in_msg=in_msg)
                         plot_forecast_area(time_slot, in_msg.model_fit_area, outputDir=outputDir+add_path, current_labels=labels_corrected,
-                                          t_stop=time_slot, BackgroundFile=c2File, ForeGroundRGBFile=c2File, labels_dir=in_msg.labelsDir, in_msg=in_msg)
+                                          t_stop=time_slot, BackgroundFile=c2File, ForeGroundRGBFile=c2File, labels_dir=labelsDir, in_msg=in_msg)
             
           # add 5min and do the next time step
-          f4p = in_msg.labelsDir+"/Labels*"
+          f4p = labelsDir+"/Labels*"
           import glob
           filenames_for_permission = glob.glob(f4p)
           for file_per in filenames_for_permission:
@@ -1095,15 +1086,16 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
 def print_usage():
    
     inputFile="input_coalition2"
-    print "***           "
-    print "*** Error, not enough command line arguments"
-    print "***        please specify at least an input file"
-    print "***        possible calls are:"
-    print "*** python "+inspect.getfile(inspect.currentframe())+" "+inputFile+" "
-    print "*** python "+inspect.getfile(inspect.currentframe())+" "+inputFile+" 2014 07 23 16 10 "
-    print "                                 date and time must be completely given"
-    print "*** python "+inspect.getfile(inspect.currentframe())+" "+inputFile+" 2014 07 23 16 10 2014 07 23 16 30"
-    print "***           "
+    print('... create output directory: ' + path)
+    print("***           ")
+    print("*** Error, not enough command line arguments")
+    print("***        please specify at least an input file")
+    print("***        possible calls are:")
+    print("*** python "+inspect.getfile(inspect.currentframe())+" "+inputFile+" ")
+    print("*** python "+inspect.getfile(inspect.currentframe())+" "+inputFile+" 2014 07 23 16 10 ")
+    print("                                 date and time must be completely given")
+    print("*** python "+inspect.getfile(inspect.currentframe())+" "+inputFile+" 2014 07 23 16 10 2014 07 23 16 30")
+    print("***           ")
     quit() # quit at this point
 #----------------------------------------------------------------------------------------------------------------
 

@@ -111,17 +111,17 @@ def input(in_msg):
     in_msg.show_clouds = 'developing_and_mature'
 
     # directory containing the forecasted brightness temperatures
-    in_msg.nowcastDirNrt= "/data/cinesat/out/" #'/opt/users/"+getpass.getuser()+"/PyTroll/scripts/nrt_test/' #
-    #in_msg.nowcastDirOffline= '/data/COALITION2/PicturesSatellite/LEL_results_wind/'
-    #in_msg.nowcastDirOffline= '/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels_LEL/'
-    in_msg.nowcastDirOffline= '/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels/'
-    ###in_msg.nowcastDir="/opt/users/"+getpass.getuser()+"/PyTroll/scripts/channels_new//" 
-    ###in_msg.nowcastDir= '/data/COALITION2/PicturesSatellite/LEL_results_wind/'
-    
+    if in_msg.nrt:
+        in_msg.nowcastDir = "/data/cinesat/out/"
+    else:
+        in_msg.nowcastDir = '/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels/'
+
     #directors with labels
-    in_msg.labelsDirNrt = '/data/cinesat/out/labels/'
-    #in_msg.labelsDirOffline = '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/'
-    in_msg.labelsDirOffline = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_labels_%(area)s/'
+    if in_msg.nrt:
+        in_msg.labelsDir = '/data/cinesat/out/labels/'
+    else:
+        #in_msg.labelsDir = '/opt/users/'+in_msg.user+'/PyTroll/scripts/labels/'
+        in_msg.labelsDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_labels_%(area)s/'
 
     # channels needed to produce the coalition2 product
     in_msg.RGBs=[]
@@ -185,23 +185,17 @@ def input(in_msg):
     
     in_msg.choose_forecast_times()
 
-    #in_msg.outputDir='./pics/'
     in_msg.standardOutputName = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
-    #in_msg.outputDir = '/data/cinesat/out/'
-    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
-    #in_msg.outputDirOffline =  '/opt/users/'+getpass.getuser()+'/PyTroll/scripts//output_coalition2/'
-    in_msg.outputDirOffline =  '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
-    in_msg.outputDirNrt = '/data/cinesat/out/' #'/opt/users/'+getpass.getuser()+'/PyTroll/scripts/nrt_test/' #
-    #if in_msg.only_obs_noForecast == True:
-    #    in_msg.outputDir = "/opt/users/"+getpass.getuser()+"/PyTroll/scripts//Mecikalski_obs/"
-    #elif in_msg.RSS == True:
-    #    in_msg.outputDir = "/opt/users/"+getpass.getuser()+"/PyTroll/scripts//Mecikalski_RapidScan/"
-    #else:
-    #    in_msg.outputDir = "/opt/users/"+getpass.getuser()+"/PyTroll/scripts//Mecikalski/"
+    if in_msg.nrt:
+        in_msg.outputDir = '/data/cinesat/out/'
+    else:
+        #in_msg.outputDir='./pics/'
+        in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
 
-
-    in_msg.outputDirForecastsNrt = "/data/cinesat/out/" #'/opt/users/'+getpass.getuser()+'/PyTroll/scripts/nrt_test/' #
-    in_msg.outputDirForecastsOffline = "/data/COALITION2/PicturesSatellite/LEL_results_wind/"
+    if in_msg.nrt:
+        in_msg.outputDirForecasts = "/data/cinesat/out/" #'/opt/users/'+in_msg.user+'/PyTroll/scripts/nrt_test/' #
+    else:
+        in_msg.outputDirForecasts = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_forecasts_%(area)s/'
    
     in_msg.scpOutput = True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"

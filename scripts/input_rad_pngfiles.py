@@ -1,5 +1,5 @@
 
-def input(in_msg):
+def input(in_msg, timeslot=None):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -22,7 +22,7 @@ def input(in_msg):
         # datetime according to command line arguments (if given)
         # otherwise the last possible time of SEVIRI observation (depends on RSS mode and chosen delay)
         # also sets the near real time marker: in_msg.nrt 
-        in_msg.init_datetime()
+        in_msg.init_datetime(timeslot=timeslot)
     else:
         # offline mode (always a fixed time) # ignores command line arguments
         year=2015

@@ -1,5 +1,5 @@
 
-def input(in_msg):
+def input(in_msg, timeslot=None):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -26,7 +26,7 @@ def input(in_msg):
         # datetime according to command line arguments (if given)
         # otherwise the last possible time of SEVIRI observation (depends on RSS mode and chosen delay)
         # also sets the near real time marker: in_msg.nrt 
-        in_msg.init_datetime()
+        in_msg.init_datetime(timeslot=timeslot)
     else:
         # offline mode (always a fixed time) # ignores command line arguments
         year=2015
@@ -190,7 +190,7 @@ def input(in_msg):
     in_msg.check_RSS_coverage()
 
     in_msg.check_input = False
-    #in_msg.reader_level="seviri-level4" 
+    in_msg.reader_level="seviri-level4" 
     in_msg.parallax_correction = False
     in_msg.parallax_gapfilling = 'bilinear' # 'False' (default), 'nearest'
     #in_msg.save_reprojected_data=['ccs4']

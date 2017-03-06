@@ -331,7 +331,10 @@ def get_input_msg(input_file, timeslot=None):
 
    # get input from (user specified) file 
    input_module = __import__(input_file)
-   input_module.input(in_msg)
+   input_module.input(in_msg, timeslot=timeslot)
+
+   if timeslot != None:
+      in_msg
 
    return in_msg
 

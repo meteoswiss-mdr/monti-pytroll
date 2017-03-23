@@ -550,6 +550,24 @@ REGION: eurotv4n {
         AREA_EXTENT:    (-5103428.6786669521, -6772478.6005340703, 3293371.3213330479, -2049278.6005340703)
 };
 
+REGION: euroHDready {
+        NAME:   euroHDready
+        PCS_ID: stere_10.0_49.0
+        PCS_DEF:        proj=stere,lat_0=49.0,lon_0=10.0,ellps=WGS84
+        XSIZE:          1280
+        YSIZE:          720
+        AREA_EXTENT:    (-3205241.2913358416, -1629248.1604196958, 2005241.291335841, 1662623.6956352878)
+};
+
+REGION: euroHDfull {
+        NAME:   euroFullHD
+        PCS_ID: stere_10.0_49.0
+        PCS_DEF:        proj=stere,lat_0=49.0,lon_0=10.0,ellps=WGS84
+        XSIZE:          1920
+        YSIZE:          1080
+        AREA_EXTENT:    (-3205241.2913358416, -1629248.1604196958, 2005241.291335841, 1662623.6956352878)
+};
+
 REGION: eurol {
         NAME:           Euro 3.0km area - Europe
         PCS_ID:         ps60wgs84

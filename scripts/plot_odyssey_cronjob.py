@@ -194,8 +194,9 @@ if add_logos:
       dc.write_vertically()
    #dc.add_logo("../logos/meteoSwiss3.jpg",height=60.0)
    #dc.add_logo("../logos/pytroll3.jpg",height=60.0)
-   dc.add_logo("/data/OWARNA/hau/pytroll/logos/meteoSwiss.png",height=40.0)
-
+   #dc.add_logo("/data/OWARNA/hau/pytroll/logos/meteoSwiss.png",height=40.0)
+   dc.add_logo("../logos/meteoSwiss.png",height=40.0)
+   
 #font_scale = aggdraw.Font("black","/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerif-Bold.ttf",size=16)
 fontsize=18
 font = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf", fontsize)

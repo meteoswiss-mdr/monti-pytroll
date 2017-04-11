@@ -43,7 +43,8 @@ echo ""
 read junk
 #/opt/users/common/packages/Anaconda2-2.4.1-Linux-x86_64.sh
 #/opt/users/common/packages/Anaconda2-4.0.0-Linux-x86_64.sh
-/opt/users/common/packages/Anaconda3-4.0.0-Linux-x86_64.sh
+#/opt/users/common/packages/Anaconda3-4.0.0-Linux-x86_64.sh
+/opt/users/common/packages/Anaconda3-4.3.1-Linux-x86_64.sh
 export HOME=$HOME_ORG
 
 

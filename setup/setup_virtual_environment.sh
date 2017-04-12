@@ -1,3 +1,4 @@
+
 #!/bin/bash
 #
 # script to install a virtual environment called "PyTroll"
@@ -34,7 +35,7 @@ conda config --set ssl_verify false
 
 echo "*** Create virtual environement and install python packages according to PyTroll-conda-package-list.txt"
 echo "======================================================================================================="
-conda create -n PyTroll_$(logname) python=2.7 --copy --file PyTroll-conda-package-list_no_version_nr.txt
+conda create -n PyTroll_$(logname) python=3.6 --copy --file PyTroll-conda-package-list_no_version_nr.txt  # _$(logname)
 ### !!! without copy conda does not create shaired library files !!!
 echo "Could you create the virtual environment? (press enter to continue or CTRL+c to abort)"
 read junk
@@ -48,23 +49,24 @@ echo ""
 echo "*** Installation of additional packages with pip (inside the virtual env)"
 echo "========================================================================="
 echo ""
-pip install --trusted-host pypi.python.org -r PyTroll-pip-requirements_no_version_nr2.txt
+pip install --trusted-host pypi.python.org -r PyTroll-pip-requirements_no_version_nr.txt  #_$(logname)
 echo "Does the installation look fine? (press enter to continue or CTRL+c to abort)"
 read junk
 
 export INSTALL_DIR=/opt/users/common/packages
 cd $INSTALL_DIR
 
-echo ""
-echo "*** Install basemap (inside the virtual env)"
-echo "============================================"
+#echo ""
+#echo "*** Install basemap (inside the virtual env)"
+#echo "============================================"
 cd $INSTALL_DIR/basemap
-# specify preinstalled GEOS_DIR library directory
+## specify preinstalled GEOS_DIR library directory
 export GEOS_DIR=$INSTALL_DIR/basemap/GEOS-3.3.3
-# install basemap
+## install basemap
 python setup.py install
 echo "did the installation of basemap work fine? (press enter to continue or CTRL+c to abort)"
 read junk
+ 
 
 echo ""
 echo "*** Install pygrib (inside the virtual env)"

@@ -18,13 +18,13 @@
 #. ./setup_anaconda_zueub428.sh
 
 #export packages="aggdraw pygrib pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate"
-export packages="pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate"
+export packages="pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate satpy"
 
 declare -A branches
 branches=( ["aggdraw"]="master" ["pygrib"]="master" ["pyresample"]="master" ["pycoast"]="master" \
            ["pyorbital"]="master" ["posttroll"]="develop" ["trollsift"]="master" \
            ["pytroll-schedule"]="master" ["trollimage"]="develop" ["mipp"]="master" \
-           ["mpop"]="master" ["trollduction"]="develop" ["pyspectral"]="master" ["pydecorate"]="master" )
+           ["mpop"]="master" ["trollduction"]="develop" ["pyspectral"]="master" ["pydecorate"]="master" ["satpy"]="develop")
 
 cd $PYTROLLHOME
 

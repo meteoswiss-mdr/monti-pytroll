@@ -31,8 +31,6 @@
 from mpop.satellites import GeostationaryFactory
 from mpop.imageo.geo_image import GeoImage
 #from mpop.imageo.palettes import cms_modified, convert_palette, convert_palette2colormap
-from datetime import datetime, timedelta
-from pyresample import image, geometry
 from pycoast import ContourWriterAGG
 from pydecorate import DecoratorAGG
 from mpop.channel import Channel, GenericChannel
@@ -129,14 +127,16 @@ def plot_msg(in_msg):
       print '*** Create plots for '
       print '    Satellite/Sensor: ' + in_msg.sat_str() 
       print '    Satellite number: ' + in_msg.sat_nr_str()
-      print '    Date/Time:        '+dateS +' '+hourS+':'+minS+'UTC'
+      print '    Satellite isntrument: ' + in_msg.instrument
+      print '    Date/Time:        '+ str(in_msg.datetime)
       print '    RGBs:            ', in_msg.RGBs
       print '    Area:            ', in_msg.areas
 
 
    # define satellite data object
    #global_data = GeostationaryFactory.create_scene(in_msg.sat, in_msg.sat_nr_str(), "seviri", in_msg.datetime)
-   global_data = GeostationaryFactory.create_scene(in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", in_msg.datetime)
+   global_data = GeostationaryFactory.create_scene(in_msg.sat_str(), in_msg.sat_nr_str(), in_msg.instrument, in_msg.datetime)
+   # global_data = GeostationaryFactory.create_scene("msg-ot", "", "Overshooting_Tops", in_msg.datetime)
 
    # print "type(global_data) ", type(global_data)   # <class 'mpop.scene.SatelliteInstrumentScene'>
    # print "dir(global_data)", dir(global_data)  [..., '__init__', ... 'area', 'area_def', 'area_id', 'channel_list', 'channels', 
@@ -290,8 +290,8 @@ def plot_msg(in_msg):
             if not check_loaded_channels(rgb, data):
                continue 
 
-            PIL_image = create_PIL_image(rgb, data, in_msg, HRV_enhancement=HRV_enhancement)   # !!! in_msg.colorbar[rgb] is initialized inside (give attention to rgbs) !!!
-
+            PIL_image = create_PIL_image(rgb, data, in_msg, HRV_enhancement=HRV_enhancement, obj_area=obj_area)  
+                                       # !!! in_msg.colorbar[rgb] is initialized inside (give attention to rgbs) !!!
             add_border_and_rivers(PIL_image, cw, area_tuple, in_msg)
    
             # indicate mask
@@ -303,7 +303,7 @@ def plot_msg(in_msg):
 
             # add title to image
             if in_msg.add_title:
-               add_title(PIL_image, HRV_enhance_str+rgb, data.sat_nr(), dateS, hourS, minS, area, dc, in_msg.verbose )
+               add_title(PIL_image, in_msg.title, HRV_enhance_str+rgb, in_msg.sat_str(), in_msg.sat_nr_str(), in_msg.datetime, area, dc, in_msg.verbose )
 
             # add MeteoSwiss and Pytroll logo
             if in_msg.add_logos:
@@ -346,7 +346,7 @@ def plot_msg(in_msg):
                makedirs(path)
    
             # save file
-            if exists(outputFile):
+            if exists(outputFile) and not in_msg.overwrite:
                if stat(outputFile).st_size > 0:
                   print '... outputFile '+outputFile+' already exists (keep old file)'
                else: 
@@ -434,7 +434,7 @@ def load_products(data_object, RGBs, in_msg, area_loaded):
                else:
                   data_object.load([channel], area_extent=area_loaded.area_extent, reader_level=in_msg.reader_level)  # load the corresponding data
 
-      if rgb in products.RGBs_buildin or rgb in products.RGBs_user:
+      elif rgb in products.RGBs_buildin or rgb in products.RGBs_user:
          obj_image = get_image(data_object, rgb)          # find corresponding RGB image object
          if in_msg.verbose:
             print "    load prerequisites by function: ", obj_image.prerequisites
@@ -443,7 +443,7 @@ def load_products(data_object, RGBs, in_msg, area_loaded):
          else:
             data_object.load(obj_image.prerequisites, area_extent=area_loaded.area_extent, reader_level=in_msg.reader_level)  # load prerequisites
 
-      if rgb in products.NWCSAF:
+      elif rgb in products.NWCSAF:
 
          pge = get_NWC_pge_name(rgb)
 
@@ -463,19 +463,15 @@ def load_products(data_object, RGBs, in_msg, area_loaded):
             area_loaded = data_object[pge].area
          convert_NWCSAF_to_radiance_format(data_object, area_loaded, rgb, in_msg.nwcsaf_calibrate, IS_PYRESAMPLE_LOADED)
 
-      if rgb in products.HSAF: 
-         if in_msg.verbose:
-            print "    load hsaf product by name: ", rgb
-         data_object.load([rgb])   # , area_extent=area_loaded.area_extent load the corresponding data
-
-      if rgb in products.CPP:
-         if in_msg.verbose:
-            print "    load CPP product by name: ", rgb
-         data_object.load([rgb])   # , area_extent=area_loaded.area_extent load the corresponding data
-
-      if rgb in products.SEVIRI_viewing_geometry: 
+      elif rgb in products.SEVIRI_viewing_geometry: 
          data_object.load([rgb], reader_level=in_msg.reader_level)
          #print data_object[rgb].data.shape, data_object[rgb].data.min(), data_object[rgb].data.max()
+
+      else: 
+         if in_msg.verbose:
+            print "    load " + str(in_msg.sat_str()) +" product by name: ", rgb
+         data_object.load([rgb])   # , area_extent=area_loaded.area_extent load the corresponding data
+
 
       if in_msg.HRV_enhancement==True or in_msg.HRV_enhancement==None:
          # load also the HRV channel (there is a check inside in the load function, if the channel is already loaded)
@@ -581,7 +577,7 @@ def mask_data(data, area):
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
 
-def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=False):
+def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=False, obj_area=None):
 
    from mpop.imageo.palettes import convert_palette2colormap
    from trollimage.colormap import rainbow   # reload in order to be save not to use a scaled colormap
@@ -645,6 +641,20 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
       if rgb == 'precip' or rgb == 'precip_ir' or rgb == 'cot' or rgb == 'cwp':
          from trollimage.colormap import RainRate
          colormap=RainRate
+   elif rgb in products.MSG_OT:
+      prop = data[rgb].data
+      plot_type='trollimage'
+      plot_daytime=True
+      if plot_daytime:
+         from trollimage.colormap import daytime
+         colormap=daytime
+         in_msg.rad_min[rgb]=0
+         in_msg.rad_max[rgb]=24
+      if rgb == 'ir_anvil_detection':
+         plot_type='contour'
+         clevels=[0.5] 
+         alpha = 1.0
+         linewidths=3.0
    else:
       # includes products.RGBs_buildin
       prop = ma.asarray([-999.,-999.])
@@ -657,6 +667,7 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
    # (default)
    min_data = prop.min()
    max_data = prop.max()
+   # print "*** min/max data: ", min_data, max_data 
    # replace default with fixed min/max if specified 
 
    if in_msg.fixed_minmax:
@@ -701,6 +712,11 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
       colormap = convert_palette2colormap(data[rgb].palette)
       colormap.set_range(min_data, max_data)  # no return value!
       in_msg.colormap[rgb] = colormap
+   elif plot_type == 'contour':
+      from my_msg_module import ContourImage
+      import matplotlib.cm as cm
+      PIL_image = ContourImage(prop, obj_area, clevels=clevels, alpha=alpha, colormap=cm.Blues, vmin=0, vmax=1.0, linewidths=linewidths)
+      return PIL_image
    elif plot_type == 'user_defined':
       obj_image = get_image(data, rgb)
       if in_msg.verbose:
@@ -807,7 +823,7 @@ def indicate_mask(rgb, PIL_image, data, verbose):
 #----------------------------------------------------------------------------------------------------------------
 
 
-def add_title(PIL_image, rgb, sat_nr, dateS, hourS, minS, area, dc, verbose ):
+def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, verbose ):
 
    if verbose:
       print "    add title to image "
@@ -835,7 +851,12 @@ def add_title(PIL_image, rgb, sat_nr, dateS, hourS, minS, area, dc, verbose ):
       #fontsize=50
       font = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf", fontsize)
 
-      title = ' '+ "MSG-"+str(sat_nr-7) +', '+ dateS+' '+hourS+':'+minS+'UTC, '+area+', '+rgb
+      if in_msg.title == None:
+        title = ' %(sat)s-%(sat_nr)s, %y-%m-%d %H:%MUTC, %(area)s, %(rgb)s'
+        format_name (title, time_slot, rgb=rgb, sat=sat, sat_nr=sat_nr, area=area )
+      else:
+        title = format_name (in_msg.title, time_slot, rgb=rgb, sat=sat, sat_nr=sat_nr, area=area )
+        
       draw = ImageDraw.Draw(PIL_image)
 
       # if area is not Europe 

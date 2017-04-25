@@ -1,0 +1,12 @@
+### ignore the anaconda package ### 
+packages/anaconda2/
+packages/anacon*
+### ignore binary, swap, object and library files ### 
+**/*.pyc
+**/*.swp
+**/*.[oa]
+**/*.png
+**/*.save
+**/*_save
+### ignore emacs backup files ### 
+**/*~

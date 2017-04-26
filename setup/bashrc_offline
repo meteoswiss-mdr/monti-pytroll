@@ -12,6 +12,7 @@ fi
 echo "USER" ${USER}
 echo "\$(logname)" $(logname)
 echo "\$LOGNAME" $LOGNAME
+echo "uname -mrs:" `uname -mrs`
 
 case $HOSTNAME in
 "zueub"[2-4][0-9][0-9])

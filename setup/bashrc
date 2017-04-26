@@ -12,38 +12,69 @@ fi
 echo "USER" ${USER}
 echo "\$(logname)" $(logname)
 echo "\$LOGNAME" $LOGNAME
+echo "uname -mrs:" `uname -mrs`
 
-export XAUTHORITY=/home/lom/users/$LOGNAME/.Xauthority
+case $HOSTNAME in
+"zueub"[2-4][0-9][0-9])
+    if [ -d /opt/users/$LOGNAME/monti-pytroll/ ]
+    then
+	export PYTROLLHOME=/opt/users/$LOGNAME/monti-pytroll/
+    else
+	export PYTROLLHOME=/opt/users/$LOGNAME/PyTroll/	
+    fi
+    export PPP_CONFIG_DIR=$PYTROLLHOME/etc/
+    export XRIT_DECOMPRESS_PATH=/opt/users/common/bin/xRITDecompress
+    export XRIT_DECOMPRESS_OUTDIR=/tmp/SEVIRI_DECOMPRESSED_$LOGNAME
+    export UTILS_PATH=/opt/users/common/
+    export CONDA_PATH="/opt/users/common/packages/anaconda3/"
+    export PATH=$CONDA_PATH"/bin:$PATH"
 
-export http_proxy=http://proxy.meteoswiss.ch:8080
-export https_proxy=https://proxy.meteoswiss.ch:8080
+    # special settings only for zueub computers
+    alias tkdiff='echo tkdiff is too old, use \"meld\" instead; echo  meld '
+    export http_proxy=http://proxy.meteoswiss.ch:8080
+    export https_proxy=https://proxy.meteoswiss.ch:8080
+    export XAUTHORITY=/home/lom/users/$LOGNAME/.Xauthority
+    export FULLNAME=`getent passwd $LOGNAME | cut -d ":" -f 5 | cut -d "," -f 1`
+    export FIRSTNAME=`echo $FULLNAME | cut -d " " -f 1`
+    export LASTNAME=`echo $FULLNAME | cut -d " " -f 2`
+    export EMAIL=${FIRSTNAME}.${LASTNAME}@meteoswiss.ch
+    #if [ -f /usr/bin/tkdiff ]
+    #then
+    #	echo "...use /usr/bin/tkdiff"
+    #else
+    #	echo "...use /opt/users/common/packages/tkdiff-unix/tkdiff"
+    #	alias tkdiff='/opt/users/common/packages/tkdiff-unix/tkdiff'
+    #fi
+    ;;
+"keschln-0002")
+    export PYTROLLHOME=$HOME/monti-pytroll/
+    export PPP_CONFIG_DIR=$PYTROLLHOME/etc/
+    export XRIT_DECOMPRESS_PATH=/store/mch/msrad/sat/pytroll/xRITDecompress
+    export XRIT_DECOMPRESS_OUTDIR=/scratch/$LOGNAME
+    export UTILS_PATH=/store/msrad/sat/
+    export CONDA_PATH="/store/msrad/utils/anaconda3/"
+    ;;
+*)
+    echo "ERROR in check_hostname: unknown computer"
+    exit 1
+    ;;
+esac
 
-export PYTROLLHOME=/opt/users/$LOGNAME/PyTroll/
-
-export PPP_CONFIG_DIR=$PYTROLLHOME/etc/
-export XRIT_DECOMPRESS_PATH=/opt/users/common/bin/xRITDecompress
-export XRIT_DECOMPRESS_OUTDIR=/tmp/SEVIRI_DECOMPRESSED_$LOGNAME
-#export PY_SHAPEFILES=$PYTROLLHOME/shapes/
-export PSP_CONFIG_FILE=/opt/users/common/packages/pyspectral_aux_files/pyspectral.cfg
-#unset PSP_CONFIG_FILE
-
-## added by Anaconda2 2.4.1 installer
-#export PATH="/opt/users/common/packages/anaconda2/bin:$PATH"
-#
-## easy access to the easy-install file
-#alias easy-install.pth='emacs /opt/users/common/packages/anaconda2/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth &'
-#export PYTHONPATH=/opt/users/common/packages/anaconda2/bin:$PYTROLLHOME/scripts
+export PATH=$CONDA_PATH"/bin:$PATH"
+export PSP_CONFIG_FILE=${UTILS_PATH}/packages/pyspectral_aux_files/pyspectral.cfg
+#unset PSP_CONFIG_FILE   # should not be needed any more ... 
 
 # added by Anaconda3 4.0.0 installer
-export PATH="/opt/users/common/packages/anaconda3/bin:$PATH"
 conda -V
 which conda
 which python
 
 # easy access to the easy-install file
-alias easy-install.pth='emacs /opt/users/common/packages/anaconda3/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth &'
+alias easy-install.pth='emacs '$CONDA_PATH'/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth &'
 
-export PYTHONPATH=/opt/users/common/packages/anaconda3/bin:$PYTROLLHOME/scripts
+#export PY_SHAPEFILES=$PYTROLLHOME/shapes/
+
+export PYTHONPATH=$CONDA_PATH/bin:$PYTROLLHOME/scripts
 
 # easier activation and deactivation of the virtual environment PyTroll
 alias activate='source activate PyTroll_$LOGNAME'
@@ -53,19 +84,5 @@ source activate PyTroll_$LOGNAME
 # some useful alias commands
 alias ll='ls --color=auto -alh'
 alias ls='ls --color=auto'
-
-if [ -f /usr/bin/tkdiff ]
-then
-  echo "...use /usr/bin/tkdiff"
-else
-  echo "...use /opt/users/common/packages/tkdiff-unix/tkdiff"
-  alias tkdiff='/opt/users/common/packages/tkdiff-unix/tkdiff'
-fi
-
-
-export FULLNAME=`getent passwd $LOGNAME | cut -d ":" -f 5 | cut -d "," -f 1`
-export FIRSTNAME=`echo $FULLNAME | cut -d " " -f 1`
-export LASTNAME=`echo $FULLNAME | cut -d " " -f 2`
-export EMAIL=${FIRSTNAME}.${LASTNAME}@meteoswiss.ch
 
 #alias cdo='/opt/users/common/lib/cdo-1.7.1/bin/cdo'

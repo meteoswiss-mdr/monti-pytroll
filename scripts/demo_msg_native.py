@@ -10,8 +10,8 @@ import sys
 import getpass
 
 ## for more debugging information uncomment the two following lines 
-#from satpy.utils import debug_on
-#debug_on()
+from satpy.utils import debug_on
+debug_on()
 
 def print_usage():
     print("***           ")
@@ -61,19 +61,24 @@ elif "kesch" in hostname:
     archive_dir = time_end.strftime("/store/mch/msclim/cmsaf/msg/native-fulldisk/%Y/%m/%d/")  # replace %Y%m%d%H%M
     ## search file
     import glob
-    bz2files = glob.glob(archive_dir + time_end.strftime('/MSG[1-4]-SEVI-MSG15-0100-NA-%Y%m%d%H%M??.*.nat.bz2'))
+    filename_pattern = archive_dir + time_end.strftime('/MSG[1-4]-SEVI-MSG15-0100-NA-%Y%m%d%H%M??.*.nat.bz2')
+    bz2files = glob.glob(filename_pattern)
+    if len(bz2files) == 0:
+        raise ValueError("... No input file found, searched for:"+filename_pattern)
+
     ## copy and bunzip2 file
     print("...copy file from archive: "+bz2files[0])
     from subprocess import call
-    data_dir="/scratch/"+getpass.getuser()+"/"
+    #data_dir="/scratch/"+getpass.getuser()+"/"   
+    data_dir=os.environ['SCRATCH']+"/"
     if not os.path.exists(data_dir):
         print('... create output directory: '+data_dir)
-        makedirs(data_dir)
+        os.makedirs(data_dir)
     call(["cp", bz2files[0], data_dir])
     os.chdir(data_dir)
     print("...bunzip2 file: "+bz2files[0])
     bz2file=os.path.basename(bz2files[0])
-    call(["bunzip2","/scratch/hamann/"+bz2file])
+    call(["bunzip2",data_dir+bz2file])
     data_file=bz2file[:-4]
 else:
     raise ValueError("Unknown computer"+hostname+": no example file is provided")
@@ -168,7 +173,7 @@ local_scene = global_scene.resample(area)
 outputfile=time_start.strftime(cwd+'/MSG_'+RGB+'-'+area+'_%Y%m%d%H%M.png')
 print("... save "+outputfile)
 local_scene.save_dataset(RGB, outputfile)
-global_scene.save_dataset('overview', cwd+'/MSG_'+RGB+'-'+area+'_%Y%m%d%H%M.tiff', writer='geotiff')
+#local_scene.save_dataset('overview', time_start.strftime(cwd+'/MSG_'+RGB+'-'+area+'_%Y%m%d%H%M.tiff'), writer='geotiff')
 
 # work with channel data
 print("========================")

@@ -39,7 +39,7 @@ freetype
 funcsigs
 gevent
 gevent-websocket
-glymur
+#glymur
 greenlet
 grin
 h5py
@@ -93,7 +93,7 @@ numexpr
 #numpy
 odo
 openblas
-openjpeg
+#openjpeg
 openpyxl
 openssl
 pandas
@@ -121,6 +121,7 @@ pycrypto
 pycurl
 pyflakes
 pygments
+## conda install -c conda-forge pygrib=2.0.2 # uses jpeg9, unfortunately in conflict with PIL using jpeg8
 pyopenssl
 pyparsing
 pyproj

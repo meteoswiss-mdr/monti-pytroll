@@ -12,7 +12,9 @@
 # author: Ulrich Hamann
 # version 0.1: 15-04-2016 U. Hamann
 
-export INSTALL_DIR=/opt/users/common/packages
+source set_paths.sh  # load functions from this script
+set_utils_path
+export INSTALL_DIR=$UTILS_PATH/packages/
 cd $INSTALL_DIR
 
 ## problems when cloning basemap
@@ -42,8 +44,8 @@ make; make install
 #echo "================================ "
 #source activate PyTroll_$(logname)
 
-cd $INSTALL_DIR/basemap/
-python setup.py install
+#cd $INSTALL_DIR/basemap/
+#python setup.py install
 
 #echo "*** Deactivate virtual environment"
 #source deactivate

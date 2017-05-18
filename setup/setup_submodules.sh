@@ -26,6 +26,8 @@ branches=( ["aggdraw"]="master" ["pygrib"]="master" ["pyresample"]="master" ["py
            ["pytroll-schedule"]="master" ["trollimage"]="develop" ["mipp"]="master" \
            ["mpop"]="master" ["trollduction"]="develop" ["pyspectral"]="master" ["pydecorate"]="master" ["satpy"]="develop")
 
+source set_paths.sh  # load functions from this script
+set_pytroll_paths
 cd $PYTROLLHOME
 
 

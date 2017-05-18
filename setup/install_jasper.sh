@@ -11,22 +11,24 @@
 # author: Ulrich Hamann
 # version 0.1: 19-07-2016 U. Hamann
 
-export INSTALL_DIR=/opt/users/common/packages
-cd $INSTALL_DIR
+source set_paths.sh  # load functions from this script
+set_utils_path
+cd $UTILS_PATH
 
-# copy and unzip jasper package
+## copy and unzip jasper package
+#wget http://www.ece.uvic.ca/~frodo/jasper/software/jasper-2.0.12.tar.gz
+#tar -xvf jasper-2.0.12.tar.gz
+
 wget http://www.ece.uvic.ca/~mdadams/jasper/software/jasper-1.900.1.zip
 unzip jasper-1.900.1.zip
-
 # copy security patch
 wget http://www.linuxfromscratch.org/patches/blfs/svn/jasper-1.900.1-security_fixes-2.patch
-
 # add security patch 
 cd jasper-1.900.1
 patch -Np1 -i ../jasper-1.900.1-security_fixes-2.patch
 
 # configure, make and install 
 export CFLAGS="-fPIC -m64"   # use fPIC and compile for 64bit machine
-./configure --prefix=/opt/users/common/lib/jasper --enable-shared --disable-static --mandir=/opt/users/common/lib/jasper/man 
+./configure --prefix=$UTILS_PATH/lib/jasper --enable-shared --disable-static --mandir=$UTILS_PATH/lib/jasper/man 
 make
 make install

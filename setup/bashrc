@@ -12,60 +12,55 @@ fi
 echo "USER" ${USER}
 echo "\$(logname)" $(logname)
 echo "\$LOGNAME" $LOGNAME
+echo "uname -mrs:" `uname -mrs`
 
-export XAUTHORITY=/home/lom/users/$LOGNAME/.Xauthority
+# tmp
+export LOGNAME_ORG=$LOGNAME
+export LOGNAME=hamann
 
-export http_proxy=http://proxy.meteoswiss.ch:8080
-export https_proxy=https://proxy.meteoswiss.ch:8080
+source /users/hamann/monti-pytroll/setup/set_paths.sh  # load functions from this script
+cd $PYTROLLHOME
+set_utils_path
+set_conda_path
+set_pytroll_paths
 
-export PYTROLLHOME=/opt/users/$LOGNAME/PyTroll/
+case $HOSTNAME in
+"zueub"[2-4][0-9][0-9])
+    # special settings only for zueub computers
+    alias tkdiff='echo tkdiff is too old, use \"meld\" instead; echo  meld '
+    export http_proxy=http://proxy.meteoswiss.ch:8080
+    export https_proxy=https://proxy.meteoswiss.ch:8080
+    export XAUTHORITY=/home/lom/users/$LOGNAME/.Xauthority
+    export FULLNAME=`getent passwd $LOGNAME | cut -d ":" -f 5 | cut -d "," -f 1`
+    export FIRSTNAME=`echo $FULLNAME | cut -d " " -f 1`
+    export LASTNAME=`echo $FULLNAME | cut -d " " -f 2`
+    export EMAIL=${FIRSTNAME}.${LASTNAME}@meteoswiss.ch
+    #if [ -f /usr/bin/tkdiff ]
+    #then
+    #	echo "...use /usr/bin/tkdiff"
+    #else
+    #	echo "...use /opt/users/common/packages/tkdiff-unix/tkdiff"
+    #	alias tkdiff='/opt/users/common/packages/tkdiff-unix/tkdiff'
+    #fi
+    ;;
+"keschln-"[0-9][0-9][0-9][0-9])
+    ;;
+*)
+    echo "ERROR in bashrc: unknown computer "$HOSTNAME
+    return
+    ;;
+esac
 
-export PPP_CONFIG_DIR=$PYTROLLHOME/etc/
-export XRIT_DECOMPRESS_PATH=/opt/users/common/bin/xRITDecompress
-export XRIT_DECOMPRESS_OUTDIR=/tmp/SEVIRI_DECOMPRESSED_$LOGNAME
 #export PY_SHAPEFILES=$PYTROLLHOME/shapes/
-export PSP_CONFIG_FILE=/opt/users/common/packages/pyspectral_aux_files/pyspectral.cfg
-#unset PSP_CONFIG_FILE
 
-## added by Anaconda2 2.4.1 installer
-#export PATH="/opt/users/common/packages/anaconda2/bin:$PATH"
-#
-## easy access to the easy-install file
-#alias easy-install.pth='emacs /opt/users/common/packages/anaconda2/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth &'
-#export PYTHONPATH=/opt/users/common/packages/anaconda2/bin:$PYTROLLHOME/scripts
+export PYTHONPATH=$CONDA_PATH/bin:$PYTROLLHOME/scripts
 
-# added by Anaconda3 4.0.0 installer
-export PATH="/opt/users/common/packages/anaconda3/bin:$PATH"
-conda -V
-which conda
-which python
-
-# easy access to the easy-install file
-alias easy-install.pth='emacs /opt/users/common/packages/anaconda3/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth &'
-
-export PYTHONPATH=/opt/users/common/packages/anaconda3/bin:$PYTROLLHOME/scripts
-
-# easier activation and deactivation of the virtual environment PyTroll
-alias activate='source activate PyTroll_$LOGNAME'
-alias deactivate='source deactivate'
+# activate virtual environment
 source activate PyTroll_$LOGNAME
 
 # some useful alias commands
 alias ll='ls --color=auto -alh'
 alias ls='ls --color=auto'
 
-if [ -f /usr/bin/tkdiff ]
-then
-  echo "...use /usr/bin/tkdiff"
-else
-  echo "...use /opt/users/common/packages/tkdiff-unix/tkdiff"
-  alias tkdiff='/opt/users/common/packages/tkdiff-unix/tkdiff'
-fi
-
-
-export FULLNAME=`getent passwd $LOGNAME | cut -d ":" -f 5 | cut -d "," -f 1`
-export FIRSTNAME=`echo $FULLNAME | cut -d " " -f 1`
-export LASTNAME=`echo $FULLNAME | cut -d " " -f 2`
-export EMAIL=${FIRSTNAME}.${LASTNAME}@meteoswiss.ch
-
-#alias cdo='/opt/users/common/lib/cdo-1.7.1/bin/cdo'
+# tmp
+export LOGNAME=$LOGNAME_ORG

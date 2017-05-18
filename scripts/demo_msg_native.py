@@ -190,7 +190,7 @@ if add_border:
     elif "kesch" in hostname:
         shape_dir='/store/msrad/utils/shapes/'
     local_scene.show(RGB, overlay={'coast_dir':shape_dir, 'color':'white', 'width':0.75})
-    local_scene.save_dataset(RGB, outputfile, overlay={'coast_dir': '/store/msrad/utils/shapes/','color': 'white', 'width' : 0.75})
+    local_scene.save_dataset(RGB, outputfile, overlay={'coast_dir':shape_dir, 'color':'white', 'width':0.75})
 else:
     local_scene.save_dataset(RGB, outputfile)
     #local_scene.save_dataset('overview', time_start.strftime(cwd+'/MSG_'+RGB+'-'+area+'_%Y%m%d%H%M.tiff'), writer='geotiff')

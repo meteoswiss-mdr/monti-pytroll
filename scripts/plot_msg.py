@@ -292,8 +292,11 @@ def plot_msg(in_msg):
 
             PIL_image = create_PIL_image(rgb, data, in_msg, HRV_enhancement=HRV_enhancement, obj_area=obj_area)  
                                        # !!! in_msg.colorbar[rgb] is initialized inside (give attention to rgbs) !!!
-            add_border_and_rivers(PIL_image, cw, area_tuple, in_msg)
-   
+                                       
+            add_border_and_rivers(PIL_image, cw, area_tuple,
+                                  add_border=in_msg.add_border, border_color=in_msg.border_color,
+                                  add_rivers=in_msg.add_rivers, river_color=in_msg.add_rivers, verbose=in_msg.verbose)
+            
             # indicate mask
             if in_msg.indicate_mask:
                PIL_image = indicate_mask(rgb, PIL_image, data, in_msg.verbose)
@@ -764,12 +767,13 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
 
-def add_border_and_rivers(PIL_image, cw, area_tuple, in_msg):
+def add_border_and_rivers(PIL_image, cw, area_tuple, add_border=True, border_color='red', add_rivers=False, river_color='blue', verbose=True):
 
    if PIL_image.mode == 'RGB' or PIL_image.mode == 'RGBA': 
-      border_color = in_msg.border_color
-      river_color  = in_msg.river_color
+      # take input colors
+      pass
    elif PIL_image.mode == 'L':
+      # replace input colors with white
       border_color = 'white'
       river_color  = 'white'
    else:

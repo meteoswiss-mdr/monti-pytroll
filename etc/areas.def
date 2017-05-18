@@ -1207,7 +1207,7 @@ REGION: SouthArabia {
 REGION: cosmo7 {
         NAME:           Cosmo 7
         PCS_ID:         cosmo7
-    PCS_DEF:    proj=ob_tran, ellps=WGS84, lat_0=46, lon_0=4.535, o_proj=stere, o_lat_p=90, o_lon_p=-5.465
+    	PCS_DEF:    proj=ob_tran, ellps=WGS84, lat_0=46, lon_0=4.535, o_proj=stere, o_lat_p=90, o_lon_p=-5.465
         XSIZE:          597
         YSIZE:          510
         AREA_EXTENT:    (-1812933.5656552943, -1003565.2518504434, 814056.0017955909, 1243448.9654948832)

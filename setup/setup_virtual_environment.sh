@@ -1,4 +1,3 @@
-
 #!/bin/bash
 #
 # script to install a virtual environment called "PyTroll"
@@ -24,18 +23,15 @@ export https_proxy=https://proxy.meteoswiss.ch:8080
 #. ./setup_anaconda_zueub428.sh
 
 # add Anaconda directory to the path and check, if it is installed
-export PATH="/opt/users/common/packages/anaconda3/bin:$PATH"
-conda -V >/dev/null 2>&1 || { echo "Setup of virtual environment requires conda but it's not installed. Contact Ulrich. Aborting." >&2; exit 1; }
-
-#echo "*** Switch off SSL check for conda installations"
-conda config --set ssl_verify false
+source set_paths.sh  # load functions from this script
+set_conda_path
 
 #echo "*** Update anaconda itself"
 #conda update conda
 
 echo "*** Create virtual environement and install python packages according to PyTroll-conda-package-list.txt"
 echo "======================================================================================================="
-conda create -n PyTroll_$(logname) python=3.6 --copy --file PyTroll-conda-package-list_no_version_nr.txt  # _$(logname)
+conda create -n PyTroll_$(logname) python=2.7 --copy --file PyTroll-conda-package-list_no_version_nr.txt  # _$(logname)
 ### !!! without copy conda does not create shaired library files !!!
 echo "Could you create the virtual environment? (press enter to continue or CTRL+c to abort)"
 read junk
@@ -53,8 +49,9 @@ pip install --trusted-host pypi.python.org -r PyTroll-pip-requirements_no_versio
 echo "Does the installation look fine? (press enter to continue or CTRL+c to abort)"
 read junk
 
-export INSTALL_DIR=/opt/users/common/packages
-cd $INSTALL_DIR
+source set_paths.sh  # load functions from this script
+set_utils_path
+export INSTALL_DIR=$UTILS_PATH/packages/
 
 #echo ""
 #echo "*** Install basemap (inside the virtual env)"
@@ -75,6 +72,8 @@ cd $INSTALL_DIR/pygrib
 # install pygrib (note jasper and grib_api libraries were already installed
 #                 and setup.cfg was modified accordingly on zueub428)
 python setup.py install
+##### works now automatically and also installs the package: ecmwf_grib
+####conda install -c conda-forge pygrib   ## very unfortunately in conflict with PIL
 echo "Did the installation of pygrib work fine? (press enter to continue or CTRL+c to abort)"
 read junk
 
@@ -91,27 +90,15 @@ echo "*** Deactivate virtual environment"
 echo ""
 source deactivate
 echo ""
-echo ""
+
 echo "*** All installations done"
 echo "=========================="
 echo "    You can now use your virtual environent with"
 echo "    source activate "PyTroll_$(logname)
 echo "    and deactivate it with"
 echo "    source deactivate"
-echo ""
-echo "    Please do some test, if you can import packages:"
-echo ""
-echo "source activate "PyTroll_$(logname)
-echo "python"
-echo "import matplotlib._path"
-echo "import h5py"
-echo "import netCDF4"
-echo "from mpl_toolkits.basemap import Basemap"
-echo "import aggdraw"
-echo "import pygrib"
-echo "import scipy"
-echo "import numpy"
-echo "import PIL"
-echo "from __future__ import print_function"
-echo "import skimage"
-echo ""
+
+alias activate='source activate PyTroll_$LOGNAME'
+alias deactivate='source deactivate'
+
+source test_virtual_env.sh

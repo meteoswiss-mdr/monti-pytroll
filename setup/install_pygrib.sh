@@ -10,7 +10,17 @@
 # author: Ulrich Hamann
 # version 0.1: 15-04-2016 U. Hamann
 
-export INSTALL_DIR=/opt/users/common/packages
+case $HOSTNAME in
+"zueub"[2-4][0-9][0-9])
+    export INSTALL_DIR=/opt/users/common/packages
+"keschln-0002")
+    export INSTALL_DIR=/store/msrad/utils
+*)
+    echo "ERROR in check_hostname: unknown computer: "$HOSTNAME
+    exit 1
+    ;;
+esac
+
 cd $INSTALL_DIR
 
 git clone https://github.com/jswhit/pygrib.git
@@ -31,8 +41,8 @@ sed -i -- 's/\#grib\_api\_dir\ \=\ \/usr\/local/grib\_api\_dir\ \=\ \/opt\/users
 #echo "================================ "
 #source activate PyTroll_$(logname)
 
-cd $INSTALL_DIR/pygrib/
-python setup.py install
+#cd $INSTALL_DIR/pygrib/
+#python setup.py install
 
 #echo "*** Deactivate virtual environment"
 #source deactivate

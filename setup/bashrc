@@ -14,11 +14,27 @@ echo "\$(logname)" $(logname)
 echo "\$LOGNAME" $LOGNAME
 echo "uname -mrs:" `uname -mrs`
 
-# tmp
-export LOGNAME_ORG=$LOGNAME
-export LOGNAME=hamann
+case $HOSTNAME in
+    "zueub"[2-4][0-9][0-9])
+	if [ -d /opt/users/$LOGNAME/monti-pytroll/ ]
+        then
+            source /opt/users/$LOGNAME/monti-pytroll/setup/set_paths.sh
+        else
+            source /opt/users/$LOGNAME/PyTroll/setup/set_paths.sh
+        fi
+	;;
+    "keschln-"[0-9][0-9][0-9][0-9])
+        # tmp !!!! BAD DIRTY FIX !!!!
+        export LOGNAME_ORG=$LOGNAME
+        export LOGNAME=hamann
+	source /users/hamann/monti-pytroll/setup/set_paths.sh  # load functions from this script
+	;;
+    *)
+	echo "ERROR in setup/bashrc: unknown computer "$HOSTNAME
+	return ;;
+	#exit 1 ;;
+esac
 
-source /users/hamann/monti-pytroll/setup/set_paths.sh  # load functions from this script
 cd $PYTROLLHOME
 set_utils_path
 set_conda_path
@@ -62,5 +78,9 @@ source activate PyTroll_$LOGNAME
 alias ll='ls --color=auto -alh'
 alias ls='ls --color=auto'
 
-# tmp
-export LOGNAME=$LOGNAME_ORG
+# tmp !!!! BAD DIRTY FIX !!!!
+case $HOSTNAME in
+    "keschln-"[0-9][0-9][0-9][0-9])
+	export LOGNAME=$LOGNAME_ORG
+	;;
+esac

@@ -3,7 +3,7 @@ function set_utils_path {
     "zueub"[2-4][0-9][0-9])
 	export UTILS_PATH=/opt/users/common/
 	export SAT_UTILS_PATH=/opt/users/common/ ;;
-    "keschln-"[0-9][0-9][0-9][0-9])
+    "keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
 	export UTILS_PATH=/store/msrad/utils/
 	export SAT_UTILS_PATH=/store/msrad/sat/pytroll/ ;;
     *)
@@ -19,7 +19,7 @@ function set_conda_path {
     case $HOSTNAME in
     "zueub"[2-4][0-9][0-9])
 	export CONDA_PATH="/opt/users/common/packages/anaconda3/" ;;
-    "keschln-"[0-9][0-9][0-9][0-9])
+    "keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
 	export CONDA_PATH="/store/msrad/utils/anaconda3/" ;;
     *)
 	echo "ERROR in set_conda_path: unknown computer "$HOSTNAME
@@ -60,7 +60,7 @@ case $HOSTNAME in
         fi
         export XRIT_DECOMPRESS_PATH=/opt/users/common/bin/xRITDecompress
         export XRIT_DECOMPRESS_OUTDIR=/tmp/SEVIRI_DECOMPRESSED_$LOGNAME ;;
-    "keschln-"[0-9][0-9][0-9][0-9])
+    "keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
         export PYTROLLHOME=$HOME/monti-pytroll/
         export XRIT_DECOMPRESS_PATH=/store/mch/msrad/sat/pytroll/xRITDecompress
         export XRIT_DECOMPRESS_OUTDIR=/scratch/$LOGNAME ;;

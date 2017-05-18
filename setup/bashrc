@@ -23,7 +23,7 @@ case $HOSTNAME in
             source /opt/users/$LOGNAME/PyTroll/setup/set_paths.sh
         fi
 	;;
-    "keschln-"[0-9][0-9][0-9][0-9])
+    "keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
         # tmp !!!! BAD DIRTY FIX !!!!
         export LOGNAME_ORG=$LOGNAME
         export LOGNAME=hamann
@@ -59,7 +59,7 @@ case $HOSTNAME in
     #	alias tkdiff='/opt/users/common/packages/tkdiff-unix/tkdiff'
     #fi
     ;;
-"keschln-"[0-9][0-9][0-9][0-9])
+"keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
     ;;
 *)
     echo "ERROR in bashrc: unknown computer "$HOSTNAME
@@ -80,7 +80,10 @@ alias ls='ls --color=auto'
 
 # tmp !!!! BAD DIRTY FIX !!!!
 case $HOSTNAME in
-    "keschln-"[0-9][0-9][0-9][0-9])
+    "keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
+	export LOGNAME=$LOGNAME_ORG
+	;;
+    "ela"[0-9])
 	export LOGNAME=$LOGNAME_ORG
 	;;
 esac

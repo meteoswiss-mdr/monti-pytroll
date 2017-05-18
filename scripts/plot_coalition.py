@@ -944,7 +944,9 @@ if __name__ == '__main__':
           c2File = (out_dir+"/cosmo/Channels/indicators_in_time/RGB"+maskS+"/%s_%s_C2rgb"+maskS+"4th"+name_4Mask+"_"+name_ForcedMask+"AdditionalMask.png") % (yearS+monthS+dayS,hourS+minS)
           if plot_RGB or plot_RGB_HRV:
               img1 = Image.fromarray( rgbArray,'RGBA')
-              #add_border_and_rivers( img1, cw, area_tuple, in_msg)
+              #add_border_and_rivers( img1, cw, area_tuple,
+              #                      add_border=in_msg.add_border, border_color=in_msg.border_color,
+              #                      add_rivers=in_msg.add_rivers, river_color=in_msg.add_rivers, verbose=in_msg.verbose)
               print "... save image: display ", c2File, " &"
               img1.save( create_dir(c2File) ) 
               
@@ -1037,7 +1039,9 @@ if __name__ == '__main__':
 
     if plot_RGB:
         img1 = Image.fromarray( rgbArray,'RGBA')
-        #add_border_and_rivers( img1, cw, area_tuple, in_msg)
+        #add_border_and_rivers( img1, cw, area_tuple,
+        #                      add_border=in_msg.add_border, border_color=in_msg.border_color,
+        #                      add_rivers=in_msg.add_rivers, river_color=in_msg.add_rivers, verbose=in_msg.verbose)
         outputFile = out_dir+"/cosmo/Channels/indicators_in_time/RGBs/%s_%s_RGB.png"%(yearS+monthS+dayS,hourS+minS)
         print "... save image: ", outputFile
         img1.save( create_dir(outputFile) ) 
@@ -1071,7 +1075,9 @@ if __name__ == '__main__':
 
     if plot_RGB_mature or plot_RGB_HRV_mature:
         img1 = Image.fromarray( rgbArray,'RGBA')
-        #add_border_and_rivers(img1, cw, area_tuple, in_msg)
+        #add_border_and_rivers( img1, cw, area_tuple,
+        #                      add_border=in_msg.add_border, border_color=in_msg.border_color,
+        #                      add_rivers=in_msg.add_rivers, river_color=in_msg.add_rivers, verbose=in_msg.verbose)
         print out_dir +"/cosmo/Channels/indicators_in_time/RGBs/%s_%s_RGBmature.png"%(yearS+monthS+dayS,hourS+minS)
         img1.save(out_dir +"/cosmo/Channels/indicators_in_time/RGBs/%s_%s_RGBmature.png"%(yearS+monthS+dayS,hourS+minS))
 
@@ -1104,7 +1110,9 @@ if __name__ == '__main__':
     rgbArray[sum_array<=0,3] = 0
     if plot_RGB_develop:
         img1 = Image.fromarray( rgbArray,'RGBA')
-        #add_border_and_rivers( img1, cw, area_tuple, in_msg)
+        #add_border_and_rivers( img1, cw, area_tuple,
+        #                      add_border=in_msg.add_border, border_color=in_msg.border_color,
+        #                      add_rivers=in_msg.add_rivers, river_color=in_msg.add_rivers, verbose=in_msg.verbose)
         print out_dir +"/cosmo/Channels/indicators_in_time/RGBs/%s_%s_RGBdeveloping.png"%(yearS+monthS+dayS,hourS+minS)
         img1.save( out_dir +"/cosmo/Channels/indicators_in_time/RGBs/%s_%s_RGBdeveloping.png"%(yearS+monthS+dayS,hourS+minS))
     
@@ -1141,7 +1149,9 @@ if __name__ == '__main__':
             converter = ImageEnhance.Color(img1)
             img1 = converter.enhance( colour_enhancement_factor)
 
-        #add_border_and_rivers( img1, cw, area_tuple, in_msg)
+        #add_border_and_rivers( img1, cw, area_tuple,
+        #                      add_border=in_msg.add_border, border_color=in_msg.border_color,
+        #                      add_rivers=in_msg.add_rivers, river_color=in_msg.add_rivers, verbose=in_msg.verbose)
         outputFile =  create_dir( out_dir +"/cosmo/Channels/indicators_in_time/RGB-all/%s_%s_RGBallb.png"%(yearS+monthS+dayS,hourS+minS) )
         img1.save( outputFile )
     
@@ -1198,7 +1208,9 @@ if __name__ == '__main__':
     cw = ContourWriterAGG(in_msg.mapDir)
     
     test = create_PIL_image(0, img_cd, in_msg, colormap='rainbow')
-    test = add_border_and_rivers(test, cw, area_tuple, in_msg)
+    test = add_border_and_rivers(test, cw, area_tuple,
+                          add_border=in_msg.add_border, border_color=in_msg.border_color,
+                          add_rivers=in_msg.add_rivers, river_color=in_msg.add_rivers, verbose=in_msg.verbose)
     dc.add_scale(rainbow,extend=True)
     
     print type(img_cd)

@@ -358,7 +358,9 @@ if __name__ == '__main__':
         #PIL_image=img.pil_image() 
 
         if add_borders:
-            add_border_and_rivers(PIL_image, cw, area_tuple, in_msg)
+            add_border_and_rivers(PIL_image, cw, area_tuple,
+                                  add_border=in_msg.add_border, border_color=in_msg.border_color,
+                                  add_rivers=in_msg.add_rivers, river_color=in_msg.add_rivers, verbose=in_msg.verbose)
 
         #if area.find("EuropeCanary") != -1 or area.find("ccs4") != -1:
         dc = DecoratorAGG(PIL_image)

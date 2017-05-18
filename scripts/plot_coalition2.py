@@ -1001,7 +1001,9 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
 
                 if 'C2rgb' in in_msg.results:
                     img1 = Image.fromarray( rgbArray,'RGBA')
-                    #add_border_and_rivers( img1, cw, area_tuple, in_msg)
+                    #add_border_and_rivers( img1, cw, area_tuple,
+                    #                      add_border=in_msg.add_border, border_color=in_msg.border_color,
+                    #                      add_rivers=in_msg.add_rivers, river_color=in_msg.add_rivers, verbose=in_msg.verbose)
                     print ("... save image: display ", c2File, " &")
                     img1.save( create_dir(c2File) ) 
                     

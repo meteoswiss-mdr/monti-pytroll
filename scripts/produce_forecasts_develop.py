@@ -44,7 +44,7 @@ import glob
 import inspect
 
 from pycoast import ContourWriterAGG
-from plot_msg import add_border_and_rivers
+
 # debug_on()
 
 import trollimage
@@ -856,8 +856,10 @@ if __name__ == '__main__':
                     pil_im = img.pil_image()                    
                     
                     #pil_im = array2PIL(p_levels[20:nx-40,85:ny-135], p_levels[20:nx-40,85:ny-135].size)
-                    pil_im = add_border_and_rivers(pil_im, cw, area_tuple, in_msg)
-                    
+                    pil_im = add_border_and_rivers(pil_im, cw, area_tuple,
+                                                   add_border=in_msg.add_border, border_color=in_msg.border_color,
+                                                   add_rivers=in_msg.add_rivers, river_color=in_msg.add_rivers, verbose=in_msg.verbose)
+
                     pil_im.save("test_Pressure.png")#"/data/COALITION2/PicturesSatellite/LEL_results_wind//"+yearS+"-"+monthS+"-"+dayS+"/channels_fig//PressureLevels_"+yearS+monthS+dayS+hourS+minS+".png")
                     quit()
     

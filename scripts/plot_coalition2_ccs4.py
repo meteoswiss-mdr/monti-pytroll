@@ -1191,7 +1191,9 @@ if __name__ == '__main__':
           c2File = ("/data/cinesat/out/"+"/%s_%s_C2rgb"+maskS+"4th"+name_4Mask+"_"+name_ForcedMask+"AdditionalMask.png") % (yearS+monthS+dayS,hourS+minS)
           if plot_RGB or plot_RGB_HRV:
               img1 = Image.fromarray( rgbArray,'RGBA')
-              #add_border_and_rivers( img1, cw, area_tuple, in_msg)
+              #add_border_and_rivers( img1, cw, area_tuple,
+              #                      add_border=in_msg.add_border, border_color=in_msg.border_color,
+              #                      add_rivers=in_msg.add_rivers, river_color=in_msg.add_rivers, verbose=in_msg.verbose)
               print "... save image: display ", c2File, " &"
               img1.save( create_dir(c2File) ) 
               

@@ -4,7 +4,7 @@ dir_=${PWD}
 
 year=2015
 y2=$(echo "$year-2000" | bc)
-month=7
+month=6
 MM="$(printf "%02d" $month)"
 
 export python=/opt/users/common/packages/anaconda3/envs/PyTroll_$LOGNAME/bin/python
@@ -12,7 +12,7 @@ export python=/opt/users/common/packages/anaconda3/envs/PyTroll_$LOGNAME/bin/pyt
 
 . /opt/users/$LOGNAME/PyTroll/setup/bashrc_offline
 
-for (( d = 7; d <= 7; d++ ))
+for (( d = 6; d <= 7; d++ ))
 do 
     dd="$(printf "%02d" $d)"
     for (( h = 0; h <= 23; h=h+1 ))

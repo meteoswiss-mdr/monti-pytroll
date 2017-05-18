@@ -15,16 +15,16 @@
 # version 0.1: 16-02-2016 U. Hamann
 
 # set paths for anaconda (again, for security)
-. ./setup_anaconda_zueub428.sh
+#. ./setup_anaconda_zueub428.sh
 
 #export packages="aggdraw pygrib pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate"
-export packages="pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate"
+export packages="pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate satpy"
 
 declare -A branches
 branches=( ["aggdraw"]="master" ["pygrib"]="master" ["pyresample"]="master" ["pycoast"]="master" \
            ["pyorbital"]="master" ["posttroll"]="develop" ["trollsift"]="master" \
            ["pytroll-schedule"]="master" ["trollimage"]="develop" ["mipp"]="master" \
-           ["mpop"]="master" ["trollduction"]="develop" ["pyspectral"]="master" ["pydecorate"]="master" )
+           ["mpop"]="master" ["trollduction"]="develop" ["pyspectral"]="master" ["pydecorate"]="master" ["satpy"]="develop")
 
 cd $PYTROLLHOME
 
@@ -48,7 +48,8 @@ read junk
 echo ""
 echo "*** Checkout branches of PyTroll modules (... git checkout $branch, in order to avoid the detached head state)"
 echo "=============================================================================================================="
-git submodule foreach -q --recursive 'branch="$(git config -f $toplevel/.gitmodules submodule.$name.branch)"; git checkout $branch'
+#git submodule foreach -q --recursive 'branch="$(git config -f $toplevel/.gitmodules submodule.$name.branch)"; git checkout $branch'
+git submodule foreach -q --recursive git pull 
 echo "Does this look good? (press enter to continue or CTRL+c to abort)"
 read junk
 

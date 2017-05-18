@@ -25,7 +25,7 @@ def get_radar_filename(in_msg, time_slot, area):
     print "    get_radar_filename radar"
     #outputDir = format_name('./%Y-%m-%d/radar/',  time_slot, area=area)
     #outputDir = "/data/cinesat/out/"
-    outputDir = format_name(in_msg.outputDir,  time_slot, area=area)
+    outputDir = format_name(in_msg.outputDir,  time_slot, area=area, rgb="radar")
     filename =  format_name('RAD_RZC-ccs4_%y%m%d%H%M.png', time_slot, area=area)
     return outputDir+filename
 
@@ -33,7 +33,7 @@ def get_odyssey_filename(in_msg, time_slot, area):
     print "    get_odyssey_filename radar"
     #outputDir = format_name('./%Y-%m-%d/radar/',  time_slot, area=area)
     #outputDir = "/data/cinesat/out/"
-    outputDir = format_name(in_msg.outputDir,  time_slot, area=area)
+    outputDir = format_name(in_msg.outputDir,  time_slot, area=area, rgb="radar")
     filename =  format_name('ODY_RATE-'+area+'_%y%m%d%H%M.png', time_slot, area=area)
     return outputDir+filename
 
@@ -41,8 +41,16 @@ def get_TRT_filename(in_msg, time_slot, area):
     print "    get_TRT_filename TRT" 
     #outputDir = format_name('./%Y-%m-%d/radar/',  time_slot, area=area)
     #outputDir = "/data/cinesat/out/"
-    outputDir = format_name(in_msg.outputDir,  time_slot, area=area)
+    outputDir = format_name(in_msg.outputDir,  time_slot, area=area, rgb="TRT")
     filename =  format_name('RAD_TRT-ccs4_%y%m%d%H%M.png', time_slot, area=area)
+    return outputDir+filename
+    
+def get_OT_filename(in_msg, rgb, time_slot, area):
+    print "    get_OT_filename" 
+    #outputDir = format_name('./%Y-%m-%d/radar/',  time_slot, area=area)
+    #outputDir = "/data/cinesat/out/"
+    outputDir = format_name(in_msg.outputDir,  time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
+    filename  = format_name(in_msg.outputFile, time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
     return outputDir+filename
 
 def get_sat_filename(in_msg, rgb, sat, sat_nr, time_slot, area):
@@ -62,7 +70,7 @@ def get_comp_filename(in_msg, comp_str, sat_nr, time_slot, area):
             print '... create output directory: ' + outputDir
         from os import makedirs
         makedirs(outputDir)
-    filename  = format_name('/MSG_'+comp_str.replace("_","-")+'-ccs4_%y%m%d%H%M.png', time_slot, area=area, sat_nr=sat_nr) 
+    filename  = format_name('/MSG_'+comp_str.replace("_","-")+'-'+area+'_%y%m%d%H%M.png', time_slot, area=area, sat_nr=sat_nr) 
     return outputDir+'/'+filename
 
 # ---
@@ -196,8 +204,6 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
             # sleep_str = " && sleep 1 "
             sleep_str = " "
 
-            outputDir = format_name(in_msg.outputDir,  time_slot, area=area)
-
             n_pics = len(montage)
             if n_pics == 2:
                 tile = "2x1"
@@ -222,7 +228,12 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
             outfile = ""
             files_exist=True
             files_complete=True
+            
             for mfile in montage:
+            
+                rgb = mfile.split("_")[1]
+                outputDir = format_name(in_msg.outputDir,  time_slot, rgb=rgb, area=area)
+                
                 next_file = outputDir+"/"+format_name(mfile+'-'+area+'_%y%m%d%H%M.png', time_slot, area=area)
                 if not isfile(next_file):
                     files_complete=False
@@ -239,6 +250,11 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
                     files += " "+outputDir+"/"+format_name(mfile+'-'+area+'_%y%m%d%H%M.png', time_slot, area=area)
                     outfile += mfile[mfile.index("_")+1:]+"-"
 
+            outputDir = format_name(in_msg.outputDir,  time_slot, rgb=outfile[:-1], area=area)
+            if not exists(outputDir):
+               if in_msg.verbose:
+                  print '... create output directory: ' + outputDir
+               makedirs(outputDir)
             outfile = outputDir+"/"+format_name( "MSG_"+ outfile[:-1] + '-'+area + '_%y%m%d%H%M.png', time_slot, area=area)
 
             #filename1 = format_name(mfile+'-'+area+'_%y%m%d%H%M.png', time_slot, area=area)

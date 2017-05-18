@@ -48,3 +48,25 @@ Radar = ['precip','poh','mesh','vil', 'maxecho','echotop15','echotop20','echotop
 HSAF  = ['h03']
 
 SEVIRI_viewing_geometry = ['vza','vaa','lat','lon']
+
+MSG_OT = ['ir_brightness_temperature',
+               'ot_rating_ir',
+               'ot_id_number',
+               'ot_anvilmean_brightness_temperature_difference',
+               'ir_anvil_detection',
+               'visible_reflectance',
+               'ot_rating_visible',
+               'ot_rating_shadow',
+               'ot_probability',
+               'surface_based_cape',
+               'most_unstable_cape',
+               'most_unstable_equilibrium_level_temperature',
+               'tropopause_temperature',
+               'surface_1km_wind_shear',
+               'surface_3km_wind_shear',
+               'surface_6km_wind_shear',
+               'ot_potential_temperature',
+               'ot_height',
+               'ot_pressure',
+               'parallax_correction_latitude',
+               'parallax_correction_longitude']

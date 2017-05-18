@@ -333,10 +333,12 @@ def format_name (folder, time_slot, rgb=None, sat=None, sat_nr=None, area=None, 
         #new_folder = (new_folder % {"msg": "MSG"+str(int(sat_nr)-7)})
         new_folder=new_folder.replace("%(sat)s", sat )
 
-    if sat_nr != None:
+    if sat_nr != None and sat_nr != "":
         #new_folder = (new_folder % {"msg": "MSG"+str(int(sat_nr)-7)})
         new_folder=new_folder.replace("%(msg)s", "MSG"+str(int(sat_nr)-7))
-
+    else:
+        new_folder=new_folder.replace("%(msg)s", "MSG")
+    
     if product != None:
         #new_folder = (new_folder % {"product": product})
         new_folder=new_folder.replace("%(product)s", str(product))
@@ -446,6 +448,9 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
        return in_msg.RGBs
     ## currently no check for cpp
     if in_msg.sat == "cpp":
+       return in_msg.RGBs
+    ## currently no check for overshooting tops
+    if in_msg.sat == "msg-ot":
        return in_msg.RGBs
 
     ## check all RGBs, if not some are defined explecitly
@@ -1019,3 +1024,59 @@ def fill_with_closest_pixel(data, invalid=None):
     ind = distance_transform_edt(invalid, return_distances=False, return_indices=True)
 
     return data[tuple(ind)]
+
+# ------------------------------------------
+def ContourImage(prop, area, clevels=[0.0], vmin=None, vmax=None, alpha=None, linewidths=2.0, colormap=None):
+
+    """
+    make a contour plot of the data and return a PIL image
+    
+    Input: 
+       prop:   numpy masked array of 2 dimensions
+       area:   area object
+       clevel: contour levels that should be drawn
+       vmin:   minimum value for colormap
+       vmax:   maximum value for colormap
+       alpha:  transparency (0.0 transparent, 1.0 opaque)
+    """
+
+    import matplotlib.pyplot as plt
+    from numpy import arange
+    from mpop.imageo.HRWimage import prepare_figure
+    from mpop.imageo.TRTimage import fig2img
+
+    import numpy as np
+
+    (ny,nx)=prop.shape
+    X, Y = np.meshgrid(range(nx), np.arange(ny-1, -1, -1))
+
+    fig, ax = prepare_figure(area)
+
+    prop_filled = prop.filled()
+
+    if vmin == None:
+      vmin=prop_filled.min()
+    if vmax == None:
+      vmax=prop_filled.max()
+
+    if colormap==None: 
+      import matplotlib.cm as cm
+      colormap=cm.autumn_r
+
+    print "... CountourImage with clevels = ", clevels, ", (vmin/vmax) =", vmin, vmax, ', alpha=', alpha
+
+    if alpha == None: 
+      CS = plt.contour(X, Y, prop.filled(), clevels, linewidths=linewidths, cmap=colormap, vmin=vmin, vmax=vmax) # , linestyles='solid'
+    else:
+      print "    half transparent plotting with alpha = ", alpha
+      CS = plt.contour(X, Y, prop.filled(), clevels, linewidths=linewidths, cmap=colormap, vmin=vmin, vmax=vmax, alpha=alpha) 
+
+    ## opaque higher levels 
+    #clevels=[-1.6,-0.9,-0.2]
+    #
+
+    PIL_image = fig2img ( fig )
+
+    return PIL_image
+
+# ------------------------------------------

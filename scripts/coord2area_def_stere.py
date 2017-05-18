@@ -45,16 +45,16 @@ import sys
 from pyproj import Proj
   
 if len(sys.argv) != 8:
-    print "Usage: ", sys.argv[0], "name proj min_lat max_lat min_lon max_lon resolution"
+    print "Usage: ", sys.argv[0], "name proj min_lat[degNorth] max_lat[degNorth] min_lon[degEast] max_lon[degEast] resolution[km]"
     exit(1)
   
 name = sys.argv[1]
 proj = sys.argv[2]
   
-left = float(sys.argv[5])
-right = float(sys.argv[6])
 up = float(sys.argv[3])
 down = float(sys.argv[4])
+left = float(sys.argv[5])
+right = float(sys.argv[6])
   
 res = float(sys.argv[7]) * 1000
   

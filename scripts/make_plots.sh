@@ -45,7 +45,7 @@ fi
 	    dir1=$dir_/$date/
 	    #mkdir $dir_/$year-$MM-${dd}/convection-RZC-ccs4
 	    #mkdir $dir_/$year-$MM-${dd}/convection-RZC-THX-ccs4
-	    for (( h = 9; h <= 23; h=h+1 ))
+	    for (( h = 6; h <= 7; h=h+1 ))
 	    do 
 		hh="$(printf "%02d" $h)"
  		for (( m = 0; m <= 55; m=m+5 ))
@@ -58,10 +58,10 @@ fi
  		    #${python} $dir_/plot_hrw.py $year $month $d $h $m 
 		    #echo " " ${python} $dir_/plot_radar.py $year $month $d $h $m 
  		    #${python} $dir_/plot_radar.py $year $month $d $h $m 
-		    #echo ${python} $dir_/plot_msg.py input_MSG $year $month $d $h $m $rgb $area
- 		    #${python} $dir_/plot_msg.py input_MSG $year $month $d $h $m $rgb $area
-		    echo ${python} $dir_/plot_coalition2.py input_coalition2 $year $month $d $h $m 
- 		    ${python} $dir_/plot_coalition2.py input_coalition2 $year $month $d $h $m 
+		    echo ${python} $dir_/plot_msg.py input_MSG $year $month $d $h $m $rgb $area
+ 		    ${python} $dir_/plot_msg.py input_MSG $year $month $d $h $m $rgb $area
+		    #echo ${python} $dir_/plot_coalition2.py input_coalition2 $year $month $d $h $m 
+ 		    #${python} $dir_/plot_coalition2.py input_coalition2 $year $month $d $h $m 
 		    #echo " " ${python} $dir_/plot_trt.py $year $month $d $h $m 
  		    #${python} $dir_/plot_trt.py $year $month $d $h $m 
 		    #echo " "python $dir_/plot_msg.py input_nwc $year $month $d $h $m 
@@ -69,9 +69,7 @@ fi
 		    #echo " "
 		    #echo ${python} $dir_/plot_msg.py input_thun $year $month $d $h $m $rgb $area
  		    #${python} $dir_/plot_msg.py input_thun $year $month $d $h $m $rgb $area
-
 		    dir1=$dir0/${year}-${MM}-${dd}
-
  		done
 	    done
 	done

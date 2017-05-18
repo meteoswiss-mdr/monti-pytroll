@@ -17,9 +17,9 @@
 
 # installation of Anaconda
 # (use the ". ./" syntax to remember env variable set inside the bash script)
-. ./setup_anaconda.sh
-echo "press enter to continue"
-read junk
+#. ./setup_anaconda.sh
+#echo "press enter to continue"
+#read junk
 
 # update Anaconda, create virt. env. "PyTroll", install python packages
 . ./setup_virtual_environment.sh

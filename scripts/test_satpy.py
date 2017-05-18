@@ -1,9 +1,11 @@
+from __future__ import print_function
 #import os
 #os.chdir("/data/cinesat/in/eumetcast1/")
 #from satpy import Scene
 #from satpy.scene import Scene
 from datetime import datetime
 from my_msg_module import get_last_SEVIRI_date
+import os
 
 RSS=False
 
@@ -31,22 +33,57 @@ from satpy import Scene
 
 #global_scene = Scene(platform_name="Meteosat-9", sensor="seviri", reader="hrit_msg", start_time=lastdate)
 
+import socket
+hostname=socket.gethostname()
 
-my_dir="/data/COALITION2/database/meteosat/native_test/"
 reader="native_msg"
+test_data=True
+test_data=False
+import datetime
+time_start = datetime.datetime(2015, 05, 29, 12, 00, 0)
+time_end = time_start + datetime.timedelta(minutes=12)
 
-import os
-os.chdir(my_dir)
+#testfile="MSG3-SEVI-MSG15-0100-NA-20170326101240.438000000Z-20170326101257-1213498.nat"
+testfile="MSG3-SEVI-MSG15-0100-NA-20170326102740.340000000Z-20170326102757-1213498.nat"
+#testfile="MSG2-SEVI-MSG15-0100-NA-20150531235918.139000000Z-20150531235936-1178986.nat"   # does not work, as number of column cant be devided by 4 
 
-global_scene = Scene(platform_name="Meteosat-9", sensor="seviri", reader=reader, filenames=["/data/COALITION2/database/meteosat/native_test/MSG3-SEVI-MSG15-0100-NA-20170326102740.340000000Z-20170326102757-1213498.nat"])
+if "zueub" in hostname:
+    data_dir = "/data/COALITION2/database/meteosat/native_test/"
+elif "kesch" in hostname:
+    if test_data:
+        data_dir = "/scratch/hamann/"
+    else: 
+        archive_dir = time_end.strftime("/store/mch/msclim/cmsaf/msg/native-fulldisk/%Y/%m/%d/")  # replace %Y%m%d%H%M
+        # search file
+        import glob
+        bz2files = glob.glob(archive_dir + time_end.strftime('/MSG[1-4]-SEVI-MSG15-0100-NA-%Y%m%d%H%M??.*.nat.bz2'))
+        print("...copy file from archive: "+bz2files[0])
+        from subprocess import call
+        data_dir="/scratch/hamann/"
+        call(["cp", bz2files[0], data_dir])
+        os.chdir(data_dir)
+        print("...bunzip2 file: "+bz2files[0])
+        bz2file=os.path.basename(bz2files[0])
+        call(["bunzip2","/scratch/hamann/"+bz2file])
+        testfile=bz2file[:-4]
+else:
+    raise ValueError("Unknown computer"+hostname+": no example file is provided")
+
+filenames=[data_dir+testfile]
+
+print(filenames)
+
+global_scene = Scene(platform_name="Meteosat-9", sensor="seviri", reader=reader, filenames=filenames)
 
 #global_scene.load([0.6, 0.8, 10.8])
 global_scene.load(['overview'])
 #global_scene.load(["VIS006", "VIS008", "IR_108"])
-#global_scene.save_dataset('overview', '/data/COALITION2/database/meteosat/native_test/local_overview.png')
+global_scene.save_dataset('overview', data_dir+'/overview_global.png')
 
+area="ccs4"
+#area="SeviriDisk00"
 local_scene = global_scene.resample("ccs4")
-local_scene.save_dataset('overview', '/data/COALITION2/database/meteosat/native_test/local_overview.png')
+local_scene.save_dataset('overview', data_dir+'/overview_'+area+'.png')
 
 
 #print global_scene

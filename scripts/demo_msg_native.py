@@ -84,6 +84,8 @@ else:
     raise ValueError("Unknown computer"+hostname+": no example file is provided")
 
 filenames=[data_dir+data_file]
+#filenames=["/store/mch/msclim/cmsaf/msg/native_test/MSG3-SEVI-MSG15-0100-NA-20170326102740.340000000Z-21213498-1.nat"]
+
 print("========================")
 print("... read file:")
 print(filenames)
@@ -117,7 +119,7 @@ print(global_scene.all_dataset_names())
 ## tested RGBs 
 #RGB='natural'            # IR_016         VIS008         VIS006
 #RGB='green_snow'
-RGB='overview'
+#RGB='overview'
 #RGB='overview_sun'
 
 #### RGB in mpop that do not yet work with satpy 
@@ -128,7 +130,7 @@ RGB='overview'
 ##RGB='convection_co2'
 ##RGB='day_microphysics'   # VIS008         IR_039(solar)  IR_108     # requires the pyspectral modul
 ##RGB='dust'               # IR_120-IR_108  IR_108-IR_087  IR_108
-##RGB='fog'  
+RGB='fog'  
 ##RGB='ir108'
 ##RGB='night_fog'
 ##RGB='night_microphysics' # IR_120-IR_108  IR_108-IR_039  IR_108

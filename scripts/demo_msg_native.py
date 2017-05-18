@@ -28,7 +28,7 @@ cwd = os.getcwd()
 if len(sys.argv) == 1:
     ## automatic choise of time
     ## either fixed
-    time_start = datetime.datetime(2015, 5, 29, 12, 00, 0)
+    time_start = datetime.datetime(2015, 5, 30, 12, 00, 0)
     ## or last time available 
     #RSS=False
     #from my_msg_module import get_last_SEVIRI_date
@@ -55,36 +55,42 @@ if "zueub" in hostname:
     data_dir = "/data/COALITION2/database/meteosat/native_test/"
     #data_file="MSG3-SEVI-MSG15-0100-NA-20170326101240.438000000Z-20170326101257-1213498.nat"
     data_file="MSG3-SEVI-MSG15-0100-NA-20170326102740.340000000Z-20170326102757-1213498.nat"
-    #data_file="MSG2-SEVI-MSG15-0100-NA-20150531235918.139000000Z-20150531235936-1178986.nat"   # does not work, as number of column cant be devided by 4 
+    #data_file="MSG2-SEVI-MSG15-0100-NA-20150531235918.139000000Z-20150531235936-1178986.nat"   # does not work, as number of columns cant be devided by 4 
+    filenames=[data_dir+data_file]
 elif "kesch" in hostname:
-    ## get archive directoy 
-    archive_dir = time_end.strftime("/store/mch/msclim/cmsaf/msg/native-fulldisk/%Y/%m/%d/")  # replace %Y%m%d%H%M
-    ## search file
-    import glob
-    filename_pattern = archive_dir + time_end.strftime('/MSG[1-4]-SEVI-MSG15-0100-NA-%Y%m%d%H%M??.*.nat.bz2')
-    bz2files = glob.glob(filename_pattern)
-    if len(bz2files) == 0:
-        raise ValueError("... No input file found, searched for:"+filename_pattern)
+    testfile=False
+    if testfile:
+        filenames=["/store/mch/msclim/cmsaf/msg/native_test/MSG3-SEVI-MSG15-0100-NA-20170326102740.340000000Z-21213498-1.nat"]
+    else:
+        ## get archive directoy 
+        archive_dir = "/store/mch/msclim/cmsaf/msg/native-fulldisk/"
+        #archive_dir = "/store/mch/msclim/cmsaf/msg/native-alps/"    ### does not work, as number of columns cant be devided by 4 
 
-    ## copy and bunzip2 file
-    print("...copy file from archive: "+bz2files[0])
-    from subprocess import call
-    #data_dir="/scratch/"+getpass.getuser()+"/"   
-    data_dir=os.environ['SCRATCH']+"/"
-    if not os.path.exists(data_dir):
-        print('... create output directory: '+data_dir)
-        os.makedirs(data_dir)
-    call(["cp", bz2files[0], data_dir])
-    os.chdir(data_dir)
-    print("...bunzip2 file: "+bz2files[0])
-    bz2file=os.path.basename(bz2files[0])
-    call(["bunzip2",data_dir+bz2file])
-    data_file=bz2file[:-4]
+        ## search file
+        import glob
+        filename_pattern = time_end.strftime( archive_dir + "/%Y/%m/%d/" + '/MSG[1-4]-SEVI-MSG15-0100-NA-%Y%m%d%H%M??.*.nat.bz2' )
+        bz2files = glob.glob(filename_pattern)
+        if len(bz2files) == 0:
+            raise ValueError("... No input file found, searched for:"+filename_pattern)
+
+        ## copy and bunzip2 file
+        print("...copy file from archive: "+bz2files[0])
+        from subprocess import call
+        #data_dir="/scratch/"+getpass.getuser()+"/"   
+        data_dir=os.environ['SCRATCH']+"/"
+        if not os.path.exists(data_dir):
+            print('... create output directory: '+data_dir)
+            os.makedirs(data_dir)
+        call(["cp", bz2files[0], data_dir])
+        os.chdir(data_dir)
+        print("...bunzip2 file: "+bz2files[0])
+        bz2file=os.path.basename(bz2files[0])
+        call(["bunzip2",data_dir+bz2file])
+        data_file=bz2file[:-4]
+        filenames=[data_dir+data_file]
 else:
     raise ValueError("Unknown computer"+hostname+": no example file is provided")
 
-filenames=[data_dir+data_file]
-#filenames=["/store/mch/msclim/cmsaf/msg/native_test/MSG3-SEVI-MSG15-0100-NA-20170326102740.340000000Z-21213498-1.nat"]
 
 print("========================")
 print("... read file:")
@@ -119,7 +125,7 @@ print(global_scene.all_dataset_names())
 ## tested RGBs 
 #RGB='natural'            # IR_016         VIS008         VIS006
 #RGB='green_snow'
-#RGB='overview'
+RGB='overview'
 #RGB='overview_sun'
 
 #### RGB in mpop that do not yet work with satpy 
@@ -130,7 +136,7 @@ print(global_scene.all_dataset_names())
 ##RGB='convection_co2'
 ##RGB='day_microphysics'   # VIS008         IR_039(solar)  IR_108     # requires the pyspectral modul
 ##RGB='dust'               # IR_120-IR_108  IR_108-IR_087  IR_108
-RGB='fog'  
+#RGB='fog'  
 ##RGB='ir108'
 ##RGB='night_fog'
 ##RGB='night_microphysics' # IR_120-IR_108  IR_108-IR_039  IR_108
@@ -160,8 +166,10 @@ global_scene.load(["VIS006"])
 
 ## save an RGB as png file 
 outputfile=time_start.strftime(cwd+'/MSG_'+RGB+'-global'+'_%Y%m%d%H%M.png')
-print("... save "+outputfile)
-global_scene.save_dataset(RGB, outputfile)
+
+if False:
+    print("... save "+outputfile)
+    global_scene.save_dataset(RGB, outputfile)
 
 
 print("========================")
@@ -173,9 +181,16 @@ area="ccs4"
 print("... resample data to another projection") 
 local_scene = global_scene.resample(area)
 outputfile=time_start.strftime(cwd+'/MSG_'+RGB+'-'+area+'_%Y%m%d%H%M.png')
+
 print("... save "+outputfile)
-local_scene.save_dataset(RGB, outputfile)
-#local_scene.save_dataset('overview', time_start.strftime(cwd+'/MSG_'+RGB+'-'+area+'_%Y%m%d%H%M.tiff'), writer='geotiff')
+add_border=True
+if add_border:
+    local_scene.show(RGB, overlay={'coast_dir': '/store/msrad/utils/shapes/','color': 'white', 'width' : 0.75})
+    local_scene.save_dataset(RGB, outputfile, overlay={'coast_dir': '/store/msrad/utils/shapes/','color': 'white', 'width' : 0.75})
+else:
+    local_scene.save_dataset(RGB, outputfile)
+    #local_scene.save_dataset('overview', time_start.strftime(cwd+'/MSG_'+RGB+'-'+area+'_%Y%m%d%H%M.tiff'), writer='geotiff')
+
 
 # work with channel data
 print("========================")

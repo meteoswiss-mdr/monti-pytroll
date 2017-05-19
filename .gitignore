@@ -8,5 +8,7 @@ packages/anacon*
 **/*.png
 **/*.save
 **/*_save
+**/backup/*
+**/save/*
 ### ignore emacs backup files ### 
 **/*~

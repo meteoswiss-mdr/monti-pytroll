@@ -46,6 +46,7 @@ class input_msg_class:
       self.add_rivers = False
       self.river_color = 'blue'
       self.add_logos = True
+      self.logos_dir = "/opt/users/common/logos/"
       self.add_colorscale = True
       self.fixed_minmax = True
       self.rad_min = {'VIS006':   0, 'VIS008':   0, 'IR_016':   0, 'IR_039': 210, 'WV_062': 210, 'WV_073': 190,\

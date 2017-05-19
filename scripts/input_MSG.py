@@ -85,18 +85,18 @@ def input(in_msg, timeslot=None):
     in_msg.RGBs.append('airmass')           # WV_062-WV_073  IR_097-IR_108  -WV_062
     #in_msg.RGBs.append('ash')               
     #in_msg.RGBs.append('cloudtop')
-    in_msg.RGBs.append('convection')         # WV_062-WV_073  IR_039-IR_108  IR_016-VIS006
+    #in_msg.RGBs.append('convection')         # WV_062-WV_073  IR_039-IR_108  IR_016-VIS006
     ##in_msg.RGBs.append('convection_co2')
     #in_msg.RGBs.append('day_microphysics')   # VIS008         IR_039(solar)  IR_108     # requires the pyspectral modul 
     #in_msg.RGBs.append('dust')               # IR_120-IR_108  IR_108-IR_087  IR_108
     #in_msg.RGBs.append('fog')
     #in_msg.RGBs.append('green_snow')
-    in_msg.RGBs.append('ir108')
-    in_msg.RGBs.append('natural')            # IR_016         VIS008         VIS006
+    #in_msg.RGBs.append('ir108')
+    #in_msg.RGBs.append('natural')            # IR_016         VIS008         VIS006
     #in_msg.RGBs.append('night_fog')          
     #in_msg.RGBs.append('night_microphysics') # IR_120-IR_108  IR_108-IR_039  IR_108
-    in_msg.RGBs.append('night_overview')
-    in_msg.RGBs.append('overview')
+    #in_msg.RGBs.append('night_overview')
+    #in_msg.RGBs.append('overview')
     ##in_msg.RGBs.append('overview_sun')
     #in_msg.RGBs.append('red_snow')
     ##in_msg.RGBs.append('refl39_chan')        # requires the pyspectral modul
@@ -106,7 +106,7 @@ def input(in_msg, timeslot=None):
     #in_msg.RGBs.append('wv_low')
     #-------------------
     # user defined RGBs
-    in_msg.RGBs.append('HRoverview')
+    #in_msg.RGBs.append('HRoverview')
     ##in_msg.RGBs.append('sandwich')
     ##in_msg.RGBs.append('ndvi')
     #in_msg.RGBs.append('HRVir108')
@@ -177,7 +177,10 @@ def input(in_msg, timeslot=None):
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     #in_msg.areas.append('eurotv4n')        # Europe TV4 -  4.1x4.1km 2048x1152
-    in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
+    #in_msg.areas.append('eurol')           # Europe 3.0km area - Europe 2560x2048
+    in_msg.areas.append('euroHDready')      # Europe in HD resolution 1280 x 720
+    #in_msg.areas.append('euroHDfull')      # Europe in full HD resolution 1920 x 1080
+    #in_msg.areas.append('ccs4')            # CCS4 Swiss projection 710x640
     #in_msg.areas.append('alps95')          # area around Switzerland processed by NWCSAF software 349x151 
     #in_msg.areas.append('ticino')          # stereographic proj of Ticino 342x311
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
@@ -190,7 +193,7 @@ def input(in_msg, timeslot=None):
     in_msg.check_RSS_coverage()
 
     in_msg.check_input = False
-    in_msg.reader_level="seviri-level4" 
+    #in_msg.reader_level="seviri-level4" 
     in_msg.parallax_correction = False
     in_msg.parallax_gapfilling = 'bilinear' # 'False' (default), 'nearest'
     #in_msg.save_reprojected_data=['ccs4']
@@ -200,10 +203,11 @@ def input(in_msg, timeslot=None):
 
     in_msg.make_plots = True
     in_msg.fill_value = (0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
-    in_msg.add_title = True
+    in_msg.add_title = False
     in_msg.add_borders = True
     in_msg.add_rivers = False
-    in_msg.add_logos = False
+    in_msg.add_logos = True
+    in_msg.logos_dir = "/opt/users/common/logos/"
     in_msg.add_colorscale = True
     in_msg.HRV_enhancement = False
 

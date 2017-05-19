@@ -255,6 +255,7 @@ def input(in_msg, timeslot=None):
     in_msg.add_rivers = False
     in_msg.river_color = 'blue'
     in_msg.add_logos = False
+    in_msg.logos_dir = "/opt/users/common/logos/"
     in_msg.add_colorscale = False
     in_msg.HRV_enhancement = False
 

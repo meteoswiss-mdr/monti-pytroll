@@ -317,9 +317,9 @@ def plot_msg(in_msg):
                   dc.write_vertically()
                if PIL_image.mode != 'L':
                   height = 60  # height=60.0 normal resolution 
-                  dc.add_logo("../logos/pytroll3.jpg",height=height)                          # height=60.0
-                  dc.add_logo("../logos/meteoSwiss3.jpg",height=height)                       
-                  dc.add_logo("../logos/EUMETSAT_logo2_tiny_white_square.png",height=height)  # height=60.0
+                  dc.add_logo(in_msg.logos_dir+"/pytroll3.jpg",height=height)                          # height=60.0
+                  dc.add_logo(in_msg.logos_dir+"/meteoSwiss3.jpg",height=height)                       
+                  dc.add_logo(in_msg.logos_dir+"/EUMETSAT_logo2_tiny_white_square.png",height=height)  # height=60.0
    
             # add colorscale
             if in_msg.add_colorscale and in_msg.colormap[rgb] != None:

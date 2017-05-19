@@ -14,7 +14,7 @@ from os.path import dirname, exists
 from os import makedirs
 from mpop.imageo.HRWimage import HRW_2dfield # , HRWstreamplot, HRWimage
 from datetime import timedelta
-from plot_msg import create_PIL_image, add_border_and_rivers, add_title
+from plot_msg import create_PIL_image, add_borders_and_rivers, add_title
 from pycoast import ContourWriterAGG
 from pydecorate import DecoratorAGG
 from my_msg_module import format_name, fill_with_closest_pixel
@@ -1001,9 +1001,10 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
 
                 if 'C2rgb' in in_msg.results:
                     img1 = Image.fromarray( rgbArray,'RGBA')
-                    #add_border_and_rivers( img1, cw, area_tuple,
-                    #                      add_border=in_msg.add_border, border_color=in_msg.border_color,
-                    #                      add_rivers=in_msg.add_rivers, river_color=in_msg.add_rivers, verbose=in_msg.verbose)
+                    #add_borders_and_rivers( img1, cw, area_tuple,
+                    #                        add_borders=in_msg.add_borders, border_color=in_msg.border_color,
+                    #                        add_rivers=in_msg.add_rivers, river_color=in_msg.river_color, 
+                    #                        resolution=in_msg.resolution, verbose=in_msg.verbose)
                     print ("... save image: display ", c2File, " &")
                     img1.save( create_dir(c2File) ) 
                     

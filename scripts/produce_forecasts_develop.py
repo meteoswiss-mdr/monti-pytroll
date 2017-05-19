@@ -18,7 +18,7 @@ from os.path import exists
 from os import makedirs
 from mpop.imageo.HRWimage import HRW_2dfield # , HRWstreamplot, HRWimage
 from datetime import timedelta
-from plot_msg import create_PIL_image, add_border_and_rivers, add_title
+from plot_msg import create_PIL_image, add_borders_and_rivers, add_title
 from pycoast import ContourWriterAGG
 from my_msg_module import check_near_real_time, format_name, fill_with_closest_pixel
 from copy import deepcopy 
@@ -856,9 +856,10 @@ if __name__ == '__main__':
                     pil_im = img.pil_image()                    
                     
                     #pil_im = array2PIL(p_levels[20:nx-40,85:ny-135], p_levels[20:nx-40,85:ny-135].size)
-                    pil_im = add_border_and_rivers(pil_im, cw, area_tuple,
-                                                   add_border=in_msg.add_border, border_color=in_msg.border_color,
-                                                   add_rivers=in_msg.add_rivers, river_color=in_msg.add_rivers, verbose=in_msg.verbose)
+                    pil_im = add_borders_and_rivers( pil_im, cw, area_tuple,
+                                                     add_borders=in_msg.add_borders, border_color=in_msg.border_color,
+                                                     add_rivers=in_msg.add_rivers, river_color=in_msg.river_color, 
+                                                     resolution=in_msg.resolution, verbose=in_msg.verbose)
 
                     pil_im.save("test_Pressure.png")#"/data/COALITION2/PicturesSatellite/LEL_results_wind//"+yearS+"-"+monthS+"-"+dayS+"/channels_fig//PressureLevels_"+yearS+monthS+dayS+hourS+minS+".png")
                     quit()

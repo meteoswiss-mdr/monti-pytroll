@@ -293,10 +293,11 @@ def plot_msg(in_msg):
             PIL_image = create_PIL_image(rgb, data, in_msg, HRV_enhancement=HRV_enhancement, obj_area=obj_area)  
                                        # !!! in_msg.colorbar[rgb] is initialized inside (give attention to rgbs) !!!
                                        
-            add_border_and_rivers(PIL_image, cw, area_tuple,
-                                  add_border=in_msg.add_border, border_color=in_msg.border_color,
-                                  add_rivers=in_msg.add_rivers, river_color=in_msg.add_rivers, verbose=in_msg.verbose)
-            
+            add_borders_and_rivers(PIL_image, cw, area_tuple,
+                                   add_borders=in_msg.add_borders, border_color=in_msg.border_color,
+                                   add_rivers=in_msg.add_rivers, river_color=in_msg.river_color, 
+                                   resolution=in_msg.resolution, verbose=in_msg.verbose)
+
             # indicate mask
             if in_msg.indicate_mask:
                PIL_image = indicate_mask(rgb, PIL_image, data, in_msg.verbose)
@@ -767,7 +768,7 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
 
-def add_border_and_rivers(PIL_image, cw, area_tuple, add_border=True, border_color='red', add_rivers=False, river_color='blue', verbose=True):
+def add_borders_and_rivers(PIL_image, cw, area_tuple, add_borders=True, border_color='red', add_rivers=False, river_color='blue', verbose=True, resolution='c'):
 
    if PIL_image.mode == 'RGB' or PIL_image.mode == 'RGBA': 
       # take input colors
@@ -777,23 +778,23 @@ def add_border_and_rivers(PIL_image, cw, area_tuple, add_border=True, border_col
       border_color = 'white'
       river_color  = 'white'
    else:
-      print "*** Error in add_border_and_rivers ("+inspect.getfile(inspect.currentframe())+")"
+      print "*** Error in add_borders_and_rivers ("+inspect.getfile(inspect.currentframe())+")"
       print "    Unknown image mode"
 
-   if in_msg.add_rivers:
-      if in_msg.verbose:
+   if add_rivers:
+      if verbose:
          print "    add rivers to image (resolution="+in_msg.resolution+")"
-      cw.add_rivers(PIL_image, area_tuple, outline=river_color, resolution=in_msg.resolution, outline_opacity=127, width=0.5, level=5) # 
-      if in_msg.verbose:
+      cw.add_rivers(PIL_image, area_tuple, outline=river_color, resolution=resolution, outline_opacity=127, width=0.5, level=5) # 
+      if verbose:
          print "    add lakes to image (resolution="+in_msg.resolution+")"
-      cw.add_coastlines(PIL_image, area_tuple, outline=river_color, resolution=in_msg.resolution, outline_opacity=127, width=0.5, level=2)  #, outline_opacity=0
-   if in_msg.add_borders:
-      if in_msg.verbose:
+      cw.add_coastlines(PIL_image, area_tuple, outline=river_color, resolution=resolution, outline_opacity=127, width=0.5, level=2)  #, outline_opacity=0
+   if add_borders:
+      if verbose:
          print "    add coastlines to image (resolution="+in_msg.resolution+")"
-      cw.add_coastlines(PIL_image, area_tuple, outline=border_color, resolution=in_msg.resolution, width=1)  #, outline_opacity=0
-      if in_msg.verbose:
+      cw.add_coastlines(PIL_image, area_tuple, outline=border_color, resolution=resolution, width=1)  #, outline_opacity=0
+      if verbose:
          print "    add borders to image (resolution="+in_msg.resolution+")"
-      cw.add_borders(PIL_image, area_tuple, outline=border_color, resolution=in_msg.resolution, width=1)     #, outline_opacity=0 
+      cw.add_borders(PIL_image, area_tuple, outline=border_color, resolution=resolution, width=1)     #, outline_opacity=0 
 
    return PIL_image
 

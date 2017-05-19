@@ -20,7 +20,7 @@ from os.path import exists, dirname
 from os import makedirs
 from mpop.imageo.HRWimage import HRW_2dfield # , HRWstreamplot, HRWimage
 from datetime import timedelta
-from plot_msg import create_PIL_image, add_border_and_rivers, add_title
+from plot_msg import create_PIL_image, add_borders_and_rivers, add_title
 from pycoast import ContourWriterAGG
 from my_msg_module import check_near_real_time, format_name, fill_with_closest_pixel
 from my_msg_module import check_loaded_channels

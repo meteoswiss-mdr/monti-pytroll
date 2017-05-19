@@ -13,7 +13,7 @@ from os.path import dirname, exists
 from os import makedirs
 from mpop.imageo.HRWimage import HRW_2dfield # , HRWstreamplot, HRWimage
 from datetime import timedelta
-from plot_msg import create_PIL_image, add_border_and_rivers, add_title
+from plot_msg import create_PIL_image, add_title
 from pycoast import ContourWriterAGG
 from pydecorate import DecoratorAGG
 from my_msg_module import format_name, fill_with_closest_pixel

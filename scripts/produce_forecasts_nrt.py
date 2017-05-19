@@ -475,7 +475,8 @@ if __name__ == '__main__':
     in_msg.outputDir='./pics/'
     in_msg.outputFile='WS_%(rgb)s-%(area)s_%y%m%d%H%M'
     in_msg.fill_value = [0,0,0] # black
-    in_msg.reader_level = "seviri-level2"
+    #in_msg.reader_level = "seviri-level2"
+    
     #in_msg.fill_value = None    # transparent
     #colormap='rainbow' 
     colormap='greys'

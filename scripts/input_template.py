@@ -202,7 +202,29 @@ def input(in_msg, timeslot=None):
     #in_msg.RGBs.append('lon')
     #in_msg.RGBs.append('time_offset')
     #-------------------
-
+    # msg-ot (Overshooting tops from Bedka 2016)
+    #-------------------
+    #in_msg.RGBs.append('ir_brightness_temperature')
+    #in_msg.RGBs.append('ot_rating_ir')
+    #in_msg.RGBs.append('ot_id_number')
+    #in_msg.RGBs.append('ot_anvilmean_brightness_temperature_difference')
+    #in_msg.RGBs.append('ir_anvil_detection')
+    #in_msg.RGBs.append('visible_reflectance')
+    #in_msg.RGBs.append('ot_rating_visible')
+    #in_msg.RGBs.append('ot_rating_shadow')
+    #in_msg.RGBs.append('ot_probability')
+    #in_msg.RGBs.append('surface_based_cape')
+    #in_msg.RGBs.append('most_unstable_cape')
+    #in_msg.RGBs.append('most_unstable_equilibrium_level_temperature')
+    #in_msg.RGBs.append('tropopause_temperature')
+    #in_msg.RGBs.append('surface_1km_wind_shear')
+    #in_msg.RGBs.append('surface_3km_wind_shear')
+    #in_msg.RGBs.append('surface_6km_wind_shear')
+    #in_msg.RGBs.append('ot_potential_temperature')
+    #in_msg.RGBs.append('ot_height')
+    #in_msg.RGBs.append('ot_pressure')
+    #in_msg.RGBs.append('parallax_correction_latitude')
+    #in_msg.RGBs.append('parallax_correction_longitude')
 
     # experimental
     #in_msg.RGBs.append('clouddepth')     # test according to Mecikalski, 2010
@@ -250,6 +272,7 @@ def input(in_msg, timeslot=None):
     in_msg.make_plots=True
     in_msg.fill_value=(0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
     in_msg.add_title = True
+    in_msg.title = " MSG-2, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s"
     in_msg.add_borders = True
     in_msg.border_color = 'red'
     in_msg.add_rivers = False

@@ -45,8 +45,8 @@ function set_conda_path {
 
     conda -V >/dev/null 2>&1 || { echo "Setup of virtual environment requires conda, but it's not installed. Contact Ulrich. Aborting." >&2; exit 1; }
 
-    # echo "... List of available environments"
-    conda info --envs
+    ## echo "... List of available environments"
+    #conda info --envs
 }
 
 function set_pytroll_paths {

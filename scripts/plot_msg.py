@@ -783,17 +783,17 @@ def add_borders_and_rivers(PIL_image, cw, area_tuple, add_borders=True, border_c
 
    if add_rivers:
       if verbose:
-         print "    add rivers to image (resolution="+in_msg.resolution+")"
+         print "    add rivers to image (resolution="+resolution+")"
       cw.add_rivers(PIL_image, area_tuple, outline=river_color, resolution=resolution, outline_opacity=127, width=0.5, level=5) # 
       if verbose:
-         print "    add lakes to image (resolution="+in_msg.resolution+")"
+         print "    add lakes to image (resolution="+resolution+")"
       cw.add_coastlines(PIL_image, area_tuple, outline=river_color, resolution=resolution, outline_opacity=127, width=0.5, level=2)  #, outline_opacity=0
    if add_borders:
       if verbose:
-         print "    add coastlines to image (resolution="+in_msg.resolution+")"
+         print "    add coastlines to image (resolution="+resolution+")"
       cw.add_coastlines(PIL_image, area_tuple, outline=border_color, resolution=resolution, width=1)  #, outline_opacity=0
       if verbose:
-         print "    add borders to image (resolution="+in_msg.resolution+")"
+         print "    add borders to image (resolution="+resolution+")"
       cw.add_borders(PIL_image, area_tuple, outline=border_color, resolution=resolution, width=1)     #, outline_opacity=0 
 
    return PIL_image
@@ -832,7 +832,7 @@ def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, verbose )
 
    if verbose:
       print "    add title to image "
-
+   
    if True: # new version of adding title 
 
       if PIL_image.mode == 'RGB' or PIL_image.mode == 'RGBA':    # color 
@@ -856,11 +856,11 @@ def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, verbose )
       #fontsize=50
       font = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf", fontsize)
 
-      if in_msg.title == None:
+      if title == None:
         title = ' %(sat)s-%(sat_nr)s, %y-%m-%d %H:%MUTC, %(area)s, %(rgb)s'
         format_name (title, time_slot, rgb=rgb, sat=sat, sat_nr=sat_nr, area=area )
       else:
-        title = format_name (in_msg.title, time_slot, rgb=rgb, sat=sat, sat_nr=sat_nr, area=area )
+        title = format_name (title, time_slot, rgb=rgb, sat=sat, sat_nr=sat_nr, area=area )
         
       draw = ImageDraw.Draw(PIL_image)
 
@@ -887,11 +887,11 @@ def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, verbose )
          dy = 1.1 * fontsize # dy = 20 dy = 50
          x1 =  0             # x1 = 10
          if not (rgb in products.CPP or rgb in products.HSAF) : # normal case  
-            draw.text((x1, y1     ),' '+dateS+' '+hourS+':'+minS+'UTC', title_color, font=font)
-            draw.text((x1, y1+  dy),' '+rgb.replace("_","-")+" (MSG-"+str(sat_nr-7) +' SEVIRI)',                title_color, font=font)
+            draw.text((x1, y1     ), time_slot.strftime(' '+'%y-%m-%d %H:%MUTC'+':'), title_color, font=font)
+            draw.text((x1, y1+  dy),' '+rgb.replace("_","-")+", "+sat+str(sat_nr)+' SEVIRI',                title_color, font=font)
             #draw.text((x1, y1+2*dy),' '+rgb.replace("_","-"),           title_color, font=font)
          else:         
-            draw.text((x1, y1+2*dy),' '+rgb.replace("_","-")+" (MSG-"+str(sat_nr-7) +' SEVIRI)',                title_color, font=font)
+            draw.text((x1, y1+2*dy),' '+rgb.replace("_","-")+", "+sat+str(sat_nr)+ +' SEVIRI',                title_color, font=font)
       if verbose:
          print "    added title: "+title
 

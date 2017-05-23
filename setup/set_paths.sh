@@ -1,4 +1,7 @@
-function set_utils_path {
+#!/bin/bash
+
+set_utils_path() {
+#function set_utils_path {  # function syntax is not supported crontab
     case $HOSTNAME in
     "zueub"[2-4][0-9][0-9])
 	export UTILS_PATH=/opt/users/common/
@@ -15,7 +18,8 @@ function set_utils_path {
     echo "... set SAT_UTILS_PATH to: "$SAT_UTILS_PATH
 }
 
-function set_conda_path {
+set_conda_path() {
+#function set_conda_path {  # function syntax is not supported crontab
     case $HOSTNAME in
     "zueub"[2-4][0-9][0-9])
 	export CONDA_PATH="/opt/users/common/packages/anaconda3/" ;;
@@ -49,7 +53,8 @@ function set_conda_path {
     #conda info --envs
 }
 
-function set_pytroll_paths {
+set_pytroll_paths() {
+# function set_pytroll_paths {   # function syntax is not supported crontab
 case $HOSTNAME in
     "zueub"[2-4][0-9][0-9])
         if [ -d /opt/users/$LOGNAME/monti-pytroll/ ]

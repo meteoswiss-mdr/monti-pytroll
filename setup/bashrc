@@ -9,33 +9,51 @@ fi
 
 #PS1='\[[\u@ \e[1;31m\]\h \e[0;37m\W]\$\[\e[0m\] '
 
+# when using cronjobs a few common shell variables are not set
+if ! test -n "${HOSTNAME}"; then
+    export HOSTNAME=`/bin/hostname` 
+    echo '... set HOSTNAME to:' ${HOSTNAME}
+fi
+if ! test -n "${USER}"; then
+    export USER=${LOGNAME}
+    echo '... set USER to:' ${LOGNAME}
+fi
+if ! test -n "${logname}"; then
+    export logname=${LOGNAME}
+    echo '... set logname to:' ${LOGNAME}
+fi
+
+
 echo "USER" ${USER}
 echo "\$(logname)" $(logname)
 echo "\$LOGNAME" $LOGNAME
 echo "uname -mrs:" `uname -mrs`
+echo "whoami:" `/usr/bin/whoami`
 
 case $HOSTNAME in
     "zueub"[2-4][0-9][0-9])
 	if [ -d /opt/users/$LOGNAME/monti-pytroll/ ]
         then
-            source /opt/users/$LOGNAME/monti-pytroll/setup/set_paths.sh
+            #source /opt/users/$LOGNAME/monti-pytroll/setup/set_paths.sh   # source is not supported by cronjobs
+	    . /opt/users/$LOGNAME/monti-pytroll/setup/set_paths.sh
         else
-            source /opt/users/$LOGNAME/PyTroll/setup/set_paths.sh
+            #source /opt/users/$LOGNAME/PyTroll/setup/set_paths.sh         # source is not supported by cronjobs
+	    . /opt/users/$LOGNAME/PyTroll/setup/set_paths.sh
         fi
 	;;
     "keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
         # tmp !!!! BAD DIRTY FIX !!!!
         export LOGNAME_ORG=$LOGNAME
         export LOGNAME=hamann
-	source /users/hamann/monti-pytroll/setup/set_paths.sh  # load functions from this script
+	# source /users/$LOGNAME/monti-pytroll/setup/set_paths.sh  # load functions from this script
+	. /users/$LOGNAME/monti-pytroll/setup/set_paths.sh
 	;;
     *)
-	echo "ERROR in setup/bashrc: unknown computer "$HOSTNAME
+	echo "ERROR (1) in setup/bashrc: unknown computer ---"$HOSTNAME"---"
 	return ;;
 	#exit 1 ;;
 esac
 
-cd $PYTROLLHOME
 set_utils_path
 set_conda_path
 set_pytroll_paths
@@ -81,9 +99,6 @@ alias ls='ls --color=auto'
 # tmp !!!! BAD DIRTY FIX !!!!
 case $HOSTNAME in
     "keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
-	export LOGNAME=$LOGNAME_ORG
-	;;
-    "ela"[0-9])
 	export LOGNAME=$LOGNAME_ORG
 	;;
 esac

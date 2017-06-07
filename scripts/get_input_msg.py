@@ -353,7 +353,7 @@ def get_input_msg(input_file, timeslot=None):
    input_module.input(in_msg, timeslot=timeslot)
 
    if timeslot != None:
-      in_msg
+      in_msg.datetime = timeslot
 
    return in_msg
 

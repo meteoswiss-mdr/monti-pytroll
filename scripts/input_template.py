@@ -83,6 +83,13 @@ def input(in_msg, timeslot=None):
     #in_msg.RGBs.append('IR_120_minus_IR_108')
     #in_msg.RGBs.append('trichannel')
     #-------------------
+    # viewing geometry
+    #-------------------
+    #in_msg.RGBs.append('vza')   # known bug: cant be displayed for original projection, e.g. met09globeFull
+    #in_msg.RGBs.append('vaa')
+    #in_msg.RGBs.append('lat')
+    #in_msg.RGBs.append('lon')
+    #-------------------    
     # buil in RGBs, see http://mpop.readthedocs.org/en/latest/pp.html
     #                or  http://oiswww.eumetsat.int/~idds/html/doc/best_practices.pdf
     #-------------------      # RED            GREEN          BLUE

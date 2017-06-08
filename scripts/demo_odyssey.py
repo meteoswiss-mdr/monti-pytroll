@@ -27,7 +27,7 @@ fill_value=None # transparent background
 #fill_value=(1,1,1) # white background 
 min_radar = 0.0
 max_radar = 150
-from trollimage.colormap import  RainRate
+from trollimage.colormap import RainRate
 colormap = RainRate
 
 LOG.debug("... min_radar/max_radar: "+str(min_radar)+" / "+str(max_radar))
@@ -48,9 +48,11 @@ resolution='l'
 cw.add_coastlines(PIL_image, area_def, outline='white', resolution=resolution, outline_opacity=127, width=1, level=2)
 cw.add_borders(PIL_image, area_def, outline='white', resolution=resolution, width=1)       #, outline_opacity=0 
 
-add_colorscale=False
+add_colorscale=True
 if add_colorscale:
     print('... add colorscale ranging from min_radar (',min_radar,') to max_radar (',max_radar,')')
+    from pydecorate import DecoratorAGG
+    dc = DecoratorAGG(PIL_image)
     dc.align_right()
     dc.write_vertically()
     ticks=20
@@ -58,8 +60,8 @@ if add_colorscale:
     minor_tick_marks=10  # default
     fontsize=18
     units=global_radar[prop_str].info["units"]
-    font = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf", fontsize)
-    #font_scale = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf", fontsize)
+    import aggdraw
+    font = aggdraw.Font("black","/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerif-Bold.ttf",size=16)
     colormap_r = colormap.reverse()
     dc.add_scale(colormap_r, extend=True, ticks=ticks, tick_marks=tick_marks, minor_tick_marks=minor_tick_marks, font=font, line_opacity=100, unit=units) #
 

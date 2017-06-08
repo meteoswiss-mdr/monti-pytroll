@@ -60,8 +60,8 @@ import products
 
 import inspect
 
-#from mpop.utils import debug_on
-#debug_on() 
+from mpop.utils import debug_on
+debug_on() 
 
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
@@ -467,7 +467,9 @@ def load_products(data_object, RGBs, in_msg, area_loaded):
             area_loaded = data_object[pge].area
          convert_NWCSAF_to_radiance_format(data_object, area_loaded, rgb, in_msg.nwcsaf_calibrate, IS_PYRESAMPLE_LOADED)
 
-      elif rgb in products.SEVIRI_viewing_geometry: 
+      elif rgb in products.SEVIRI_viewing_geometry:
+         if in_msg.verbose:
+            print "    load SEVIRI viewing geometry: ", rgb, " with reader_level: ", in_msg.reader_level
          data_object.load([rgb], reader_level=in_msg.reader_level)
          #print data_object[rgb].data.shape, data_object[rgb].data.min(), data_object[rgb].data.max()
 

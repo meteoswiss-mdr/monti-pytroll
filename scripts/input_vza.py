@@ -198,7 +198,7 @@ def input(in_msg, timeslot=None):
     in_msg.check_RSS_coverage()
 
     # please download the shape file 
-    in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
+    in_msg.mapDir='/opt/users/common/shapes/'
     in_msg.mapResolution=None       ## f  full resolution: Original (full) data resolution.          
                                     ## h  high resolution: About 80 % reduction in size and quality. 
                                     ## i  intermediate resolution: Another ~80 % reduction.          
@@ -206,18 +206,19 @@ def input(in_msg, timeslot=None):
                                     ## c  crude resolution: Another ~80 % reduction.   
 
     in_msg.check_input = False
-    in_msg.save_reprojected_data=['ccs4']
+    in_msg.reader_level="seviri-level6" 
+    #in_msg.save_reprojected_data=['ccs4']
     if in_msg.sat_nr==10:
-        in_msg.reprojected_data_filename='tMSG_SEVIRI_lon00_viewing_geometry_%(area)s.nc'
+        in_msg.reprojected_data_filename='MSG_SEVIRI_lon00_viewing_geometry_%(area)s.nc'
     elif in_msg.sat_nr==9:
-        in_msg.reprojected_data_filename='tMSG_SEVIRI_lon95_viewing_geometry_%(area)s.nc'
+        in_msg.reprojected_data_filename='MSG_SEVIRI_lon95_viewing_geometry_%(area)s.nc'
     elif in_msg.sat_nr==8:
-        in_msg.reprojected_data_filename='tMSG_SEVIRI_lon35_viewing_geometry_%(area)s.nc'
+        in_msg.reprojected_data_filename='MSG_SEVIRI_lon35_viewing_geometry_%(area)s.nc'
 
     in_msg.reprojected_data_dir='/data/COALITION2/database/meteosat/SEVIRI/'
     in_msg.save_statistics=False
 
-    in_msg.make_plots=False
+    in_msg.make_plots=True
     in_msg.fill_value=(0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
     in_msg.add_title = True
     in_msg.add_borders = True

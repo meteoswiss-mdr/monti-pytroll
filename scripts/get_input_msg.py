@@ -61,7 +61,7 @@ class input_msg_class:
                       'azidiff':0,'cth':0,'cldmask':0,'cot':0,'cph':0,'ctt':210.,'cwp':0,\
                       'dcld':0,'dcot':0,'dcwp':0,'dndv':0,'dreff':0,\
                       'precip':0,'precip_ir':0,'qa':0,'reff':0,'satz':0,'sds':0,'sds_cs':0,'sds_diff':0,'sds_diff_cs':0,\
-                      'sunz':0,'lat':-80,'lon':-80,'time_offset':0,
+                      'vza':0,'vaa':0,'sunz':0,'lat':-80,'lon':-80,'time_offset':0,
                       'ot_anvilmean_brightness_temperature_difference':0}
       self.rad_max = {'VIS006':  85, 'VIS008':  90, 'IR_016':  80, 'IR_039': 340, 'WV_062': 260, 'WV_073': 280,\
                       'IR_087': 320, 'IR_097': 285, 'IR_108': 320, 'IR_120': 320, 'IR_134': 290, 'HRV': 100,\
@@ -75,7 +75,7 @@ class input_msg_class:
                       'azidiff':180,'cth':12,'cldmask':3,'cot':256,'cph':2,'ctt':320.,'cwp':10,\
                       'dcld':4,'dcot':50,'dcwp':10,'dndv':4,'dreff':20,\
                       'precip':256,'precip_ir':256,'qa':50,'reff':50,'satz':90,'sds':1200,'sds_cs':1200,'sds_diff':800,'sds_diff_cs':800,\
-                      'sunz':90,'lat':80,'lon':80,'time_offset':750,
+                      'vza':90,'vaa':360,'sunz':90,'lat':80,'lon':80,'time_offset':750,
                       'ot_anvilmean_brightness_temperature_difference':6}
       self.tick_marks= {'VIS006': 20, 'VIS008': 20, 'IR_016': 20, 'IR_039': 20, 'WV_062': 20, 'WV_073': 20,\
                         'IR_087': 20, 'IR_097': 20, 'IR_108': 20, 'IR_120': 20, 'IR_134': 20, 'HRV': 20,\

@@ -830,20 +830,19 @@ def indicate_mask(rgb, PIL_image, data, verbose):
 #----------------------------------------------------------------------------------------------------------------
 
 
-def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, verbose ):
+def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, verbose, title_color=None ):
 
    if verbose:
       print "    add title to image "
    
    if True: # new version of adding title 
 
-      if PIL_image.mode == 'RGB' or PIL_image.mode == 'RGBA':    # color 
-         title_color=(255,255,255)
-         #title_color=(0,0,0)
-         outline=(255, 0, 0)
-      elif PIL_image.mode == 'L':    # black white 
-         title_color=(255)
-         outline=(255)
+      if title_color==None:
+         if PIL_image.mode == 'RGB' or PIL_image.mode == 'RGBA':    # color 
+            title_color=(255,255,255)
+            #title_color=(0,0,0)
+         elif PIL_image.mode == 'L':    # black white
+            title_color=(255)
 
       # determine font size
       if "EuropeCanary" in area:

@@ -5,10 +5,8 @@ from my_msg_module import get_last_SEVIRI_date
 from pycoast import ContourWriterAGG
 from mpop.projector import get_area_def
 
-time_slot = get_last_SEVIRI_date(False)
-from datetime import timedelta
-#time_slot -= timedelta(minutes=15) # data arrive with 15min delay 
-time_slot = datetime.datetime(2015, 12, 18, 12, 30)
+time_slot = get_last_SEVIRI_date(False, delay=15)
+#time_slot = datetime.datetime(2015, 12, 18, 12, 30)
 print str(time_slot)
 
 global_data = GeostationaryFactory.create_scene("cpp", "10", "seviri", time_slot)
@@ -36,7 +34,7 @@ if chn=='cth':
 
 colormap.set_range(min_data, max_data)
 from trollimage.image import Image as trollimage
-img = trollimage(data[chn].data, mode="L", fill_value=[0,0,0])
+img = trollimage(data[chn].data, mode="L", fill_value=[1,1,1]) # fill_value=[0,0,0]
 img.colorize(colormap)
 PIL_image=img.pil_image()
 
@@ -50,15 +48,24 @@ area_extent = obj_area.area_extent
 area_def = (proj4_string, area_extent)
 
 if True:
-   cw = ContourWriterAGG('/data/OWARNA/hau/pytroll/shapes/')
+   #cw = ContourWriterAGG('/data/OWARNA/hau/pytroll/shapes/')
+   cw = ContourWriterAGG('/opt/users/common/shapes/')
    resolution='l'
    if area=='ccs4':
        resolution='h'
-   outline = (255, 0, 0)
-   outline = 'white'
-   cw.add_coastlines(PIL_image, area_def, outline=outline, resolution=resolution, outline_opacity=127, width=1, level=2)  #, outline_opacity=0
+   #outline = (255, 0, 0)
+   #outline = 'white'
+   outline = 'red'
+   cw.add_coastlines(PIL_image, area_def, outline='blue', resolution=resolution, level=2, width=1)  #, outline_opacity=127, outline_opacity=0
    #cw.add_coastlines(PIL_image, area_def, outline=outline, resolution=resolution, width=2)  #, outline_opacity=0
    cw.add_borders(PIL_image, area_def, outline=outline, resolution=resolution, width=2)       #, outline_opacity=0 
+
+if True:
+    from plot_msg import add_title
+    from pydecorate import DecoratorAGG
+    dc = DecoratorAGG(PIL_image)
+    title="Cloud Physical Properties (Roebeling, 2009), %Y-%m-%d %H:%MUTC, %(area)s\n%(rgb)s"
+    add_title(PIL_image, title, chn, "cpp", "10", time_slot, area, dc, True, title_color='red' )
 
 #img.show()
 PIL_image.show()

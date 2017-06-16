@@ -340,13 +340,15 @@ if __name__ == '__main__':
                in_msg.postprocessing_areas = [sys.argv[8]]
            else:
                in_msg.postprocessing_areas = sys.argv[8]
-
-   # loop over all processed areas
-   for area in in_msg.areas:
-
-      ## start postprocessing for postprocessing areas
-      if area in in_msg.postprocessing_areas:
-         postprocessing(in_msg, in_msg.datetime, int(in_msg.sat_nr), area)
+ 
+   print "*** start postprocessing for: "
+   print "    area: ", in_msg.postprocessing_areas
+   print "    composite: ", in_msg.postprocessing_composite
+   print "    montage: ", in_msg.postprocessing_montage
+              
+   # loop over all postprocessing areas
+   for area in in_msg.postprocessing_areas:
+       postprocessing(in_msg, in_msg.datetime, int(in_msg.sat_nr), area)
 
    if in_msg.verbose:
       print " "

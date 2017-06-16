@@ -32,6 +32,7 @@ if __name__ == '__main__':
     from get_input_msg import get_date_and_inputfile_from_commandline
     in_msg = get_date_and_inputfile_from_commandline(print_usage=print_usage)
 
+    # interpret additional command line arguments
     if len(sys.argv) > 7:
         if type(sys.argv[7]) is str:
             in_msg.RGBs = [sys.argv[7]]

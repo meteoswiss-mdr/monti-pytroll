@@ -1,5 +1,5 @@
 
-def input(in_msg):
+def input(in_msg, timeslot=None):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -24,7 +24,7 @@ def input(in_msg):
         # datetime according to command line arguments (if given)
         # otherwise the last possible time of SEVIRI observation (depends on RSS mode and chosen delay)
         # also sets the near real time marker: in_msg.nrt 
-        in_msg.init_datetime()
+        in_msg.init_datetime(timeslot=timeslot)
     else:
         # offline mode (always a fixed time) # ignores command line arguments
         year=2015
@@ -110,7 +110,7 @@ def input(in_msg):
     ## NWC SAF
     ##-------------------
     ## NWC SAF PEG 1
-    #in_msg.RGBs.append('CMa')
+    in_msg.RGBs.append('CMa')
     #in_msg.RGBs.append('CMa_DUST')
     #in_msg.RGBs.append('CMa_VOLCANIC')
     #in_msg.RGBs.append('CMa_QUALITY')
@@ -120,7 +120,7 @@ def input(in_msg):
     #in_msg.RGBs.append('CT_QUALITY')
     ## NWC SAF PEG 3 
     in_msg.nwcsaf_calibrate=True
-    in_msg.RGBs.append('CTT')
+    #in_msg.RGBs.append('CTT')
     #in_msg.RGBs.append('CTH')
     #in_msg.RGBs.append('CTP')
     ## NWC SAF PEG 4
@@ -194,7 +194,8 @@ def input(in_msg):
     #default see scp_settings.py: e.g. in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
 
     # please download the shape file 
-    in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
+    #in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
+    in_msg.mapDir='/opt/users/common/shapes/'
 
     in_msg.add_title = True
     in_msg.colormap='greys'

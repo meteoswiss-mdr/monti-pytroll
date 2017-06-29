@@ -64,7 +64,8 @@ case $HOSTNAME in
             export PYTROLLHOME=/opt/users/$LOGNAME/PyTroll/	
         fi
         export XRIT_DECOMPRESS_PATH=/opt/users/common/bin/xRITDecompress
-        export XRIT_DECOMPRESS_OUTDIR=/tmp/SEVIRI_DECOMPRESSED_$LOGNAME ;;
+        #export XRIT_DECOMPRESS_OUTDIR=/tmp/SEVIRI_DECOMPRESSED_$LOGNAME ;;
+        export XRIT_DECOMPRESS_OUTDIR=/tmp/SEVIRI_DECOMPRESSED ;;
     "keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
         export PYTROLLHOME=$HOME/monti-pytroll/
         export XRIT_DECOMPRESS_PATH=/store/mch/msrad/sat/pytroll/xRITDecompress
@@ -74,11 +75,9 @@ case $HOSTNAME in
 	return ;;
 	#exit 1 ;;
     esac
-    export PPP_CONFIG_DIR=$PYTROLLHOME/etc/
     export PSP_CONFIG_FILE=${UTILS_PATH}/packages/pyspectral_aux_files/pyspectral.cfg
     #unset PSP_CONFIG_FILE   # should not be needed any more ... 
     echo "... set PYTROLLHOME to: "$PYTROLLHOME
-    echo "... set PPP_CONFIG_DIR to: "$PPP_CONFIG_DIR
     echo "... set PSP_CONFIG_FILE to: "$PSP_CONFIG_FILE
     echo "... set XRIT_DECOMPRESS_PATH to: "$XRIT_DECOMPRESS_PATH
     echo "... set XRIT_DECOMPRESS_OUTDIR to: "$XRIT_DECOMPRESS_OUTDIR

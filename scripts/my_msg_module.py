@@ -7,6 +7,12 @@ output:
 '''
 
 import products 
+import inspect
+import logging
+
+LOG = logging.getLogger(__name__)
+LOG.setLevel(30)
+#CRITICAL 50 #ERROR 40 #WARNING 30 #INFO 20 #DEBUG 10 #NOTSET 0
 
 '''
 input: RSS 
@@ -23,6 +29,8 @@ def get_last_SEVIRI_date(RSS, delay=0):
     from time import gmtime
     import datetime
 
+    LOG.info("*** start get_last_SEVIRI_date ("+inspect.getfile(inspect.currentframe())+")")
+
     # get the current time
     gmt = gmtime()
     #print "GMT time: "+ str(gmt)
@@ -31,12 +39,12 @@ def get_last_SEVIRI_date(RSS, delay=0):
 
     # convert to datetime format
     t0 = datetime.datetime(gmt.tm_year, gmt.tm_mon, gmt.tm_mday, gmt.tm_hour, gmt.tm_min, 0) 
-    print 'current time = ', str(t0)
+    LOG.debug("    current time = "+str(t0))
 
     # apply delay (if it usually takes 5 min for the data to arrive, use delay 5min)
     if delay != 0:
        t0 -= datetime.timedelta(minutes=delay)
-    print 'applied delay = ', str(t0)
+    LOG.debug("    applying delay "+str(delay)+" min delay, time = "+ str(t0))
 
     # if rapid scan service than 5min otherwise 15
     if RSS:
@@ -44,19 +52,19 @@ def get_last_SEVIRI_date(RSS, delay=0):
     else:
         nmin = 15
 
-    # round minutes by one scan time 
+    LOG.debug("    round by scanning time "+str(min)+" min")
     #tm_min2 = gmt.tm_min - (gmt.tm_min % nmin)
     minute1 = t0.minute - (t0.minute % nmin)
 
     # define current date rounded by one scan time 
     #date1 = datetime.datetime(gmt.tm_year, gmt.tm_mon, gmt.tm_mday, gmt.tm_hour, tm_min2 , 0) 
     t1 = datetime.datetime(t0.year, t0.month, t0.day, t0.hour, minute1, 0) 
-    print 'last end time of scan = ', str(t1)
+    LOG.debug("    end time of last scan: "+str(t1))
 
 
     # substracting one scan time (as the start time of scan is returned) 
     t1 -= datetime.timedelta(seconds=nmin*60)
-    print 'last start time of scan = ', str(t1)
+    LOG.info("    start time of last scan: "+str(t1))
 
     return t1
 
@@ -73,7 +81,7 @@ def check_near_real_time(time_slot, minutes):
       False, if older
     """ 
 
-    print "*** start check_near_real_time: ", # no new line
+    LOG.info("*** start check_near_real_time ("+inspect.getfile(inspect.currentframe())+")")
 
     # check if specified time is older than 2 hours 
     from time import gmtime
@@ -87,10 +95,10 @@ def check_near_real_time(time_slot, minutes):
 
     # if specified time is older than current time 'minutes' min 
     if time_slot < (t0 - datetime.timedelta(seconds=minutes*60)):
-        print (" near_real_time = False")
+        LOG.info("    near_real_time = False")
         return False
     else:
-        print (" near_real_time = True")
+        LOG.info("    near_real_time = True")
         return True
 
 '''
@@ -108,6 +116,8 @@ def rgb_prerequisites(rgb, sat="meteosat", sat_nr="10", verbose=True):
     from my_composites import get_image
     import datetime
 
+    LOG.debug("*** start rgb_prerequisites ("+inspect.getfile(inspect.currentframe())+")")
+
     # create an arbitrary data container
     date = datetime.datetime(2000, 12, 24, 18, 0, 0) # like christmas eve :-)
     global_data = GeostationaryFactory.create_scene(sat, sat_nr, "seviri", date)
@@ -119,17 +129,17 @@ def rgb_prerequisites(rgb, sat="meteosat", sat_nr="10", verbose=True):
     rgb_to_do=[]
 
     for this_rgb in rgb:
-        if verbose:
-            print "... get prerequisite for ", this_rgb
+
+        LOG.debug("... get prerequisite for "+this_rgb)
 
         if this_rgb in products.RGBs_buildin or this_rgb in products.RGBs_user:
-            # print "... add prerequsites by function ", this_rgb
+            LOG.debug("    add prerequsites by function ")
             obj_image = get_image(global_data, this_rgb) 
             channels_needed = obj_image.prerequisites
             all_channels_needed = all_channels_needed.union(channels_needed)
 
         if this_rgb in products.MSG or this_rgb in products.MSG_color: 
-            # print "... add prerequsites by name", this_rgb
+            LOG.debug("    add prerequsites by name ")
             for channel in products.MSG:
                 if this_rgb.find(channel) != -1: 
                     all_channels_needed = all_channels_needed.union(set([channel]))
@@ -179,16 +189,16 @@ def channel_num2str(channels):
             elif channel == 13.4:
                 channels[i] = 'IR_134'
             else:
-                print "*** ERROR (A) in channel_num2str (my_msg_module)", channel
-                print "*** This should not happen, please contact the developers (Uli, Lorenzo)"
+                LOG.critical("*** ERROR (A) in channel_num2str ("+inspect.getfile(inspect.currentframe())+"), channel = "+channel)
+                LOG.critical("*** This should not happen, please contact the developers (Ulrich H., Lorenzo C., Marco S.)")
                 quit()
         elif type(channel) is str:
             # nothing to do
-            if False:
-                print "do nothing"
+            LOG.debug("    channel is already a string, do nothing ")
         else:
-            print "*** ERROR (B) in channel_num2str (my_msg_module)", channel
-            print "*** This should not happen, please contact the developers (Uli, Lorenzo)"
+            LOG.critical("*** ERROR (B) in channel_num2str ("+inspect.getfile(inspect.currentframe())+"), channel = "+channel)
+            LOG.critical("*** This should not happen, please contact the developers (Ulrich H., Lorenzo C., Marco S.)")
+            quit()
         i=i+1
 
     return set(channels)
@@ -228,8 +238,9 @@ def channel_str2ind(channel):
     elif channel == 'HRV':
         index=11
     else:
-        print "*** ERROR in channel_str2ind (my_msg_module)", channel
-        print "*** This should not happen, please contact the developers (Uli, Lorenzo)"
+        LOG.critical("*** ERROR in channel_str2ind ("+inspect.getfile(inspect.currentframe())+"), channel = "+ channel)
+        LOG.critical("*** This should not happen, please contact the developers (Ulrich H., Lorenzo C., Marco S.)")
+        quit()
 
     return index
 
@@ -282,6 +293,9 @@ def check_RSS(sat_nr, date):
     
     from datetime import datetime
 
+    LOG.info("*** start check_RSS ("+inspect.getfile(inspect.currentframe())+")")
+    LOG.info("    automatic check if Metesat"+str(sat_nr)+" works in Rapid Scan Service (RSS) mode at this time: "+str(date))
+
     # check if Meteosat satellite was in RSS mode
     if date <  datetime(2008, 5, 13, 0, 0):   # before 13.05.2008 only nominal MSG1 (meteosat8), no Rapid Scan Service yet
         if int(sat_nr) == 8:
@@ -304,7 +318,7 @@ def check_RSS(sat_nr, date):
         else:
             RSS = None 
 
-    print "... check if Meteosat", sat_nr, " was in RSS mode: ", RSS
+    LOG.info("... Rapid Scan Service (RSS) mode = "+str(RSS))
 
     return RSS
 
@@ -520,16 +534,17 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
             
                 #check epilogues file 
                 epi_file= "?-000-"+MSG+"__-"+MSG+"_???____-_________-EPI______-"+yearS+monthS+dayS+hourS+minuteS+"-__"
+                epi_filename = glob.glob(inputDirectory+'/'+epi_file)
                 #if len(filter(listdir(inputDirectory), epi_file)) == 0:
-                if len(glob.glob(inputDirectory+'/'+epi_file)) == 0:
+                if len(epi_filename) == 0:
                     if in_msg.verbose:
                         print "*** Warning, no epilogue file found: "+inputDirectory+'/'+epi_file
                     return rgb_complete
                 else:
-                    print "    found epilogue file"                
+                    print "    found epilogue file", epi_filename
 
             # retrieve channels needed for specific rgb
-            channels_needed = rgb_prerequisites(rgb, sat_nr=str(in_msg.sat_nr), verbose=False)
+            channels_needed = rgb_prerequisites(rgb, sat=in_msg.sat_str(), sat_nr=in_msg.sat_nr_str(), verbose=False)
         
             if in_msg.verbose:
                 print "    check input files for "+ rgb+ ', channels needed: ', list(channels_needed)

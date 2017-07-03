@@ -11,7 +11,7 @@ import inspect
 import logging
 
 LOG = logging.getLogger(__name__)
-LOG.setLevel(30)
+LOG.setLevel(10)
 #CRITICAL 50 #ERROR 40 #WARNING 30 #INFO 20 #DEBUG 10 #NOTSET 0
 
 '''
@@ -52,7 +52,7 @@ def get_last_SEVIRI_date(RSS, delay=0):
     else:
         nmin = 15
 
-    LOG.debug("    round by scanning time "+str(min)+" min")
+    LOG.debug("    round by scanning time "+str(nmin)+" min, RSS = "+str(RSS))
     #tm_min2 = gmt.tm_min - (gmt.tm_min % nmin)
     minute1 = t0.minute - (t0.minute % nmin)
 

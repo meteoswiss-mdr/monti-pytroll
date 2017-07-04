@@ -9,7 +9,7 @@ Created on Wed Dec  2 10:00:18 2015
 
 This example is using a ninjotiff.cfg file. If you prefer to pass all
 meta-data by arguments, they can be defined like:
-The ninjotiff.cfg is saved in the PPP_CONFIG_DIR, i.g. $PYTROLLHOME/PyTroll/etc/
+The ninjotiff_products.cfg is saved in the PPP_CONFIG_DIR, i.g. $PYTROLLHOME/PyTroll/etc/
 
 ninjotiff_config = {
       0.6: {'description': 'MSG Channel 1',
@@ -122,7 +122,8 @@ if __name__ == '__main__':
             RSS = False
         else:
             RSS = True
-        TIMESLOT = get_last_SEVIRI_date(RSS, delay=10)
+        #TIMESLOT = get_last_SEVIRI_date(RSS, delay=10)
+        TIMESLOT = datetime(2015, 7, 7, 16, 0, 0)
 
     print "*** MSG ", SATNO, str(TIMESLOT)
         

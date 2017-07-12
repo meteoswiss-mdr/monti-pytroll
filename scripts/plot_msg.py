@@ -891,8 +891,8 @@ def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, verbose, 
             draw.text((x1, y1     ), time_slot.strftime(' '+'%y-%m-%d %H:%MUTC'+':'), title_color, font=font)
             draw.text((x1, y1+  dy),' '+rgb.replace("_","-")+", "+sat+str(sat_nr)+' SEVIRI',                title_color, font=font)
             #draw.text((x1, y1+2*dy),' '+rgb.replace("_","-"),           title_color, font=font)
-         else:         
-            draw.text((x1, y1+2*dy),' '+rgb.replace("_","-")+", "+sat+str(sat_nr)+ +' SEVIRI',                title_color, font=font)
+         else:
+            draw.text((x1, y1+2*dy),' '+rgb.replace("_","-")+", "+sat+str(sat_nr)+' SEVIRI',                title_color, font=font)
       if verbose:
          print "    added title: "+title
 

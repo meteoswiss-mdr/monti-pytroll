@@ -11,7 +11,7 @@ import inspect
 import logging
 
 LOG = logging.getLogger(__name__)
-LOG.setLevel(10)
+#LOG.setLevel(10)
 #CRITICAL 50 #ERROR 40 #WARNING 30 #INFO 20 #DEBUG 10 #NOTSET 0
 
 '''
@@ -671,26 +671,16 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                 rgb_complete.append(rgb)
 
         elif rgb in products.HSAF:
-
-            import datetime
-
-            conf = ConfigParser()
-            conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
-            inputDirectory = time_slot.strftime(conf.get("seviri-level2", "dir"))
-
-            end_time = time_slot + datetime.timedelta(minutes=12)
-            filename = end_time.strftime(conf.get("seviri-level2", "filename", raw=True))
-            #    #e.g. SAFNWC_MSG?_%(product)s%Y%m%d%H%M_FES_*
-            filename = os.path.join(inputDirectory, filename)
-
-            if len(glob.glob(filename)) == 0:
-                if in_msg.verbose:
-                    print "*** Warning, no HSAF file found: "+filename
+            
+            from mpop.satin.hsaf_h03 import find_hsaf_files
+            filenames = find_hsaf_files(time_slot, fullname)
+            
+            if len(filenames) == 0:
+                LOG.info("*** Warning, no HSAF input file found")
             else:
-                if in_msg.verbose:
-                    print "    HSAF file found: "+glob.glob(filename)[0]
+                LOG.info("    HSAF file found: "+filenames[0])
                 rgb_complete.append(rgb)
-
+                
         else:
            # currently no check, just append rgb and try to process it
            rgb_complete.append(rgb)

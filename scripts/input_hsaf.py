@@ -10,18 +10,18 @@ def input(in_msg, timeslot=None):
     #in_msg.RSS=False 
     #in_msg.sat_nr=9
     #in_msg.RSS=True
-    #in_msg.sat_nr=10
-    #in_msg.RSS=False 
+    in_msg.sat_nr=10
+    in_msg.RSS=False 
 
     # specify an delay (in minutes), when you like to process a time some minutes ago
     # e.g. current time               2015-05-31 12:33 UTC
     # delay 5 min                     2015-05-31 12:28 UTC
     # last Rapid Scan Service picture 2015-05-31 12:25 UTC (Scan start) 
-    in_msg.delay=0
+    in_msg.delay=10
 
     #------------------------------------------------------------------------
     # if not specified (False), current (last) observation time is chosen  
-    # chosse specification, if you want a default time without command line arguments 
+    # choose specification, if you want a default time without command line arguments 
     # (the specified time is overwritten by the command line arguments of plot_msg.py)
     #------------------------------------------------------------------------
     if True:
@@ -182,6 +182,7 @@ def input(in_msg, timeslot=None):
     #in_msg.areas.append('fullearth')       # full earth 600x300                    # does not yet work
     #in_msg.areas.append('met09globe')      # Cropped globe MSG image 3620x3620     # does not yet work
     #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
+    #in_msg.areas.append('odysseyS25')
     in_msg.check_RSS_coverage()
 
     # switch off Rapid scan, if large areas are wanted 
@@ -204,16 +205,16 @@ def input(in_msg, timeslot=None):
     in_msg.HRV_enhancement = False
 
     in_msg.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
-    #in_msg.outputDir='./pics/'
+    in_msg.outputDir='./pics/'
     #in_msg.outputDir = "./%Y-%m-%d/%Y-%m-%d_%(rgb)s-%(area)s/"
     #in_msg.outputDir = '/data/cinesat/out/'
-    in_msg.outputDir = '/data/COALITION2/PicturesSatellite/GPM/%Y-%m-%d/'
+    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/GPM/%Y-%m-%d/'
 
     in_msg.compress_to_8bit=False
 
     # please download the shape file 
-    in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
-    
+    in_msg.mapDir='/opt/users/common/shapes/'
+
     #in_msg.scpOutput=True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"

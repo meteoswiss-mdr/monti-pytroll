@@ -10,15 +10,20 @@ def input(in_msg, timeslot=None):
     #in_msg.RSS=False 
     #in_msg.sat_nr=9
     #in_msg.RSS=True
-    #in_msg.sat_nr=10
-    #in_msg.RSS=False 
+    in_msg.sat_nr=10
+    in_msg.RSS=False 
 
     # specify an delay (in minutes), when you like to process a time some minutes ago
     # e.g. current time               2015-05-31 12:33 UTC
     # delay 5 min                     2015-05-31 12:28 UTC
     # last Rapid Scan Service picture 2015-05-31 12:25 UTC (Scan start) 
-    in_msg.delay=0
+    in_msg.delay=8
 
+    #------------------------------------------------------------------------
+    # if not specified (False), current (last) observation time is chosen  
+    # choose specification, if you want a default time without command line arguments 
+    # (the specified time is overwritten by the command line arguments of plot_msg.py)
+    #------------------------------------------------------------------------
     if True:
         # choose timeslot of the satellite picture to process
         # datetime according to command line arguments (if given)
@@ -153,9 +158,9 @@ def input(in_msg, timeslot=None):
     #-------------------
     # H-SAF
     #-------------------
-    in_msg.sat = "hsaf"
-    in_msg.sat_nr=10
-    in_msg.RSS=False 
+    in_msg.sat = "Hsaf"
+    in_msg.sat_nr = 10
+    in_msg.RSS = False 
     in_msg.RGBs.append('h03')
     #-------------------
     # experimental
@@ -178,7 +183,8 @@ def input(in_msg, timeslot=None):
     #in_msg.areas.append('met09globe')      # Cropped globe MSG image 3620x3620     # does not yet work
     #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
     in_msg.areas.append('odysseyS25')
-    
+    in_msg.check_RSS_coverage()
+
     # switch off Rapid scan, if large areas are wanted 
     if ('fullearth' in in_msg.areas) or ('met09globe' in in_msg.areas) or ('met09globeFull' in in_msg.areas): 
        in_msg.RSS=False 
@@ -205,13 +211,13 @@ def input(in_msg, timeslot=None):
 
     in_msg.compress_to_8bit=False
 
+    # please download the shape file 
+    in_msg.mapDir='/opt/users/common/shapes/'
+
     in_msg.scpOutput = True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
-
-    # please download the shape file 
-    in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
-        
+    
     in_msg.postprocessing_areas=['ccs4','EuropeCanaryS95','odysseyS25']
     in_msg.postprocessing_composite = ["h03-ir108", "h03-HRV"]
     #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03-ir108"],["MSG_radar-HRV","MSG_h03-HRV"]]

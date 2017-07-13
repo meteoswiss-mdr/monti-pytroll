@@ -330,32 +330,38 @@ output:
   directory or filename with replaced placeholders
 '''
 
-def format_name (folder, time_slot, rgb=None, sat=None, sat_nr=None, area=None, product=None ):
+def format_name (folder, time_slot, rgb=None, sat=None, sat_nr=None, RSS=None, area=None, product=None ):
 
     # replace time placeholders like %Y%m%d%H%M
     new_folder = time_slot.strftime(folder)
 
     if rgb != None:
         #new_folder = (new_folder % {"rgb": rgb.replace("_","-")})
-        new_folder=new_folder.replace("%(rgb)s",rgb.replace("_","-"))
+        new_folder = new_folder.replace("%(rgb)s",rgb.replace("_","-"))
 
     if area != None:
         #new_folder = (new_folder % {"area": area})
-        new_folder=new_folder.replace("%(area)s", area)
+        new_folder = new_folder.replace("%(area)s", area)
 
     if sat != None:
         #new_folder = (new_folder % {"msg": "MSG"+str(int(sat_nr)-7)})
-        new_folder=new_folder.replace("%(sat)s", sat )
+        new_folder = new_folder.replace("%(sat)s", sat )
 
     if sat_nr != None and sat_nr != "":
         #new_folder = (new_folder % {"msg": "MSG"+str(int(sat_nr)-7)})
-        new_folder=new_folder.replace("%(msg)s", "MSG"+str(int(sat_nr)-7))
+        new_folder = new_folder.replace("%(msg)s", "MSG"+str(int(sat_nr)-7))
+        new_folder = new_folder.replace("%(sat_nr)s", str(int(sat_nr)) )  # get rid of leading 0
     else:
-        new_folder=new_folder.replace("%(msg)s", "MSG")
+        new_folder = new_folder.replace("%(msg)s", "MSG")
     
+    if RSS == True:
+        new_folder = new_folder.replace("%(RSS)s", "RSS")
+    else:
+        new_folder = new_folder.replace("%(RSS)s", "___")
+
     if product != None:
         #new_folder = (new_folder % {"product": product})
-        new_folder=new_folder.replace("%(product)s", str(product))
+        new_folder = new_folder.replace("%(product)s", str(product))
                       
     return new_folder
 
@@ -871,7 +877,7 @@ def convert_NWCSAF_to_radiance_format(satscene, area, rgb, nwcsaf_calibrate, IS_
                                          calibration_unit=units))
 
     #print rgb
-    print '(my_msg_module) min/max C', satscene[rgb].data.min(), satscene[rgb].data.max()
+    print '(my_msg_module) min/max: ', satscene[rgb].data.min(), satscene[rgb].data.max()
 
     # satscene[rgb].data = data
     satscene[rgb].info['satname'] = satscene.satname

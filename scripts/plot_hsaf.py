@@ -58,7 +58,7 @@ areas=['EuropeCanaryS95']
 fill_value=None
 title_color=(0,0,0)
 #title_color=(255,255,255)
-delay=5
+delay=10    # usually 8min, between 0->8 and 15->23 
 
 if len(sys.argv) > 1:
     if len(sys.argv) < 6:

@@ -82,19 +82,18 @@ REGION: ticino {
         AREA_EXTENT:    (-42758.508094068224, -38755.028853807205, 42758.5080940681, 39051.562898605094)
 };
 
-# see /data/COALITION2/database/projections/ninjotif_coalition/coord2area_def_COALITION1.py
-REGION: nrCOALone1km {
-        NAME:   nrCOALone1km ninjo stereographic projection NPOL close to COALITION1 projection resolution 1056m
-        PCS_ID: stere_10_60
-        PCS_DEF:        proj=stere,lat_0=60,lon_0=10,ellps=WGS84,a=6370997.0,b=6370000.0
-        XSIZE:  958
-        YSIZE:  931
-        AREA_EXTENT:    (-672310.3662273086, -1930945.3323685967, 339819.2714594059, -946872.5495937874)
+REGION: nrEURO1km {
+        NAME:          nrCOALone1km ninjo stereographic projection NPOL close to COALITION1 projection resolution 1056m
+        PCS_ID:        nrEURO1km_NPOL_stere_10_90
+        PCS_DEF:       proj=stere, lat_0=90.0, lon_0=10.0, ellps=WGS84
+        XSIZE:         972
+        YSIZE:         933
+        AREA_EXTENT:   (-783252.336773,-5544157.984519,319810.747325,-4488637.312331)
 };
 
 # see /data/COALITION2/database/projections/ninjotif_coalition/coord2area_def_COALITION1.py
 REGION: nrCOALtwo1km {
-        NAME:   nrCOALtwo1km ninjo stereographic projection NPOL for COALITION2 resolution 1000m
+        NAME:   nrCOALtwo1km ninjo stereographic projection NPOL for COALITION2 resolution 1000m ccs4 corners
         PCS_ID: stere_10_60
         PCS_DEF:        proj=stere,lat_0=60,lon_0=10,ellps=WGS84,a=6370997.0,b=6370000.0
         XSIZE:  802
@@ -104,7 +103,7 @@ REGION: nrCOALtwo1km {
 
 # see /data/COALITION2/database/projections/ninjotif_coalition/coord2area_def_COALITION1.py
 REGION: nrCOALtwo750m {
-        NAME:   nrCOALtwo750m ninjo stereographic projection NPOL for COALITION2 resolution 750m
+        NAME:   nrCOALtwo750m ninjo stereographic projection NPOL for COALITION2 resolution 750m ccs4 corners
         PCS_ID: stere_10_60
         PCS_DEF:        proj=stere,lat_0=60,lon_0=10,ellps=WGS84,a=6370997.0,b=6370000.0
         XSIZE:  1070

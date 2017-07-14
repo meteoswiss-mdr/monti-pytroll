@@ -1,3 +1,4 @@
+
 # https://pyresample.readthedocs.org/en/latest/geo_def.html#areadefinition
 #    area_id ID of area
 #    name: Description
@@ -85,7 +86,7 @@ REGION: ticino {
 REGION: nrEURO1km {
         NAME:          nrCOALone1km ninjo stereographic projection NPOL close to COALITION1 projection resolution 1056m
         PCS_ID:        nrEURO1km_NPOL_stere_10_90
-        PCS_DEF:       proj=stere, lat_0=90.0, lon_0=10.0, ellps=WGS84
+        PCS_DEF:       proj=stere, lat_0=90.0, lon_0=10.0, a=6370000.0, b=6370000.0, ellps=WGS84
         XSIZE:         972
         YSIZE:         933
         AREA_EXTENT:   (-783252.336773,-5544157.984519,319810.747325,-4488637.312331)

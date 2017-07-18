@@ -23,7 +23,7 @@ def input(in_msg, timeslot=None):
     #------------------------------------------------------------------------
     # if not specified (False), current (last) observation time is chosen  
     # choose specification, if you want a default time without command line arguments 
-    # (the specified time is overwritte by the command line arguments of plot_msg.py)
+    # (the specified time is overwritten by the command line arguments of plot_msg.py)
     #------------------------------------------------------------------------
     if True:
         # choose timeslot of the satellite picture to process
@@ -63,15 +63,10 @@ def input(in_msg, timeslot=None):
     #in_msg.areas.append('EuropeCanaryS95') # "ccs4" "blitzortung" #"eurotv" # "eurotv"
     #in_msg.areas.append("blitzortung")
     
-    # Warning, if large areas are wanted and RSS is specified
-    if in_msg.RSS and (('fullearth' in in_msg.areas) or ('met09globe' in in_msg.areas) or ('met09globeFull' in in_msg.areas)): 
-        print        "*** WARNING, large areas are requested: ", in_msg.areas
-        print        "    as well as rapid scan service is specified, which covers only the uppermost 1/3 of the disk"
-        print        "    (1) continue with enter"
-        junk = input("    (2) abort with Ctrl+c")
+    in_msg.check_RSS_coverage()
 
     in_msg.properties_cells = True
-    in_msg.plot_forecast = True
+    in_msg.plot_forecast = False    # !!! change by UH 2017-07-04 !!!
     
     #model which will be used to fit the history of the cells and extrapolate the future area
     #in_msg.model_fit_area = "linear_exp" #reccomended
@@ -139,6 +134,12 @@ def input(in_msg, timeslot=None):
     # choose production of results
     #-----------------------------
     in_msg.results = ['C2rgb']
+    #in_msg.result_formats = ['png']  # only for 'C2rgb'
+    in_msg.result_formats = ['png','ninjotif']  # only for 'C2rgb'
+    in_msg.ninjotifFilename = 'MET%(sat_nr)s_%(RSS)s_COALITION2_%(area)s_%Y%m%d%H%M.tif'
+    # look at metadata with: 
+    #    identify -verbose MET9_RSS_COALITION2_nrCOALtwo750m_1707051420.tif              # zueub227 # does not contain channel_id
+    #    tiffdump /data/COALITION2/tmp/MET9_RSS_COALITION2_nrCOALtwo750m_1707051425.tif  # zueub427
     in_msg.results.append('C2rgbHRV')
     # --------------------------------------
     # choose production of auxiliary results

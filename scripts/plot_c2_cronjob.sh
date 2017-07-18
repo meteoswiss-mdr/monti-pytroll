@@ -22,3 +22,4 @@ echo "*** Remove uncompressed data files older than " ${mm} "min"
 find /tmp/?-000-MSG?__-MSG?_???____-*_-*___-*-__  -type f -mmin +${mm} -delete \;
 
 find /tmp/SEVIRI_DECOMPRESSED_$LOGNAME/?-000-MSG?__-MSG?_???____-*_-*___-*-__ -type f -mmin +${mm} -delete
+find /tmp/SEVIRI_DECOMPRESSED/?-000-MSG?__-MSG?_???____-*_-*___-*-__          -type f -mmin +${mm} -delete

@@ -252,8 +252,8 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
                   #center of mass before resizing
                   center_before = ndimage.measurements.center_of_mass(shifted_label)
                   center_before = np.rint(center_before)        
-                  if verbose:
-                      print("   after shift ", sum(sum(shifted_label)))
+                  #if verbose:
+                  #    print("   after shift ", sum(sum(shifted_label)))
 
                   resized_label = scipy.misc.imresize(shifted_label,float(growth),'nearest')
       
@@ -269,9 +269,9 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
                       y_start = max(min(np.nonzero(resized_label)[1])-1,0)      
                       temp_label[0:min(nx,resized_label.shape[0]-x_start),0:min(ny,resized_label.shape[1]-y_start)] = deepcopy(resized_label[x_start:min(x_start+nx,resized_label.shape[0]),y_start:min(y_start+ny,resized_label.shape[1])])            
                   
-                  if verbose:
-                      print(np.unique(temp_label))
-                      print("   after resize ", sum(sum(temp_label)))
+                  #if verbose:
+                  #    print(np.unique(temp_label))
+                  #    print("   after resize ", sum(sum(temp_label)))
 
                   #figure_labels(resized_label, outputDir, ttt, dt, area_plot="ccs4", add_name = "before_shifted_resized")
       
@@ -282,8 +282,8 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
                   dx_new,dy_new = center_before - center_after
       
                   shifted_label = resize_array(temp_label,dx_new,dy_new, nx, ny)
-                  if verbose:
-                      print("   after shift2 ", sum(sum(shifted_label)))
+                  #if verbose:
+                  #    print("   after shift2 ", sum(sum(shifted_label)))
                   label_cell = np.zeros((nx,ny))
 
                   label_cell[0:,0:] = shifted_label[0:nx,0:ny]

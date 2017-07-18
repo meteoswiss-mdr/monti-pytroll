@@ -53,7 +53,7 @@ def input(in_msg, timeslot=None):
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('EuropeCanary')    # upper third of MSG disk, satellite at 0.0 deg East, full resolution 
     #in_msg.areas.append('EuropeCanary95')  # upper third of MSG disk, satellite at 9.5 deg East, full resolution 
-    #in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
+    in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
     #in_msg.areas.append('fullearth')       # full earth 600x300                    # does not yet work
@@ -64,21 +64,22 @@ def input(in_msg, timeslot=None):
     #in_msg.areas.append('EuropeCanaryS95') # "ccs4" "blitzortung" #"eurotv" # "eurotv"
     #in_msg.areas.append("blitzortung")
     
-    # Warning, if large areas are wanted and RSS is specified
-    if in_msg.RSS and (('fullearth' in in_msg.areas) or ('met09globe' in in_msg.areas) or ('met09globeFull' in in_msg.areas)): 
-        print        "*** WARNING, large areas are requested: ", in_msg.areas
-        print        "    as well as rapid scan service is specified, which covers only the uppermost 1/3 of the disk"
-        print        "    (1) continue with enter"
-        junk = input("    (2) abort with Ctrl+c")
+    in_msg.check_RSS_coverage()
 
     in_msg.properties_cells = True
-    in_msg.plot_forecast = True
+    in_msg.plot_forecast = False
     
     #model which will be used to fit the history of the cells and extrapolate the future area
     #in_msg.model_fit_area = "linear_exp" #reccomended
     in_msg.model_fit_area = "linear_exp_exp" #reccomended
     #in_msg.model_fit_area = "linear"
         
+    in_msg.stop_history_when_smallForward = False
+    in_msg.stop_history_when_smallBackward = False
+    in_msg.threshold_stop_history_when_small = 0.4
+
+    in_msg.px_cut = 70 #set to 0 in validation (want to track cells wherever they are?); else reccomended 70
+
     in_msg.area_forecast = "ccs4c2" #reccomended: this way extra borders that allow to always have values within ccs4 area (but slower)
     #in_msg.area_forecast = "ccs4" 
              
@@ -138,6 +139,8 @@ def input(in_msg, timeslot=None):
     # choose production of results
     #-----------------------------
     in_msg.results = ['C2rgb']
+    in_msg.result_formats = ['png','ninjotif']  # only for 'C2rgb'
+    in_msg.ninjotifFilename = 'MET%(sat_nr)s_%(RSS)s_COALITION2_%(area)s_%Y%m%d%H%M.tif' 
     in_msg.results.append('C2rgbHRV')
     # --------------------------------------
     # choose production of auxiliary results

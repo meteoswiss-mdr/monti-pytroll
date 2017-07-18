@@ -96,12 +96,13 @@ print "*** read hsaf data (plot_hsaf.py)"
 #prop_str = 'dem'
 
 
-global_data = GeostationaryFactory.create_scene("hsaf", "10", "seviri", time_slot)
-prop_str = 'h03'
+global_data = GeostationaryFactory.create_scene("meteosat", "10", "seviri", time_slot)
+#prop_str = ['h03']
+prop_str = ['h03','IR_108']
 # area="hsaf" this is h03 data coverage 
 
 # load data 
-global_data.load([prop_str])
+global_data.load(prop_str)
 
 #plot.show_quicklook(obj_area, global_data[prop_str].data )
 #print "global_data[prop_str].data", global_data[prop_str].data
@@ -122,9 +123,21 @@ minS   = "%02d" % minute
 dateS=yearS+'-'+monthS+'-'+dayS
 timeS=hourS+':'+minS+'UTC' 
 
+global_data.project('hsaf')
+
 #outputDir='./'+yearS+'-'+monthS+'-'+dayS+'/'+yearS+'-'+monthS+'-'+dayS+'_'+prop_str+'-'+area+'/'
 outputDir='./pics/'
 #outputDir='/data/cinesat/out/'
+
+# parallax correction
+loaded_channels = [chn.name for chn in global_data.loaded_channels()]
+print loaded_channels
+print "---"
+print global_data['h03'].area
+print "---"
+
+if True:
+    global_data.parallax_corr(fill="False", estimate_cth=True, replace=True)
 
 if not exists(outputDir):
     print '... create output directory: ' + outputDir

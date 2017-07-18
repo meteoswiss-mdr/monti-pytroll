@@ -12,6 +12,7 @@ import aggdraw
 from PIL import Image, ImageFont, ImageDraw, ImageEnhance
 from os.path import dirname, exists
 from os import makedirs
+from mpop.imageo.geo_image import GeoImage
 from mpop.imageo.HRWimage import HRW_2dfield # , HRWstreamplot, HRWimage
 from datetime import timedelta
 from plot_msg import create_PIL_image, add_borders_and_rivers, add_title
@@ -54,6 +55,46 @@ import inspect
 
 # ===============================
 
+def _image2array(im):
+    '''
+    Utility function that converts an image file in 3 or 4 np arrays
+    that can be fed into 'geo_image.GeoImage' in order to generate
+    a PyTROLL GeoImage object.
+    '''
+    #im = Pimage.open(filepath).convert('RGB')
+    (width, height) = im.size
+    if im.mode == 'RGB' or im.mode == 'RGBA':
+        _r = np.array(list(im.getdata(0)))/255.0; _r = _r.reshape((height, width))
+        _g = np.array(list(im.getdata(1)))/255.0; _g = _g.reshape((height, width))
+        _b = np.array(list(im.getdata(2)))/255.0; _b = _b.reshape((height, width))
+    else:
+        "*** Error in pilimage2geoimage ("+inspect.getfile(inspect.currentframe())+")"
+        "    unknown PIL_image mode: ", pimage.mode       
+    if 'RGBA':
+        _a = np.array(list(im.getdata(3)))/255.0; _a = _a.reshape((height, width))
+    
+    if im.mode == 'RGB':
+        return _r, _g, _b
+    elif im.mode == 'RGBA':
+        return _r, _g, _b, _a
+
+# ===============================
+
+def pilimage2geoimage(pimage, area, timeslot):
+    if pimage.mode == 'RGB':
+        (r,g,b) = _image2array(pimage)
+        gi = GeoImage((r,g,b), area, timeslot, mode=pimage.mode)
+    elif pimage.mode == 'RGBA':
+        (r,g,b,a) = _image2array(pimage)
+        gi = GeoImage((r,g,b,a), area, timeslot, mode=pimage.mode)
+    else:
+        "*** Error in pilimage2geoimage (ninjotiff_example)"
+        "    unknown PIL_image mode: ", pimage.mode
+        quit
+    return gi
+
+# ===============================
+
 def create_dir(outputFile):
 
     path = dirname(outputFile)
@@ -82,6 +123,7 @@ def force_to_observed_cloud_mask(mod, obs):
     mod.mask = obs
     return mod
     
+# ===============================
 
 def downscale_array(array, mode='gaussian_225_125', mask=None):
 
@@ -146,6 +188,7 @@ def downscale_array(array, mode='gaussian_225_125', mask=None):
 
     return array
 
+# ===============================
     
 def downscale(data, mode='gaussian_225_125', mask=None):
     
@@ -192,6 +235,7 @@ def downscale(data, mode='gaussian_225_125', mask=None):
 
     return data
     
+# ===============================
 
 def make_figure(values, obj_area, outputFile, colorbar = True, text_to_write = None, vmin = False, vmax = False, contour_value = None, linewidth = 1):
     import matplotlib as mpl
@@ -990,11 +1034,11 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                       make_figure(labels, obj_area, outputFile,colorbar = False,text_to_write = "Forth mask: %s\nForcen mask: %s\nCleaning: %s"%(in_msg.name_4Mask,in_msg.name_ForcedMask,cleaning_text), vmin = False, vmax = False)
       
                 # set background_color for "no clouds" 
-                rgbArray[sum_array<=0,0] = background_color[0] 
-                rgbArray[sum_array<=0,1] = background_color[1] 
-                rgbArray[sum_array<=0,2] = background_color[2] 
+                rgbArray[sum_array<=0,0] = background_color[0] # see coalition2_settings.py
+                rgbArray[sum_array<=0,1] = background_color[1] # see coalition2_settings.py
+                rgbArray[sum_array<=0,2] = background_color[2] # see coalition2_settings.py
                 # set transparency for "no clouds" 
-                rgbArray[sum_array<=0,3] = background_alpha
+                rgbArray[sum_array<=0,3] = background_alpha    # see coalition2_settings.py
                 
                 # create output file name (replace wildcards)
                 c2File = format_name(outputDir+'/'+in_msg.outputFile, data.time_slot, area=area, rgb='C2rgb', sat=data.satname, sat_nr=data.sat_nr())
@@ -1006,8 +1050,49 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     #                        add_rivers=in_msg.add_rivers, river_color=in_msg.river_color, 
                     #                        resolution=in_msg.resolution, verbose=in_msg.verbose)
                     print ("... save image: display ", c2File, " &")
-                    img1.save( create_dir(c2File) ) 
+                    img1.save( create_dir(c2File) )
                     
+                    if 'ninjotif' in in_msg.result_formats:
+                        
+                        if area == "ccs4":
+                            area_ninjotif = 'nrEURO1km'
+                            chan_id = 8800015
+                        elif area == "EuropeCanaryS95":
+                            area_ninjotif = 'nrEURO3km'
+                            chan_id = 9600015
+                        
+                        print ("... reproject COALITION2 result ("+area+") to "+area_ninjotif)
+
+                        from mpop.channel import Channel
+                        c2_data = GeostationaryFactory.create_scene(in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", time_slot)
+                        c2_data.channels.append(Channel(name='r', wavelength_range=[0.,0.,0.], resolution=1000., data=rgbArray[:,:,0], area=area))
+                        c2_data.channels.append(Channel(name='g', wavelength_range=[0.,0.,0.], resolution=1000., data=rgbArray[:,:,1], area=area))
+                        c2_data.channels.append(Channel(name='b', wavelength_range=[0.,0.,0.], resolution=1000., data=rgbArray[:,:,2], area=area))
+                        c2_data.channels.append(Channel(name='a', wavelength_range=[0.,0.,0.], resolution=1000., data=rgbArray[:,:,3], area=area))
+                        c2_data = c2_data.project(area_ninjotif)
+                        nx2,ny2 = c2_data['r'].data.shape
+                        print ("    new shape (nx,ny)= (",nx2,",",ny2,")")
+
+                        rgbArray2 = np.zeros( (nx2,ny2,4), 'uint8')
+                        print (type(rgbArray2), rgbArray2.shape)
+                        print (rgbArray2[:,:,0].shape, c2_data['r'].data.shape)
+                        rgbArray2[:,:,0] = c2_data['r'].data
+                        rgbArray2[:,:,1] = c2_data['g'].data
+                        rgbArray2[:,:,2] = c2_data['b'].data
+                        rgbArray2[:,:,3] = c2_data['a'].data
+                        
+                        c2ninjotif_file = format_name (outputDir+'/'+in_msg.ninjotifFilename, data.time_slot, sat_nr=data.sat_nr(), RSS=True, area=area_ninjotif )
+                        print ("... save ninjotif image: display ", c2ninjotif_file, " &")
+                        PIL_image = Image.fromarray( rgbArray2,'RGBA')
+                        GEO_image = pilimage2geoimage(PIL_image, c2_data['r'].area_def, data.time_slot)
+                        GEO_image.save(c2ninjotif_file,
+                                       fformat='mpop.imageo.formats.ninjotiff',
+                                       ninjo_product_name='COALITION2', chan_id=chan_id,
+                                       nbits=8)
+                        os.chmod(c2ninjotif_file, 0777)
+                        print ("... upload ninjotif: /tools/mch/datadisp/bin/jwscp_upload.zueub227.tcoalition2 &")
+                        subprocess.call("/tools/mch/datadisp/bin/jwscp_upload.zueub227.tcoalition2 &", shell=True)
+
                     #pickle.dump( img1, open("RGB"+yearS+monthS+dayS+hourS+minS+".p", "wb" ) )
                 
                 if area in in_msg.postprocessing_areas:                        

@@ -433,6 +433,9 @@ def mask_rgb_based_pressure(data,p_min,p_max,data_CTP):
 if __name__ == '__main__':
     # input 
     
+    LOG = logging.getLogger(__name__)
+    LOG.setLevel(30)
+
     time_start_TOT = time.time()
     detailed = True 
  
@@ -631,7 +634,7 @@ if __name__ == '__main__':
           
           # check if input data is complete 
           if in_msg.verbose:
-              print "*** check input data", in_msg.RGBs
+              print "*** check input data", in_msg.RGBs, " for ", in_msg.sat_str()+in_msg.sat_nr_str()
           RGBs = check_input(in_msg, in_msg.sat_str()+in_msg.sat_nr_str(), in_msg.datetime)  
           # in_msg.sat_nr might be changed to backup satellite
 

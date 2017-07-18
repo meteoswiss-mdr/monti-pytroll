@@ -384,7 +384,7 @@ def input(in_msg, timeslot=None):
     in_msg.settingsLocal['forth_mask'] = 'IR_039_minus_IR_108'
     in_msg.settingsLocal['forced_mask'] = 'no_mask'
     in_msg.settingsLocal['mask_cirrus'] = True
-    #in_msg.settingsLocal['reader_level'] = "seviri-level4"
+    in_msg.settingsLocal['reader_level'] = "seviri-level4"
 
     in_msg.settingsBroad = {}
     in_msg.settingsBroad['use_TB_forecast'] = False

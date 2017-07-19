@@ -375,30 +375,7 @@ def input(in_msg, timeslot=None):
     in_msg.channels15 = ['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134']
     in_msg.channels30 = ['WV_062','WV_073','IR_097','IR_108','IR_134']
 
-    nrt = True # !HAU! ???
-
-    in_msg.settingsLocal = {}
-    in_msg.settingsLocal['use_TB_forecast'] = True
-    in_msg.settingsLocal['mode_downscaling'] = 'gaussian_225_125'
-    in_msg.settingsLocal['mask_labelsSmall_lowUS'] = True
-    in_msg.settingsLocal['clean_mask'] = 'skimage' 
-    in_msg.settingsLocal['rapid_scan_mode'] = False
-    in_msg.settingsLocal['forth_mask'] = 'IR_039_minus_IR_108'
-    in_msg.settingsLocal['forced_mask'] = 'no_mask'
-    in_msg.settingsLocal['mask_cirrus'] = True
-    #in_msg.settingsLocal['reader_level'] = "seviri-level4"
-
-    in_msg.settingsBroad = {}
-    in_msg.settingsBroad['use_TB_forecast'] = False
-    in_msg.settingsBroad['mode_downscaling'] = 'no_downscaling'
-    in_msg.settingsBroad['mask_labelsSmall_lowUS'] = False
-    in_msg.settingsBroad['clean_mask'] = 'no_cleaning'
-    in_msg.settingsBroad['rapid_scan_mode'] = True 
-    in_msg.settingsBroad['forth_mask'] = 'IR_039_minus_IR_108'
-    in_msg.settingsBroad['forced_mask'] = 'no_mask'
-    in_msg.settingsBroad['mask_cirrus'] = True            
-    #in_msg.settingsBroad['reader_level']="seviri-level2"           
-    
+    nrt = True # !HAU! ???    
     
     # -------------   
     # input checks 

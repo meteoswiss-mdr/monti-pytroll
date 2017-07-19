@@ -273,10 +273,11 @@ class input_msg_class:
       local_settings['mask_labelsSmall_lowUS'] = True
       local_settings['clean_mask']             = 'skimage' 
       local_settings['rapid_scan_mode']        = False                 # always use 15min and 30min hindcast, as updraft is better visible
-      local_settings['forth_mask']             = 'IR_039_minus_IR_108'
+      #local_settings['forth_mask']             = 'IR_039_minus_IR_108'
+      local_settings['forth_mask']             = 'IR_039_minus_IR_108_day_only'
       local_settings['forced_mask']            = 'no_mask'
       local_settings['mask_cirrus']            = True
-      #local_settings["reader_level            = "seviri-level4"
+      #local_settings['reader_level']           = "seviri-level4"
 
       # Settings for Switzerland (assuming that we dont have COSMO and NWC-SAF data, checks if Rapid Scan Observations are available
       global_settings={}
@@ -292,6 +293,10 @@ class input_msg_class:
       global_settings['forced_mask']            = 'no_mask'
       global_settings['mask_cirrus']            = True            
       #global_settings['reader_level            = "seviri-level2"   
+
+      # FIXME: this is used in produce_forecasts_develop.py -> might be not consistent with local settings above
+      self.settingsLocal={}
+      self.settingsLocal['mode_downscaling'] = 'gaussian_225_125'
 
       if self.settings == "default":
          if scale == "local":

@@ -297,7 +297,7 @@ def check_area(area_wanted):
     else:
         scale = "broad"
     
-    print("the scale is being set to: ", scale)
+    print("*** the scale is being set to: ", scale)
     
     return scale
 
@@ -381,6 +381,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
 
           for area in in_msg.areas:
 
+                # see get_input_msg.py
                 chosen_settings = in_msg.choose_coalistion2_settings(area)
                 
                 print ("  *******SETTINGS*******")
@@ -417,12 +418,14 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 # string for filenames
                 if chosen_settings['forth_mask'] == 'IR_039_minus_IR_108':
                     in_msg.name_4Mask = 'IRdiff'
+                if chosen_settings['forth_mask'] == 'IR_039_minus_IR_108_day_only':
+                    in_msg.name_4Mask = 'IRdiffday'
                 elif chosen_settings['forth_mask'] == 'CloudType':
                     in_msg.name_4Mask = 'CT'
                 elif chosen_settings['forth_mask'] == 'no_mask':
                     in_msg.name_4Mask = 'none'
                 else:
-                    print ("*** Error in main (Mecikalski_test.py)")
+                    print ("*** Error in main ("+inspect.getfile(inspect.currentframe())+")")
                     print ("    unknown 4th mask", chosen_settings['forth_mask'])
                     quit() 
                 
@@ -778,43 +781,50 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     make_figure(us, obj_area, outputFile,colorbar = True,text_to_write = "Updraft Strength", vmin = 0, vmax = n_tests_us)
                 
             
-                # test for SMALL ICE CRYSTALS 
-                # -------------------
-                IR_039_minus_IR_108 = deepcopy(data['IR_039'].data)-deepcopy(data['IR_108'].data)
-                
+                # test for SMALL ICE CRYSTALS (this test works only at daytime) 
+                # -------------------------------------------------------------
+                IR_039_minus_IR_108 = data['IR_039'].data - data['IR_108'].data  # also needed in code later
                 if 'tests_small_ice' in in_msg.aux_results:
                     outputFile = outputDir +"/cosmo/Channels/indicators_in_time/all_indicators/%s_%s_Small_ice.png"%(yearS+monthS+dayS,hourS+minS)
-                    make_figure(IR_039_minus_IR_108, obj_area, outputFile,colorbar = True,text_to_write = "IR039 minus IR108", vmin = False, vmax = False, contour_value = [developing_th_chDiff, mature_th_chDiff])
-                
-                if 'indicator_small_ice' in in_msg.aux_results:
-                    #fig = plt.figure()
-                    si = np.zeros( (nx,ny)) 
-                    si = np.where( IR_039_minus_IR_108 >= mature_th_chDiff, si+1, si )
-                    #plt.imshow( si, vmin=0, vmax=1) # vmax=len( updraft_strength))
-                    #plt.colorbar()
-                    outputFile = outputDir +"/cosmo/Channels/indicators_in_time/SmallIceTH/%s_%s_Small_ice.png"%(yearS+monthS+dayS,hourS+minS)
-                    make_figure(si, obj_area, outputFile,colorbar = True,text_to_write = "Indicator small ice mask (>= %s)"%(str(mature_th_chDiff)), vmin = 0, vmax = 1)
-                    #fig.savefig( create_dir(outputFile) )  
-                    #plt.close(fig)
-            
-            
+                    make_figure(IR_039_minus_IR_108, obj_area, outputFile, colorbar=True, 
+                                text_to_write="IR039 minus IR108", vmin=False, vmax=False, contour_value = [developing_th_chDiff, mature_th_chDiff])
+
+                # calculate the mask for mature thunderstorms: sufficient ice (gi glaciantion indicators), sufficient cd (cloud depth), and forth mask (small ice crystals or cloud tpye)
                 mature_mask = np.zeros( (nx,ny)) 
                 mature_mask[:,:] = -2
                 mature_mask = np.where( gi>=2,                     mature_mask+1, mature_mask)
                 mature_mask = np.where( cd>=4,                     mature_mask+1, mature_mask)   # !!! changed from 5 to 4 !!! NEW 01/04 changed to 3 because removed one cd indicator
                 
-                if chosen_settings['forth_mask']!='no_mask':      
-                      if chosen_settings['forth_mask'] == 'CloudType':
-                          for ct in range(0,len(mature_ct)):
-                              cl_typ = mature_ct[ct]
-                              mature_mask = np.where(data['CT'].data == cl_typ,mature_mask+1,mature_mask)                
+                if chosen_settings['forth_mask'] != 'no_mask':  
+                    print ("... check forth mask, ", chosen_settings['forth_mask'] )
+                    si = np.zeros( (nx,ny)) 
+                    if chosen_settings['forth_mask'] == 'CloudType':
+                        for ct in range(0,len(mature_ct)):
+                            cl_typ = mature_ct[ct]
+                            mature_mask = np.where( data['CT'].data == cl_typ, mature_mask+1, mature_mask)                
                       
-                      elif chosen_settings['forth_mask'] == 'IR_039_minus_IR_108':
-                              mature_mask = np.where( IR_039_minus_IR_108 >= mature_th_chDiff, mature_mask+1, mature_mask)   
-                      
-                      mature_mask = np.where( mature_mask==1, 1, 0) # start counting at -2  (so 1 = -2+1+1+1)
+                    elif chosen_settings['forth_mask'] == 'IR_039_minus_IR_108':
+                        si = np.where( IR_039_minus_IR_108 >= mature_th_chDiff, si+1, si )
+                        mature_mask += si
+
+                    elif chosen_settings['forth_mask'] == 'IR_039_minus_IR_108_day_only':
+                        from pyorbital.astronomy import sun_zenith_angle
+                        lonlats = data['IR_108'].area.get_lonlats()
+                        sza = sun_zenith_angle(time_slot, lonlats[0], lonlats[1])
+                        si = np.where( ((IR_039_minus_IR_108 >= mature_th_chDiff) | (sza > 74)), si+1, si )    # for sza = 74 degree the channel diff is not good anymore...
+                        mature_mask += si
+                    else:
+                        print ("*** Error in plot_coalition2 ("+inspect.getfile(inspect.currentframe())+")")
+                        print ("    unknown input option: forth_mask", chosen_settings['forth_mask'] )
+                        quit()
+
+                    if 'indicator_small_ice' in in_msg.aux_results:
+                        outputFile = outputDir +"/cosmo/Channels/indicators_in_time/SmallIceTH/%s_%s_Small_ice.png"%(yearS+monthS+dayS,hourS+minS)
+                        make_figure(si, obj_area, outputFile, colorbar=True, text_to_write="Indicator small ice mask (>= %s)"%(str(mature_th_chDiff)), vmin = 0, vmax = 1)
+
+                    mature_mask = np.where( mature_mask==1, 1, 0) # start counting at -2  (so 1 is mature thunderstorms = -2+1+1+1)
                 else:
-                      mature_mask = np.where( mature_mask==0, 1, 0) # start counting at -2  (so 1 = -2+1+1+1)
+                    mature_mask = np.where( mature_mask==0, 1, 0) # start counting at -2  (so 0 is mature thunderstorms = -2+1+1  )
                 
                 if 'mature_mask' in in_msg.aux_results:
                     outputFile = outputDir +"/cosmo/Channels/indicators_in_time/masks/"+yearS+monthS+dayS+"_"+hourS+minS+"_"+"4th"+in_msg.name_4Mask+"_Mature_mask.png"
@@ -860,7 +870,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     g = cmin_us + (us/n_tests_us) * (cmax_us - cmin_us)
                     b = cmin_gi + (gi/n_tests_gi) * (cmax_gi - cmin_gi)
                 else: 
-                    print ("*** Error in main (Mecikalski_test.py)")
+                    print ("*** Error in main ("+inspect.getfile(inspect.currentframe())+")")
                     print ("    unknown rgb illustration", rgb_display)
                     quit()
                 
@@ -884,7 +894,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 elif chosen_settings['forced_mask'] == 'IR_039_minus_IR_108':  
                         force_mask = np.where(IR_039_minus_IR_108 >= force_th_chDiff,1,0)
                 elif chosen_settings['forced_mask'] !='no_mask': 
-                    print ("*** Error in main (Mecikalski_test.py)")
+                    print ("*** Error in main ("+inspect.getfile(inspect.currentframe())+")")
                     print ("    unknown forcing mask -> applying no forcing mask", chosen_settings['forced_mask'])     
             
                 if 'forced_mask' in in_msg.aux_results:
@@ -943,7 +953,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                         # Remove small black hole
                         mask = ndimage.binary_closing(mask) 
                 elif chosen_settings['clean_mask'] != 'no_cleaning':
-                    print ("*** Error in main (Mecikalski.py)")
+                    print ("*** Error in main ("+inspect.getfile(inspect.currentframe())+")")
                     print ("    unknown clean_mask: ", chosen_settings['clean_mask'])
                     quit()          
                 

@@ -6,7 +6,8 @@ def input(in_msg, timeslot=None):
     import getpass
 
     #in_msg.sat = "meteosat"  # default "meteosat"
-    in_msg.sat = "Meteosat"
+    in_msg.sat = "meteosat"
+    #in_msg.sat = "Meteosat"
     # 8=MSG1, 9=MSG2, 10=MSG3
     #in_msg.sat_nr=8
     #in_msg.RSS=False 
@@ -53,7 +54,7 @@ def input(in_msg, timeslot=None):
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('EuropeCanary')    # upper third of MSG disk, satellite at 0.0 deg East, full resolution 
     #in_msg.areas.append('EuropeCanary95')  # upper third of MSG disk, satellite at 9.5 deg East, full resolution 
-    in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
+    #in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
     #in_msg.areas.append('fullearth')       # full earth 600x300                    # does not yet work
@@ -66,7 +67,7 @@ def input(in_msg, timeslot=None):
     
     in_msg.check_RSS_coverage()
 
-    in_msg.properties_cells = True
+    in_msg.properties_cells = False
     in_msg.plot_forecast = False
     
     #model which will be used to fit the history of the cells and extrapolate the future area
@@ -98,11 +99,8 @@ def input(in_msg, timeslot=None):
     in_msg.areasNoRapidScan = ['fullearth','met09globe','met09globeFull'] #should also be changed to coordinates check!!!!
       
     in_msg.settings = "default" # the settings will be automatically defined depending on the area chosen
-      #in_msg.settings == "manual"
-    
-    # near real time or offline (will be overwritten depending on the date) ###changed: should know, based on the date, where to look for things!!!
-    #in_msg.nrt = False
-    in_msg.nrt = True 
+    #in_msg.settings == "manual"
+
     
     # set cloud mask 
     #-------------------------
@@ -139,7 +137,8 @@ def input(in_msg, timeslot=None):
     # choose production of results
     #-----------------------------
     in_msg.results = ['C2rgb']
-    in_msg.result_formats = ['png','ninjotif']  # only for 'C2rgb'
+    in_msg.result_formats = ['png']  # only for 'C2rgb'
+    #in_msg.result_formats = ['png','ninjotif']  # only for 'C2rgb'
     in_msg.ninjotifFilename = 'MET%(sat_nr)s_%(RSS)s_COALITION2_%(area)s_%Y%m%d%H%M.tif' 
     in_msg.results.append('C2rgbHRV')
     # --------------------------------------
@@ -155,7 +154,7 @@ def input(in_msg, timeslot=None):
     #in_msg.aux_results.append('indicator_glationation')
     #in_msg.aux_results.append('indicator_optical_thickness')
     #in_msg.aux_results.append('indicator_updraft')
-    #in_msg.aux_results.append('indicator_small_ice')
+    in_msg.aux_results.append('indicator_small_ice')
     #in_msg.aux_results.append('labelled_objects')
     #in_msg.aux_results.append('final_mask')
     #in_msg.aux_results.append('forced_mask')
@@ -200,7 +199,7 @@ def input(in_msg, timeslot=None):
     else:
         in_msg.outputDirForecasts = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_forecasts_%(area)s/'
    
-    in_msg.scpOutput = True
+    in_msg.scpOutput = False
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
 
@@ -275,6 +274,7 @@ def input(in_msg, timeslot=None):
         check_overwriting = 0; current_setting = 'forth_mask'
         
         #6) SETTING: choose one
+        #in_msg.chosen_settings['forth_mask'] = 'IR_039_minus_IR_108_day_only'; check_overwriting+=1              
         in_msg.chosen_settings['forth_mask'] = 'IR_039_minus_IR_108'; check_overwriting+=1              
         #in_msg.chosen_settings['forth_mask'] = 'CloudType'; check_overwriting+=1 #at the moment this is not possible (problems loading CT)
         #in_msg.chosen_settings['forth_mask'] = 'no_mask'; check_overwriting+=1
@@ -349,9 +349,9 @@ def input(in_msg, timeslot=None):
     in_msg.postprocessing_areas.append('EuropeCanaryS95')
     in_msg.postprocessing_areas.append("ccs4")
     
-    #in_msg.postprocessing_composite1=["C2rgb-ir108"]
+    in_msg.postprocessing_composite1=["C2rgb-ir108"]
     #in_msg.postprocessing_composite2=["C2rgb-Forecast-ir108"]  
-    in_msg.postprocessing_composite1=["C2rgb-IR_108"]                # used by plot_coalition2
+    #in_msg.postprocessing_composite1=["C2rgb-IR_108"]                # used by plot_coalition2
     in_msg.postprocessing_composite2=["C2rgb-Forecast-IR_108"]       # used by plot_coalition2
     #in_msg.postprocessing_composite=["C2rgb-IR_108","C2rgb-HRV"]    
 
@@ -377,30 +377,7 @@ def input(in_msg, timeslot=None):
     in_msg.channels30 = ['WV_062','WV_073','IR_097','IR_108','IR_134']
 
     nrt = True # !HAU! ???
-
-    in_msg.settingsLocal = {}
-    in_msg.settingsLocal['use_TB_forecast'] = True
-    in_msg.settingsLocal['mode_downscaling'] = 'gaussian_225_125'
-    in_msg.settingsLocal['mask_labelsSmall_lowUS'] = True
-    in_msg.settingsLocal['clean_mask'] = 'skimage' 
-    in_msg.settingsLocal['rapid_scan_mode'] = False
-    in_msg.settingsLocal['forth_mask'] = 'IR_039_minus_IR_108'
-    in_msg.settingsLocal['forced_mask'] = 'no_mask'
-    in_msg.settingsLocal['mask_cirrus'] = True
-    in_msg.settingsLocal['reader_level'] = "seviri-level4"
-
-    in_msg.settingsBroad = {}
-    in_msg.settingsBroad['use_TB_forecast'] = False
-    in_msg.settingsBroad['mode_downscaling'] = 'no_downscaling'
-    in_msg.settingsBroad['mask_labelsSmall_lowUS'] = False
-    in_msg.settingsBroad['clean_mask'] = 'no_cleaning'
-    in_msg.settingsBroad['rapid_scan_mode'] = True 
-    in_msg.settingsBroad['forth_mask'] = 'IR_039_minus_IR_108'
-    in_msg.settingsBroad['forced_mask'] = 'no_mask'
-    in_msg.settingsBroad['mask_cirrus'] = True            
-    #in_msg.settingsBroad['reader_level']="seviri-level2"           
-    
-    
+        
     # -------------   
     # input checks 
     # -------------   
@@ -435,7 +412,7 @@ def input(in_msg, timeslot=None):
 
     #in_msg.make_plots=True
     #in_msg.fill_value=(0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
-    #in_msg.add_title = True
+    #in_msg.add_title = True  # ??? does not work, not implemented jet ???
     #in_msg.add_borders = True
     #in_msg.border_color = 'red'
     #in_msg.add_rivers = False

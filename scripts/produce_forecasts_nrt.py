@@ -646,6 +646,16 @@ if __name__ == '__main__':
           area_tuple = (proj4_string, area_extent)
       
           # read CTP to distinguish high, medium and low clouds
+          for i_try in range(30):
+              RGBs = check_input(in_msg, in_msg.sat_str()+in_msg.sat_nr_str(), in_msg.datetime, RGBs=['CTP'])
+              if len(RGBs) > 0:
+                  # exit loop, if input is found
+                  break
+              else:
+                  # else wait 20s and try again
+                  import time
+                  time.sleep(25)
+
           print "*** read CTP for ", in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", str(time_slot)
           global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", time_slot)
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, in_msg.sat_nr_str(), "seviri", time_slot)

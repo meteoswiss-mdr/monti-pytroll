@@ -16,9 +16,9 @@ def get_THX_filename(in_msg, time_slot, area):
     dx_str = ("%03d" % dx) + "km"
     #outputDir = format_name('./%Y-%m-%d/THX/',  time_slot, area=area)
     #outputDir = "/data/cinesat/out/"
-    outputDir = format_name(in_msg.outputDir,  time_slot, area=area)
+    outputDir = format_name(in_msg.outputDir,  time_slot, area=area, rgb="THX")
     rgb='dens'
-    filename =  format_name('THX_'+rgb+'-ccs4_%y%m%d%H%M_'+dt_str+'_'+dx_str+'.png', time_slot, area=area)
+    filename =  format_name('THX_'+rgb+'-ccs4_%y%m%d%H%M_'+dt_str+'_'+dx_str+'.png', time_slot, area=area, rgb="THX")
     return outputDir+filename
 
 def get_radar_filename(in_msg, time_slot, area):
@@ -104,7 +104,7 @@ def get_file_list(composite, in_msg, sat, sat_nr, time_slot, area, n=None):
     return file_list
 
 # ---
-def n_file_composite(composite, in_msg, sat_nr, time_slot, area, composites_done=[]):
+def n_file_composite(composite, in_msg, sat_nr, time_slot, area, bits_per_pixel=8, composites_done=[]):
 
     n_rgb = composite.count('-') + 1
 
@@ -133,9 +133,10 @@ def n_file_composite(composite, in_msg, sat_nr, time_slot, area, composites_done
             print '... create output directory: ' + comp_dir
         makedirs(comp_dir)
 
+    command="/usr/bin/composite -depth "+str(bits_per_pixel)+" "+file_list[0]+" "+file_list[1]+" "+comp_file
     if in_msg.verbose:
-        print "    composite "+file_list[0]+" "+file_list[1]+" "+comp_file
-    subprocess.call("/usr/bin/composite "+file_list[0]+" "+file_list[1]+" "+comp_file, shell=True) #+" 2>&1 &"
+        print "    "+command
+    subprocess.call(command, shell=True) #+" 2>&1 &"
     # check if file is produced
     if isfile(comp_file):
         composites_done.append(composite)

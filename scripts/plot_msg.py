@@ -63,6 +63,11 @@ import inspect
 from mpop.utils import debug_on
 debug_on() 
 
+try:
+  basestring
+except NameError:
+  basestring = str
+
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
@@ -830,75 +835,83 @@ def indicate_mask(rgb, PIL_image, data, verbose):
 #----------------------------------------------------------------------------------------------------------------
 
 
-def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, verbose, title_color=None ):
+def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, verbose, title_color=None, title_y_line_nr=1 ):
 
    if verbose:
-      print "    add title to image "
-   
-   if True: # new version of adding title 
+      print "*** add title to image "
 
-      if title_color==None:
-         if PIL_image.mode == 'RGB' or PIL_image.mode == 'RGBA':    # color 
-            title_color=(255,255,255)
-            #title_color=(0,0,0)
-         elif PIL_image.mode == 'L':    # black white
-            title_color=(255)
+   if title_color==None:
+      if PIL_image.mode == 'RGB' or PIL_image.mode == 'RGBA':    # color 
+         title_color=(255,255,255)
+         #title_color=(0,0,0)
+      elif PIL_image.mode == 'L':    # black white
+         title_color=(255)
 
-      # determine font size
-      if "EuropeCanary" in area:
-         fontsize=36
-      if "eurotv" in area:
-         fontsize=24
-      elif area.find("ticino") != -1:
-         fontsize=12
-      else:
-         fontsize=18
+   # determine font size
+   if "EuropeCanary" in area:
+      fontsize=36
+   if "eurotv" in area:
+      fontsize=24
+   elif area.find("ticino") != -1:
+      fontsize=12
+   else:
+      fontsize=18
 
-      #fontsize=50
-      font = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf", fontsize)
+   font = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf", fontsize)
 
-      if title == None:
-        title = ' %(sat)s-%(sat_nr)s, %y-%m-%d %H:%MUTC, %(area)s, %(rgb)s'
-        format_name (title, time_slot, rgb=rgb, sat=sat, sat_nr=sat_nr, area=area )
-      else:
-        title = format_name (title, time_slot, rgb=rgb, sat=sat, sat_nr=sat_nr, area=area )
-        
-      draw = ImageDraw.Draw(PIL_image)
+   # define draw object
+   draw = ImageDraw.Draw(PIL_image)
 
+   # get day string (specify if product uses solar channels and hence is "day only")
+   day_str=''
+   if rgb in products.CPP:
+      if rgb in ['cth','cldmask','cot','cph','ctt','cwp','dcld','dcot','dcwp','dndv','dreff',\
+                    'precip','qa','reff','sds','sds_cs','sds_diff','sds_diff_cs']:
+         day_str=" (day only)"
+      if rgb=="CRPh":
+         day_str=" (day only)"
+
+   rgb = rgb.replace("_","-")+day_str
+
+   if title == None:
+      ## default title
       # if area is not Europe 
       if area.find("EuropeCanary") == -1:
-         y_pos_title=0
          if rgb=="CRR" or rgb=="CRPh" or rgb in products.CPP or rgb in products.HSAF:
-            y_pos_title=20
             if rgb=="CRR":
-               title= ' 2nd layer: '+rgb+", precip rate [mm/h]"
+               title= [' 2nd layer: '+rgb+", precip rate [mm/h]"]
             if rgb=="CRPh":
-               title= ' 2nd layer: '+rgb+" (day only), precip rate [mm/h]"
+               title= [' 2nd layer: '+rgb+", precip rate [mm/h]"]
             if rgb in products.CPP:
-               day_str=''
-               if rgb in ['cth','cldmask','cot','cph','ctt','cwp','dcld','dcot','dcwp','dndv','dreff',\
-                             'precip','qa','reff','sds','sds_cs','sds_diff','sds_diff_cs']:
-                  day_str=" (day only)"
-               title= ' 2nd layer: CPP ' + rgb + day_str
+               title= [' 2nd layer: CPP ' + rgb]
             if rgb in products.HSAF:
-               title= " 2nd layer: HSAF "+ rgb + " [mm/h]"
-         draw.text((0, y_pos_title),title, title_color,font=font)
+               title= [" 2nd layer: HSAF "+ rgb + " [mm/h]"]
       else:
-         y1 =  5             # y1 = 10
-         dy = 1.1 * fontsize # dy = 20 dy = 50
-         x1 =  0             # x1 = 10
          if not (rgb in products.CPP or rgb in products.HSAF) : # normal case  
-            draw.text((x1, y1     ), time_slot.strftime(' '+'%y-%m-%d %H:%MUTC'+':'), title_color, font=font)
-            draw.text((x1, y1+  dy),' '+rgb.replace("_","-")+", "+sat+str(sat_nr)+' SEVIRI',                title_color, font=font)
-            #draw.text((x1, y1+2*dy),' '+rgb.replace("_","-"),           title_color, font=font)
-         else:
-            draw.text((x1, y1+2*dy),' '+rgb.replace("_","-")+", "+sat+str(sat_nr)+' SEVIRI',                title_color, font=font)
-      if verbose:
-         print "    added title: "+title
+            title= [' %y-%m-%d %H:%MUTC', ' '+rgb.replace("_","-")+", "+sat+str(sat_nr)+' SEVIRI']
+      #title = [' %(sat)s-%(sat_nr)s, %y-%m-%d %H:%MUTC, %(area)s, %(rgb)s']
+   else:
+      # backward compartibility: convert title to a list, if given as a string
+      if isinstance(title, basestring):
+         title=[title]
 
-   else: # old version of adding title 
-      font=aggdraw.Font("blue","/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerif.ttf",size=16)
-      dc.add_text(dateS+"\n"+"MSG-"+str(sat_nr-7)+" SEVIRI\n"+rgb.replace("_"," ")+"\n")
+   # if area does not contain Europe 
+   if area.find("EuropeCanary") == -1:
+      x_pos_title = 10
+      y_pos_title =  0
+      dy = 20
+   else:
+      x_pos_title = 10  # x1 = 10
+      y_pos_title =  5  # y1 = 10
+      dy = 1.1 * fontsize # dy = 20 dy = 50
+
+   # replace wildcards such as %Y-%m-%d with values
+   for idx, title_line in enumerate(title):
+      title_line1 = format_name (title_line, time_slot, rgb=rgb, sat=sat, sat_nr=sat_nr, area=area )  
+      y_pos = y_pos_title + (idx+(title_y_line_nr-1)) * dy
+      draw.text( (x_pos_title, y_pos), title_line1, title_color, font=font)
+      if verbose:
+         print "    added title_line "+str(idx)+": "+title_line
 
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------

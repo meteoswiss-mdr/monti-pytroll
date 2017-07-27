@@ -41,6 +41,7 @@ class input_msg_class:
       self.add_title = True
       #self.title = None
       self.title = ' %(sat)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s'
+      self.title_y_line_nr = 1        # at which line should the title be written
       self.add_borders = True
       self.border_color = 'red'
       self.add_rivers = False
@@ -275,9 +276,12 @@ class input_msg_class:
       local_settings['rapid_scan_mode']        = False                 # always use 15min and 30min hindcast, as updraft is better visible
       #local_settings['forth_mask']             = 'IR_039_minus_IR_108'
       local_settings['forth_mask']             = 'IR_039_minus_IR_108_day_only'
+      #local_settings['forth_mask']             = 'CloudType'
+      #local_settings['forth_mask']             = 'combined'
       local_settings['forced_mask']            = 'no_mask'
       local_settings['mask_cirrus']            = True
       #local_settings['reader_level']           = "seviri-level4"
+      local_settings['reader_level']           = "seviri-level2"
 
       # Settings for Switzerland (assuming that we dont have COSMO and NWC-SAF data, checks if Rapid Scan Observations are available
       global_settings={}
@@ -285,11 +289,13 @@ class input_msg_class:
       global_settings['mode_downscaling']       = 'no_downscaling'
       global_settings['mask_labelsSmall_lowUS'] = False
       global_settings['clean_mask']             = 'no_cleaning'
-      if self.RSS:
+      if self.RSS and self.sat_nr != 10:
          global_settings['rapid_scan_mode']     = True                    # use 5min and 10min forecast to minimize the bias from movement (which is not taken into account)
       else:
          global_settings['rapid_scan_mode']     = False                   # no RSS available, so chose 15min, 30min forecasts
-      global_settings['forth_mask']             = 'IR_039_minus_IR_108'
+      global_settings['forth_mask']             = 'IR_039_minus_IR_108_day_only'
+      #global_settings['forth_mask']             = 'CloudType'
+      #global_settings['forth_mask']             = 'combined'
       global_settings['forced_mask']            = 'no_mask'
       global_settings['mask_cirrus']            = True            
       #global_settings['reader_level            = "seviri-level2"   

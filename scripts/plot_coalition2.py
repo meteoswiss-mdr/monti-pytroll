@@ -68,8 +68,8 @@ def _image2array(im):
         _g = np.array(list(im.getdata(1)))/255.0; _g = _g.reshape((height, width))
         _b = np.array(list(im.getdata(2)))/255.0; _b = _b.reshape((height, width))
     else:
-        "*** Error in pilimage2geoimage ("+inspect.getfile(inspect.currentframe())+")"
-        "    unknown PIL_image mode: ", pimage.mode       
+        "*** Error in  _image2array ("+inspect.getfile(inspect.currentframe())+")"
+        "    unknown PIL_image mode: ", im.mode       
     if 'RGBA':
         _a = np.array(list(im.getdata(3)))/255.0; _a = _a.reshape((height, width))
     
@@ -88,7 +88,7 @@ def pilimage2geoimage(pimage, area, timeslot):
         (r,g,b,a) = _image2array(pimage)
         gi = GeoImage((r,g,b,a), area, timeslot, mode=pimage.mode)
     else:
-        "*** Error in pilimage2geoimage (ninjotiff_example)"
+        "*** Error in pilimage2geoimage ("+inspect.getfile(inspect.currentframe())+")"
         "    unknown PIL_image mode: ", pimage.mode
         quit
     return gi
@@ -237,7 +237,8 @@ def downscale(data, mode='gaussian_225_125', mask=None):
     
 # ===============================
 
-def make_figure(values, obj_area, outputFile, colorbar = True, text_to_write = None, vmin = False, vmax = False, contour_value = None, linewidth = 1):
+def make_figure(values, obj_area, outputFile, 
+                colorbar=True, text_to_write=None, vmin=False, vmax=False, contour_value=None, linewidth=1):
     import matplotlib as mpl
     import pickle
     import matplotlib.pyplot as plt
@@ -246,22 +247,22 @@ def make_figure(values, obj_area, outputFile, colorbar = True, text_to_write = N
     import numpy as np
     from mpop.imageo.TRTimage import fig2img    
     from mpop.imageo.HRWimage import prepare_figure
-    
+
     if vmin == False:
         vmin = values.min()
     if vmax == False:
         vmax = values.max()
-    
+
     #obj_area = get_area_def(area)
-    
+
     fig, ax = prepare_figure(obj_area) 
-    
+
     mappable = plt.imshow(np.flipud(values), vmin = vmin, vmax = vmax, origin="lower")
-    
+
     if contour_value != None:
         plt.contour( values, contour_value, linewidths=linewidth, origin='upper' )
         #plt.contour( values, contour_value, linewidths=linewidth, origin='lower' )
-    
+
     if text_to_write != None:
         ax.text(0.95, 0.01, text_to_write,
                 verticalalignment='bottom', horizontalalignment='right',
@@ -271,9 +272,12 @@ def make_figure(values, obj_area, outputFile, colorbar = True, text_to_write = N
     if colorbar:
         color_bar = fig.colorbar(mappable,cax=position) ## 
         plt.setp(plt.getp(color_bar.ax.axes, 'yticklabels'), color='cyan')
-    
+        
     PIL_image = fig2img ( fig )
-    PIL_image.save(create_dir(outputFile))
+
+    PIL_image.save(create_dir(outputFile))                    # automatic choise of mode 
+    #PIL_image.convert('RGBA').save(create_dir(outputFile))   # RGBA (4x8-bit pixels, true colour with transparency mask)
+    #PIL_image.convert('I').save(create_dir(outputFile))      # I (32-bit signed integer pixels)
     print("... display ",outputFile," &")
     plt.close( fig)
     
@@ -312,6 +316,13 @@ def check_area(area_wanted):
 
 def plot_coalition2(in_msg, time_slot, time_slotSTOP):
     
+    import logging
+    logging.basicConfig(level=logging.WARNING)
+    #DEBUG - debug message
+    #INFO - info message
+    #WARNING - warn message
+    #ERROR - error message
+    #CRITICAL - critical message
 
     while time_slot <= time_slotSTOP:
       
@@ -377,7 +388,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
 
           print ("*** load data for ", in_msg.sat_str(), in_msg.sat_nr_str(), str(time_slot))
           # load product, global_data is changed in this step!
-          area_loaded = load_products(global_data, in_msg.RGBs, in_msg, area_loaded ) #
+          area_loaded = load_products(global_data, in_msg.RGBs, in_msg, area_loaded ) 
 
           for area in in_msg.areas:
 
@@ -402,33 +413,17 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 obj_area = get_area_def(area)
                 
                 time_slot15 = time_slot - timedelta(minutes=chosen_settings['dt_forecast1'])
-                
-                
                 time_slot30 = time_slot - timedelta(minutes=chosen_settings['dt_forecast2'])
-            
+                
                 hour_forecast15S = "%02d" % (time_slot15.hour)
                 min_forecast15S = "%02d" % (time_slot15.minute)
-            
+                
                 hour_forecast30S = "%02d" % (time_slot30.hour)
                 min_forecast30S = "%02d" % (time_slot30.minute)  
                 
                 dt_forecast1S = str(chosen_settings['dt_forecast1'])  
                 dt_forecast2S = str(chosen_settings['dt_forecast2'])
-                
-                # string for filenames
-                if chosen_settings['forth_mask'] == 'IR_039_minus_IR_108':
-                    in_msg.name_4Mask = 'IRdiff'
-                if chosen_settings['forth_mask'] == 'IR_039_minus_IR_108_day_only':
-                    in_msg.name_4Mask = 'IRdiffday'
-                elif chosen_settings['forth_mask'] == 'CloudType':
-                    in_msg.name_4Mask = 'CT'
-                elif chosen_settings['forth_mask'] == 'no_mask':
-                    in_msg.name_4Mask = 'none'
-                else:
-                    print ("*** Error in main ("+inspect.getfile(inspect.currentframe())+")")
-                    print ("    unknown 4th mask", chosen_settings['forth_mask'])
-                    quit() 
-                
+                                
                 if chosen_settings['forced_mask'] == 'IR_039_minus_IR_108':
                     in_msg.name_ForcedMask = 'IRdiff'
                 elif chosen_settings['forced_mask'] == 'CloudType':
@@ -439,7 +434,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     print ("    unknown forcing mask -> applying no forcing mask", chosen_settings['forced_mask'])
                     in_msg.name_ForcedMask = 'no'
                 
-
+                # load satellte data
                 if chosen_settings['scale'] == 'local' and in_msg.no_NWCSAF == False:
                     print ("... check for CTH observation (scale=", chosen_settings['scale']," no_NWCSAF=", in_msg.no_NWCSAF, ")")
 
@@ -459,6 +454,48 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 print ('... project data to desired area ', area)
                 data = global_data.project(area)
                 
+                # fill placeholders in directory names with content
+                outputDir = format_name(in_msg.outputDir, time_slot, area=area, rgb='C2rgb', sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
+                labelsDir = format_name(in_msg.labelsDir, time_slot, area=area, rgb='label', sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
+                    
+                # determined 4th mask (small ice crystal or cloud type): get string for filename and load CloudType
+                if chosen_settings['forth_mask'] == 'IR_039_minus_IR_108':
+                    in_msg.name_4Mask = 'IRdiff'
+                elif chosen_settings['forth_mask'] == 'IR_039_minus_IR_108_day_only':
+                    in_msg.name_4Mask = 'IRdiffday'
+                elif chosen_settings['forth_mask'] == 'CloudType' or chosen_settings['forth_mask'] == 'combined':
+                    if chosen_settings['forth_mask'] == 'CloudType':
+                        in_msg.name_4Mask = 'CT'
+                    elif chosen_settings['forth_mask'] == 'combined':
+                        in_msg.name_4Mask = 'com'
+                    # load CloudType
+                    scale = check_area(area)
+                    if (scale == "local"):
+                        global_CT_data = GeostationaryFactory.create_scene('Meteosat-9', "", "seviri", time_slot)
+                    elif (scale == "broad"):    
+                        from my_msg_module import get_last_SEVIRI_date
+                        time_slot_MSG3 = get_last_SEVIRI_date(False, time_slot=time_slot)
+                        global_CT_data = GeostationaryFactory.create_scene('Meteosat-10', "", "seviri", time_slot_MSG3)
+                    else:
+                        print ("*** Error in plot_coalition2 ("+inspect.getfile(inspect.currentframe())+")")
+                        print ("    unknown area scale", area, scale )
+                        quit() 
+                    load_products(global_CT_data, ['CT'], in_msg, area_loaded ) 
+                    CT_data = global_CT_data.project(area)
+                    if "CloudType" in in_msg.aux_results:
+                        outputFile = outputDir +"/aux_results/%s_%s_CloudType.png"%(yearS+monthS+dayS,hourS+minS)
+                        img = GeoImage( CT_data['CT'].data, CT_data['CT'].area, CT_data.time_slot, mode="P", palette=CT_data['CT'].palette, fill_value=0 )
+                        PIL_image = img.pil_image()
+                        PIL_image.save(create_dir(outputFile))                    # automatic choise of mode 
+                        print("... display ",outputFile," &")
+
+                elif chosen_settings['forth_mask'] == 'no_mask':
+                    in_msg.name_4Mask = 'none'
+                else:
+                    print ("*** Error in plot_coalition2 ("+inspect.getfile(inspect.currentframe())+")")
+                    print ("    unknown 4th mask", chosen_settings['forth_mask'])
+                    quit() 
+
                 # print type(data)
                 loaded_channels = [chn.name for chn in data.loaded_channels()]
                 print ("... loaded_channels: ", loaded_channels)               
@@ -469,15 +506,10 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 print ('... downscaling', chosen_settings['mode_downscaling'])
                 data = downscale(data,chosen_settings['mode_downscaling'], mask = mask_downscale)
 
-                # fill placeholders in directory names with content
-                outputDir = format_name(in_msg.outputDir, time_slot, area=area, rgb='C2rgb', sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
-                labelsDir = format_name(in_msg.labelsDir, time_slot, area=area, rgb='label', sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
-
                 # create a cloud mask: if scale local based on CTH, else based on  where CTP can be derived 
                 # -------------------
             
                 nx,ny = data['IR_108'].data.shape
-                print ("    nx, ny= ", nx,ny)
       
                 #print type(data['CTP'].data)
                 if chosen_settings['scale'] != 'local' or in_msg.no_NWCSAF == True:
@@ -669,19 +701,19 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     for i in range( 0,cloud_depth.shape[0]):
                           item = cloud_depth[i,:,:]
                           item[mask_NoClouds==True] = np.nan
-                          outputFile = outputDir +"/cosmo/Channels/indicators_in_time/all_indicators/%s_%s_Cloud_depth%s.png"%(yearS+monthS+dayS,hourS+minS,str(i+1))
+                          outputFile = outputDir +"/aux_results/%s_%s_Cloud_depth%s.png"%(yearS+monthS+dayS,hourS+minS,str(i+1))
                           make_figure(item, obj_area,  outputFile,colorbar = True,text_to_write = "Cloud depth %s"%(str(i+1)), vmin = vmin_cd[i], vmax = vmax_cd[i], contour_value = [th_cd[i]], linewidth = 1)
                           print ("... display ", outputFile, " &")
        
                     item = cloud_depth[5,:,:]
                     item[mask_NoClouds==True] = np.nan
                     
-                    outputFile = outputDir +"/cosmo/Channels/indicators_in_time/all_indicators/%s_%s_Cloud_depth%s_cirrus.png"%(yearS+monthS+dayS,hourS+minS,str(i+1))
+                    outputFile = outputDir +"/aux_results/%s_%s_Cloud_depth%s_cirrus.png"%(yearS+monthS+dayS,hourS+minS,str(i+1))
                     make_figure(item, obj_area, outputFile, colorbar = True, text_to_write = "Cloud depth 6", vmin = vmin_cd[5], vmax = vmax_cd[5], contour_value = [th_cirrus], linewidth = 1)
                     print ("... display ", outputFile, " &")   
                 
                 if 'indicator_optical_thickness' in in_msg.aux_results:
-                    outputFile = outputDir +"/cosmo/Channels/indicators_in_time/CloudDepthTH/%s_%s_Cloud_Depth.png"%(yearS+monthS+dayS,hourS+minS)
+                    outputFile = outputDir +"/aux_results//%s_%s_Cloud_Depth.png"%(yearS+monthS+dayS,hourS+minS)
                     make_figure(cd, obj_area, outputFile, colorbar = True, text_to_write = "Cloud Depth", vmin = 0, vmax = n_tests_cd)
             
             
@@ -706,7 +738,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 gi = np.where( glaciation_indicators[3,:,:] >  th_gi[3], gi+1, gi );   n_tests_gi+=1.
                 #gi= np.where( glaciation_indicators[4,:,:] >  th_gi[4], gi+1, gi );   n_tests_gi+=1.
                 #gi= np.where( glaciation_indicators[5,:,:] >  th_gi[5], gi+1, gi );   n_tests_gi+=1.
-                gi = np.where( np.logical_or(glaciation_indicators[6,:,:]<-5.0,glaciation_indicators[6,:,:]>-1.5) ,gi+1,gi);   n_tests_gi+=1.
+                gi = np.where( np.logical_or(glaciation_indicators[6,:,:]<-5.0, glaciation_indicators[6,:,:]>-1.5), gi+1, gi);   n_tests_gi+=1.
                 
                 cirrus = np.where( glaciation_indicators[6,:,:] < -5.0 ,cirrus +1, cirrus)
                 
@@ -727,14 +759,14 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                         else:
                             contour_value = [th_gi[i]]
                         #plt.title( "Glaciation_Indicators%s"%(str(i+1)))
-                        outputFile = outputDir +"/cosmo/Channels/indicators_in_time/all_indicators/%s_%s_Glaciation_Indicators%s.png"%(yearS+monthS+dayS,hourS+minS,str(i+1))
+                        outputFile = outputDir +"/aux_results/%s_%s_Glaciation_Indicators%s.png"%(yearS+monthS+dayS,hourS+minS,str(i+1))
                         make_figure(item,obj_area,  outputFile, colorbar = True, text_to_write = "Glaciation_Indicators%s"%(str(i+1)), vmin = vmin_gi[i], vmax = vmax_gi[i], contour_value = contour_value) 
                         #fig.savefig( create_dir(outputFile) ) 
                         #plt.close(fig)
                         #print ("... display ", outputFile, " &")
             
                 if 'indicator_glationation' in in_msg.aux_results:
-                    outputFile = outputDir +"/cosmo/Channels/indicators_in_time/GlaciationIndicatorTH/%s_%s_Glaciation_indicators.png"%(yearS+monthS+dayS,hourS+minS)
+                    outputFile = outputDir +"/aux_results//%s_%s_Glaciation_indicators.png"%(yearS+monthS+dayS,hourS+minS)
                     make_figure(gi, obj_area, outputFile,colorbar = True,text_to_write = "Glaciation Indicators", vmin = 0, vmax = n_tests_gi)      
       
       
@@ -773,11 +805,11 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     for i in range( updraft_strength.shape[0]):
                         item = updraft_strength[i,:,:]
                         item[mask_NoClouds==True] = np.nan
-                        outputFile = outputDir +"/cosmo/Channels/indicators_in_time/all_indicators/%s_%s_Updraft_strength%s.png"%(yearS+monthS+dayS,hourS+minS,str(i+1))
+                        outputFile = outputDir +"/aux_results/%s_%s_Updraft_strength_test%s.png"%(yearS+monthS+dayS,hourS+minS,str(i+1))
                         make_figure(item, obj_area, outputFile,colorbar = True,text_to_write = "Updraft Strength %s"%(str(i+1)), vmin = vmin_us[i], vmax = vmax_us[i], contour_value = [th_us[i]])
             
                 if 'indicator_updraft' in in_msg.aux_results:
-                    outputFile = outputDir +"/cosmo/Channels/indicators_in_time/UpdraftStrengthTH/%s_%s_Updraft_strength.png"%(yearS+monthS+dayS,hourS+minS)
+                    outputFile = outputDir +"/aux_results/%s_%s_Updraft_strength_mask.png"%(yearS+monthS+dayS,hourS+minS)
                     make_figure(us, obj_area, outputFile,colorbar = True,text_to_write = "Updraft Strength", vmin = 0, vmax = n_tests_us)
                 
             
@@ -785,7 +817,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 # -------------------------------------------------------------
                 IR_039_minus_IR_108 = data['IR_039'].data - data['IR_108'].data  # also needed in code later
                 if 'tests_small_ice' in in_msg.aux_results:
-                    outputFile = outputDir +"/cosmo/Channels/indicators_in_time/all_indicators/%s_%s_Small_ice.png"%(yearS+monthS+dayS,hourS+minS)
+                    outputFile = outputDir +"/aux_results/%s_%s_Small_ice_test.png"%(yearS+monthS+dayS,hourS+minS)
                     make_figure(IR_039_minus_IR_108, obj_area, outputFile, colorbar=True, 
                                 text_to_write="IR039 minus IR108", vmin=False, vmax=False, contour_value = [developing_th_chDiff, mature_th_chDiff])
 
@@ -797,11 +829,11 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 
                 if chosen_settings['forth_mask'] != 'no_mask':  
                     print ("... check forth mask, ", chosen_settings['forth_mask'] )
-                    si = np.zeros( (nx,ny)) 
+                    si = np.zeros( (nx,ny) ) 
                     if chosen_settings['forth_mask'] == 'CloudType':
-                        for ct in range(0,len(mature_ct)):
-                            cl_typ = mature_ct[ct]
-                            mature_mask = np.where( data['CT'].data == cl_typ, mature_mask+1, mature_mask)                
+                        ## search if CloudType is in marture_ct, if so set si to True (==1) 
+                        si = np.in1d(CT_data['CT'].data, mature_ct).reshape(CT_data['CT'].data.shape[0],CT_data['CT'].data.shape[1])
+                        mature_mask += si
                       
                     elif chosen_settings['forth_mask'] == 'IR_039_minus_IR_108':
                         si = np.where( IR_039_minus_IR_108 >= mature_th_chDiff, si+1, si )
@@ -811,23 +843,44 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                         from pyorbital.astronomy import sun_zenith_angle
                         lonlats = data['IR_108'].area.get_lonlats()
                         sza = sun_zenith_angle(time_slot, lonlats[0], lonlats[1])
-                        si = np.where( ((IR_039_minus_IR_108 >= mature_th_chDiff) | (sza > 74)), si+1, si )    # for sza = 74 degree the channel diff is not good anymore...
+                        # for sza > 72 degree the channel diff is not good anymore...
+                        si = np.where( ((IR_039_minus_IR_108 >= mature_th_chDiff) | (sza > 72)), si+1, si )    
                         mature_mask += si
+
+                    elif chosen_settings['forth_mask'] == 'combined':
+                        from pyorbital.astronomy import sun_zenith_angle
+                        lonlats = data['IR_108'].area.get_lonlats()
+                        sza = sun_zenith_angle(time_slot, lonlats[0], lonlats[1])
+                        # for sza < 72 degree, check the channel difference ...
+                        mask_day   = np.where( ((IR_039_minus_IR_108 >= mature_th_chDiff) & (sza < 72)), True, False )
+                        outputFile = outputDir +"/aux_results/%s_%s_mask_day.png"%(yearS+monthS+dayS,hourS+minS)
+                        make_figure(mask_day, obj_area, outputFile, colorbar=True, text_to_write = "mask day", vmin=0, vmax=1)
+                        # for sza >= 72 degree, check the cloud types  
+                        mask_night_ct = np.in1d(CT_data['CT'].data, mature_ct).reshape(CT_data['CT'].data.shape[0],CT_data['CT'].data.shape[1])
+                        mask_night = np.where( mask_night_ct & (sza > 72), True, False )
+                        outputFile = outputDir +"/aux_results/%s_%s_mask_night.png"%(yearS+monthS+dayS,hourS+minS)
+                        make_figure(mask_night, obj_area, outputFile, colorbar=True, text_to_write = "mask night", vmin=0, vmax=1)
+                        # combine both masks with bitwise logical or
+                        si = np.where( mask_day | mask_night, 1, 0) 
+                        outputFile = outputDir +"/aux_results/%s_%s_mask_combined.png"%(yearS+monthS+dayS,hourS+minS)
+                        make_figure(si, obj_area, outputFile, colorbar=True, text_to_write = "mask combined", vmin=0, vmax=1)
+                        mature_mask += si
+
                     else:
                         print ("*** Error in plot_coalition2 ("+inspect.getfile(inspect.currentframe())+")")
                         print ("    unknown input option: forth_mask", chosen_settings['forth_mask'] )
                         quit()
-
-                    if 'indicator_small_ice' in in_msg.aux_results:
-                        outputFile = outputDir +"/cosmo/Channels/indicators_in_time/SmallIceTH/%s_%s_Small_ice.png"%(yearS+monthS+dayS,hourS+minS)
-                        make_figure(si, obj_area, outputFile, colorbar=True, text_to_write="Indicator small ice mask (>= %s)"%(str(mature_th_chDiff)), vmin = 0, vmax = 1)
+                        
+                    if 'fourth_mask' in in_msg.aux_results:
+                        outputFile = outputDir +"/aux_results/%s_%s_fourth_mask.png"%(yearS+monthS+dayS,hourS+minS)
+                        make_figure(si, obj_area, outputFile, colorbar=True, text_to_write="forth_mask = %s"%chosen_settings['forth_mask'] , vmin = 0, vmax = 1)
 
                     mature_mask = np.where( mature_mask==1, 1, 0) # start counting at -2  (so 1 is mature thunderstorms = -2+1+1+1)
                 else:
                     mature_mask = np.where( mature_mask==0, 1, 0) # start counting at -2  (so 0 is mature thunderstorms = -2+1+1  )
                 
                 if 'mature_mask' in in_msg.aux_results:
-                    outputFile = outputDir +"/cosmo/Channels/indicators_in_time/masks/"+yearS+monthS+dayS+"_"+hourS+minS+"_"+"4th"+in_msg.name_4Mask+"_Mature_mask.png"
+                    outputFile = outputDir +"/aux_results/masks/"+yearS+monthS+dayS+"_"+hourS+minS+"_"+"4th"+in_msg.name_4Mask+"_Mature_mask.png"
                     make_figure(mature_mask, obj_area, outputFile,colorbar = True,text_to_write = "Mature mask", vmin = 0, vmax = 1)
             
                 
@@ -840,21 +893,40 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     developing_mask = np.where( cd+us>=7, developing_mask+2, developing_mask)
                 
                 if chosen_settings['forth_mask']!='no_mask':
+
+                    si = np.zeros( (nx,ny) ) 
                     if chosen_settings['forth_mask'] == 'CloudType':
-                        ct_devel_mask = np.zeros((nx,ny))
-                        for ct in range(0,len(developing_ct)):
-                            cl_typ = developing_ct[ct]
-                            developing_mask = np.where(data['CT'].data == cl_typ,developing_mask+1,developing_mask)   
-                            ct_devel_mask = np.where(data['CT'].data == cl_typ,ct_devel_mask+1,ct_devel_mask)             
+                        ## search if CloudType is in developing_ct, if so set si to True (==1) 
+                        si = np.in1d(CT_data['CT'].data, developing_ct).reshape(CT_data['CT'].data.shape[0],CT_data['CT'].data.shape[1])
+                        developing_mask += si
+
                     elif chosen_settings['forth_mask'] == 'IR_039_minus_IR_108':
-                            developing_mask = np.where( IR_039_minus_IR_108 > developing_th_chDiff,developing_mask+1, developing_mask)
-                  
-                    developing_mask = np.where( developing_mask==1, 1, 0 )
+                            developing_mask = np.where(  IR_039_minus_IR_108 > developing_th_chDiff,               developing_mask+1, developing_mask)
+
+                    elif chosen_settings['forth_mask'] == 'IR_039_minus_IR_108_day_only':
+                            developing_mask = np.where( (IR_039_minus_IR_108 > developing_th_chDiff) | (sza > 72), developing_mask+1, developing_mask)
+
+                    elif chosen_settings['forth_mask'] == 'combined':
+                        #from pyorbital.astronomy import sun_zenith_angle
+                        #lonlats = data['IR_108'].area.get_lonlats()
+                        #sza = sun_zenith_angle(time_slot, lonlats[0], lonlats[1])
+                        # for sza < 72 degree, check the channel difference ...
+                        mask_day   = np.where( ((IR_039_minus_IR_108 >= developing_th_chDiff) | (sza < 72)), True, False )
+                        # for sza >= 72 degree, check the cloud types  
+                        mask_night = np.in1d(CT_data['CT'].data, developing_ct).reshape(CT_data['CT'].data.shape[0],CT_data['CT'].data.shape[1])
+                        # combine both masks with bitwise logical or
+                        si = np.where( mask_day | mask_night, 1, 0) 
+                        developing_mask += si
+                    else:
+                        print ("*** Error in plot_coalition2 ("+inspect.getfile(inspect.currentframe())+")")
+                        print ("    unknown input option: forth_mask", chosen_settings['forth_mask'] )
+                        quit()
+                    developing_mask = np.where( developing_mask==1, 1, 0 )  # start counting at -2  (so 1 is developing thunderstorms = -2+1+1+1)
                 else:
-                    developing_mask = np.where( developing_mask==0, 1, 0 ) 
+                    developing_mask = np.where( developing_mask==0, 1, 0 )  # start counting at -2  (so 0 is developing thunderstorms = -2+1+1  )
                  
                 if developing_mask in in_msg.aux_results:
-                    outputFile = outputDir +"/cosmo/Channels/indicators_in_time/masks/"+yearS+monthS+dayS+"_"+hourS+minS+"_4th"+in_msg.name_4Mask+"_Developing_mask.png"
+                    outputFile = outputDir +"/aux_results/masks/"+yearS+monthS+dayS+"_"+hourS+minS+"_4th"+in_msg.name_4Mask+"_Developing_mask.png"
                     make_figure(developing_mask, obj_area, outputFile,colorbar = True,text_to_write = "Developing mask", vmin = 0, vmax = 1)              
                               
                 cw = ContourWriterAGG( in_msg.mapDir)
@@ -898,7 +970,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     print ("    unknown forcing mask -> applying no forcing mask", chosen_settings['forced_mask'])     
             
                 if 'forced_mask' in in_msg.aux_results:
-                    outputFile = outputDir +"/cosmo/Channels/indicators_in_time/masks/"+yearS+monthS+dayS+"_"+hourS+minS+"_4th"+in_msg.name_4Mask+"_Forced_mask.png"
+                    outputFile = outputDir +"/aux_results/masks/"+yearS+monthS+dayS+"_"+hourS+minS+"_4th"+in_msg.name_4Mask+"_Forced_mask.png"
                     make_figure(force_mask, obj_area, outputFile,colorbar = True,text_to_write = "Forcing mask", vmin = 0, vmax = 1)
                     
                     
@@ -915,7 +987,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     mask  = np.logical_or(mature_mask==1,developing_mask==1)
                     maskS = '_dam'
                 else:
-                    print ("*** Error in main (plot_coalition2.py)")
+                    print ("*** Error in main ("+inspect.getfile(inspect.currentframe())+")")
                     print ("    unknown show_clouds: ", in_msg.show_clouds)
                     quit()
                 
@@ -925,7 +997,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 if chosen_settings['mask_cirrus']:
                     cirrus = np.where( cirrus == 1,1,0)
                     if 'mask_cirrus' in in_msg.aux_results: 
-                        outputFile = outputDir +"/cosmo/Channels/indicators_in_time/masks/%s_%s_ThinCirrus_mask.png"%(yearS+monthS+dayS,hourS+minS)
+                        outputFile = outputDir +"/aux_results/masks/%s_%s_ThinCirrus_mask.png"%(yearS+monthS+dayS,hourS+minS)
                         make_figure(mature_mask, obj_area, outputFile,colorbar = True,text_to_write = "Thin Cirrus mask\n1 Test (GI7)", vmin = 0, vmax = 1)
       
                     not_cirrus = np.where(cirrus == 1,0,1)
@@ -943,7 +1015,6 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                         mask = ndimage.binary_opening(mask)
                         # Remove small black hole
                         mask = ndimage.binary_closing(mask)  
-                        
                 elif chosen_settings['clean_mask'] == 'both':
                     if in_msg.show_clouds != 'all':
                         mask = morphology.remove_small_objects(mask, min_cloud) #,connectivity=2)
@@ -966,6 +1037,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 rgbArray[..., 0] = r * mask
                 rgbArray[..., 1] = g * mask
                 rgbArray[..., 2] = b * mask
+
                 if chosen_settings['clean_mask'] != "no_cleaning":
                     rgbArray[..., 0] = rgbArray[..., 0] * mask_black
                     rgbArray[..., 1] = rgbArray[..., 1] * mask_black
@@ -1008,7 +1080,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                      
                 if 'final_mask' in in_msg.aux_results:
       
-                    outputFile = outputDir +"/cosmo/Channels/indicators_in_time/masks/"+yearS+monthS+dayS+"_"+hourS+minS+"_4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask_Final_mask.png"
+                    outputFile = outputDir +"/aux_results/masks/"+yearS+monthS+dayS+"_"+hourS+minS+"_4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask_Final_mask.png"
                     text_to_write = "Forth mask: %s\nForcen mask: %s\nCleaning: %s"%(in_msg.name_4Mask,in_msg.name_ForcedMask,cleaning_text)
                     make_figure(mask, obj_area, outputFile,colorbar = True,text_to_write = "Final mask", vmin = 0, vmax = 1)
                 
@@ -1040,7 +1112,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                       pickle.dump( labels, open(create_dir(outputDir +"/cosmo/Channels/labels/labels_"+yearS+monthS+dayS+hourS+minS+".p"), "wb" ) )
                 
                 if 'labelled_objects' in in_msg.aux_results:
-                      outputFile = outputDir +"/cosmo/Channels/indicators_in_time/labelled/"+yearS+monthS+dayS+"_"+hourS+minS+"_4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask.png"
+                      outputFile = outputDir +"/aux_results/labelled/"+yearS+monthS+dayS+"_"+hourS+minS+"_4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask.png"
                       make_figure(labels, obj_area, outputFile,colorbar = False,text_to_write = "Forth mask: %s\nForcen mask: %s\nCleaning: %s"%(in_msg.name_4Mask,in_msg.name_ForcedMask,cleaning_text), vmin = False, vmax = False)
       
                 # set background_color for "no clouds" 
@@ -1050,17 +1122,40 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 # set transparency for "no clouds" 
                 rgbArray[sum_array<=0,3] = background_alpha    # see coalition2_settings.py
                 
+                # sza indication
+                if chosen_settings['forth_mask'] == 'IR_039_minus_IR_108_day_only' or chosen_settings['forth_mask'] == 'combined':
+                    ind_sza = (sza > 72) & (sum_array<=0)
+                    # modify background to bluesh with alpha = 100
+                    rgbArray[ind_sza,2] = 130    # 255 intense blue 
+                    rgbArray[ind_sza,3] =  70    # 255=opaque
+
                 # create output file name (replace wildcards)
                 c2File = format_name(outputDir+'/'+in_msg.outputFile, data.time_slot, area=area, rgb='C2rgb', sat=data.satname, sat_nr=data.sat_nr())
 
                 if 'C2rgb' in in_msg.results:
-                    img1 = Image.fromarray( rgbArray,'RGBA')
-                    #add_borders_and_rivers( img1, cw, area_tuple,
+                    PIL_image = Image.fromarray( rgbArray, 'RGBA' )
+                    #add_borders_and_rivers( PIL_image, cw, area_tuple,
                     #                        add_borders=in_msg.add_borders, border_color=in_msg.border_color,
                     #                        add_rivers=in_msg.add_rivers, river_color=in_msg.river_color, 
                     #                        resolution=in_msg.resolution, verbose=in_msg.verbose)
+
+                    # add title
+                    if in_msg.add_title:
+                        from pydecorate import DecoratorAGG
+                        dc = DecoratorAGG(PIL_image)
+
+                        # bad fix
+                        if area=='ccs4':
+                            title_y_line_nr = 2 
+                        else:
+                            title_y_line_nr = deepcopy(in_msg.title_y_line_nr)
+                        print ("... in_msg.title_y_line_nr ", in_msg.title_y_line_nr)
+
+                        add_title(PIL_image, in_msg.title, "COALITION-2", 
+                                  in_msg.sat_str(), in_msg.sat_nr_str(), in_msg.datetime, area, dc, in_msg.verbose, title_y_line_nr=title_y_line_nr )
+
                     print ("... save image: display ", c2File, " &")
-                    img1.save( create_dir(c2File) )
+                    PIL_image.save( create_dir(c2File) )
                     
                     if 'ninjotif' in in_msg.result_formats:
                         
@@ -1103,7 +1198,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                         print ("... upload ninjotif: /tools/mch/datadisp/bin/jwscp_upload.zueub227.tcoalition2 &")
                         subprocess.call("/tools/mch/datadisp/bin/jwscp_upload.zueub227.tcoalition2 &", shell=True)
 
-                    #pickle.dump( img1, open("RGB"+yearS+monthS+dayS+hourS+minS+".p", "wb" ) )
+                    #pickle.dump( PIL_image, open("RGB"+yearS+monthS+dayS+hourS+minS+".p", "wb" ) )
                 
                 if area in in_msg.postprocessing_areas:                        
                     print ("... post-processing for area ", area)
@@ -1116,7 +1211,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                         type_image = "_HRV"
                     else:
                         type_image = "_overview"
-                    #c2FileHRV = (outputDir+"/cosmo/Channels/indicators_in_time/RGB-HRV"+maskS+"/%s_%s_C2rgb"+maskS+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask.png") % (yearS+monthS+dayS,hourS+minS)
+                    #c2FileHRV = (outputDir+"/aux_results/RGB-HRV"+maskS+"/%s_%s_C2rgb"+maskS+"4th"+in_msg.name_4Mask+"_"+in_msg.name_ForcedMask+"AdditionalMask.png") % (yearS+monthS+dayS,hourS+minS)
                     #hrvFile = "/data/COALITION2/PicturesSatellite//"+yearS+"-"+monthS+"-"+dayS+"/"+yearS+"-"+monthS+"-"+dayS+type_image+"_"+area+"/MSG"+type_image+"-"+area+"_"+yearS[2:]+monthS+dayS+hourS+minS+".png"
                      
                     #hrvFile = outputDir+"MSG_IR-108-"+area+"_"+"16"+monthS+dayS+hourS+minS+".png"
@@ -1179,6 +1274,13 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 os.chmod(file_per, 0664)  ## FOR PYTHON3: 0o664           
           time_slot = time_slot + timedelta(minutes=5)
 
+    # return True, if result file exists
+    if os.path.exists(c2File) and os.path.getsize(c2File) > 0:
+        return True
+    else:
+        return False
+
+
 #=================================================================================================
 #=================================================================================================
 def print_usage():
@@ -1219,5 +1321,7 @@ if __name__ == '__main__':
         time_slotSTOP = in_msg.datetime
 
     print ("*** start plot_coalition2 ")
-    plot_coalition2(in_msg, in_msg.datetime, time_slotSTOP)
+    image_written = plot_coalition2(in_msg, in_msg.datetime, time_slotSTOP)
 
+    if not image_written:
+        print ("*** Error, COALITION2 image could not be produced!")

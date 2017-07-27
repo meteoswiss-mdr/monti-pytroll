@@ -49,19 +49,18 @@ def input(in_msg, timeslot=None):
     # chose area
     #----------------
     #in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
+    in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
     #in_msg.areas.append('alps95')          # area around Switzerland processed by NWCSAF software 349x151 
     #in_msg.areas.append('ticino')          # stereographic proj of Ticino 342x311
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('EuropeCanary')    # upper third of MSG disk, satellite at 0.0 deg East, full resolution 
     #in_msg.areas.append('EuropeCanary95')  # upper third of MSG disk, satellite at 9.5 deg East, full resolution 
-    #in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
     #in_msg.areas.append('fullearth')       # full earth 600x300                    # does not yet work
     #in_msg.areas.append('met09globe')      # Cropped globe MSG image 3620x3620     # does not yet work
     #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
     #in_msg.areas.append('odysseyS25')      # Area of Odyssey composite (factor 2.5 smaller)
-    in_msg.areas.append('ccs4')
     #in_msg.areas.append('EuropeCanaryS95') # "ccs4" "blitzortung" #"eurotv" # "eurotv"
     #in_msg.areas.append("blitzortung")
     
@@ -154,12 +153,14 @@ def input(in_msg, timeslot=None):
     #in_msg.aux_results.append('indicator_glationation')
     #in_msg.aux_results.append('indicator_optical_thickness')
     #in_msg.aux_results.append('indicator_updraft')
-    in_msg.aux_results.append('indicator_small_ice')
-    #in_msg.aux_results.append('labelled_objects')
+    #in_msg.aux_results.append('indicator_small_ice')
+    #in_msg.aux_results.append('CloudType')
+    #in_msg.aux_results.append('fourth_mask')
+    #in_msg.aux_results.append('developing_mask')
+    #in_msg.aux_results.append('mature_mask')
     #in_msg.aux_results.append('final_mask')
     #in_msg.aux_results.append('forced_mask')
-    #in_msg.aux_results.append('mature_mask')
-    #in_msg.aux_results.append('developing_mask')
+    #in_msg.aux_results.append('labelled_objects')
     #in_msg.aux_results.append('IR_108')
     #in_msg.aux_results.append('labels_tracked')
     #in_msg.aux_results.append('forecast_channels')
@@ -274,8 +275,8 @@ def input(in_msg, timeslot=None):
         check_overwriting = 0; current_setting = 'forth_mask'
         
         #6) SETTING: choose one
-        #in_msg.chosen_settings['forth_mask'] = 'IR_039_minus_IR_108_day_only'; check_overwriting+=1              
-        in_msg.chosen_settings['forth_mask'] = 'IR_039_minus_IR_108'; check_overwriting+=1              
+        in_msg.chosen_settings['forth_mask'] = 'IR_039_minus_IR_108_day_only'; check_overwriting+=1              
+        #in_msg.chosen_settings['forth_mask'] = 'IR_039_minus_IR_108'; check_overwriting+=1              
         #in_msg.chosen_settings['forth_mask'] = 'CloudType'; check_overwriting+=1 #at the moment this is not possible (problems loading CT)
         #in_msg.chosen_settings['forth_mask'] = 'no_mask'; check_overwriting+=1
         #in_msg.chosen_settings['forth_mask'] = None; check_overwriting+=1
@@ -332,10 +333,9 @@ def input(in_msg, timeslot=None):
         #in_msg.chosen_settings['reader_level']= None    
 
     #PLOTTING SETTINGS. Not used??
-    in_msg.title_color = (255,255,255)
     #in_msg.layer = ''
-    in_msg.layer = ' 2nd layer'
-    #in_msg.layer = '3rd layer'
+    #in_msg.layer = ' 2nd layer'
+    in_msg.layer = '3rd layer'
     in_msg.add_rivers = False
     in_msg.add_borders = False
     in_msg.legend = True
@@ -349,10 +349,10 @@ def input(in_msg, timeslot=None):
     in_msg.postprocessing_areas.append('EuropeCanaryS95')
     in_msg.postprocessing_areas.append("ccs4")
     
-    in_msg.postprocessing_composite1=["C2rgb-ir108"]
+    #in_msg.postprocessing_composite1=["C2rgb-ir108"]
     #in_msg.postprocessing_composite2=["C2rgb-Forecast-ir108"]  
-    #in_msg.postprocessing_composite1=["C2rgb-IR_108"]                # used by plot_coalition2
-    in_msg.postprocessing_composite2=["C2rgb-Forecast-IR_108"]       # used by plot_coalition2
+    in_msg.postprocessing_composite1=["C2rgb-IR_108"]                # used by plot_coalition2
+    #in_msg.postprocessing_composite2=["C2rgb-Forecast-IR_108"]       # used by plot_coalition2
     #in_msg.postprocessing_composite=["C2rgb-IR_108","C2rgb-HRV"]    
 
 
@@ -412,7 +412,11 @@ def input(in_msg, timeslot=None):
 
     #in_msg.make_plots=True
     #in_msg.fill_value=(0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
-    #in_msg.add_title = True  # ??? does not work, not implemented jet ???
+    in_msg.add_title = True 
+    in_msg.title_color = (255,255,255)
+    #in_msg.title = "COALITION-2, %Y-%m-%d %H:%MUTC, %(area)s"
+    in_msg.title = "COALITION-2"
+    in_msg.title_y_line_nr = 3  # (INT) at which line should the title start (automatically overwriten with 2 for ccs4)
     #in_msg.add_borders = True
     #in_msg.border_color = 'red'
     #in_msg.add_rivers = False

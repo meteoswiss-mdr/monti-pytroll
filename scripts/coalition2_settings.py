@@ -39,7 +39,7 @@ th_cd   =    [-16.,    - 7.5,   250.,    - 2.,    -12.5,    2.2]   # threshold o
 # glaciation indicator tests
 vmin_gi =    [- 6.,    - 8.,    - 5.,    - 3.,   - 6.,     -32.,    -10.]  # colorbar range for the diagram showing the current test 
 vmax_gi =    [ 10.,      4.,      8.,      6.,     6.,      32.,      2.]  # colorbar range for the diagram showing the current test 
-th_gi   =    [  2.,    - 1.5,    1.5,    - 1.,   - 1.,       0.,    - 1.]  # threshold of the tests
+th_gi   =    [  2.,    - 1.5,    1.5,    - 1.,   - 1.,       0.,    - 1.]  # threshold of the tests (!!! last one is not USED, see plot_coalition2 !!!)
 
 # updraft strength tests
 vmin_us =    [-12.,    -50.,    -60.,    -15.,   - 8.,     -40.,    -40.,    -12.] # colorbar range for the diagram showing the current test 

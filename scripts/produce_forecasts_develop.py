@@ -688,6 +688,7 @@ if __name__ == '__main__':
 
     
     mode_downscaling = in_msg.settingsLocal['mode_downscaling']
+
     if mode_downscaling != 'no_downscaling':
         downscaling_data = True
     else:

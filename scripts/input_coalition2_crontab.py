@@ -18,7 +18,10 @@ def input(in_msg, timeslot=None):
     # e.g. current time               2015-05-31 12:33 UTC
     # delay 5 min                     2015-05-31 12:28 UTC
     # last Rapid Scan Service picture 2015-05-31 12:25 UTC (Scan start) 
-    in_msg.delay=6   # start 3, 8, 13, 18 ...
+    if in_msg.RSS:
+        in_msg.delay=6   # start 4, 9, 14, 19 ... -> go to time step before
+    else:
+        in_msg.delay=3   # start 4, 9, 14, 19 ... -> not allowed to go to 15min before, as 30min old MSG data is deleted at that time
 
     #------------------------------------------------------------------------
     # if not specified (False), current (last) observation time is chosen  
@@ -331,6 +334,9 @@ def input(in_msg, timeslot=None):
         #in_msg.chosen_settings['reader_level']= None    
 
     #PLOTTING SETTINGS. Not used??
+    in_msg.add_title = True
+    in_msg.title = "COALITION-2"
+    in_msg.title_y_line_nr = 3  # (INT) at which line should the title start
     in_msg.title_color = (255,255,255)
     #in_msg.layer = ''
     in_msg.layer = ' 2nd layer'
@@ -411,7 +417,6 @@ def input(in_msg, timeslot=None):
 
     #in_msg.make_plots=True
     #in_msg.fill_value=(0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
-    #in_msg.add_title = True
     #in_msg.add_borders = True
     #in_msg.border_color = 'red'
     #in_msg.add_rivers = False

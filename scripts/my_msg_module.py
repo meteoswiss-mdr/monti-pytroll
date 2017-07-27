@@ -9,9 +9,11 @@ output:
 import products 
 import inspect
 import logging
+import datetime
+from copy import deepcopy 
 
 LOG = logging.getLogger(__name__)
-#LOG.setLevel(10)
+LOG.setLevel(40)
 #CRITICAL 50 #ERROR 40 #WARNING 30 #INFO 20 #DEBUG 10 #NOTSET 0
 
 '''
@@ -20,37 +22,42 @@ input: RSS
   specifies if you like get 
   (RSS=True)  the last rapid scan observation date (every 5  min) 
   (RSS=False) the last full disk  observation date (every 15 min)
+  (delay=INT) number of minutes to substract before finding the date (good if data needs a few min before arriving)
+  (time_slot) If not given, take last time
+              otherwise search scanning time of SEVIRI before given time_slot
 output:
   date structure with the date of the last SEVIRI observation
 '''
 
-def get_last_SEVIRI_date(RSS, delay=0):
+def get_last_SEVIRI_date(RSS, delay=0, time_slot=None):
 
     from time import gmtime
-    import datetime
 
     LOG.info("*** start get_last_SEVIRI_date ("+inspect.getfile(inspect.currentframe())+")")
-
-    # get the current time
-    gmt = gmtime()
-    #print "GMT time: "+ str(gmt)
-    # or alternatively 
-    # utc = datetime.datetime.utcnow()
-
-    # convert to datetime format
-    t0 = datetime.datetime(gmt.tm_year, gmt.tm_mon, gmt.tm_mday, gmt.tm_hour, gmt.tm_min, 0) 
-    LOG.debug("    current time = "+str(t0))
-
-    # apply delay (if it usually takes 5 min for the data to arrive, use delay 5min)
-    if delay != 0:
-       t0 -= datetime.timedelta(minutes=delay)
-    LOG.debug("    applying delay "+str(delay)+" min delay, time = "+ str(t0))
 
     # if rapid scan service than 5min otherwise 15
     if RSS:
         nmin = 5 
     else:
         nmin = 15
+
+    if (time_slot==None):
+        # get the current time
+        gmt = gmtime()
+        #print "GMT time: "+ str(gmt)
+        # or alternatively 
+        # utc = datetime.datetime.utcnow()
+        # convert to datetime format
+        t0 = datetime.datetime(gmt.tm_year, gmt.tm_mon, gmt.tm_mday, gmt.tm_hour, gmt.tm_min, 0) 
+        LOG.debug("    current time = "+str(t0))
+    else:
+        t0 = time_slot + datetime.timedelta(seconds=nmin*60)  # we substract one scanning time later, so we can add it here
+        LOG.debug("    reference time = "+str(t0))
+
+    # apply delay (if it usually takes 5 min for the data to arrive, use delay 5min)
+    if delay != 0:
+       t0 -= datetime.timedelta(minutes=delay)
+    LOG.debug("    applying delay "+str(delay)+" min delay, time = "+ str(t0))
 
     LOG.debug("    round by scanning time "+str(nmin)+" min, RSS = "+str(RSS))
     #tm_min2 = gmt.tm_min - (gmt.tm_min % nmin)
@@ -60,7 +67,6 @@ def get_last_SEVIRI_date(RSS, delay=0):
     #date1 = datetime.datetime(gmt.tm_year, gmt.tm_mon, gmt.tm_mday, gmt.tm_hour, tm_min2 , 0) 
     t1 = datetime.datetime(t0.year, t0.month, t0.day, t0.hour, minute1, 0) 
     LOG.debug("    end time of last scan: "+str(t1))
-
 
     # substracting one scan time (as the start time of scan is returned) 
     t1 -= datetime.timedelta(seconds=nmin*60)
@@ -85,7 +91,6 @@ def check_near_real_time(time_slot, minutes):
 
     # check if specified time is older than 2 hours 
     from time import gmtime
-    import datetime
 
     # get the current time
     gmt = gmtime()
@@ -114,7 +119,6 @@ def rgb_prerequisites(rgb, sat="meteosat", sat_nr="10", verbose=True):
     # import glob
     from mpop.satellites import GeostationaryFactory
     from my_composites import get_image
-    import datetime
 
     LOG.debug("*** start rgb_prerequisites ("+inspect.getfile(inspect.currentframe())+")")
 
@@ -255,17 +259,15 @@ output:
 
 def choose_msg(date, RSS=True):
 
-    from datetime import datetime
-
     # automatic choise of the Meteosat satellite (depending on RSS mode)
-    if date <  datetime(2008, 5, 13, 0, 0):   # before 13.05.2008 only nominal MSG1 (meteosat8), no Rapid Scan Service yet
+    if date <  datetime.datetime(2008, 5, 13, 0, 0):   # before 13.05.2008 only nominal MSG1 (meteosat8), no Rapid Scan Service yet
         if RSS:
             print "*** Error in choose_msg (my_msg_module.py)"
             print "    no RSS available yet for ", str(date)
             quit()
         else:
             sat_nr = 8 
-    elif date <  datetime(2013, 2, 27, 9, 0): # 13.05.2008 ...  27.02.2013 
+    elif date <  datetime.datetime(2013, 2, 27, 9, 0): # 13.05.2008 ...  27.02.2013 
         if RSS:                       # MSG-2  (meteosat9) became nominal satellite, MSG-1 (meteosat8) started RSS
             sat_nr = 8  
         else:                       # MSG-2  (meteosat9) became nominal satellite, MSG-1 (meteosat8) started RSS
@@ -290,19 +292,17 @@ output:
 '''
 
 def check_RSS(sat_nr, date):
-    
-    from datetime import datetime
 
     LOG.info("*** start check_RSS ("+inspect.getfile(inspect.currentframe())+")")
     LOG.info("    automatic check if Metesat"+str(sat_nr)+" works in Rapid Scan Service (RSS) mode at this time: "+str(date))
 
     # check if Meteosat satellite was in RSS mode
-    if date <  datetime(2008, 5, 13, 0, 0):   # before 13.05.2008 only nominal MSG1 (meteosat8), no Rapid Scan Service yet
+    if date <  datetime.datetime(2008, 5, 13, 0, 0):   # before 13.05.2008 only nominal MSG1 (meteosat8), no Rapid Scan Service yet
         if int(sat_nr) == 8:
             RSS = False  
         else:
             RSS = None 
-    elif date <  datetime(2013, 2, 27, 9, 0): # 13.05.2008 ...  27.02.2013 
+    elif date <  datetime.datetime(2013, 2, 27, 9, 0): # 13.05.2008 ...  27.02.2013 
         if int(sat_nr) == 9:                       # MSG-2  (meteosat9) became nominal satellite, MSG-1 (meteosat8) started RSS
             RSS = False 
         elif int(sat_nr) == 8:
@@ -505,39 +505,63 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                 print '... check input in directory '+inputDirectory
 
             if not pro_file_checked:
+
                 #check prologues file 
                 pro_file_checked=True
-                sat_nr_org = in_msg.sat_nr
+                sat_nr_org = deepcopy(in_msg.sat_nr)
+                there_is_no_backup_satellite = False
+
                 while in_msg.sat_nr > 7:
 
+                    # update pro_file with new sat_nr and search for prolog files
                     MSG = in_msg.msg_str(layout="%(msg)s%(msg_nr)s")
-
                     if in_msg.verbose:
                         print "... check input files for ", MSG, str(in_msg.datetime), in_msg.RGBs
-            
                     pro_file= "?-000-"+MSG+"__-"+MSG+"_"+RSSS+"____-_________-PRO______-"+yearS+monthS+dayS+hourS+minuteS+"-__"
                     #if len(filter(listdir(inputDirectory), pro_file)) == 0:
-                    pro_filename = glob.glob(inputDirectory+'/'+pro_file)                    
+                    pro_filename = glob.glob(inputDirectory+'/'+pro_file)
 
                     if len(pro_filename) > 0:
                         print "    found prologue file ", pro_filename
-                        break  # prologue file found, satellite nr is OK
+                        break  # prologue file found, break this loop and check if epilog is there
                     else:
-                        if in_msg.verbose:
-                            print "*** Warning, no prologue file found: "+inputDirectory+'/'+pro_file
-                            print "... try backup satellite "
-                            # try the next backup satellite
-                            in_msg.sat_nr = in_msg.sat_nr-1
-            
-                # if no prolog file is found then 
-                #if len(filter(listdir(inputDirectory), pro_file)) == 0:
-                if len(glob.glob(inputDirectory+'/'+pro_file)) == 0:
-                    # reset satellite number 
-                    in_msg.sat_nr = sat_nr_org 
-                    if in_msg.verbose:
-                        print "*** Warning, no prolog file found, cannot process anything"
-                    return []  # rgb_complete is empty 
-            
+                        if there_is_no_backup_satellite:
+                            # reset sat_nr and return empty rgb_complete
+                            in_msg.sat_nr = sat_nr_org 
+                            if in_msg.verbose:
+                                print "*** Warning, no prolog file found, cannot process anything"
+                            return []  # rgb_complete is empty 
+                        else:
+                            # try backup satellite
+                            if in_msg.verbose:
+                                print "*** Warning, no prologue file found for Meteosat ",in_msg.sat_nr ," : "+inputDirectory+'/'+pro_file
+                            # before July 2016: Meteosat 8 is RSS backup for Meteosat 9, but also try Meteosat 10 if possible
+                            if in_msg.datetime < datetime.datetime(2016, 7, 1, 0, 0): 
+                                if in_msg.sat_nr == 9:
+                                    in_msg.sat_nr = 8
+                                    if in_msg.verbose:
+                                        print "... try backup satellite ", in_msg.sat_nr
+                                elif in_msg.sat_nr == 8:
+                                    in_msg.sat_nr = 10
+                                    if in_msg.verbose:
+                                        print "... try backup satellite ", in_msg.sat_nr
+                                elif in_msg.sat_nr == 10:
+                                    there_is_no_backup_satellite = True  
+                                else:
+                                    LOG.error("*** ERROR, unknown Meteosat satellite number", in_msg.sat_nr )
+                            # after July 2016 there is no RSS backup, try if there is Meteosat 10 instead (available every 15min) 
+                            else:
+                                if in_msg.sat_nr == 9:
+                                    in_msg.sat_nr = 10
+                                    if in_msg.verbose:
+                                        print "... try backup satellite ", in_msg.sat_nr
+                                elif in_msg.sat_nr == 8:   # indian ocean data coverage, no backup
+                                    there_is_no_backup_satellite = True  
+                                elif in_msg.sat_nr == 10:  # full disk service, no backup
+                                    there_is_no_backup_satellite = True  
+                                else:
+                                    LOG.error("*** ERROR, unknown Meteosat satellite number", in_msg.sat_nr )
+                
                 #check epilogues file 
                 epi_file= "?-000-"+MSG+"__-"+MSG+"_???____-_________-EPI______-"+yearS+monthS+dayS+hourS+minuteS+"-__"
                 epi_filename = glob.glob(inputDirectory+'/'+epi_file)

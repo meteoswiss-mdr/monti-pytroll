@@ -43,7 +43,7 @@ if len(layer) > 0:
     add_rivers  = False # no rivers if an overlay is needed
     add_borders = False # no map    if an overlay is needed
 add_title=True
-add_logos=True
+add_logos=False
 add_colorscale=False
 fill_value=None # transparent background 
 #fill_value=(1,1,1)  # white background
@@ -150,9 +150,9 @@ if prop_str == 'h03':
     obj_area = get_area_def(area)
 
 #output_dir='./'+yearS+'-'+monthS+'-'+dayS+'/'+yearS+'-'+monthS+'-'+dayS+'_'+prop_str+'-'+area+'/'
-output_dir='./pics/'
-#outputDir='/data/COALITION2/PicturesSatellite/'+yearS+'-'+monthS+'-'+dayS+'/'+yearS+'-'+monthS+'-'+dayS+'_radar-'+area+'/'
-#outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_RZC_%(area)s/'
+#output_dir='./pics/'
+output_dir='/data/COALITION2/PicturesSatellite/'+yearS+'-'+monthS+'-'+dayS+'/'+yearS+'-'+monthS+'-'+dayS+'_radar_'+area+'/'
+#output_dir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_RZC_%(area)s/'
 
 if not exists(output_dir):
     print '... create output directory: ' + output_dir
@@ -319,9 +319,9 @@ if add_logos:
     dc.align_right()
     if add_colorscale:
         dc.write_vertically()
-    dc.add_logo("../logos/meteoSwiss3.jpg",height=60.0)
-    dc.add_logo("../logos/pytroll3.jpg",height=60.0)
-    dc.add_logo("../logos/EUMETSAT_logo2_tiny_white.png",height=60.0)
+    dc.add_logo("/opt/users/common/logos/meteoSwiss3.jpg",height=60.0)
+    dc.add_logo("/opt/users/common/logos/pytroll3.jpg",height=60.0)
+    dc.add_logo("/opt/users/common/logos/EUMETSAT_logo2_tiny_white.png",height=60.0)
 
 if add_colorscale:
     print '... add colorscale ranging from min_data (',min_data,') to max_data (',max_data,')'

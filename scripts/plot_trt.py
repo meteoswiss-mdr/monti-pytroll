@@ -21,7 +21,7 @@ import scp_settings
 scpOutputDir = scp_settings.scpOutputDir
 scpID = scp_settings.scpID 
 
-# debug_on()
+debug_on()
 
 save_statistics=True
 
@@ -64,7 +64,7 @@ else:
         minute=00
 
 time_slot = datetime(year, month, day, hour, minute)
-global_data = GeostationaryFactory.create_scene("trt", "04", "radar", time_slot)
+global_data = GeostationaryFactory.create_scene("swisstrt", "04", "radar", time_slot)
 
 #cell='2014072316550030'
 #cell='2014072313000006' # max_rank
@@ -117,8 +117,8 @@ timeS = hourS+':'+minS+" UTC"
 
 #output_dir='./pics/'+yearS+'-'+monthS+'-'+dayS+'/'+yearS+'-'+monthS+'-'+dayS+'_TRT/'
 #output_dir='./pics/TRT/'
-output_dir='./pics/'
-#output_dir='/data/COALITION2/PicturesSatellite/'+yearS+'-'+monthS+'-'+dayS+'/'+yearS+'-'+monthS+'-'+dayS+'_TRT_'+area+'/'
+#output_dir='./pics/'
+output_dir='/data/COALITION2/PicturesSatellite/'+yearS+'-'+monthS+'-'+dayS+'/'+yearS+'-'+monthS+'-'+dayS+'_TRT_'+area+'/'
 #output_dir='/data/cinesat/out/'
 
 if not exists(output_dir+cell_dir):

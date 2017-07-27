@@ -4,7 +4,7 @@ alabaster
 anaconda-client
 argcomplete
 argh
-astropy
+#astropy
 Babel
 backports-abc
 backports.ssl-match-hostname

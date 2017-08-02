@@ -70,3 +70,44 @@ MSG_OT = ['ir_brightness_temperature',
                'ot_pressure',
                'parallax_correction_latitude',
                'parallax_correction_longitude']
+
+ninjo_chan_id = {'THX-ic_nrEURO1km':     8300015,
+                 'THX-cg_nrEURO1km':     8400015,
+                 'THX-tot_nrEURO1km':    8500015,
+                 'HRoverview_nrEURO1km': 8600015,
+                 'COALITION2_nrEURO1km': 8800015, 
+                 'h03_nrEURO3km':        8900015,
+                 'ref_nrEURO1km':        9000015,
+                 'cot_nrEURO1km':        9100015,
+                 'PCPh_nrEURO1km':       9200015,
+                 'CRR_nrEURO1km':        9300015,
+                 'CI_nrEURO1km':         9400015,
+                 'OT_nrEURO1km':         9500015,
+                 'COALITION2_nrEURO3km': 9600015, 
+                 'IR108_nrEURO3km':      9700015,
+                 'CT_nrEURO1km':         9800015, 
+                 'TRT_nrEURO1km':        9900015}
+
+#7900015=COALITION
+#### New satellite products MCH (Ulrich Hamann - APR 2016)
+#8300015 = Lightning rate (IC)
+#8400015 = Lightning rate (CG)
+#8500015 = Lightning rate (TOT)
+#8600015 = HRoverview
+#8700015 = HRW (streamlines)
+#8800015 = COALITION2                            # MET9_RSS_COALITION2_nrEURO1km_201707170945.tif  
+#8900015 = H-SAF RR-int. (calibrated with Pol)
+#9000015 = cloud effective radius
+#9100015 = cloud optical depth
+###### NWCSAF products (Ulrich Hamann - APR 2016)           
+#9200015 = Prob. of prec. (PCPh)
+#9300015 = CRR (PCPh)
+#9400015 = CI (Convective Initiation)
+#9500015 = Overshooting Tops
+#9600015 = PyTroll1                             #MET9_RSS_COALITION2_nrEURO3km_201707170945.tif 
+#9700015 = PyTroll2                             #MET9_RSS_IR108_nrEURO3km_201707170945.tif 
+#9800015 = PyTroll3                             
+#9900015 = PyTroll4
+
+
+

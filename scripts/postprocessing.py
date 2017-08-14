@@ -5,7 +5,7 @@ from os import makedirs
 import subprocess
 
 def get_THX_filename(in_msg, time_slot, area):
-    print "    get_THX_filename THX"
+    print "    get_THX_filename THX for ", area
     from ConfigParser import ConfigParser
     from mpop import CONFIG_PATH
     conf = ConfigParser()
@@ -18,19 +18,19 @@ def get_THX_filename(in_msg, time_slot, area):
     #outputDir = "/data/cinesat/out/"
     outputDir = format_name(in_msg.outputDir,  time_slot, area=area, rgb="THX")
     rgb='dens'
-    filename =  format_name('THX_'+rgb+'-ccs4_%y%m%d%H%M_'+dt_str+'_'+dx_str+'.png', time_slot, area=area, rgb="THX")
+    filename =  format_name('THX_'+rgb+'-'+area+'_%y%m%d%H%M_'+dt_str+'_'+dx_str+'.png', time_slot, area=area, rgb="THX")
     return outputDir+filename
 
 def get_radar_filename(in_msg, time_slot, area):
-    print "    get_radar_filename radar"
+    print "    get_radar_filename radar for ", area
     #outputDir = format_name('./%Y-%m-%d/radar/',  time_slot, area=area)
     #outputDir = "/data/cinesat/out/"
     outputDir = format_name(in_msg.outputDir,  time_slot, area=area, rgb="radar")
-    filename =  format_name('RAD_RZC-ccs4_%y%m%d%H%M.png', time_slot, area=area)
+    filename =  format_name('RAD_RZC-'+area+'_%y%m%d%H%M.png', time_slot, area=area)
     return outputDir+filename
 
 def get_odyssey_filename(in_msg, time_slot, area):
-    print "    get_odyssey_filename radar"
+    print "    get_odyssey_filename radar for ", area
     #outputDir = format_name('./%Y-%m-%d/radar/',  time_slot, area=area)
     #outputDir = "/data/cinesat/out/"
     outputDir = format_name(in_msg.outputDir,  time_slot, area=area, rgb="radar")
@@ -38,15 +38,15 @@ def get_odyssey_filename(in_msg, time_slot, area):
     return outputDir+filename
 
 def get_TRT_filename(in_msg, time_slot, area):
-    print "    get_TRT_filename TRT" 
+    print "    get_TRT_filename TRT for ", area 
     #outputDir = format_name('./%Y-%m-%d/radar/',  time_slot, area=area)
     #outputDir = "/data/cinesat/out/"
     outputDir = format_name(in_msg.outputDir,  time_slot, area=area, rgb="TRT")
-    filename =  format_name('RAD_TRT-ccs4_%y%m%d%H%M.png', time_slot, area=area)
+    filename =  format_name('RAD_TRT-'+area+'_%y%m%d%H%M.png', time_slot, area=area)
     return outputDir+filename
     
 def get_OT_filename(in_msg, rgb, time_slot, area):
-    print "    get_OT_filename" 
+    print "    get_OT_filename (overshooting top) for ", area 
     #outputDir = format_name('./%Y-%m-%d/radar/',  time_slot, area=area)
     #outputDir = "/data/cinesat/out/"
     outputDir = format_name(in_msg.outputDir,  time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
@@ -54,7 +54,7 @@ def get_OT_filename(in_msg, rgb, time_slot, area):
     return outputDir+filename
 
 def get_sat_filename(in_msg, rgb, sat, sat_nr, time_slot, area):
-    print "    get_sat_filename ", rgb
+    print "    get_sat_filename for ", rgb, area
     #outputDir = "/data/cinesat/out/"
     outputDir = format_name(in_msg.outputDir,  time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
     filename  = format_name(in_msg.outputFile, time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)

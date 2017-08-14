@@ -49,7 +49,6 @@ def input(in_msg, timeslot=None):
     #----------------
     # chose area
     #----------------
-    #in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
     #in_msg.areas.append('alps95')          # area around Switzerland processed by NWCSAF software 349x151 
     #in_msg.areas.append('ticino')          # stereographic proj of Ticino 342x311
     #in_msg.areas.append('germ')            # Germany 1024x1024
@@ -62,9 +61,9 @@ def input(in_msg, timeslot=None):
     #in_msg.areas.append('met09globe')      # Cropped globe MSG image 3620x3620     # does not yet work
     #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
     #in_msg.areas.append('odysseyS25')      # Area of Odyssey composite (factor 2.5 smaller)
-    in_msg.areas.append('ccs4')
+    in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640 (should be second after Europe)
     #in_msg.areas.append('EuropeCanaryS95') # "ccs4" "blitzortung" #"eurotv" # "eurotv"
-    #in_msg.areas.append("blitzortung")
+    #in_msg.areas.append("EuroMercator")    # same projection as blitzortung.org
     
     in_msg.check_RSS_coverage()
 
@@ -100,7 +99,7 @@ def input(in_msg, timeslot=None):
     in_msg.areasNoRapidScan = ['fullearth','met09globe','met09globeFull'] #should also be changed to coordinates check!!!!
       
     in_msg.settings = "default" # the settings will be automatically defined depending on the area chosen
-      #in_msg.settings == "manual"
+    #in_msg.settings == "manual"
     
     # set cloud mask 
     #-------------------------
@@ -137,9 +136,12 @@ def input(in_msg, timeslot=None):
     # choose production of results
     #-----------------------------
     in_msg.results = ['C2rgb']
-    #in_msg.result_formats = ['png']  # only for 'C2rgb'
-    in_msg.result_formats = ['png','ninjotif']  # only for 'C2rgb'
+    #in_msg.outputFormats = ['png']  # only for 'C2rgb'
+    in_msg.outputFormats = ['png','ninjotif']  # only for 'C2rgb'
     in_msg.ninjotifFilename = 'MET%(sat_nr)s_%(RSS)s_COALITION2_%(area)s_%Y%m%d%H%M.tif'
+    in_msg.upload_ninjotif = False
+    #in_msg.results.append('C2rgbHRV')
+
     # look at metadata with: 
     #    identify -verbose MET9_RSS_COALITION2_nrCOALtwo750m_1707051420.tif              # zueub227 # does not contain channel_id
     #    tiffdump /data/COALITION2/tmp/MET9_RSS_COALITION2_nrCOALtwo750m_1707051425.tif  # zueub427
@@ -164,6 +166,9 @@ def input(in_msg, timeslot=None):
     #in_msg.aux_results.append('mature_mask')
     #in_msg.aux_results.append('developing_mask')
     #in_msg.aux_results.append('IR_108')
+    #in_msg.aux_results.append('IR_108_t1')
+    #in_msg.aux_results.append('IR_108_t2')
+    #in_msg.aux_results.append('mask_downscale')
     #in_msg.aux_results.append('labels_tracked')
     #in_msg.aux_results.append('forecast_channels')
     
@@ -417,6 +422,10 @@ def input(in_msg, timeslot=None):
 
     #in_msg.make_plots=True
     #in_msg.fill_value=(0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
+    in_msg.add_title = True 
+    in_msg.title_color = (255,255,255)
+    #in_msg.title = "COALITION-2, %Y-%m-%d %H:%MUTC, %(area)s"
+    in_msg.title = "COALITION-2"
     #in_msg.add_borders = True
     #in_msg.border_color = 'red'
     #in_msg.add_rivers = False

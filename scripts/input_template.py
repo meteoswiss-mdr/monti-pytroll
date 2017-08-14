@@ -290,17 +290,20 @@ def input(in_msg, timeslot=None):
     in_msg.add_colorscale = False
     in_msg.HRV_enhancement = False
 
+    in_msg.outputFormats = ['png','ninjotif'] 
     in_msg.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
     in_msg.outputDir='./pics/'
     #in_msg.outputDir = "./%Y-%m-%d/%Y-%m-%d_%(rgb)s-%(area)s/"
     #in_msg.outputDir = '/data/cinesat/out/'
     in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
-
     in_msg.compress_to_8bit=False
 
     #in_msg.scpOutput = True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
     
+    in_msg.ninjotifFilename = 'MET%(sat_nr)s_%(RSS)s_%(rgb)s_%(area)s_%Y%m%d%H%M.tif' 
+    in_msg.upload_ninjotif = False
+
     #in_msg.postprocessing_areas=['ccs4']
     in_msg.postprocessing_composite=["THX-IR_108","radar-convection","THX-radar-convection"]    

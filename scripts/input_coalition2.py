@@ -48,8 +48,8 @@ def input(in_msg, timeslot=None):
     #----------------
     # chose area
     #----------------
-    #in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
-    in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
+    in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
+    #in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
     #in_msg.areas.append('alps95')          # area around Switzerland processed by NWCSAF software 349x151 
     #in_msg.areas.append('ticino')          # stereographic proj of Ticino 342x311
     #in_msg.areas.append('germ')            # Germany 1024x1024
@@ -62,7 +62,7 @@ def input(in_msg, timeslot=None):
     #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
     #in_msg.areas.append('odysseyS25')      # Area of Odyssey composite (factor 2.5 smaller)
     #in_msg.areas.append('EuropeCanaryS95') # "ccs4" "blitzortung" #"eurotv" # "eurotv"
-    #in_msg.areas.append("blitzortung")
+    #in_msg.areas.append("EuroMercator")    # same projection as blitzortung.org
     
     in_msg.check_RSS_coverage()
 
@@ -136,9 +136,10 @@ def input(in_msg, timeslot=None):
     # choose production of results
     #-----------------------------
     in_msg.results = ['C2rgb']
-    in_msg.result_formats = ['png']  # only for 'C2rgb'
-    #in_msg.result_formats = ['png','ninjotif']  # only for 'C2rgb'
+    #in_msg.outputFormats = ['png']  # only for 'C2rgb'
+    in_msg.outputFormats = ['png','ninjotif']  # only for 'C2rgb'
     in_msg.ninjotifFilename = 'MET%(sat_nr)s_%(RSS)s_COALITION2_%(area)s_%Y%m%d%H%M.tif' 
+    in_msg.upload_ninjotif = False
     in_msg.results.append('C2rgbHRV')
     # --------------------------------------
     # choose production of auxiliary results
@@ -164,7 +165,11 @@ def input(in_msg, timeslot=None):
     #in_msg.aux_results.append('IR_108')
     #in_msg.aux_results.append('labels_tracked')
     #in_msg.aux_results.append('forecast_channels')
-    
+    #in_msg.aux_results.append('IR_108')
+    #in_msg.aux_results.append('IR_108_t1')
+    #in_msg.aux_results.append('IR_108_t2')
+    #in_msg.aux_results.append('mask_downscale')
+
 
     # please download the shape file 
     in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
@@ -190,6 +195,7 @@ def input(in_msg, timeslot=None):
 
     in_msg.standardOutputName = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
     if in_msg.nrt:
+        #in_msg.outputDir = '/data/COALITION2/tmp/'
         in_msg.outputDir = '/data/cinesat/out/'
     else:
         #in_msg.outputDir='./pics/'
@@ -331,6 +337,10 @@ def input(in_msg, timeslot=None):
         in_msg.chosen_settings['forced_mask'] = None
         in_msg.chosen_settings['mask_cirrus'] = None
         #in_msg.chosen_settings['reader_level']= None    
+        #in_msg.chosen_settings['reader_level']="seviri-level4"
+
+    ## !!! BAD FIX !!!
+    #in_msg.reader_level="seviri-level4"
 
     #PLOTTING SETTINGS. Not used??
     #in_msg.layer = ''
@@ -346,12 +356,14 @@ def input(in_msg, timeslot=None):
     in_msg.pickle_labels = False; in_msg.shelve_labels = False
 
     in_msg.postprocessing_areas= []
-    in_msg.postprocessing_areas.append('EuropeCanaryS95')
+    #in_msg.postprocessing_areas.append('EuropeCanaryS95')
+    #in_msg.postprocessing_areas.append('EuroMercator')
     in_msg.postprocessing_areas.append("ccs4")
     
     #in_msg.postprocessing_composite1=["C2rgb-ir108"]
     #in_msg.postprocessing_composite2=["C2rgb-Forecast-ir108"]  
     in_msg.postprocessing_composite1=["C2rgb-IR_108"]                # used by plot_coalition2
+    #in_msg.postprocessing_composite1=["C2rgb-overview"]                # used by plot_coalition2
     #in_msg.postprocessing_composite2=["C2rgb-Forecast-IR_108"]       # used by plot_coalition2
     #in_msg.postprocessing_composite=["C2rgb-IR_108","C2rgb-HRV"]    
 

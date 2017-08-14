@@ -29,6 +29,7 @@ class input_msg_class:
       self.overwrite = True           # usually overwrite existing products
       self.fill_value = None          # black (0,0,0) / white (1,1,1) / transparent None  
       self.nwcsaf_calibrate = False   # False -> dont scale to real values, plot with palette
+      self.outputFormats = ['png']
       self.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
       self.outputDir = "./%Y-%m-%d/%(rgb)s-%(area)s/"
       self.compress_to_8bit=False
@@ -274,14 +275,15 @@ class input_msg_class:
       local_settings['mask_labelsSmall_lowUS'] = True
       local_settings['clean_mask']             = 'skimage' 
       local_settings['rapid_scan_mode']        = False                 # always use 15min and 30min hindcast, as updraft is better visible
+      local_settings['forth_mask']             = 'no_mask'
       #local_settings['forth_mask']             = 'IR_039_minus_IR_108'
-      local_settings['forth_mask']             = 'IR_039_minus_IR_108_day_only'
+      #local_settings['forth_mask']             = 'IR_039_minus_IR_108_day_only'
       #local_settings['forth_mask']             = 'CloudType'
       #local_settings['forth_mask']             = 'combined'
       local_settings['forced_mask']            = 'no_mask'
       local_settings['mask_cirrus']            = True
       #local_settings['reader_level']           = "seviri-level4"
-      local_settings['reader_level']           = "seviri-level2"
+      #local_settings['reader_level']           = "seviri-level2"
 
       # Settings for Switzerland (assuming that we dont have COSMO and NWC-SAF data, checks if Rapid Scan Observations are available
       global_settings={}
@@ -289,11 +291,13 @@ class input_msg_class:
       global_settings['mode_downscaling']       = 'no_downscaling'
       global_settings['mask_labelsSmall_lowUS'] = False
       global_settings['clean_mask']             = 'no_cleaning'
+      #global_settings['clean_mask'] = 'skimage'   # !!!  test !!!
       if self.RSS and self.sat_nr != 10:
          global_settings['rapid_scan_mode']     = True                    # use 5min and 10min forecast to minimize the bias from movement (which is not taken into account)
       else:
          global_settings['rapid_scan_mode']     = False                   # no RSS available, so chose 15min, 30min forecasts
-      global_settings['forth_mask']             = 'IR_039_minus_IR_108_day_only'
+      global_settings['forth_mask']             = 'no_mask'
+      #global_settings['forth_mask']             = 'IR_039_minus_IR_108_day_only'
       #global_settings['forth_mask']             = 'CloudType'
       #global_settings['forth_mask']             = 'combined'
       global_settings['forced_mask']            = 'no_mask'
@@ -344,6 +348,10 @@ class input_msg_class:
          chosen_settings['dt_forecast2'] = 30
 
       chosen_settings['scale'] = scale
+
+      self.upload_ninjotif = True  
+      self.modify_day_color = True
+      self.indicate_sza = True
 
       return chosen_settings
 

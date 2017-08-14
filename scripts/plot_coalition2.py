@@ -63,34 +63,50 @@ def _image2array(im):
     '''
     #im = Pimage.open(filepath).convert('RGB')
     (width, height) = im.size
-    if im.mode == 'RGB' or im.mode == 'RGBA':
+
+    if im.mode == 'L':
+        _grey = np.array(list(im.getdata(0)))/255.0; _grey = _grey.reshape((height, width))
+        return _grey
+    if im.mode == 'LA':
+        _grey = np.array(list(im.getdata(0)))/255.0; _grey = _grey.reshape((height, width))
+        _a    = np.array(list(im.getdata(1)))/255.0; _a = _a.reshape((height, width))
+        return _grey, _a
+    elif im.mode == 'RGB':
         _r = np.array(list(im.getdata(0)))/255.0; _r = _r.reshape((height, width))
         _g = np.array(list(im.getdata(1)))/255.0; _g = _g.reshape((height, width))
         _b = np.array(list(im.getdata(2)))/255.0; _b = _b.reshape((height, width))
-    else:
-        "*** Error in  _image2array ("+inspect.getfile(inspect.currentframe())+")"
-        "    unknown PIL_image mode: ", im.mode       
-    if 'RGBA':
-        _a = np.array(list(im.getdata(3)))/255.0; _a = _a.reshape((height, width))
-    
-    if im.mode == 'RGB':
         return _r, _g, _b
     elif im.mode == 'RGBA':
+        _r = np.array(list(im.getdata(0)))/255.0; _r = _r.reshape((height, width))
+        _g = np.array(list(im.getdata(1)))/255.0; _g = _g.reshape((height, width))
+        _b = np.array(list(im.getdata(2)))/255.0; _b = _b.reshape((height, width))
+        _a = np.array(list(im.getdata(3)))/255.0; _a = _a.reshape((height, width))
         return _r, _g, _b, _a
+    else:
+        "*** Error in  _image2array ("+inspect.getfile(inspect.currentframe())+")"
+        "    unknown PIL_image mode: ", im.mode
+        quit()
 
 # ===============================
 
 def pilimage2geoimage(pimage, area, timeslot):
-    if pimage.mode == 'RGB':
+    print (pimage.mode)
+    if pimage.mode == 'L':
+        (grey) = _image2array(pimage)
+        gi = GeoImage((grey), area, timeslot, mode=pimage.mode)
+    elif pimage.mode == 'LA':
+        (grey,a) = _image2array(pimage)
+        gi = GeoImage((grey,a), area, timeslot, mode=pimage.mode)
+    elif pimage.mode == 'RGB':
         (r,g,b) = _image2array(pimage)
         gi = GeoImage((r,g,b), area, timeslot, mode=pimage.mode)
     elif pimage.mode == 'RGBA':
         (r,g,b,a) = _image2array(pimage)
         gi = GeoImage((r,g,b,a), area, timeslot, mode=pimage.mode)
     else:
-        "*** Error in pilimage2geoimage ("+inspect.getfile(inspect.currentframe())+")"
-        "    unknown PIL_image mode: ", pimage.mode
-        quit
+        print ("*** Error in pilimage2geoimage ("+inspect.getfile(inspect.currentframe())+")")
+        print ("    unknown PIL_image mode: ", pimage.mode)
+        quit()
     return gi
 
 # ===============================
@@ -174,11 +190,11 @@ def downscale_array(array, mode='gaussian_225_125', mask=None):
         array = fill_with_closest_pixel(array)
 
     # downscale array 
-    array = downscale_func(array, weights, mode='nearest')
+    array_downscaled = downscale_func(array, weights, mode='nearest')
 
     # restore mask
     if mask != None:
-        array[mask] = no_data
+        array_downscaled[mask] = no_data
 
     """
     # convert to mask array and change array.mask 
@@ -186,7 +202,7 @@ def downscale_array(array, mode='gaussian_225_125', mask=None):
         np.ma.masked_array(array, mask)
     """
 
-    return array
+    return array_downscaled
 
 # ===============================
     
@@ -228,7 +244,7 @@ def downscale(data, mode='gaussian_225_125', mask=None):
 
             print ("... downscale "+chn.name)
             if hasattr(data[chn.name], 'data'):
-                downscale_array(data[chn.name].data, mode=mode, mask=mask)
+                data[chn.name].data = downscale_array(data[chn.name].data, mode=mode, mask=mask)
             else:
                 print ("*** Warning in downscale ("+inspect.getfile(inspect.currentframe())+")")
                 print ("    skip downscaling of ", chn.name, ", as this channel has no attribute: data" )
@@ -500,11 +516,25 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 loaded_channels = [chn.name for chn in data.loaded_channels()]
                 print ("... loaded_channels: ", loaded_channels)               
                 if "CTH" in loaded_channels:
+                    print ("    take CTH mask for downscaling")
                     mask_downscale = data['CTH'].data.mask
                 else:
+                    print ("    take "+loaded_channels[0]+" mask for downscaling")
                     mask_downscale = data[loaded_channels[0]].data.mask #to avoid error on Europe, anyway on Europe there shouldn't be downscaling
+
                 print ('... downscaling', chosen_settings['mode_downscaling'])
-                data = downscale(data,chosen_settings['mode_downscaling'], mask = mask_downscale)
+                data = downscale(data, chosen_settings['mode_downscaling'], mask=mask_downscale)
+
+                if 'IR_108' in in_msg.aux_results:
+                    outputFile = outputDir +"/aux_results/"+yearS+monthS+dayS+"_"+hourS+minS+"_IR-108_"+area+".png"
+                    print ("... save aux result: display "+outputFile)
+                    make_figure(data['IR_108'].data, obj_area, outputFile, colorbar=True,text_to_write = "IR_108 ", linewidth = 1)
+
+                if 'mask_downscale' in in_msg.aux_results:
+                    outputFile = outputDir +"/aux_results/"+yearS+monthS+dayS+"_"+hourS+minS+"_mask_downscale_"+area+".png"
+                    print ("... save aux result: display "+outputFile)
+                    make_figure(mask_downscale, obj_area, outputFile, colorbar=True,text_to_write = "mask_downscale ", vmin=0, vmax=1, linewidth = 1)
+
 
                 # create a cloud mask: if scale local based on CTH, else based on  where CTP can be derived 
                 # -------------------
@@ -525,30 +555,38 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
       
                     print ("*** read forecasted brightness temperatures")
                     print ("    ", nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S) )
-                    print ("    ", nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S) )                               
                     wv_062_t15 = pickle.load( open( nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) ) 
+                    print ("    ", nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S) )                               
                     wv_062_t30 = pickle.load( open( nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S), "rb" ) )
                             
+                    print ("    ", nowcastDir+"%s_%s_WV_073_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S) )
                     wv_073_t15 = pickle.load( open( nowcastDir+"%s_%s_WV_073_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) )
                     wv_073_t30 = pickle.load( open( nowcastDir+"%s_%s_WV_073_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S), "rb" ) )           
                 
+                    print ("    ", nowcastDir+"%s_%s_IR_097_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S) )
                     ir_097_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_097_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) )
                     ir_097_t30 = pickle.load( open( nowcastDir+"%s_%s_IR_097_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S), "rb" ) )  
                 
+                    print ("    ", nowcastDir+"%s_%s_IR_108_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S) )
                     ir_108_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_108_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) )
                     ir_108_t30 = pickle.load( open( nowcastDir+"%s_%s_IR_108_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S), "rb" ) )  
                     
+                    print ("    ", nowcastDir+"%s_%s_IR_134_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S) )
                     ir_134_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_134_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) )
                     ir_134_t30 = pickle.load( open( nowcastDir+"%s_%s_IR_134_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S), "rb" ) ) 
                 
+                    print ("    ", nowcastDir+"%s_%s_IR_087_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S) )
                     ir_087_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_087_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) ) 
                     
+                    print ("    ", nowcastDir+"%s_%s_IR_120_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S) )
                     ir_120_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_120_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) ) 
                     
+                    print ("    ", nowcastDir+"%s_%s_IR_039_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S) )
                     ir_039_t15 = pickle.load( open( nowcastDir+"%s_%s_IR_039_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) ) 
-            
-                    downscalings = [wv_062_t15[1],wv_062_t30[1],wv_073_t15[1],wv_073_t30[1],ir_097_t15[1],ir_097_t30[1],ir_108_t15[1],ir_108_t30[1],ir_134_t15[1],ir_134_t30[1],ir_087_t15[1],ir_120_t15[1],ir_039_t15[1]]
-                    
+
+                    downscalings = [wv_062_t15[1], wv_062_t30[1], wv_073_t15[1], wv_073_t30[1], ir_097_t15[1], ir_097_t30[1],
+                                    ir_108_t15[1], ir_108_t30[1], ir_134_t15[1], ir_134_t30[1], ir_087_t15[1], ir_120_t15[1], ir_039_t15[1]]
+    
                     #check if downscaling you are applying matches with the downscaling applied when producing the forecasts
                     if True:
                         if any(bz != chosen_settings['mode_downscaling'] for bz in downscalings):
@@ -624,6 +662,14 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     
                     ir_039_t15 = deepcopy(data15['IR_039'].data)
                     
+                if 'IR_108_t1' in in_msg.aux_results:
+                    outputFile = outputDir +"/aux_results/"+yearS+monthS+dayS+"_"+hourS+minS+"_IRR-108-t1_"+area+".png"
+                    print ("... save aux result: display "+outputFile)
+                    make_figure(ir_108_t15, obj_area, outputFile, colorbar=True, text_to_write="IRR_108 "+str(chosen_settings['dt_forecast1']), linewidth = 1)
+                if 'IR_108_t2' in in_msg.aux_results:
+                    outputFile = outputDir +"/aux_results/"+yearS+monthS+dayS+"_"+hourS+minS+"_IRR-108-t2_"+area+".png"
+                    print ("... save aux result: display "+outputFile)
+                    make_figure(ir_108_t30, obj_area, outputFile, colorbar=True, text_to_write="IRR_108 "+str(chosen_settings['dt_forecast2']), linewidth = 1)   
                     
                 # force the brightness temperatures to the current (observed) cloud mask 
                 ir_120_t15 = force_to_observed_cloud_mask(ma.masked_array(ir_120_t15), mask_NoClouds)
@@ -650,24 +696,14 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                                                                     
                 ir_039_t15 = force_to_observed_cloud_mask(ma.masked_array(ir_039_t15), mask_NoClouds)
             
-      
-                if 'IR_108' in in_msg.aux_results:
-                    fig, ax = prepare_figure(obj_area) 
-                    plt.imshow(ir_108_t15)
-                    #plt.colorbar()
-                    #plt.title( "IR108 t=t plus %s"%(str(dt_forecast1)) )
-                    fig.savefig(yearS+monthS+dayS+"_"+hour_forecast15S+min_forecast15S+"_"+"ir_108_t"+dt_forecast1S+".png")
-                    plt.close( fig)
-                    #pickle.dump( ir_108_t15, open("ir_108_t15.p", "wb" ) )
-          
-                    fig, ax = prepare_figure(obj_area) 
-                    plt.imshow(ir_108_t30)
-                    #plt.colorbar()
-                    #plt.title( "IR108 t=t plus %s"%(str(dt_forecast2)) )
-                    fig.savefig(yearS+monthS+dayS+"_"+hour_forecast30S+min_forecast30S+"_"+"ir_108_t"+dt_forecast2S+".png")
-                    plt.close(fig)
-      
-      
+                if 'IR_108_t1' in in_msg.aux_results:
+                    outputFile = outputDir +"/aux_results/"+yearS+monthS+dayS+"_"+hourS+minS+"_IR-108-t1_"+area+".png"
+                    print ("... save aux result: display "+outputFile)
+                    make_figure(ir_108_t15, obj_area, outputFile, colorbar=True, text_to_write="IR_108 "+str(chosen_settings['dt_forecast1']), linewidth = 1)
+                if 'IR_108_t2' in in_msg.aux_results:
+                    outputFile = outputDir +"/aux_results/"+yearS+monthS+dayS+"_"+hourS+minS+"_IR-108-t2_"+area+".png"
+                    print ("... save aux result: display "+outputFile)
+                    make_figure(ir_108_t30, obj_area, outputFile, colorbar=True, text_to_write="IR_108 "+str(chosen_settings['dt_forecast2']), linewidth = 1)      
       
                 cirrus = np.zeros((nx,ny))
                     
@@ -827,9 +863,12 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 mature_mask = np.where( gi>=2,                     mature_mask+1, mature_mask)
                 mature_mask = np.where( cd>=4,                     mature_mask+1, mature_mask)   # !!! changed from 5 to 4 !!! NEW 01/04 changed to 3 because removed one cd indicator
                 
-                if chosen_settings['forth_mask'] != 'no_mask':  
+                if chosen_settings['forth_mask'] != 'no_mask': 
+ 
                     print ("... check forth mask, ", chosen_settings['forth_mask'] )
+                    # initialize the mask with zeros
                     si = np.zeros( (nx,ny) ) 
+
                     if chosen_settings['forth_mask'] == 'CloudType':
                         ## search if CloudType is in marture_ct, if so set si to True (==1) 
                         si = np.in1d(CT_data['CT'].data, mature_ct).reshape(CT_data['CT'].data.shape[0],CT_data['CT'].data.shape[1])
@@ -877,7 +916,11 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
 
                     mature_mask = np.where( mature_mask==1, 1, 0) # start counting at -2  (so 1 is mature thunderstorms = -2+1+1+1)
                 else:
-                    mature_mask = np.where( mature_mask==0, 1, 0) # start counting at -2  (so 0 is mature thunderstorms = -2+1+1  )
+                    si = np.zeros( (nx,ny) )
+                    si = np.where(data['IR_108'].data>0, si+1, si)  # just a mask to get rid of the space outside the MSG disk 
+                    mature_mask += si
+                    mature_mask = np.where( mature_mask==1, 1, 0) # start counting at -2  (so 1 is mature thunderstorms = -2+1+1+1)
+                    #mature_mask = np.where( mature_mask==0, 1, 0) # start counting at -2  (so 0 is mature thunderstorms = -2+1+1  )
                 
                 if 'mature_mask' in in_msg.aux_results:
                     outputFile = outputDir +"/aux_results/masks/"+yearS+monthS+dayS+"_"+hourS+minS+"_"+"4th"+in_msg.name_4Mask+"_Mature_mask.png"
@@ -956,7 +999,19 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 b[np.where(b>255)] = 255
                 b[np.where(b<  0)] =   0
       
-      
+                # modify colors for day tests only
+                if in_msg.modify_day_color:
+                    print ("*** Modify day colors")
+                    from pyorbital.astronomy import sun_zenith_angle
+                    lonlats = data['IR_108'].area.get_lonlats()
+                    sza = sun_zenith_angle(time_slot, lonlats[0], lonlats[1])
+                    # for daytime (sza < 72 degree) do channel check the channel diff is not good anymore...
+                    index_day = np.where( (IR_039_minus_IR_108 >= mature_th_chDiff) & (0 < sza) & (sza < 72) & mature_mask & (us < 3) )  ### test mature_mask & (not developing_mask)
+                    # add 100 to the blue channel (max saturation at 255)
+                    b[index_day] = np.where(b[index_day]+110<255, b[index_day]+110, 255)
+                    # substract 50 from the red channel (min saturation is 0)
+                    r[index_day] = np.where(r[index_day]- 70<0,   0,    r[index_day]-70)
+
                 force_mask = np.zeros((nx,ny))
                 
                 if chosen_settings['forced_mask'] == 'CloudType':
@@ -1123,11 +1178,14 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 rgbArray[sum_array<=0,3] = background_alpha    # see coalition2_settings.py
                 
                 # sza indication
-                if chosen_settings['forth_mask'] == 'IR_039_minus_IR_108_day_only' or chosen_settings['forth_mask'] == 'combined':
+                if in_msg.indicate_sza:
+                    from pyorbital.astronomy import sun_zenith_angle
+                    lonlats = data['IR_108'].area.get_lonlats()
+                    sza = sun_zenith_angle(time_slot, lonlats[0], lonlats[1])
                     ind_sza = (sza > 72) & (sum_array<=0)
                     # modify background to bluesh with alpha = 100
                     rgbArray[ind_sza,2] = 130    # 255 intense blue 
-                    rgbArray[ind_sza,3] =  70    # 255=opaque
+                    rgbArray[ind_sza,3] =  60    # 255=opaque
 
                 # create output file name (replace wildcards)
                 c2File = format_name(outputDir+'/'+in_msg.outputFile, data.time_slot, area=area, rgb='C2rgb', sat=data.satname, sat_nr=data.sat_nr())
@@ -1157,7 +1215,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     print ("... save image: display ", c2File, " &")
                     PIL_image.save( create_dir(c2File) )
                     
-                    if 'ninjotif' in in_msg.result_formats:
+                    if 'ninjotif' in in_msg.outputFormats:
                         
                         if area == "ccs4":
                             area_ninjotif = 'nrEURO1km'
@@ -1165,16 +1223,52 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                         elif area == "EuropeCanaryS95":
                             area_ninjotif = 'nrEURO3km'
                             chan_id = 9600015
-                        
+                        obj_area_ninjotif = get_area_def(area_ninjotif)  
+
                         print ("... reproject COALITION2 result ("+area+") to "+area_ninjotif)
+                        
+                        # there is a problem, that areas outside the 
+                        # erase outermost lines
+                        if area_ninjotif == 'nrEURO1km':
+                            rgbArray[ 0, :, :] = 0
+                            rgbArray[-1, :, :] = 0
+                            rgbArray[ :, 0, :] = 0
+                            rgbArray[ :,-1, :] = 0
 
                         from mpop.channel import Channel
+                        # add rgb array as channel to a GeostationaryFactory object
                         c2_data = GeostationaryFactory.create_scene(in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", time_slot)
-                        c2_data.channels.append(Channel(name='r', wavelength_range=[0.,0.,0.], resolution=1000., data=rgbArray[:,:,0], area=area))
+                        c2_data.channels.append(Channel(name='r', wavelength_range=[0.,0.,0.], resolution=1000., data=rgbArray[:,:,0], area=area))  
                         c2_data.channels.append(Channel(name='g', wavelength_range=[0.,0.,0.], resolution=1000., data=rgbArray[:,:,1], area=area))
                         c2_data.channels.append(Channel(name='b', wavelength_range=[0.,0.,0.], resolution=1000., data=rgbArray[:,:,2], area=area))
                         c2_data.channels.append(Channel(name='a', wavelength_range=[0.,0.,0.], resolution=1000., data=rgbArray[:,:,3], area=area))
-                        c2_data = c2_data.project(area_ninjotif)
+
+
+                        c2_data = c2_data.project(area_ninjotif) # (default) mode='quick' || mode="bilinear", radius=50e3 || mode="ewa" || mode="nearest"
+
+                        """
+                        # reproject all channels to the area needed by NINJO
+                        if area_ninjotif == 'nrEURO3km':
+                            # normal reprojection
+                            c2_data = c2_data.project(area_ninjotif) 
+                        elif area_ninjotif == 'nrEURO1km':
+                            # take care of area outside of ccs4, which is filled with nearest neighbour...
+                            c2_data = c2_data.project(area_ninjotif, mode='quick') # , mode='quick' || mode="bilinear", radius=50e3 || mode="ewa" || mode="nearest"
+
+                            ##c2_data['a'].data = np.where(c2_data['r'].data==c2_data['r'].data[0,0], 255, c2_data['a'].data)
+                            ##c2_data['a'].data = np.where(isinstance(c2_data['r'].data, np.ma.core.MaskedConstant), 0, c2_data['a'].data)
+                            #outputFile = outputDir +"/aux_results/masks/"+yearS+monthS+dayS+"_"+hourS+minS+"_arg.png"
+                            #make_figure(c2_data['a'].data.mask, obj_area_ninjotif, outputFile, colorbar=True, text_to_write = "wiogbwpg", vmin = 0, vmax = 1)
+                            # np.where(type(c2_data['r'].data)=='numpy.ma.core.MaskedConstant', c2_data['r'].data.max()
+                            #print ("******************", c2_data['r'].data.max(), c2_data['g'].data.max(), c2_data['b'].data.max(), 
+                            #       isinstance(c2_data['r'].data[0,0], np.ma.core.MaskedConstant), type(c2_data['r'].data[0,0]), np.isnan(c2_data['r'].data[0,0]))
+                            #print ("******************", c2_data['r'].data.max(), c2_data['g'].data.max(), c2_data['b'].data.max(), type(c2_data['r'].data[0,0]), np.isnan(c2_data['r'].data[0,0]))
+                            #print ("******************", c2_data['r'].data.max(), c2_data['g'].data.max(), c2_data['b'].data.max(), type(c2_data['r'].data[0,0]), np.isnan(c2_data['r'].data[0,0]))
+                        else:
+                            print ("... Warning, unknown projection in save ninjotiff")
+                            c2_data = c2_data.project(area_ninjotif)
+                        """
+
                         nx2,ny2 = c2_data['r'].data.shape
                         print ("    new shape (nx,ny)= (",nx2,",",ny2,")")
 
@@ -1188,15 +1282,22 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                         
                         c2ninjotif_file = format_name (outputDir+'/'+in_msg.ninjotifFilename, data.time_slot, sat_nr=data.sat_nr(), RSS=True, area=area_ninjotif )
                         print ("... save ninjotif image: display ", c2ninjotif_file, " &")
-                        PIL_image = Image.fromarray( rgbArray2,'RGBA')
+                        PIL_image = Image.fromarray(rgbArray2, 'RGBA')
                         GEO_image = pilimage2geoimage(PIL_image, c2_data['r'].area_def, data.time_slot)
-                        GEO_image.save(c2ninjotif_file,
-                                       fformat='mpop.imageo.formats.ninjotiff',
-                                       ninjo_product_name='COALITION2', chan_id=chan_id,
-                                       nbits=8)
+                        if area_ninjotif == 'nrEURO1km':
+                            GEO_image.save(c2ninjotif_file,
+                                           fformat='mpop.imageo.formats.ninjotiff',
+                                           ninjo_product_name='COALITION2', chan_id=chan_id,
+                                           nbits=8, pixel_xres=0.00949833,  pixel_yres=0.00949833)   # meridian_west=0.0, meridian_east=0.0 -> no effect
+                        else:
+                            GEO_image.save(c2ninjotif_file,
+                                           fformat='mpop.imageo.formats.ninjotiff',
+                                           ninjo_product_name='COALITION2', chan_id=chan_id,
+                                           nbits=8)   
                         os.chmod(c2ninjotif_file, 0777)
-                        print ("... upload ninjotif: /tools/mch/datadisp/bin/jwscp_upload.zueub227.tcoalition2 &")
-                        subprocess.call("/tools/mch/datadisp/bin/jwscp_upload.zueub227.tcoalition2 &", shell=True)
+                        if in_msg.upload_ninjotif:
+                            print ("... upload ninjotif: /tools/mch/datadisp/bin/jwscp_upload.zueub227.tcoalition2 &")
+                            subprocess.call("/tools/mch/datadisp/bin/jwscp_upload.zueub227.tcoalition2 &", shell=True)
 
                     #pickle.dump( PIL_image, open("RGB"+yearS+monthS+dayS+hourS+minS+".p", "wb" ) )
                 
@@ -1245,13 +1346,13 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     print ("**** Computing properties of the cells")
                     outputDir_labels = outputDir+'/labels/'
                     """
-                    if 'labels_tracked' in in_msg.aux_results:               !!!! UH this might give very hard to find bugs
+                    if 'labels_tracked' in in_msg.aux_results:        !!!! UH this might give very hard to find bugs
                         outputDir_labels = outputDir+'/labels/'       !!!! switching on an additional output changes the directory where to read from ...
                     else:
                         outputDir_labels = None
                     """
                     labels_corrected, first_time_step = properties_cells(time_slot, time_slot, current_labels=labels, metadata=metadata,
-                                                                        labels_dir=labelsDir, outputDir_labels=outputDir_labels, in_msg=in_msg, sat_data=data)
+                                                                         labels_dir=labelsDir, outputDir_labels=outputDir_labels, in_msg=in_msg, sat_data=data)
                     if first_time_step:
                         print ("no history to follow, first timestep")
                     if in_msg.plot_forecast == True and first_time_step == False:
@@ -1263,7 +1364,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                         #plot_forecast_area(time_slot, in_msg.model_fit_area, outputFile=outputDir+add_path, current_labels=labels_corrected,
                         #                  t_stop=time_slot, BackgroundFile=out_file1, ForeGroundRGBFile=c2File, labels_dir=labelsDir, in_msg=in_msg)
                         plot_forecast_area(time_slot, in_msg.model_fit_area, outputDir=outputDir+add_path, current_labels=labels_corrected,
-                                          t_stop=time_slot, BackgroundFile=c2File, ForeGroundRGBFile=c2File, labels_dir=labelsDir, in_msg=in_msg)
+                                           t_stop=time_slot, BackgroundFile=c2File, ForeGroundRGBFile=c2File, labels_dir=labelsDir, in_msg=in_msg)
             
           # add 5min and do the next time step
           f4p = labelsDir+"/Labels*"

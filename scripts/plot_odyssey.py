@@ -25,7 +25,7 @@ if len(sys.argv) > 1:
     if len(sys.argv) < 6:
         print "***           "
         print "*** Warning, please specify date and time completely, e.g."
-        print "***          python plot_hsaf.py 2014 07 23 16 10 "
+        print "***          python plot_odyssey.py 2014 07 23 16 10 "
         print "***           "
         quit() # quit at this point
     else:
@@ -52,6 +52,7 @@ else:
         hour = 13
         minute = 30
 
+
 #prop_str='DBZH'
 prop_str='RATE'
 
@@ -67,11 +68,13 @@ minS   = "%02d" % minute
 dateS=yearS+'-'+monthS+'-'+dayS
 timeS=hourS+':'+minS+'UTC' 
 
+print dateS, timeS
+
 #import sys, string, os
 #sys.path.insert(0, "/opt/users/mbc/pytroll/install/lib/python2.6/site-packages")
 debug_on()
 
-time_slot = datetime.datetime(year, 12, 16, 13, 30)
+time_slot = datetime.datetime(year, month, day, hour, minute)
 global_data = GeostationaryFactory.create_scene("odyssey", "", "radar", time_slot)
 
 global_data.load([prop_str])
@@ -80,13 +83,11 @@ print global_data
 
 color_mode='RainRate'
 
-outputDir = "/data/cinesat/out/"
-#outputFile = "/tmp/test1."+prop_str+".png"
-
 #print "global_data[prop_str].product_name=",global_data[prop_str].product_name
 
 #area='odyssey'
-area='odysseyS25'
+#area='odysseyS25'
+area='EuroMercator'
 
 reproject=True
 if reproject:
@@ -98,9 +99,9 @@ if reproject:
    #data[prop_str].units = global_data[prop_str].units
    global_data = data
 
-
+#outputDir = "/data/cinesat/out/"
+outputDir = time_slot.strftime('/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_ODY_RATE_'+area+'/')
 outputFile = outputDir+'ODY_'+prop_str+'-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS +'.png'
-
 
 # define area
 print '-------------------'

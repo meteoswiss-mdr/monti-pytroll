@@ -97,8 +97,8 @@ print "*** read hsaf data (plot_hsaf.py)"
 
 
 global_data = GeostationaryFactory.create_scene("meteosat", "10", "seviri", time_slot)
-#prop_str = ['h03']
-prop_str = ['h03','IR_108']
+prop_str = ['h03']
+#prop_str = ['h03','IR_108']
 # area="hsaf" this is h03 data coverage 
 
 # load data 
@@ -136,7 +136,7 @@ print "---"
 print global_data['h03'].area
 print "---"
 
-if True:
+if False:
     global_data.parallax_corr(fill="False", estimate_cth=True, replace=True)
 
 if not exists(outputDir):
@@ -326,7 +326,7 @@ for area in areas:
         if len(layer) > 0:
             layer=layer+':'
 
-        title = layer+' HSAF, '+prop_str+' ['+data[prop_str].units+']'
+        title = layer+' HSAF, '+'h03'+' ['+data['h03'].units+']'
         draw.text((0, y_pos_title),title, title_color, font=font)
 
     print '... save image as ', outputFile

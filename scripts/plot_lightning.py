@@ -46,8 +46,8 @@ title_color=(255,255,255) # white       # for multi layer overlay
 #fill_value=(1,1,1) # white background  # for single layer 
 #title_color=(0,0,0) # black            # for single layer 
 #layer=''
-#layer=' 2nd layer'
-layer=' 3rd layer'
+layer=' 2nd layer'
+#layer=' 3rd layer'
 add_rivers=True
 add_borders=True
 if len(layer) > 0:
@@ -92,6 +92,8 @@ else:
 time_slot = datetime(year, month, day, hour, minute)
 
 area='ccs4'
+#area='nrEURO1km'
+#area='nrEURO3km'
 #area='EuropeCanaryS95'
 obj_area = get_area_def(area)
 
@@ -119,11 +121,11 @@ dateS=yearS+'-'+monthS+'-'+dayS
 timeS = hourS+':'+minS+' UTC'
 
 #outputDir='./pics/'+yearS+'-'+monthS+'-'+dayS+'_lightnings/'
-outputDir='/data/cinesat/out/'
+#outputDir='/data/cinesat/out/'
 #outputDir='./'+yearS+'-'+monthS+'-'+dayS+'/THX/'
 #outputDir='./pics/'
 #outputDir='./'+yearS+'-'+monthS+'-'+dayS+'/'+yearS+'-'+monthS+'-'+dayS+'_'+prop_str+'-'+area+'/'
-#outputDir='/data/COALITION2/PicturesSatellite/'+yearS+'-'+monthS+'-'+dayS+'/'+yearS+'-'+monthS+'-'+dayS+'_THX_'+area+'/'
+outputDir='/data/COALITION2/PicturesSatellite/'+yearS+'-'+monthS+'-'+dayS+'/'+yearS+'-'+monthS+'-'+dayS+'_THX_'+area+'/'
 
 
 # choose one property 
@@ -400,6 +402,10 @@ if plot_diagram:
 
     if area.find("EuropeCanary") != -1:
         resolution='l'
+    if area.find("nrEURO3km") != -1:
+        resolution='l' 
+    if area.find("nrEURO1km") != -1:
+        resolution='i' 
     if area.find("ccs4") != -1:
         resolution='i' 
     if area.find("ticino") != -1:

@@ -372,7 +372,7 @@ def plot_msg(in_msg):
                if in_msg.verbose:
                   print '... compress to 8 bit image: display '+outputFile.replace(".png","-fs8.png")+' &'
                subprocess.call("/usr/bin/pngquant -force 256 "+outputFile+" 2>&1 &", shell=True) # 256 == "number of colors"
-   
+
             #if in_msg.verbose:
             #   print "    add coastlines to "+outputFile   
             ## alternative: reopen image and modify it (takes longer due to additional reading and saving)
@@ -389,13 +389,24 @@ def plot_msg(in_msg):
                   if in_msg.verbose:
                      print "... secure copy "+outputFile.replace(".png","-fs8.png")+ " to "+in_msg.scpOutputDir
                      subprocess.call("scp "+in_msg.scpID+" "+outputFile.replace(".png","-fs8.png")+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
-   
+ 
+            if 'ninjotif' in in_msg.outputFormats:
+               ninjotif_file = format_name (outputDir+'/'+in_msg.ninjotifFilename, data.time_slot, sat_nr=data.sat_nr(), RSS=in_msg.RSS, area=area, rgb=rgb )
+               from plot_coalition2 import pilimage2geoimage
+               GEO_image = pilimage2geoimage(PIL_image, obj_area, data.time_slot)
+               GEO_image.save(ninjotif_file,
+                             fformat='mpop.imageo.formats.ninjotiff',
+                             ninjo_product_name=rgb, chan_id = products.ninjo_chan_id[rgb.replace("_","-")+"_"+area],
+                             nbits=8)
+               chmod(ninjotif_file, 0777)
+               print ("... save ninjotif image: display ", ninjotif_file, " &")
+
             if rgb not in RGBs_done:
                RGBs_done.append(rgb)
    
       ## start postprocessing
       if area in in_msg.postprocessing_areas:
-         postprocessing(in_msg, global_data.time_slot, int(data.sat_nr()), area)
+        postprocessing(in_msg, global_data.time_slot, int(data.sat_nr()), area)
 
    if in_msg.verbose:
       print " "

@@ -215,14 +215,18 @@ def plot_msg(in_msg):
          resolution='i'
 
       if in_msg.parallax_correction:
-         if in_msg.verbose:
-            loaded_products = [chn.name for chn in data.loaded_channels()]
-            print "    perform parallax correction for loaded channels: ", loaded_products
-         if area == 'ccs4':
-            estimate_cth=False
-         else:
-            estimate_cth=True
-         data = data.parallax_corr(fill=in_msg.parallax_gapfilling, estimate_cth=estimate_cth, replace=True)
+        loaded_products = [chn.name for chn in data.loaded_channels()]
+
+        if 'CTH' not in loaded_products:
+          print "*** Error in plot_msg ("+inspect.getfile(inspect.currentframe())+")"
+          print "    Cloud Top Height is needed for parallax correction "
+          print "    either load CTH or specify the estimation of the CTH in the input file (load 10.8 in this case)"
+          quit()
+          
+        if in_msg.verbose:
+          print "    perform parallax correction for loaded channels: ", loaded_products
+          
+        data = data.parallax_corr(fill=in_msg.parallax_gapfilling, estimate_cth=in_msg.estimate_cth, replace=True)
 
       #import matplotlib.pyplot as plt
       #plt.imshow(data['lat'].data)
@@ -433,7 +437,7 @@ def load_products(data_object, RGBs, in_msg, area_loaded):
    except ImportError:
       LOGGER.warning("pyresample missing. Can only work in satellite projection")
 
-   if in_msg.parallax_correction:
+   if in_msg.parallax_correction and in_msg.estimate_cth==False:
       if 'CTH' not in RGBs:
          RGBs.append('CTH')
       if in_msg.nwcsaf_calibrate == False:

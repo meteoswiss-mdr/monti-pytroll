@@ -270,6 +270,7 @@ def input(in_msg, timeslot=None):
     in_msg.check_input = False
     #in_msg.reader_level="seviri-level4" 
     #in_msg.parallax_correction = True
+    #in_msg.estimate_cth=True
     #in_msg.parallax_gapfilling = 'bilinear' # 'False' (default), 'nearest'
     #in_msg.save_reprojected_data=['ccs4']
     in_msg.reprojected_data_filename='%(msg)s_%(area)s_%Y%m%d%H%M_nwcsaf.nc'

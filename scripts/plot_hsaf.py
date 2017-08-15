@@ -42,16 +42,23 @@ if len(layer) > 0:
     print "*** No borders and rivers for an overlay"
     add_rivers  = False # no rivers if an overlay is needed
     add_borders = False # no map    if an overlay is needed
+
 add_title=True
 add_logos=True
+
 add_colorscale=True
 #add_colorscale=False
+
 #color_mode=''
 color_mode='hsaf'
 #color_mode='radar'
+
+areas=['ccs4']
+#areas=['EuropeCanaryS95']
 #areas=['ccs4','EuropeCanaryS95']
-#areas=['ccs4']
-areas=['EuropeCanaryS95']
+
+parallax_correction=True
+estimate_cth=False
 
 #fill_value=(1,1,1) # fill_value=(1,1,1)  # white background
 #fill_value=(0,0,0) # fill_value=(0,0,0)  # black background 
@@ -97,22 +104,15 @@ print "*** read hsaf data (plot_hsaf.py)"
 
 
 global_data = GeostationaryFactory.create_scene("meteosat", "10", "seviri", time_slot)
+#prop_str = ['h03']
 prop_str = ['h03']
-#prop_str = ['h03','IR_108']
-# area="hsaf" this is h03 data coverage 
-
-# load data 
+# load data
 global_data.load(prop_str)
+#plot.show_quicklook(global_data[prop_str].area_def, global_data[prop_str].data )
 
-#plot.show_quicklook(obj_area, global_data[prop_str].data )
-#print "global_data[prop_str].data", global_data[prop_str].data
-#print "global_data[prop_str].data", global_data[prop_str].data[355,:]
-#print "shape: ", global_data[prop_str].data.shape
-#print "radar product name: ", global_data[prop_str].product_name
-
+## mask array if necessary
 #prop = np.ma.asarray(global_data[prop_str].data)
 #prop.mask = (prop == 9999.9) | (prop <= 0.0001) 
-
 
 yearS = str(year)
 #yearS = yearS[2:]
@@ -123,21 +123,34 @@ minS   = "%02d" % minute
 dateS=yearS+'-'+monthS+'-'+dayS
 timeS=hourS+':'+minS+'UTC' 
 
-global_data.project('hsaf')
-
 #outputDir='./'+yearS+'-'+monthS+'-'+dayS+'/'+yearS+'-'+monthS+'-'+dayS+'_'+prop_str+'-'+area+'/'
 outputDir='./pics/'
 #outputDir='/data/cinesat/out/'
 
 # parallax correction
-loaded_channels = [chn.name for chn in global_data.loaded_channels()]
-print loaded_channels
-print "---"
-print global_data['h03'].area
-print "---"
-
-if False:
-    global_data.parallax_corr(fill="False", estimate_cth=True, replace=True)
+parallax_str=''
+if parallax_correction:
+    if estimate_cth:
+        print "*** estimate cth"
+        print "... read IR_108"
+        IR_data = GeostationaryFactory.create_scene("Meteosat-9", "", "seviri", time_slot)
+        IR_data.load(['IR_108'], reader_level="seviri-level2")
+        print "    reproject IR_108 to projection of hsaf"  
+        IR_data = IR_data.project('hsaf')  # return statement is necessary
+        global_data.parallax_corr(fill="nearest", estimate_cth=True, IR_108=IR_data['IR_108'], cth_atm="best", time_slot=time_slot, replace=True)
+        parallax_str='-PC-ECTH'
+        #plot.show_quicklook(global_data['CTH'].area_def, global_data['CTH'].data)
+    else:
+        print "... take cth from NWC-SAF"
+        print "*** read CTH"
+        global_data.load(['CTTH'], reader_level="seviri-level3")
+        from my_msg_module import convert_NWCSAF_to_radiance_format
+        convert_NWCSAF_to_radiance_format(global_data, global_data['CTTH'].area, 'CTH', True, True)
+        global_data.channels.remove('CTTH')
+        print "reproject CTH to projection of hsaf"  
+        global_data = global_data.project('hsaf')  # return statement is necessary
+        global_data.parallax_corr(fill="nearest", estimate_cth=False, replace=True)  # fill="False", "nearest" or "bilinear"
+        parallax_str='-PC-CTH'
 
 if not exists(outputDir):
     print '... create output directory: ' + outputDir
@@ -156,8 +169,8 @@ for area in areas:
         resolution='c'
 
     data = global_data.project(area)
-    data[prop_str].product_name = global_data[prop_str].product_name
-    data[prop_str].units = global_data[prop_str].units
+    #data[prop_str].product_name = global_data[prop_str].product_name
+    #data[prop_str].units = global_data[prop_str].units
 
     obj_area = get_area_def(area)
     
@@ -193,7 +206,8 @@ for area in areas:
 
 
     #outputFile = "./pics/radar.png"
-    outputFile = outputDir+'MSG_'+data[prop_str].product_name+'-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS +'.png'
+    #outputFile = outputDir+'MSG_'+data[prop_str].product_name+'-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS +'.png'
+    outputFile = outputDir+'/MSG_'+'h03'+parallax_str+'-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS +'.png'
 
     prop=data[prop_str].data
 
@@ -266,13 +280,11 @@ for area in areas:
         resolution='h'
 
     # define area
-    print 'obj_area ', obj_area
     proj4_string = obj_area.proj4_string     
     # e.g. proj4_string = '+proj=geos +lon_0=0.0 +a=6378169.00 +b=6356583.80 +h=35785831.0'
     area_extent = obj_area.area_extent              
     # e.g. area_extent = (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
     area_def = (proj4_string, area_extent)
-    print 'area_def ', area_def
 
     if add_rivers:
        if verbose:

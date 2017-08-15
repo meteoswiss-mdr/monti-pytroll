@@ -21,6 +21,7 @@ class input_msg_class:
       self.check_input = False
       self.reader_level = None
       self.parallax_correction = False
+      self.estimate_cth=False
       self.parallax_gapfilling = 'False'
       self.save_reprojected_data = []
       self.save_statistics = False

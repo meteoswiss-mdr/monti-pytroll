@@ -270,6 +270,7 @@ def input(in_msg, timeslot=None):
     in_msg.check_input = False
     #in_msg.reader_level="seviri-level4" 
     #in_msg.parallax_correction = True
+    #in_msg.estimate_cth=True
     #in_msg.parallax_gapfilling = 'bilinear' # 'False' (default), 'nearest'
     #in_msg.save_reprojected_data=['ccs4']
     in_msg.reprojected_data_filename='%(msg)s_%(area)s_%Y%m%d%H%M_nwcsaf.nc'
@@ -279,7 +280,8 @@ def input(in_msg, timeslot=None):
     in_msg.make_plots=True
     in_msg.fill_value=(0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
     in_msg.add_title = True
-    in_msg.title = " MSG-2, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s"
+    in_msg.title = [" MSG-2, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s"]
+    in_msg.title_y_line_nr = 1  # (INT) at which line should the title start
     in_msg.add_borders = True
     in_msg.border_color = 'red'
     in_msg.add_rivers = False
@@ -289,17 +291,20 @@ def input(in_msg, timeslot=None):
     in_msg.add_colorscale = False
     in_msg.HRV_enhancement = False
 
+    in_msg.outputFormats = ['png','ninjotif'] 
     in_msg.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
     in_msg.outputDir='./pics/'
     #in_msg.outputDir = "./%Y-%m-%d/%Y-%m-%d_%(rgb)s-%(area)s/"
     #in_msg.outputDir = '/data/cinesat/out/'
     in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
-
     in_msg.compress_to_8bit=False
 
     #in_msg.scpOutput = True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
     
+    in_msg.ninjotifFilename = 'MET%(sat_nr)s_%(RSS)s_%(rgb)s_%(area)s_%Y%m%d%H%M.tif' 
+    in_msg.upload_ninjotif = False
+
     #in_msg.postprocessing_areas=['ccs4']
     in_msg.postprocessing_composite=["THX-IR_108","radar-convection","THX-radar-convection"]    

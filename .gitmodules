@@ -28,7 +28,7 @@
 	branch = develop
 [submodule "packages/mipp"]
 	path = packages/mipp
-	url = https://github.com/pytroll/mipp.git
+	url = https://github.com/meteoswiss-mdr/mipp.git
 	branch = pre-master
 [submodule "packages/mpop"]
 	path = packages/mpop

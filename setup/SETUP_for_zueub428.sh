@@ -15,13 +15,13 @@
 # author: Ulrich Hamann
 # version 0.1: 16-02-2016 U. Hamann
 
-# installation of Anaconda
+# installation of Anaconda (not necessary for zueub427, zueub428 and CSCS, as we use a common Anaconda installation)
 # (use the ". ./" syntax to remember env variable set inside the bash script)
 #. ./setup_anaconda.sh
 #echo "press enter to continue"
 #read junk
 
-# update Anaconda, create virt. env. "PyTroll", install python packages
+# update Anaconda, create virt. env. "PyTroll_${LOGNAME}", install python packages
 . ./setup_virtual_environment.sh
 echo "press enter to continue"
 read junk

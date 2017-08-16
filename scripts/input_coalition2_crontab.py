@@ -18,12 +18,15 @@ def input(in_msg, timeslot=None):
     # e.g. current time               2015-05-31 12:33 UTC
     # delay 5 min                     2015-05-31 12:28 UTC
     # last Rapid Scan Service picture 2015-05-31 12:25 UTC (Scan start) 
-    in_msg.delay=6   # start 3, 8, 13, 18 ...
+    if in_msg.RSS:
+        in_msg.delay=6   # start 4, 9, 14, 19 ... -> go to time step before
+    else:
+        in_msg.delay=3   # start 4, 9, 14, 19 ... -> not allowed to go to 15min before, as 30min old MSG data is deleted at that time
 
     #------------------------------------------------------------------------
     # if not specified (False), current (last) observation time is chosen  
     # choose specification, if you want a default time without command line arguments 
-    # (the specified time is overwritte by the command line arguments of plot_msg.py)
+    # (the specified time is overwritten by the command line arguments of plot_msg.py)
     #------------------------------------------------------------------------
     if True:
         # choose timeslot of the satellite picture to process
@@ -46,7 +49,6 @@ def input(in_msg, timeslot=None):
     #----------------
     # chose area
     #----------------
-    #in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
     #in_msg.areas.append('alps95')          # area around Switzerland processed by NWCSAF software 349x151 
     #in_msg.areas.append('ticino')          # stereographic proj of Ticino 342x311
     #in_msg.areas.append('germ')            # Germany 1024x1024
@@ -59,19 +61,14 @@ def input(in_msg, timeslot=None):
     #in_msg.areas.append('met09globe')      # Cropped globe MSG image 3620x3620     # does not yet work
     #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
     #in_msg.areas.append('odysseyS25')      # Area of Odyssey composite (factor 2.5 smaller)
-    in_msg.areas.append('ccs4')
+    in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640 (should be second after Europe)
     #in_msg.areas.append('EuropeCanaryS95') # "ccs4" "blitzortung" #"eurotv" # "eurotv"
-    #in_msg.areas.append("blitzortung")
+    #in_msg.areas.append("EuroMercator")    # same projection as blitzortung.org
     
-    # Warning, if large areas are wanted and RSS is specified
-    if in_msg.RSS and (('fullearth' in in_msg.areas) or ('met09globe' in in_msg.areas) or ('met09globeFull' in in_msg.areas)): 
-        print        "*** WARNING, large areas are requested: ", in_msg.areas
-        print        "    as well as rapid scan service is specified, which covers only the uppermost 1/3 of the disk"
-        print        "    (1) continue with enter"
-        junk = input("    (2) abort with Ctrl+c")
+    in_msg.check_RSS_coverage()
 
     in_msg.properties_cells = True
-    in_msg.plot_forecast = True
+    in_msg.plot_forecast = False    # !!! change by UH 2017-07-04 !!!
     
     #model which will be used to fit the history of the cells and extrapolate the future area
     #in_msg.model_fit_area = "linear_exp" #reccomended
@@ -102,7 +99,7 @@ def input(in_msg, timeslot=None):
     in_msg.areasNoRapidScan = ['fullearth','met09globe','met09globeFull'] #should also be changed to coordinates check!!!!
       
     in_msg.settings = "default" # the settings will be automatically defined depending on the area chosen
-      #in_msg.settings == "manual"
+    #in_msg.settings == "manual"
     
     # set cloud mask 
     #-------------------------
@@ -139,6 +136,15 @@ def input(in_msg, timeslot=None):
     # choose production of results
     #-----------------------------
     in_msg.results = ['C2rgb']
+    #in_msg.outputFormats = ['png']  # only for 'C2rgb'
+    in_msg.outputFormats = ['png','ninjotif']  # only for 'C2rgb'
+    in_msg.ninjotifFilename = 'MET%(sat_nr)s_%(RSS)s_COALITION2_%(area)s_%Y%m%d%H%M.tif'
+    in_msg.upload_ninjotif = False
+    #in_msg.results.append('C2rgbHRV')
+
+    # look at metadata with: 
+    #    identify -verbose MET9_RSS_COALITION2_nrCOALtwo750m_1707051420.tif              # zueub227 # does not contain channel_id
+    #    tiffdump /data/COALITION2/tmp/MET9_RSS_COALITION2_nrCOALtwo750m_1707051425.tif  # zueub427
     in_msg.results.append('C2rgbHRV')
     # --------------------------------------
     # choose production of auxiliary results
@@ -160,6 +166,9 @@ def input(in_msg, timeslot=None):
     #in_msg.aux_results.append('mature_mask')
     #in_msg.aux_results.append('developing_mask')
     #in_msg.aux_results.append('IR_108')
+    #in_msg.aux_results.append('IR_108_t1')
+    #in_msg.aux_results.append('IR_108_t2')
+    #in_msg.aux_results.append('mask_downscale')
     #in_msg.aux_results.append('labels_tracked')
     #in_msg.aux_results.append('forecast_channels')
     
@@ -330,6 +339,9 @@ def input(in_msg, timeslot=None):
         #in_msg.chosen_settings['reader_level']= None    
 
     #PLOTTING SETTINGS. Not used??
+    in_msg.add_title = True
+    in_msg.title = "COALITION-2"
+    in_msg.title_y_line_nr = 3  # (INT) at which line should the title start
     in_msg.title_color = (255,255,255)
     #in_msg.layer = ''
     in_msg.layer = ' 2nd layer'
@@ -374,30 +386,7 @@ def input(in_msg, timeslot=None):
     in_msg.channels15 = ['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134']
     in_msg.channels30 = ['WV_062','WV_073','IR_097','IR_108','IR_134']
 
-    nrt = True # !HAU! ???
-
-    in_msg.settingsLocal = {}
-    in_msg.settingsLocal['use_TB_forecast'] = True
-    in_msg.settingsLocal['mode_downscaling'] = 'gaussian_225_125'
-    in_msg.settingsLocal['mask_labelsSmall_lowUS'] = True
-    in_msg.settingsLocal['clean_mask'] = 'skimage' 
-    in_msg.settingsLocal['rapid_scan_mode'] = False
-    in_msg.settingsLocal['forth_mask'] = 'IR_039_minus_IR_108'
-    in_msg.settingsLocal['forced_mask'] = 'no_mask'
-    in_msg.settingsLocal['mask_cirrus'] = True
-    #in_msg.settingsLocal['reader_level'] = "seviri-level4"
-
-    in_msg.settingsBroad = {}
-    in_msg.settingsBroad['use_TB_forecast'] = False
-    in_msg.settingsBroad['mode_downscaling'] = 'no_downscaling'
-    in_msg.settingsBroad['mask_labelsSmall_lowUS'] = False
-    in_msg.settingsBroad['clean_mask'] = 'no_cleaning'
-    in_msg.settingsBroad['rapid_scan_mode'] = True 
-    in_msg.settingsBroad['forth_mask'] = 'IR_039_minus_IR_108'
-    in_msg.settingsBroad['forced_mask'] = 'no_mask'
-    in_msg.settingsBroad['mask_cirrus'] = True            
-    #in_msg.settingsBroad['reader_level']="seviri-level2"           
-    
+    nrt = True # !HAU! ???    
     
     # -------------   
     # input checks 
@@ -433,7 +422,10 @@ def input(in_msg, timeslot=None):
 
     #in_msg.make_plots=True
     #in_msg.fill_value=(0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
-    #in_msg.add_title = True
+    in_msg.add_title = True 
+    in_msg.title_color = (255,255,255)
+    #in_msg.title = "COALITION-2, %Y-%m-%d %H:%MUTC, %(area)s"
+    in_msg.title = "COALITION-2"
     #in_msg.add_borders = True
     #in_msg.border_color = 'red'
     #in_msg.add_rivers = False

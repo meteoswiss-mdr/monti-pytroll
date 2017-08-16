@@ -10,9 +10,10 @@ def input(in_msg, timeslot=None):
     #in_msg.RSS=False 
     #in_msg.sat_nr=9
     #in_msg.RSS=True
-    in_msg.sat_nr=10
-    in_msg.RSS=False 
-
+    #in_msg.sat_nr=10
+    #in_msg.RSS=False 
+    # -> specify satellite close to HSAF product h03
+    
     # specify an delay (in minutes), when you like to process a time some minutes ago
     # e.g. current time               2015-05-31 12:33 UTC
     # delay 5 min                     2015-05-31 12:28 UTC
@@ -128,7 +129,7 @@ def input(in_msg, timeslot=None):
     #in_msg.RGBs.append('CTH')
     #in_msg.RGBs.append('CTP')
     ## NWC SAF PEG 13 
-    #in_msg.nwcsaf_calibrate=False
+    in_msg.nwcsaf_calibrate=True
     #in_msg.RGBs.append('sphr_bl')
     #in_msg.RGBs.append('sphr_cape')
     #in_msg.RGBs.append('sphr_diffbl')
@@ -190,6 +191,9 @@ def input(in_msg, timeslot=None):
        in_msg.RSS=False 
 
     in_msg.check_input = False
+    #in_msg.parallax_correction = True   ### does not work, as you need CTH or IR_108 in the same sat scene 
+    in_msg.parallax_gapfilling = 'bilinear' # 'False' (default), 'nearest'
+    #in_msg.estimate_cth=True
     #in_msg.save_reprojected_data=['ccs4']
     in_msg.reprojected_data_filename='%(msg)s_%(area)s_%Y%m%d%H%M_nwcsaf.nc'
     in_msg.reprojected_data_dir='/data/COALITION2/database/meteosat/ccs4/%Y/%m/%d/'
@@ -209,6 +213,7 @@ def input(in_msg, timeslot=None):
     #in_msg.outputDir = "./%Y-%m-%d/%Y-%m-%d_%(rgb)s-%(area)s/"
     #in_msg.outputDir = '/data/cinesat/out/'
     #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/GPM/%Y-%m-%d/'
+    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
 
     in_msg.compress_to_8bit=False
 
@@ -221,6 +226,6 @@ def input(in_msg, timeslot=None):
     
     in_msg.postprocessing_areas=["ccs4"]
     #in_msg.postprocessing=False
-    in_msg.postprocessing_composite=["h03-ir108"] 
+    #in_msg.postprocessing_composite=["h03-ir108"] 
     #in_msg.postprocessing_composite=["THX-IR_108","radar-convection","THX-radar-convection"]    
     #in_msg.postprocessing_montage = [["MSG_h03-ir108","MSG_HRV"]]

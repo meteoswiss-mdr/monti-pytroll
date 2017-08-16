@@ -433,6 +433,9 @@ def mask_rgb_based_pressure(data,p_min,p_max,data_CTP):
 if __name__ == '__main__':
     # input 
     
+    LOG = logging.getLogger(__name__)
+    LOG.setLevel(30)
+
     time_start_TOT = time.time()
     detailed = True 
  
@@ -466,7 +469,7 @@ if __name__ == '__main__':
 
     # load a few standard things 
     from get_input_msg import get_input_msg
-    in_msg = get_input_msg('input_coalition2')
+    in_msg = get_input_msg('input_coalition2_crontab')
 
     in_msg.resolution = 'i'
     in_msg.sat="Meteosat-"
@@ -631,7 +634,7 @@ if __name__ == '__main__':
           
           # check if input data is complete 
           if in_msg.verbose:
-              print "*** check input data", in_msg.RGBs
+              print "*** check input data", in_msg.RGBs, " for ", in_msg.sat_str()+in_msg.sat_nr_str()
           RGBs = check_input(in_msg, in_msg.sat_str()+in_msg.sat_nr_str(), in_msg.datetime)  
           # in_msg.sat_nr might be changed to backup satellite
 
@@ -643,6 +646,16 @@ if __name__ == '__main__':
           area_tuple = (proj4_string, area_extent)
       
           # read CTP to distinguish high, medium and low clouds
+          for i_try in range(30):
+              RGBs = check_input(in_msg, in_msg.sat_str()+in_msg.sat_nr_str(), in_msg.datetime, RGBs=['CTP'])
+              if len(RGBs) > 0:
+                  # exit loop, if input is found
+                  break
+              else:
+                  # else wait 20s and try again
+                  import time
+                  time.sleep(25)
+
           print "*** read CTP for ", in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", str(time_slot)
           global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", time_slot)
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, in_msg.sat_nr_str(), "seviri", time_slot)

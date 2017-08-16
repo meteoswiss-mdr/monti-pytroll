@@ -14,6 +14,7 @@ from trollimage.image import Image as trollimage
 from PIL import ImageFont, ImageDraw 
 from pycoast import ContourWriterAGG
 import sys
+import inspect
 
 LOG = logging.getLogger(__name__)
 
@@ -22,8 +23,8 @@ delay=10
 if len(sys.argv) > 1:
     if len(sys.argv) != 6:
         print "***           "
-        print "*** Warning, please specify date and time completely, e.g."
-        print "***          python plot_hsaf.py 2014 07 23 16 10 "
+        print "*** Error, please specify date and time completely, e.g."
+        print "***        python "+inspect.getfile(inspect.currentframe())+" 2014 07 23 16 10 "
         print "***           "
         quit() # quit at this point
     else:

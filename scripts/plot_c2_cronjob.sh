@@ -16,9 +16,10 @@ echo
 $python ${dir1}/plot_coalition2.py input_coalition2_crontab #> /tmp/plot_coalition2.txt 2>&1
 
 # remove uncompressed data older than 10min
-export mm=50
+export mm=60
 echo "*** Remove uncompressed data files older than " ${mm} "min"
 #find /tmp/?-000-MSG?__-MSG?_???____-*_-*___-*-__ -type f -mmin +$mm -exec rm {} \;
 find /tmp/?-000-MSG?__-MSG?_???____-*_-*___-*-__  -type f -mmin +${mm} -delete \;
 
 find /tmp/SEVIRI_DECOMPRESSED_$LOGNAME/?-000-MSG?__-MSG?_???____-*_-*___-*-__ -type f -mmin +${mm} -delete
+find /tmp/SEVIRI_DECOMPRESSED/?-000-MSG?__-MSG?_???____-*_-*___-*-__          -type f -mmin +${mm} -delete

@@ -23,14 +23,14 @@ else:
     quit()
 
 print "... Meteosat ", sat_nr,", Rapid Scan mode: ", Rapid_Scan
-time_slot = get_last_SEVIRI_date(Rapid_Scan, delay=delay)
-#time_slot = datetime.datetime(2015, 11, 26, 19, 30)
+#time_slot = get_last_SEVIRI_date(Rapid_Scan, delay=delay)
+time_slot = datetime.datetime(2015, 11, 26, 19, 30)
 print str(time_slot)
 
 global_data = GeostationaryFactory.create_scene("meteosat", sat_nr, "seviri", time_slot)
 
-#prop="CMa"
-prop='CT'
+prop="CMa"
+#prop='CT'
 #prop="CTH"
 
 # e.g. return "CTTH" for prop "CTH"

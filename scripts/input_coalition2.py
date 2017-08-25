@@ -131,13 +131,14 @@ def input(in_msg, timeslot=None):
     in_msg.RGBs.append('IR_108')
     in_msg.RGBs.append('IR_120')
     in_msg.RGBs.append('IR_134')
+    in_msg.RGBs.append('HRV')      # for luminance
 
     #-----------------------------
     # choose production of results
     #-----------------------------
     in_msg.results = ['C2rgb']
-    #in_msg.outputFormats = ['png']  # only for 'C2rgb'
-    in_msg.outputFormats = ['png','ninjotif']  # only for 'C2rgb'
+    in_msg.outputFormats = ['png']  # only for 'C2rgb'
+    #in_msg.outputFormats = ['png','ninjotif']  # only for 'C2rgb'
     in_msg.ninjotifFilename = 'MET%(sat_nr)s_%(RSS)s_COALITION2_%(area)s_%Y%m%d%H%M.tif' 
     in_msg.upload_ninjotif = False
     in_msg.results.append('C2rgbHRV')

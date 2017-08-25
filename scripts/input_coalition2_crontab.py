@@ -131,7 +131,8 @@ def input(in_msg, timeslot=None):
     in_msg.RGBs.append('IR_108')
     in_msg.RGBs.append('IR_120')
     in_msg.RGBs.append('IR_134')
-
+    #in_msg.RGBs.append('HRV')      # for luminance
+    
     #-----------------------------
     # choose production of results
     #-----------------------------

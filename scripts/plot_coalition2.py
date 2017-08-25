@@ -1419,7 +1419,7 @@ def print_usage():
 if __name__ == '__main__':
 
     from get_input_msg import get_date_and_inputfile_from_commandline
-    in_msg = get_date_and_inputfile_from_commandline(print_usage=print_usage)
+    in_msg = get_date_and_inputfile_from_commandline(print_usage=print_usage)    
     time_slot = in_msg.datetime
 
     from coalition2_settings import *    

@@ -384,16 +384,18 @@ def plot_msg(in_msg):
             #cw.add_coastlines_to_file(outputFile, obj_area, resolution=resolution, level=4)
             #cw.add_borders_to_file(outputFile, obj_area, outline=outline, resolution=resolution)
     
-            # copy to another place
+            # secure copy file to another place
             if in_msg.scpOutput:
-               if in_msg.verbose:
-                  print "... secure copy "+outputFile+ " to "+in_msg.scpOutputDir
-               subprocess.call("scp "+in_msg.scpID+" "+outputFile+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
-               if in_msg.compress_to_8bit:
-                  if in_msg.verbose:
-                     print "... secure copy "+outputFile.replace(".png","-fs8.png")+ " to "+in_msg.scpOutputDir
+               if (rgb in in_msg.scpProducts) or ('all' in [x.lower() for x in in_msg.scpProducts if type(x)==str]):
+                  if in_msg.compress_to_8bit:
+                     if in_msg.verbose:
+                        print "... secure copy "+outputFile.replace(".png","-fs8.png")+ " to "+in_msg.scpOutputDir
                      subprocess.call("scp "+in_msg.scpID+" "+outputFile.replace(".png","-fs8.png")+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
- 
+                  else:
+                     if in_msg.verbose:
+                        print "... secure copy "+outputFile+ " to "+in_msg.scpOutputDir
+                     subprocess.call("scp "+in_msg.scpID+" "+outputFile+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
+
             if 'ninjotif' in in_msg.outputFormats:
                ninjotif_file = format_name (outputDir+'/'+in_msg.ninjotifFilename, data.time_slot, sat_nr=data.sat_nr(), RSS=in_msg.RSS, area=area, rgb=rgb )
                from plot_coalition2 import pilimage2geoimage

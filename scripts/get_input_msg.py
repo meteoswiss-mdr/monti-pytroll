@@ -37,6 +37,7 @@ class input_msg_class:
       self.scpOutput = False
       self.scpOutputDir = scp_settings.scpOutputDir
       self.scpID = scp_settings.scpID
+      self.scpProducts = ['all']
       self.mapDir = ""
       self.mapResolution = None
       self.indicate_mask = True

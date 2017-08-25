@@ -1177,25 +1177,37 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 # set transparency for "no clouds" 
                 rgbArray[sum_array<=0,3] = background_alpha    # see coalition2_settings.py
                 
-                # sza indication
-                if in_msg.indicate_sza:
-                    from pyorbital.astronomy import sun_zenith_angle
-                    lonlats = data['IR_108'].area.get_lonlats()
-                    sza = sun_zenith_angle(time_slot, lonlats[0], lonlats[1])
-                    ind_sza = (sza > 72) & (sum_array<=0)
-                    # modify background to bluesh with alpha = 100
-                    rgbArray[ind_sza,2] = 130    # 255 intense blue 
-                    rgbArray[ind_sza,3] =  60    # 255=opaque
+                ############################################################################################################################################
 
                 # create output file name (replace wildcards)
                 c2File = format_name(outputDir+'/'+in_msg.outputFile, data.time_slot, area=area, rgb='C2rgb', sat=data.satname, sat_nr=data.sat_nr())
 
                 if 'C2rgb' in in_msg.results:
+
                     PIL_image = Image.fromarray( rgbArray, 'RGBA' )
                     #add_borders_and_rivers( PIL_image, cw, area_tuple,
                     #                        add_borders=in_msg.add_borders, border_color=in_msg.border_color,
                     #                        add_rivers=in_msg.add_rivers, river_color=in_msg.river_color, 
                     #                        resolution=in_msg.resolution, verbose=in_msg.verbose)
+
+                    if in_msg.HRV_enhancement:
+                        if in_msg.verbose:
+                            print ("enhance the image with the HRV channel")
+                        GEO_image = pilimage2geoimage(PIL_image, c2_data['r'].area_def, data.time_slot)
+                        luminance = GeoImage((data["HRV"].data), data.area, data.time_slot,
+                                             crange=(0, 100), mode="L")
+                        luminance.enhance(gamma=2.0)
+                        img.replace_luminance(luminance.channels[0])
+
+                    # sza indication
+                    if in_msg.indicate_sza:
+                        from pyorbital.astronomy import sun_zenith_angle
+                        lonlats = data['IR_108'].area.get_lonlats()
+                        sza = sun_zenith_angle(time_slot, lonlats[0], lonlats[1])
+                        ind_sza = (sza > 72) & (sum_array<=0)
+                        # modify background to bluesh with alpha = 100
+                        rgbArray[ind_sza,2] = 130    # 255 intense blue 
+                        rgbArray[ind_sza,3] =  60    # 255=opaque
 
                     # add title
                     if in_msg.add_title:
@@ -1227,8 +1239,9 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
 
                         print ("... reproject COALITION2 result ("+area+") to "+area_ninjotif)
                         
-                        # there is a problem, that areas outside the 
-                        # erase outermost lines
+                        # !!! FIX ME !!!
+                        # there is a problem, that areas outside ccs4 are extrapolated with nearest neighbour
+                        # here: delete the outermost lines of the result, so that nearest neighbour is NaN
                         if area_ninjotif == 'nrEURO1km':
                             rgbArray[ 0, :, :] = 0
                             rgbArray[-1, :, :] = 0
@@ -1247,6 +1260,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                         c2_data = c2_data.project(area_ninjotif) # (default) mode='quick' || mode="bilinear", radius=50e3 || mode="ewa" || mode="nearest"
 
                         """
+                        # !!! FIX ME !!!
                         # reproject all channels to the area needed by NINJO
                         if area_ninjotif == 'nrEURO3km':
                             # normal reprojection
@@ -1366,6 +1380,8 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                         plot_forecast_area(time_slot, in_msg.model_fit_area, outputDir=outputDir+add_path, current_labels=labels_corrected,
                                            t_stop=time_slot, BackgroundFile=c2File, ForeGroundRGBFile=c2File, labels_dir=labelsDir, in_msg=in_msg)
             
+
+
           # add 5min and do the next time step
           f4p = labelsDir+"/Labels*"
           import glob

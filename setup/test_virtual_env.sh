@@ -3,7 +3,8 @@ function test_virtual_env {
     echo ""
     echo "    Please do some test, if you can import packages:"
     echo ""
-    echo "source activate "PyTroll_$(logname)
+    ## echo "source activate "PyTroll_$(logname) # this is hau even for cinesat
+    echo "source activate "PyTroll_$LOGNAME
     echo "python"
     echo "import matplotlib._path"
     echo "import h5py"

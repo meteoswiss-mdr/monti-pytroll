@@ -71,6 +71,7 @@ case $HOSTNAME in
     export http_proxy=http://proxy.meteoswiss.ch:8080
     export https_proxy=https://proxy.meteoswiss.ch:8080
     if [ $HOSTNAME == "hau" ]; then
+	echo "*** change XAUTHORITY"
 	export XAUTHORITY=/home/lom/users/$LOGNAME/.Xauthority
     fi
     export FULLNAME=`getent passwd $LOGNAME | cut -d ":" -f 5 | cut -d "," -f 1`

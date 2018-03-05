@@ -70,7 +70,10 @@ case $HOSTNAME in
     fi
     export http_proxy=http://proxy.meteoswiss.ch:8080
     export https_proxy=https://proxy.meteoswiss.ch:8080
-    export XAUTHORITY=/home/lom/users/$LOGNAME/.Xauthority
+    if [ $HOSTNAME == "hau" ]; then
+	echo "*** change XAUTHORITY"
+	export XAUTHORITY=/home/lom/users/$LOGNAME/.Xauthority
+    fi
     export FULLNAME=`getent passwd $LOGNAME | cut -d ":" -f 5 | cut -d "," -f 1`
     export FIRSTNAME=`echo $FULLNAME | cut -d " " -f 1`
     export LASTNAME=`echo $FULLNAME | cut -d " " -f 2`
@@ -96,7 +99,18 @@ esac
 export PYTHONPATH=$CONDA_PATH/bin:$PYTROLLHOME/scripts
 
 # activate virtual environment
-source activate PyTroll_$LOGNAME
+if [ "$1" == "no_virtual_environment" ] || [ "$1" = "nve" ] ; then
+    echo "*** dont activate virtual environement"
+    export VIRTUAL_ENV=$CONDA_PATH/envs/PyTroll_$LOGNAME/
+    export PATH="$VIRTUAL_ENV/bin:$PATH"
+    unset PYTHON_HOME
+
+else
+    echo "*** activate virtual environment: source activate PyTroll_"$LOGNAME
+    source activate PyTroll_$LOGNAME
+fi
+
+
 
 # some useful alias commands
 alias ll='ls --color=auto -alh'

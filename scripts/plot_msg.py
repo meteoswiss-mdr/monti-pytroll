@@ -56,7 +56,8 @@ from my_msg_module import choose_msg, convert_NWCSAF_to_radiance_format, get_NWC
 from my_msg_module import check_loaded_channels
 from postprocessing import postprocessing
 
-import products 
+import products
+from datetime import datetime
 
 import inspect
 
@@ -93,7 +94,24 @@ def plot_msg(in_msg):
    if in_msg.sat_nr==None:
       in_msg.sat_nr=choose_msg(in_msg.datetime,in_msg.RSS)
 
-   if in_msg.datetime.year > 2012:
+   if in_msg.datetime > datetime(2018, 3, 1):
+      # MSG4 prime satellite, MSG3 RSS, MSG2 backup, MSG1 Indian Ocean Data Coverage
+      if in_msg.sat_nr == 8:
+         area_loaded = get_area_def("IODC")
+      elif in_msg.sat_nr ==  9: # rapid scan service satellite
+         area_loaded = get_area_def("EuropeCanary35")  
+      elif in_msg.sat_nr == 10: # default satellite
+         area_loaded = get_area_def("EuropeCanary95")  # full disk service, like EUMETSATs NWC-SAF products
+      elif in_msg.sat_nr == 11: # fake satellite for reprojected ccs4 data in netCDF
+         area_loaded = get_area_def("SeviriDiskFull00")  # full disk service, like EUMETSATs NWC-SAF products        
+      elif in_msg.sat_nr == 0: # fake satellite for reprojected ccs4 data in netCDF
+         area_loaded = get_area_def("ccs4")  # 
+         #area_loaded = get_area_def("EuropeCanary")
+         #area_loaded = get_area_def("alps")  # new projection of SAM
+      else:
+         print "*** Error (A), unknown satellite number ", in_msg.sat_nr, "in plot_msg (plot_msg.py)"
+         area_loaded = get_area_def("hsaf")  # 
+   elif in_msg.datetime.year > 2012:
       if in_msg.sat_nr == 8:
          area_loaded = get_area_def("EuropeCanary35")
       elif in_msg.sat_nr ==  9: # rapid scan service satellite
@@ -105,7 +123,7 @@ def plot_msg(in_msg):
          #area_loaded = get_area_def("EuropeCanary")
          #area_loaded = get_area_def("alps")  # new projection of SAM
       else:
-         print "*** Error, unknown satellite number ", in_msg.sat_nr
+         print "*** Error (B), unknown satellite number ", in_msg.sat_nr, "in plot_msg (plot_msg.py)"
          area_loaded = get_area_def("hsaf")  # 
    else:
       if in_msg.sat_nr == 8:
@@ -131,7 +149,7 @@ def plot_msg(in_msg):
    if in_msg.verbose:
       print '*** Create plots for '
       print '    Satellite/Sensor: ' + in_msg.sat_str() 
-      print '    Satellite number: ' + in_msg.sat_nr_str()
+      print '    Satellite number: ' + in_msg.sat_nr_str() + str(in_msg.sat_nr)
       print '    Satellite isntrument: ' + in_msg.instrument
       print '    Date/Time:        '+ str(in_msg.datetime)
       print '    RGBs:            ', in_msg.RGBs
@@ -316,7 +334,7 @@ def plot_msg(in_msg):
 
             # add title to image
             if in_msg.add_title:
-               add_title(PIL_image, in_msg.title, HRV_enhance_str+rgb, in_msg.sat_str(), in_msg.sat_nr_str(), in_msg.datetime, area, dc, in_msg.verbose )
+               add_title(PIL_image, in_msg.title, HRV_enhance_str+rgb, in_msg.sat_str(), data.sat_nr(), in_msg.datetime, area, dc, in_msg.verbose ) # !!! needs change
 
             # add MeteoSwiss and Pytroll logo
             if in_msg.add_logos:
@@ -454,7 +472,7 @@ def load_products(data_object, RGBs, in_msg, area_loaded):
          for channel in products.MSG:
             if rgb.find(channel) != -1:                   # if a channel name (IR_108) is in the rgb name (IR_108c)
                if in_msg.verbose: 
-                  print "    load prerequisites by name: ", channel, in_msg.reader_level
+                  print "    load prerequisites by name: ", channel, ", reader:", in_msg.reader_level,"+++"
                if in_msg.reader_level == None:
                   data_object.load([channel], area_extent=area_loaded.area_extent)   # try all reader levels  load the corresponding data
                else:
@@ -543,6 +561,7 @@ def choose_map_resolution(area, resolution, MapResolutionInputfile):
 
 def save_reprojected_data(data, area, in_msg, concatenate_bands=False):
 
+   print "*** save reprojected data" 
    _sat_nr = int(data.sat_nr())-7 if int(data.sat_nr())-7 > 0 else 0  # use data.sat_nr() instead of data.number
    # directory / path 
    nc_dir  = (data.time_slot.strftime(in_msg.reprojected_data_dir)
@@ -924,7 +943,7 @@ def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, verbose, 
 
    # replace wildcards such as %Y-%m-%d with values
    for idx, title_line in enumerate(title):
-      title_line1 = format_name (title_line, time_slot, rgb=rgb, sat=sat, sat_nr=sat_nr, area=area )  
+      title_line1 = format_name (title_line, time_slot, rgb=rgb, sat=sat, sat_nr=sat_nr, area=area )
       y_pos = y_pos_title + (idx+(title_y_line_nr-1)) * dy
       draw.text( (x_pos_title, y_pos), title_line1, title_color, font=font)
       if verbose:

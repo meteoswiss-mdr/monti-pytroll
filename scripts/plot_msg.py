@@ -365,6 +365,12 @@ def plot_msg(in_msg):
                print "... units = ", unit
                add_colorscale(dc, rgb, in_msg, unit=unit)
 
+            if in_msg.parallax_correction:
+               parallax_correction_str='pc'
+            else:
+               parallax_correction_str=''
+            rgb+=parallax_correction_str
+
             # create output filename
             outputDir =              format_name(in_msg.outputDir,  data.time_slot, area=area, rgb=rgb, sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
             outputFile = outputDir +"/"+ format_name(in_msg.outputFile, data.time_slot, area=area, rgb=rgb, sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
@@ -442,7 +448,7 @@ def plot_msg(in_msg):
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
 
-def load_products(data_object, RGBs, in_msg, area_loaded):
+def load_products(data_object, RGBs, in_msg, area_loaded, load_CTH=True):
 
    if in_msg.verbose:
       print "*** load products ", RGBs
@@ -458,7 +464,7 @@ def load_products(data_object, RGBs, in_msg, area_loaded):
       LOGGER.warning("pyresample missing. Can only work in satellite projection")
 
    if in_msg.parallax_correction and in_msg.estimate_cth==False:
-      if 'CTH' not in RGBs:
+      if 'CTH' not in RGBs and load_CTH:
          RGBs.append('CTH')
       if in_msg.nwcsaf_calibrate == False:
          print "*** Error in plot_msg ("+inspect.getfile(inspect.currentframe())+")"
@@ -653,8 +659,8 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
    elif rgb in products.SEVIRI_viewing_geometry:
       prop = data[rgb].data
       plot_type='trollimage'
-   elif rgb in (products.CTTH + products.PC + products.CRR + products.PPh) :
-      prop = data[rgb].data
+   elif rgb in (products.CTTH + products.PC + products.CRR + products.PPh):
+      prop = ma.masked_array(data[rgb].data)
       prop.mask = (prop <= 0)
       if in_msg.nwcsaf_calibrate==True:
          if rgb == 'CTH':
@@ -811,18 +817,22 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
 
-def add_borders_and_rivers(PIL_image, cw, area_tuple, add_borders=True, border_color='red', add_rivers=False, river_color='blue', verbose=True, resolution='c'):
+def add_borders_and_rivers(PIL_image, cw, area_tuple, add_borders=True, border_color=None, add_rivers=False, river_color=None, verbose=True, resolution='c'):
 
    if PIL_image.mode == 'RGB' or PIL_image.mode == 'RGBA': 
-      # take input colors
-      pass
+      if border_color==None:
+         border_color='red'
+      if river_color==None:
+         river_color='blue'
    elif PIL_image.mode == 'L':
       # replace input colors with white
-      border_color = 'white'
-      river_color  = 'white'
+      if border_color==None:
+         border_color = 'white'
+      if river_color==None:
+         river_color  = 'white'
    else:
       print "*** Error in add_borders_and_rivers ("+inspect.getfile(inspect.currentframe())+")"
-      print "    Unknown image mode"
+      print "    Unknown image mode", PIL_image.mode
 
    if add_rivers:
       if verbose:

@@ -99,7 +99,18 @@ esac
 export PYTHONPATH=$CONDA_PATH/bin:$PYTROLLHOME/scripts
 
 # activate virtual environment
-source activate PyTroll_$LOGNAME
+if [ "$1" == "no_virtual_environment" ] || [ "$1" = "nve" ] ; then
+    echo "*** dont activate virtual environement"
+    export VIRTUAL_ENV=$CONDA_PATH/envs/PyTroll_$LOGNAME/
+    export PATH="$VIRTUAL_ENV/bin:$PATH"
+    unset PYTHON_HOME
+
+else
+    echo "*** activate virtual environment: source activate PyTroll_"$LOGNAME
+    source activate PyTroll_$LOGNAME
+fi
+
+
 
 # some useful alias commands
 alias ll='ls --color=auto -alh'

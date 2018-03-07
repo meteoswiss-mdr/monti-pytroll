@@ -420,6 +420,8 @@ def input(in_msg, timeslot=None):
         print "    in_msg.postprocessing_composite: ", in_msg.postprocessing_composite
     """
     #in_msg.check_input = False
+    in_msg.parallax_correction = False
+    in_msg.parallax_gapfilling = 'nearest' # 'False' (default), 'nearest', 'bilinear'
 
     #in_msg.make_plots=True
     #in_msg.fill_value=(0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  

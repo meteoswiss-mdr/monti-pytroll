@@ -10,10 +10,12 @@ def input(in_msg, timeslot=None):
     #in_msg.sat = "meteosat"
     #in_msg.sat_nr=8
     #in_msg.RSS=False 
-    in_msg.sat_nr=9
-    in_msg.RSS=True
-    #in_msg.sat_nr=10
-    #in_msg.RSS=False
+    #in_msg.sat_nr=9
+    #in_msg.RSS=True
+    in_msg.sat_nr=10
+    in_msg.RSS=True    # better determine RSS automatically
+    #in_msg.sat_nr=11
+    #in_msg.RSS=False  # better determine RSS automatically
 
     # specify an delay (in minutes), when you like to process a time some minutes ago
     # e.g. current time               2015-05-31 12:33 UTC
@@ -75,12 +77,14 @@ def input(in_msg, timeslot=None):
     #in_msg.sat = "vaa"
 
     # satellite channel differences
-    #in_msg.RGBs.append('WV_062_minus_WV_073')
-    #in_msg.RGBs.append('WV_062_minus_IR_108')
-    #in_msg.RGBs.append('WV_073_minus_IR_134')
-    #in_msg.RGBs.append('IR_087_minus_IR_108')      
-    #in_msg.RGBs.append('IR_087_minus_IR_120')      
-    #in_msg.RGBs.append('IR_120_minus_IR_108')
+    #in_msg.RGBs.append('WV_062-WV_073')
+    #in_msg.RGBs.append('WV_062-IR_108')
+    #in_msg.RGBs.append('WV_073-IR_134')
+    #in_msg.RGBs.append('IR_087-IR_108')      
+    #in_msg.RGBs.append('IR_039-IR_108')      
+    #in_msg.RGBs.append('IR_120-IR_108')      
+    #in_msg.RGBs.append('IR_087-IR_120')      
+    #in_msg.RGBs.append('IR_120-IR_108')
     #in_msg.RGBs.append('trichannel')
     #-------------------
     # viewing geometry

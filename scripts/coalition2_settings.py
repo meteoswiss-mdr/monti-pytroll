@@ -53,15 +53,18 @@ th_us   =    [  2.5,   -12.,    -10.,      2.5,    2.,      13.,     10.,    - 7
 mature_th_chDiff     = 25.0
 developing_th_chDiff = 8.0
 
-# if forth_mask == 'CloudType', then only a few cloud types 
-mature_ct            = [17,14,12]
-developing_ct        = [8,9,10,17,14,12]
+# if forth_mask == 'CloudType', then only a few cloud types (see number code of cloud types at the end of file)
+# ATTENTION, these numbers might change with NWC-SAF version !!!
+mature_ct            = [11,12,13,14]         # 11 high opaque and cumuliform clouds, 12 high opaque and stratiform clouds, 13 very high opaque and cumuliform clouds, 14 very high opaque and stratiform clouds
+#developing_ct        = [8,9,10,17,14,12]  # 8 low and stratiform clouds, 9 medium and cumuliform clouds, 10 medium and stratiform clouds, and mature...
+#developing_ct        = [8,9,10]  # 8 low and stratiform clouds, 9 medium and cumuliform clouds, 10 medium and stratiform clouds, and mature...
+developing_ct        = [5,6,7,8,9,10,11,12,13,14]  # 8 low and stratiform clouds, 9 medium and cumuliform clouds, 10 medium and stratiform clouds, and mature...  ??18 possible??
 
 # settings of the forced_mask (force to include any pixel (in mature_mask) regardless of the other thresholds)
 # ------------------------------------------------------------------------------------------------------------
 # threshold for forced_mask 
 force_th_chDiff      = 40.0
-cloud_type_forced    = [17,14]
+cloud_type_forced    = [12,14]
 
 #additional threshold for mask_cirrus (cd6 > th)
 # -----------------------------------
@@ -80,3 +83,31 @@ max_holes = 500.0
 # [removes cells with mean_us <= 3 and area<=500 (move this also to coalition2_settings)]
 mask_labelsSmall_lowUS_maxUS = 3.0 
 mask_labelsSmall_lowUS_maxArea = 500.0
+
+
+# cloud types NWC-SAF v2013
+# 0 non-processed containing no data or corrupted data
+# 1 cloud free land no contamination by snow/ice covered surface,
+#   no contamination by clouds ;
+#   but contamination by thin dust/volcanic clouds not checked
+# 2 cloud free sea no contamination by snow/ice covered surface,
+#   no contamination by clouds ;
+#   but contamination by thin dust/volcanic clouds not checked
+# 3 land contaminated by snow
+# 4 sea contaminated by snow/ice
+# 5 very low and cumuliform clouds
+# 6 very low and stratiform clouds
+# 7 low and cumuliform clouds
+# 8 low and stratiform clouds
+# 9 medium and cumuliform clouds
+#10 medium and stratiform clouds
+#11 high opaque and cumuliform clouds
+#12 high opaque and stratiform clouds
+#13 very high opaque and cumuliform clouds
+#14 very high opaque and stratiform clouds
+#15 high semitransparent thin clouds
+#16 high semitransparent meanly thick clouds
+#17 high semitransparent thick clouds
+#18 high semitransparent above low or medium clouds
+#19 fractional clouds (sub-pixel water clouds)
+#20 undefined (undefined by CMa)

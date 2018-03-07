@@ -363,20 +363,37 @@ class input_msg_class:
 def get_input_msg(input_file, timeslot=None):
 
    from os import getcwd
+   from os import path
 
    print "... read input file from directory:", getcwd()
 
    # define input class
    in_msg = input_msg_class()
 
-   # get input from (user specified) file 
-   input_module = __import__(input_file)
-   input_module.input(in_msg, timeslot=timeslot)
-
-   if timeslot != None:
-      in_msg.datetime = timeslot
-
-   return in_msg
+   # check if input file exists
+   try:
+      if path.getsize(input_file+".py") > 0:
+         # Non empty file exists
+         # get input from (user specified) file 
+         input_module = __import__(input_file)
+         input_module.input(in_msg, timeslot=timeslot)
+         
+         if timeslot != None:
+            in_msg.datetime = timeslot
+            
+         return in_msg
+      else:
+         # Empty file exists
+         print "*** ERROR in get_input_msg (get_input_msg.py)"
+         print '    input file %s.py is empty' % input_file
+         quit()
+   except OSError as e:
+      # File does not exists or is non accessible
+      print "*** ERROR in get_input_msg (get_input_msg.py)"
+      print '    input file %s.py does not exist' % input_file
+      quit()
+      
+   
 
 # =====================================================================================================================
 

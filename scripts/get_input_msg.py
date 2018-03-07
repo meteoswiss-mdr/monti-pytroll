@@ -277,10 +277,11 @@ class input_msg_class:
       local_settings['mask_labelsSmall_lowUS'] = True
       local_settings['clean_mask']             = 'skimage' 
       local_settings['rapid_scan_mode']        = False                 # always use 15min and 30min hindcast, as updraft is better visible
-      local_settings['forth_mask']             = 'no_mask'
+      #local_settings['forth_mask']             = 'no_mask'
       #local_settings['forth_mask']             = 'IR_039_minus_IR_108'
       #local_settings['forth_mask']             = 'IR_039_minus_IR_108_day_only'
       #local_settings['forth_mask']             = 'CloudType'
+      local_settings['forth_mask']             = 'NWCSAF'
       #local_settings['forth_mask']             = 'combined'
       local_settings['forced_mask']            = 'no_mask'
       local_settings['mask_cirrus']            = True

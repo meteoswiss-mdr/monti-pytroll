@@ -293,7 +293,7 @@ output:
 
 def check_RSS(sat_nr, date):
 
-    LOG.info("*** start get_RSS_mode ("+inspect.getfile(inspect.currentframe())+")")
+    LOG.info("*** start check_RSS ("+inspect.getfile(inspect.currentframe())+")")
     LOG.info("    automatic check if Metesat"+str(sat_nr)+" works in Rapid Scan Service (RSS) mode at this time: "+str(date))
 
     # check if Meteosat satellite was in RSS mode

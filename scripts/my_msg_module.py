@@ -459,6 +459,8 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
     #    RSSS='___'
     RSSS='???'
 
+    print in_msg.check_input
+
     # choose MSG satellite
     if in_msg.sat_nr == None:
         in_msg.sat_nr = choose_msg(in_msg.datetime, RSS=in_msg.RSS)
@@ -603,7 +605,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                         #n_files = len(filter(listdir(inputDirectory), search_pattern))
                         n_files = len(glob.glob(inputDirectory+'/'+search_pattern))
         
-                        if check_input:
+                        if in_msg.check_input:
                             if n_files != len(segments):     # we like to have all segments
                                 input_complete=False
                         else:
@@ -617,6 +619,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                             #else:
                             #   print '    input complete for '+channel+ ' ('+rgb+')'+' '+search_pattern
                     else:
+
                         for seg in HRsegments:
                             segS = "%02d" % seg
                             search_pattern=fname1+"HRV___"+fname2+"0000"+segS+fname3
@@ -626,20 +629,22 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                                 input_complete=False
                                 if in_msg.verbose:
                                     print "*** Warning, missing file: " + search_pattern
-                                break
+    
                             elif n_files == 1:
                                 input_any = True
                             #    if in_msg.verbose:
                             #        print "    found file: ", fname1+"HRV___"+fname2+"0000"+segS+fname3
-        
-                            if not check_input:         # in this case we are happy with one segment
-                                if input_any == True:
-                                    input_complete=True
-        
+                
                             if n_files != 0 and n_files != 1:
                                 print "*** ERROR in check_input (my_msg_module.py)"
                                 print "*** ERROR this should not happen, please contact the developers (Uli, Lorenzo)"
                             search_pattern=''
+
+                        # if we are not checking (for all segments)
+                        if not in_msg.check_input:         # ... we are happy with at least one segment
+                            if input_any == True:
+                                input_complete=True
+
                 #else:
                 #    if in_msg.verbose:
                 #        print "    input for channel "+channel+" is already checked and complete"

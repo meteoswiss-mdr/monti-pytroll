@@ -141,11 +141,11 @@ def n_file_composite(composite, in_msg, sat_nr, time_slot, area, bits_per_pixel=
     if isfile(comp_file):
         composites_done.append(composite)
 
-    if in_msg.scpOutput and composite in in_msg.postprocessing_composite:
-        if in_msg.verbose:
-            print "... secure copy "+comp_file+ " to "+in_msg.scpOutputDir
+    if in_msg.scpOutput:
+        if (composite in in_msg.scpProducts) or ('all' in [x.lower() for x in in_msg.scpProducts if type(x)==str]):
+            if in_msg.verbose:
+                print "... secure copy "+comp_file+ " to "+in_msg.scpOutputDir
             subprocess.call("/usr/bin/scp "+in_msg.scpID+" "+comp_file+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
-
 
     return composites_done
 
@@ -283,9 +283,10 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
                     montage_done.append(montage)
 
                 if in_msg.scpOutput:
-                    if in_msg.verbose:
-                        print "... secure copy "+outfile+ " to "+in_msg.scpOutputDir
-                    subprocess.call("/usr/bin/scp "+in_msg.scpID+" "+outfile+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
+                    if (montage in in_msg.scpProducts) or ('all' in [x.lower() for x in in_msg.scpProducts if type(x)==str]):
+                        if in_msg.verbose:
+                            print "... secure copy "+outfile+ " to "+in_msg.scpOutputDir
+                        subprocess.call("/usr/bin/scp "+in_msg.scpID+" "+outfile+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
 
         if in_msg.verbose:
             if len(montage_done) > 0:
@@ -293,7 +294,9 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
                 for montage in montage_done:
                     print "   ", montage
             else:
-                print "*** Warning, no montages produced "
+                if len(in_msg.postprocessing_montage) > 0:
+                    if len(in_msg.postprocessing_montage[0]) > 0:
+                        print "*** Warning, no montages produced (requested ",in_msg.postprocessing_montage,")"
 
     return composites_done, montage_done
 

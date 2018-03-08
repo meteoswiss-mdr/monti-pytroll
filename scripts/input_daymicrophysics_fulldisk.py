@@ -12,7 +12,9 @@ def input(in_msg, timeslot=None):
     #in_msg.RSS=False 
     #in_msg.sat_nr=9
     #in_msg.RSS=True
-    in_msg.sat_nr=10
+    #in_msg.sat_nr=10
+    #in_msg.RSS=False
+    in_msg.sat_nr=11
     in_msg.RSS=False
 
     # specify an delay (in minutes), when you like to process a time some minutes ago

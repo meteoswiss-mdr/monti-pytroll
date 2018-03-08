@@ -37,6 +37,7 @@ class input_msg_class:
       self.scpOutput = False
       self.scpOutputDir = scp_settings.scpOutputDir
       self.scpID = scp_settings.scpID
+      self.scpProducts = ['all']
       self.mapDir = ""
       self.mapResolution = None
       self.indicate_mask = True
@@ -277,10 +278,11 @@ class input_msg_class:
       local_settings['mask_labelsSmall_lowUS'] = True
       local_settings['clean_mask']             = 'skimage' 
       local_settings['rapid_scan_mode']        = False                 # always use 15min and 30min hindcast, as updraft is better visible
-      local_settings['forth_mask']             = 'no_mask'
+      #local_settings['forth_mask']             = 'no_mask'
       #local_settings['forth_mask']             = 'IR_039_minus_IR_108'
       #local_settings['forth_mask']             = 'IR_039_minus_IR_108_day_only'
       #local_settings['forth_mask']             = 'CloudType'
+      local_settings['forth_mask']             = 'NWCSAF'
       #local_settings['forth_mask']             = 'combined'
       local_settings['forced_mask']            = 'no_mask'
       local_settings['mask_cirrus']            = True
@@ -363,20 +365,37 @@ class input_msg_class:
 def get_input_msg(input_file, timeslot=None):
 
    from os import getcwd
+   from os import path
 
    print "... read input file from directory:", getcwd()
 
    # define input class
    in_msg = input_msg_class()
 
-   # get input from (user specified) file 
-   input_module = __import__(input_file)
-   input_module.input(in_msg, timeslot=timeslot)
-
-   if timeslot != None:
-      in_msg.datetime = timeslot
-
-   return in_msg
+   # check if input file exists
+   try:
+      if path.getsize(input_file+".py") > 0:
+         # Non empty file exists
+         # get input from (user specified) file 
+         input_module = __import__(input_file)
+         input_module.input(in_msg, timeslot=timeslot)
+         
+         if timeslot != None:
+            in_msg.datetime = timeslot
+            
+         return in_msg
+      else:
+         # Empty file exists
+         print "*** ERROR in get_input_msg (get_input_msg.py)"
+         print '    input file %s.py is empty' % input_file
+         quit()
+   except OSError as e:
+      # File does not exists or is non accessible
+      print "*** ERROR in get_input_msg (get_input_msg.py)"
+      print '    input file %s.py does not exist' % input_file
+      quit()
+      
+   
 
 # =====================================================================================================================
 

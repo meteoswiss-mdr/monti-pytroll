@@ -7,32 +7,39 @@ import datetime
 #debug_on()
 
 from my_msg_module import get_last_SEVIRI_date
-#time_slot = get_last_SEVIRI_date(True, delay=5)
-time_slot = datetime.datetime(2017, 06, 30, 12, 30)
+time_slot = get_last_SEVIRI_date(True, delay=5)
+#time_slot = datetime.datetime(2015, 11, 26, 19, 30)
 print str(time_slot)
 
-global_data = GeostationaryFactory.create_scene("Meteosat-10", "", "seviri", time_slot)
+global_data = GeostationaryFactory.create_scene("Meteosat-9", "", "seviri", time_slot)
 #europe = get_area_def("EuropeCanaryS95")
-global_data.load([0.6, 0.8, 10.8])  # , area_extent=europe.area_extent
+#global_data.load([0.6, 0.8, 10.8])  # , area_extent=europe.area_extent
+global_data.load([10.8])  # , area_extent=europe.area_extent
 print global_data
 
-area="EuropeCanaryS95"
-#area="ccs4"
+#area="EuropeCanaryS95"
+area="ccs4"
 data = global_data.project(area)
 
 from trollimage.colormap import rainbow
 colormap = rainbow
 #chn = 'VIS006'
 chn = 'IR_108'
-#print dir(data)
+from trollimage.image import Image as trollimage
+
 min_data = data[chn].data.min()
 max_data = data[chn].data.max()
-print " "
-min_data=220
-print "min_data, max_data: ", min_data, max_data
 colormap.set_range(min_data, max_data)
-from trollimage.image import Image as trollimage
+
 img = trollimage(data[chn].data, mode="L", fill_value=[0,0,0])
 img.colorize(colormap)
 img.show()
+
+from plot_coalition2 import downscale_array
+
+data[chn].data = downscale_array(data[chn].data, mode='gaussian_225_125', mask=data[chn].data.mask)
+img2 = trollimage(data[chn].data, mode="L", fill_value=[0,0,0])
+img2.colorize(colormap)
+img2.show()
+
 #img.save("tmp.png")

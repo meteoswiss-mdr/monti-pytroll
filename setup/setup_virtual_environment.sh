@@ -113,4 +113,5 @@ echo "    source deactivate"
 alias activate='source activate PyTroll_$LOGNAME'
 alias deactivate='source deactivate'
 
-source test_virtual_env.sh
+set_pytroll_paths
+source $PYTROLLHOME/setup/test_virtual_env.sh

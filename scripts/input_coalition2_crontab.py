@@ -131,7 +131,8 @@ def input(in_msg, timeslot=None):
     in_msg.RGBs.append('IR_108')
     in_msg.RGBs.append('IR_120')
     in_msg.RGBs.append('IR_134')
-
+    #in_msg.RGBs.append('HRV')      # for luminance
+    
     #-----------------------------
     # choose production of results
     #-----------------------------
@@ -419,6 +420,8 @@ def input(in_msg, timeslot=None):
         print "    in_msg.postprocessing_composite: ", in_msg.postprocessing_composite
     """
     #in_msg.check_input = False
+    in_msg.parallax_correction = False
+    in_msg.parallax_gapfilling = 'nearest' # 'False' (default), 'nearest', 'bilinear'
 
     #in_msg.make_plots=True
     #in_msg.fill_value=(0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  

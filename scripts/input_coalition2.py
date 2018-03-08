@@ -131,13 +131,16 @@ def input(in_msg, timeslot=None):
     in_msg.RGBs.append('IR_108')
     in_msg.RGBs.append('IR_120')
     in_msg.RGBs.append('IR_134')
+    #in_msg.RGBs.append('HRV')      # for luminance
+    in_msg.nwcsaf_calibrate=True
+    #in_msg.RGBs.append('CTH')
 
     #-----------------------------
     # choose production of results
     #-----------------------------
     in_msg.results = ['C2rgb']
-    #in_msg.outputFormats = ['png']  # only for 'C2rgb'
-    in_msg.outputFormats = ['png','ninjotif']  # only for 'C2rgb'
+    in_msg.outputFormats = ['png']  # only for 'C2rgb'
+    #in_msg.outputFormats = ['png','ninjotif']  # only for 'C2rgb'
     in_msg.ninjotifFilename = 'MET%(sat_nr)s_%(RSS)s_COALITION2_%(area)s_%Y%m%d%H%M.tif' 
     in_msg.upload_ninjotif = False
     in_msg.results.append('C2rgbHRV')
@@ -279,21 +282,22 @@ def input(in_msg, timeslot=None):
                     
         
         check_overwriting = 0; current_setting = 'forth_mask'
-        
+        # the forth mask will add an additional criteria that the pixel is accepted as COALITION2 result, e.g. it has to be a specific cloud type        
         #6) SETTING: choose one
         in_msg.chosen_settings['forth_mask'] = 'IR_039_minus_IR_108_day_only'; check_overwriting+=1              
         #in_msg.chosen_settings['forth_mask'] = 'IR_039_minus_IR_108'; check_overwriting+=1              
         #in_msg.chosen_settings['forth_mask'] = 'CloudType'; check_overwriting+=1 #at the moment this is not possible (problems loading CT)
-        #in_msg.chosen_settings['forth_mask'] = 'no_mask'; check_overwriting+=1
+        #in_msg.chosen_settings['forth_mask'] = 'no_mask'; check_overwriting+=1 
+        #in_msg.chosen_settings['forth_mask'] = 'combined'; check_overwriting+=1   # for SZA>72 CT, otherwise IR_039_minus_IR_108
         #in_msg.chosen_settings['forth_mask'] = None; check_overwriting+=1
         
         if check_overwriting > 1:
             print "you are overwriting your settings!!!! Check: ", current_setting
             quit()
-                    
+        
         
         check_overwriting = 0; current_setting = 'forced_mask'
-        
+        # the forced_mask will add additional pixels to the COALITION2 result, independend of the cloud updraft, glaciation and optical thickness test                
         #7) SETTING: choose one
         in_msg.chosen_settings['forced_mask'] = 'no_mask'; check_overwriting+=1              
         #in_msg.chosen_settings['forced_mask'] = 'IR_039_minus_IR_108'; check_overwriting+=1  # force to include any pixel (in mature_mask) regardless of the other thresholds
@@ -362,7 +366,8 @@ def input(in_msg, timeslot=None):
     
     #in_msg.postprocessing_composite1=["C2rgb-ir108"]
     #in_msg.postprocessing_composite2=["C2rgb-Forecast-ir108"]  
-    in_msg.postprocessing_composite1=["C2rgb-IR_108"]                # used by plot_coalition2
+    in_msg.postprocessing_composite1=["C2rgb-IR_108"]                   # used by plot_coalition2
+    #in_msg.postprocessing_composite1=["C2rgbPC-IR_108"]                # used by plot_coalition2
     #in_msg.postprocessing_composite1=["C2rgb-overview"]                # used by plot_coalition2
     #in_msg.postprocessing_composite2=["C2rgb-Forecast-IR_108"]       # used by plot_coalition2
     #in_msg.postprocessing_composite=["C2rgb-IR_108","C2rgb-HRV"]    
@@ -421,6 +426,9 @@ def input(in_msg, timeslot=None):
         print "    in_msg.postprocessing_composite: ", in_msg.postprocessing_composite
     """
     #in_msg.check_input = False
+    in_msg.parallax_correction = False
+    #in_msg.parallax_correction = True
+    in_msg.parallax_gapfilling = 'nearest' # 'False' (default), 'nearest', 'bilinear'
 
     #in_msg.make_plots=True
     #in_msg.fill_value=(0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
@@ -435,7 +443,8 @@ def input(in_msg, timeslot=None):
     #in_msg.river_color = 'blue'
     #in_msg.add_logos = False
     #in_msg.add_colorscale = False
-    #in_msg.HRV_enhancement = False
+    #in_msg.HRV_enhancement = True
+    in_msg.HRV_enhancement = False
 
     #in_msg.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
 

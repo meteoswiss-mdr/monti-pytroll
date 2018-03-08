@@ -56,7 +56,8 @@ from my_msg_module import choose_msg, convert_NWCSAF_to_radiance_format, get_NWC
 from my_msg_module import check_loaded_channels
 from postprocessing import postprocessing
 
-import products 
+import products
+from datetime import datetime
 
 import inspect
 
@@ -93,7 +94,24 @@ def plot_msg(in_msg):
    if in_msg.sat_nr==None:
       in_msg.sat_nr=choose_msg(in_msg.datetime,in_msg.RSS)
 
-   if in_msg.datetime.year > 2012:
+   if in_msg.datetime > datetime(2018, 3, 1):
+      # MSG4 prime satellite, MSG3 RSS, MSG2 backup, MSG1 Indian Ocean Data Coverage
+      if in_msg.sat_nr == 8:
+         area_loaded = get_area_def("IODC")
+      elif in_msg.sat_nr ==  9: # rapid scan service satellite
+         area_loaded = get_area_def("EuropeCanary35")  
+      elif in_msg.sat_nr == 10: # default satellite
+         area_loaded = get_area_def("EuropeCanary95")  # full disk service, like EUMETSATs NWC-SAF products
+      elif in_msg.sat_nr == 11: # fake satellite for reprojected ccs4 data in netCDF
+         area_loaded = get_area_def("SeviriDiskFull00")  # full disk service, like EUMETSATs NWC-SAF products        
+      elif in_msg.sat_nr == 0: # fake satellite for reprojected ccs4 data in netCDF
+         area_loaded = get_area_def("ccs4")  # 
+         #area_loaded = get_area_def("EuropeCanary")
+         #area_loaded = get_area_def("alps")  # new projection of SAM
+      else:
+         print "*** Error (A), unknown satellite number ", in_msg.sat_nr, "in plot_msg (plot_msg.py)"
+         area_loaded = get_area_def("hsaf")  # 
+   elif in_msg.datetime.year > 2012:
       if in_msg.sat_nr == 8:
          area_loaded = get_area_def("EuropeCanary35")
       elif in_msg.sat_nr ==  9: # rapid scan service satellite
@@ -105,7 +123,7 @@ def plot_msg(in_msg):
          #area_loaded = get_area_def("EuropeCanary")
          #area_loaded = get_area_def("alps")  # new projection of SAM
       else:
-         print "*** Error, unknown satellite number ", in_msg.sat_nr
+         print "*** Error (B), unknown satellite number ", in_msg.sat_nr, "in plot_msg (plot_msg.py)"
          area_loaded = get_area_def("hsaf")  # 
    else:
       if in_msg.sat_nr == 8:
@@ -131,7 +149,7 @@ def plot_msg(in_msg):
    if in_msg.verbose:
       print '*** Create plots for '
       print '    Satellite/Sensor: ' + in_msg.sat_str() 
-      print '    Satellite number: ' + in_msg.sat_nr_str()
+      print '    Satellite number: ' + in_msg.sat_nr_str() + str(in_msg.sat_nr)
       print '    Satellite isntrument: ' + in_msg.instrument
       print '    Date/Time:        '+ str(in_msg.datetime)
       print '    RGBs:            ', in_msg.RGBs
@@ -316,7 +334,7 @@ def plot_msg(in_msg):
 
             # add title to image
             if in_msg.add_title:
-               add_title(PIL_image, in_msg.title, HRV_enhance_str+rgb, in_msg.sat_str(), in_msg.sat_nr_str(), in_msg.datetime, area, dc, in_msg.verbose )
+               add_title(PIL_image, in_msg.title, HRV_enhance_str+rgb, in_msg.sat_str(), data.sat_nr(), in_msg.datetime, area, dc, in_msg.verbose ) # !!! needs change
 
             # add MeteoSwiss and Pytroll logo
             if in_msg.add_logos:
@@ -346,6 +364,12 @@ def plot_msg(in_msg):
                         unit = data[rgb].info['units']
                print "... units = ", unit
                add_colorscale(dc, rgb, in_msg, unit=unit)
+
+            if in_msg.parallax_correction:
+               parallax_correction_str='pc'
+            else:
+               parallax_correction_str=''
+            rgb+=parallax_correction_str
 
             # create output filename
             outputDir =              format_name(in_msg.outputDir,  data.time_slot, area=area, rgb=rgb, sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
@@ -384,16 +408,18 @@ def plot_msg(in_msg):
             #cw.add_coastlines_to_file(outputFile, obj_area, resolution=resolution, level=4)
             #cw.add_borders_to_file(outputFile, obj_area, outline=outline, resolution=resolution)
     
-            # copy to another place
+            # secure copy file to another place
             if in_msg.scpOutput:
-               if in_msg.verbose:
-                  print "... secure copy "+outputFile+ " to "+in_msg.scpOutputDir
-               subprocess.call("scp "+in_msg.scpID+" "+outputFile+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
-               if in_msg.compress_to_8bit:
-                  if in_msg.verbose:
-                     print "... secure copy "+outputFile.replace(".png","-fs8.png")+ " to "+in_msg.scpOutputDir
+               if (rgb in in_msg.scpProducts) or ('all' in [x.lower() for x in in_msg.scpProducts if type(x)==str]):
+                  if in_msg.compress_to_8bit:
+                     if in_msg.verbose:
+                        print "... secure copy "+outputFile.replace(".png","-fs8.png")+ " to "+in_msg.scpOutputDir
                      subprocess.call("scp "+in_msg.scpID+" "+outputFile.replace(".png","-fs8.png")+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
- 
+                  else:
+                     if in_msg.verbose:
+                        print "... secure copy "+outputFile+ " to "+in_msg.scpOutputDir
+                     subprocess.call("scp "+in_msg.scpID+" "+outputFile+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
+
             if 'ninjotif' in in_msg.outputFormats:
                ninjotif_file = format_name (outputDir+'/'+in_msg.ninjotifFilename, data.time_slot, sat_nr=data.sat_nr(), RSS=in_msg.RSS, area=area, rgb=rgb )
                from plot_coalition2 import pilimage2geoimage
@@ -422,7 +448,7 @@ def plot_msg(in_msg):
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
 
-def load_products(data_object, RGBs, in_msg, area_loaded):
+def load_products(data_object, RGBs, in_msg, area_loaded, load_CTH=True):
 
    if in_msg.verbose:
       print "*** load products ", RGBs
@@ -438,7 +464,7 @@ def load_products(data_object, RGBs, in_msg, area_loaded):
       LOGGER.warning("pyresample missing. Can only work in satellite projection")
 
    if in_msg.parallax_correction and in_msg.estimate_cth==False:
-      if 'CTH' not in RGBs:
+      if 'CTH' not in RGBs and load_CTH:
          RGBs.append('CTH')
       if in_msg.nwcsaf_calibrate == False:
          print "*** Error in plot_msg ("+inspect.getfile(inspect.currentframe())+")"
@@ -452,7 +478,7 @@ def load_products(data_object, RGBs, in_msg, area_loaded):
          for channel in products.MSG:
             if rgb.find(channel) != -1:                   # if a channel name (IR_108) is in the rgb name (IR_108c)
                if in_msg.verbose: 
-                  print "    load prerequisites by name: ", channel, in_msg.reader_level
+                  print "    load prerequisites by name: ", channel, ", reader:", in_msg.reader_level,"+++"
                if in_msg.reader_level == None:
                   data_object.load([channel], area_extent=area_loaded.area_extent)   # try all reader levels  load the corresponding data
                else:
@@ -541,6 +567,7 @@ def choose_map_resolution(area, resolution, MapResolutionInputfile):
 
 def save_reprojected_data(data, area, in_msg, concatenate_bands=False):
 
+   print "*** save reprojected data" 
    _sat_nr = int(data.sat_nr())-7 if int(data.sat_nr())-7 > 0 else 0  # use data.sat_nr() instead of data.number
    # directory / path 
    nc_dir  = (data.time_slot.strftime(in_msg.reprojected_data_dir)
@@ -632,8 +659,8 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
    elif rgb in products.SEVIRI_viewing_geometry:
       prop = data[rgb].data
       plot_type='trollimage'
-   elif rgb in (products.CTTH + products.PC + products.CRR + products.PPh) :
-      prop = data[rgb].data
+   elif rgb in (products.CTTH + products.PC + products.CRR + products.PPh):
+      prop = ma.masked_array(data[rgb].data)
       prop.mask = (prop <= 0)
       if in_msg.nwcsaf_calibrate==True:
          if rgb == 'CTH':
@@ -790,18 +817,22 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
 
-def add_borders_and_rivers(PIL_image, cw, area_tuple, add_borders=True, border_color='red', add_rivers=False, river_color='blue', verbose=True, resolution='c'):
+def add_borders_and_rivers(PIL_image, cw, area_tuple, add_borders=True, border_color=None, add_rivers=False, river_color=None, verbose=True, resolution='c'):
 
    if PIL_image.mode == 'RGB' or PIL_image.mode == 'RGBA': 
-      # take input colors
-      pass
+      if border_color==None:
+         border_color='red'
+      if river_color==None:
+         river_color='blue'
    elif PIL_image.mode == 'L':
       # replace input colors with white
-      border_color = 'white'
-      river_color  = 'white'
+      if border_color==None:
+         border_color = 'white'
+      if river_color==None:
+         river_color  = 'white'
    else:
       print "*** Error in add_borders_and_rivers ("+inspect.getfile(inspect.currentframe())+")"
-      print "    Unknown image mode"
+      print "    Unknown image mode", PIL_image.mode
 
    if add_rivers:
       if verbose:
@@ -922,7 +953,7 @@ def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, verbose, 
 
    # replace wildcards such as %Y-%m-%d with values
    for idx, title_line in enumerate(title):
-      title_line1 = format_name (title_line, time_slot, rgb=rgb, sat=sat, sat_nr=sat_nr, area=area )  
+      title_line1 = format_name (title_line, time_slot, rgb=rgb, sat=sat, sat_nr=sat_nr, area=area )
       y_pos = y_pos_title + (idx+(title_y_line_nr-1)) * dy
       draw.text( (x_pos_title, y_pos), title_line1, title_color, font=font)
       if verbose:

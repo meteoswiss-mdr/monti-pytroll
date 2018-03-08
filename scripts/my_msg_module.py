@@ -310,10 +310,22 @@ def check_RSS(sat_nr, date):
         else:                       # MSG-2  (meteosat9) became nominal satellite, MSG-1 (meteosat8) started RSS
             RSS = None 
       # 01.-26.02.2013 no RSS observations
-    else:                                     # 27.02.2013 9:00UTC                                     
-        if int(sat_nr) == 10:                      # MSG-3 (meteosat10) became nominal satellite, MSG-2 started RSS (MSG1 is backup for MSG2)
+    elif date <  datetime.datetime(2018, 3, 9, 0, 0): # 27.02.2013 ... 09.03.2013
+        if int(sat_nr) == 10:                       # MSG-2  (meteosat9) became nominal satellite, MSG-1 (meteosat8) started RSS
             RSS = False 
         elif int(sat_nr) == 8 or int(sat_nr) == 9:
+            RSS = True 
+        else:                       # MSG-2  (meteosat9) became nominal satellite, MSG-1 (meteosat8) started RSS
+            RSS = None 
+      # 01.-26.02.2013 no RSS observations      
+    else:                                     # 09.03.2013 ...                                    
+        if int(sat_nr) == 11:                      # MSG-3 (meteosat10) became nominal satellite, MSG-2 started RSS (MSG1 is backup for MSG2)
+            RSS = False
+        elif int(sat_nr) == 9 or int(sat_nr) == 10:
+            RSS = True 
+        elif int(sat_nr) == 8:
+            print "*** Attention!!!: This is Indian Ocean Data Coverage ***"
+            print "*** Attention!!!: This is Indian Ocean Data Coverage ***"
             RSS = True 
         else:
             RSS = None 
@@ -348,8 +360,9 @@ def format_name (folder, time_slot, rgb=None, sat=None, sat_nr=None, RSS=None, a
         new_folder = new_folder.replace("%(sat)s", sat )
 
     if sat_nr != None and sat_nr != "":
+        #print "... replace sat_nr", sat_nr
         #new_folder = (new_folder % {"msg": "MSG"+str(int(sat_nr)-7)})
-        new_folder = new_folder.replace("%(msg)s", "MSG"+str(int(sat_nr)-7))
+        new_folder = new_folder.replace("%(msg)s", "MSG-"+str(int(sat_nr)-7))
         new_folder = new_folder.replace("%(sat_nr)s", str(int(sat_nr)) )  # get rid of leading 0
     else:
         new_folder = new_folder.replace("%(msg)s", "MSG")
@@ -550,19 +563,37 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                                 elif in_msg.sat_nr == 10:
                                     there_is_no_backup_satellite = True  
                                 else:
-                                    LOG.error("*** ERROR, unknown Meteosat satellite number", in_msg.sat_nr )
-                            # after July 2016 there is no RSS backup, try if there is Meteosat 10 instead (available every 15min) 
-                            else:
+                                    LOG.error("*** ERROR (A), unknown Meteosat satellite number", in_msg.sat_nr, "in check_input (my_msg_module)" )
+                            # after July 2016 there is no RSS backup, try if there is Meteosat 10 instead (available every 15min)
+                            if in_msg.datetime < datetime.datetime(2018, 3, 3, 0, 0):
                                 if in_msg.sat_nr == 9:
                                     in_msg.sat_nr = 10
                                     if in_msg.verbose:
                                         print "... try backup satellite ", in_msg.sat_nr
                                 elif in_msg.sat_nr == 8:   # indian ocean data coverage, no backup
+                                    LOG.info("*** Warning, Meteosat satellite number", in_msg.sat_nr, " is Indian Ocean Data Coverage")
                                     there_is_no_backup_satellite = True  
                                 elif in_msg.sat_nr == 10:  # full disk service, no backup
                                     there_is_no_backup_satellite = True  
                                 else:
-                                    LOG.error("*** ERROR, unknown Meteosat satellite number", in_msg.sat_nr )
+                                    LOG.error("*** ERROR (B), unknown Meteosat satellite number", in_msg.sat_nr, "in check_input (my_msg_module)" )
+                            #    after March 2018 MSG4 is prime, MSG3 is RSS, MSG2 is backup RSS
+                            else:
+                                if in_msg.sat_nr == 10:
+                                    in_msg.sat_nr = 9
+                                    if in_msg.verbose:
+                                        print "... try backup satellite ", in_msg.sat_nr
+                                elif in_msg.sat_nr == 9:
+                                    in_msg.sat_nr = 11
+                                    if in_msg.verbose:
+                                        print "... try backup satellite ", in_msg.sat_nr
+                                elif in_msg.sat_nr == 11:
+                                    there_is_no_backup_satellite = True  
+                                elif in_msg.sat_nr == 8:
+                                    LOG.info("*** Warning, Meteosat satellite number", in_msg.sat_nr, " is Indian Ocean Data Coverage")
+                                    there_is_no_backup_satellite = True  
+                                else:
+                                    LOG.error("*** ERROR (C), unknown Meteosat satellite number", in_msg.sat_nr, "in check_input (my_msg_module)" )
                 
                 #check epilogues file 
                 epi_file= "?-000-"+MSG+"__-"+MSG+"_???____-_________-EPI______-"+yearS+monthS+dayS+hourS+minuteS+"-__"

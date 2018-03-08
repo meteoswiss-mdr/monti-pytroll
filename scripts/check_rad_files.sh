@@ -5,27 +5,38 @@ rgbs="[VIS006 VIS008 IR_016 IR_039 WV_062 WV_073 IR_087 IR_097 IR_108 IR_120 IR_
 #areas="ccs4"
 
 echo ""
-dir1=/data/OWARNA/hau/pytroll/test
-export PYTHONPATH=/home/cinesat/python/lib/python2.7/site-packages:$dir1
-export PPP_CONFIG_DIR=/data/OWARNA/hau/pytroll/cfg_offline
-export XRIT_DECOMPRESS_PATH=/data/OWARNA/hau/pytroll/bin/xRITDecompress
-echo 'PPP_CONFIG_DIR' $PPP_CONFIG_DIR
+#dir1=/data/OWARNA/hau/pytroll/test
+#export PYTHONPATH=/home/cinesat/python/lib/python2.7/site-packages:$dir1
+#export XRIT_DECOMPRESS_PATH=/data/OWARNA/hau/pytroll/bin/xRITDecompress
+#export PPP_CONFIG_DIR=/data/OWARNA/hau/pytroll/cfg_offline
+#echo 'PPP_CONFIG_DIR' $PPP_CONFIG_DIR
+#export python=/usr/bin/python
+export python=$CONDA_PATH/envs/PyTroll_$LOGNAME/bin/python
 
-if [ 1 -eq 1 ]; then
-    date_start="2010-06-01 00:00"
-    date_end="2010-10-01 00:00"
-else
-    check_time=$(echo 6*60*60 | bc) # 6 hours 
-    date_end=$(/bin/date  +$"%Y-%m-%d %H:%M")
+echo "*** create dates"
+if [ 1 -eq 0 ]; then
+    # check old dates from archive (offline modus)
+    date_start="2015-06-30 23:52"
+    date_start_s=$(/bin/date --date "$date_start" +"%s")
+    date_end="2015-07-01 01:04"
     date_end_s=$(/bin/date --date "$date_end" +"%s")
-    date_start_s=$(echo "$date_end_s - $check_time" | bc)
+    . /opt/users/cinesat/monti-pytroll/setup/bashrc_offline no_virtual_environment
+else
+    # check near real time dates for the last "check_time" seconds (nrt modus)
+    date_end=$(/bin/date  +$"%Y-%m-%d %H:%M")  # now (current date)
+    date_end_s=$(/bin/date --date "$date_end" +"%s") 
+    check_time=$(expr 6 \* 60 \* 60 )          # check for the last 6 hours 
+    #date_start_s=$(echo "$date_end_s - $check_time" | bc)
+    date_start_s=$(expr $date_end_s - $check_time )
     date_start=$(/bin/date -d @$date_start_s +"%Y-%m-%d %H:%M")
-fi 
+    . /opt/users/cinesat/monti-pytroll/setup/bashrc no_virtual_environment
+fi
 
-date_start_s=$(/bin/date --date "$date_start" +"%s")
-date_start_s=$(echo "$date_start_s - ($date_start_s % 300)" | bc) # round by 5 min = 300 s
+# round start date to 5 min (begin of MSG RSS scans)
+date_start_s=$(awk "BEGIN {printf \"%i\n\", $date_start_s - ($date_start_s % 300 ) }") # round by 5 min = 300 s
 date_start=$(date -d @$date_start_s +"%Y-%m-%d %H:%M")
-date_end_s=$(/bin/date --date "$date_end" +"%s")
+#echo $date_start_s
+#echo $date_end_s
 
 echo "*** create MSG SEVIRI radiance files from " $date_start " until " $date_end 
 
@@ -42,7 +53,8 @@ fi
 # check every 5 min == RSS scan time
 dtime="5 min"
 i=0
-i_max=$(echo " ($date_end_s - $date_start_s) / 300 + 1 " | bc) # 5 min = 300 s
+#i_max=$(echo " ($date_end_s - $date_start_s) / 300 + 1 " | bc) # 5 min = 300 s
+i_max=$(awk "BEGIN {printf \"%i\n\", ($date_end_s - $date_start_s) / 300 + 1 }") # round by 5 min = 300 s
 
 currentdate_s=$date_start_s
 
@@ -80,14 +92,16 @@ do
     
     if [ $calculate_radfile -eq 1 ]; then 
 	echo '    calculate MSG SEVIRI radiance file'
-	echo "    /usr/bin/python" $dir1/plot_msg.py input_rad_ncfiles.py $year $month $day $hour $minute 
- 	/usr/bin/python $dir1/plot_msg.py input_rad_ncfiles.py $year $month $day $hour $minute 
+	cd $PYTROLLHOME/scripts # necessary to specify input file without path
+	echo "    "$python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles.py $year $month $day $hour $minute 
+ 	$python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles.py $year $month $day $hour $minute 
     fi
 
     # add 5min (dtime) to current date 
     currentdate_s=$(/bin/date --date "$currentdate $dtime" +"%s") 
 
-    i=$(echo $i+1 | /usr/bin/bc)
+    # i=$(echo $i+1 | /usr/bin/bc)
+    i=$(expr $i + 1 )
     if [ $i -gt $i_max ]; then break; fi
 done
 

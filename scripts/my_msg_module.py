@@ -530,7 +530,8 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                     MSG = in_msg.msg_str(layout="%(msg)s%(msg_nr)s")
                     if in_msg.verbose:
                         print "... check input files for ", MSG, str(in_msg.datetime), in_msg.RGBs
-                    pro_file= "?-000-"+MSG+"__-"+MSG+"_"+RSSS+"____-_________-PRO______-"+yearS+monthS+dayS+hourS+minuteS+"-__"
+                    #pro_file = "?-000-"+MSG+"__-"+MSG+"_"+RSSS+"_???-_________-PRO______-"+yearS+monthS+dayS+hourS+minuteS+"-__"
+                    pro_file = time_slot.strftime(conf.get("seviri-level1", "filename_pro"))
                     #if len(filter(listdir(inputDirectory), pro_file)) == 0:
                     pro_filename = glob.glob(inputDirectory+'/'+pro_file)
 
@@ -593,8 +594,9 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                                 else:
                                     LOG.error("*** ERROR (C), unknown Meteosat satellite number", in_msg.sat_nr, "in check_input (my_msg_module)" )
                 
-                #check epilogues file 
-                epi_file= "?-000-"+MSG+"__-"+MSG+"_???____-_________-EPI______-"+yearS+monthS+dayS+hourS+minuteS+"-__"
+                #check epilogues file
+                #epi_file = "?-000-"+MSG+"__-"+MSG+"_???_???-_________-EPI______-"+yearS+monthS+dayS+hourS+minuteS+"-__"
+                epi_file = time_slot.strftime(conf.get("seviri-level1", "filename_epi"))
                 epi_filename = glob.glob(inputDirectory+'/'+epi_file)
                 #if len(filter(listdir(inputDirectory), epi_file)) == 0:
                 if len(epi_filename) == 0:
@@ -610,7 +612,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
             if in_msg.verbose:
                 print "    check input files for "+ rgb+ ', channels needed: ', list(channels_needed)
         
-            fname1= "?-000-"+MSG+"__-"+MSG+"_???____-"
+            fname1= "?-000-"+MSG+"__-"+MSG+"_???_???-"
             # channel
             fname2= "___-"
             # segements

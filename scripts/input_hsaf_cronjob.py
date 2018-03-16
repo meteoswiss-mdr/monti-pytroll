@@ -10,7 +10,9 @@ def input(in_msg, timeslot=None):
     #in_msg.RSS=False 
     #in_msg.sat_nr=9
     #in_msg.RSS=True
-    in_msg.sat_nr=10
+    #in_msg.sat_nr=10
+    #in_msg.RSS=False 
+    in_msg.sat_nr=11
     in_msg.RSS=False 
 
     # specify an delay (in minutes), when you like to process a time some minutes ago
@@ -58,7 +60,7 @@ def input(in_msg, timeslot=None):
     ##in_msg.RGBs.append('IR_108')       # black and white
     ##in_msg.RGBs.append('IR_120')       # black and white
     ##in_msg.RGBs.append('IR_134')       # black and white
-    ##in_msg.RGBs.append('HRV')          # black and white
+    #in_msg.RGBs.append('HRV')          # black and white
     #in_msg.RGBs.append('VIS006c')      # colored version
     #in_msg.RGBs.append('VIS008c')      # colored version
     #in_msg.RGBs.append('IR_016c')      # colored version
@@ -93,7 +95,7 @@ def input(in_msg, timeslot=None):
     #in_msg.RGBs.append('dust')               # IR_120-IR_108  IR_108-IR_087  IR_108
     #in_msg.RGBs.append('fog')
     #in_msg.RGBs.append('green_snow')
-    ##in_msg.RGBs.append('ir108')
+    #in_msg.RGBs.append('ir108')
     #in_msg.RGBs.append('natural')            # IR_016         VIS008         VIS006
     #in_msg.RGBs.append('night_fog')          
     #in_msg.RGBs.append('night_microphysics') # IR_120-IR_108  IR_108-IR_039  IR_108
@@ -159,7 +161,7 @@ def input(in_msg, timeslot=None):
     # H-SAF
     #-------------------
     in_msg.sat = "Hsaf"
-    in_msg.sat_nr = 10
+    in_msg.sat_nr = 11
     in_msg.RSS = False 
     in_msg.RGBs.append('h03')
     #-------------------
@@ -198,6 +200,7 @@ def input(in_msg, timeslot=None):
     in_msg.make_plots=True
 
     in_msg.add_title = True
+    in_msg.title_y_line_nr = 2  # (INT) at which line should the title start
     in_msg.add_borders = False
     in_msg.add_rivers = False
     in_msg.add_logos = True
@@ -214,12 +217,12 @@ def input(in_msg, timeslot=None):
     # please download the shape file 
     in_msg.mapDir='/opt/users/common/shapes/'
 
-    in_msg.scpOutput = True
+    in_msg.scpOutput = False  # !!!!
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
     
-    in_msg.postprocessing_areas=['ccs4','EuropeCanaryS95','odysseyS25']
+    in_msg.postprocessing_areas=['ccs4','EuropeCanaryS95','odysseyS25'] # !!!!
     in_msg.postprocessing_composite = ["h03-ir108", "h03-HRV"]
     #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03-ir108"],["MSG_radar-HRV","MSG_h03-HRV"]]
     #                                 only ccs4                           only ccs4                       only odyssey                      only odyssey
-    in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03-ir108"],["MSG_radar-HRV","MSG_h03-HRV"],["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]]
+    #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03-ir108"],["MSG_radar-HRV","MSG_h03-HRV"],["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]] # !!!!

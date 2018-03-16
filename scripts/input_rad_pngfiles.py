@@ -10,10 +10,10 @@ def input(in_msg, timeslot=None):
     #in_msg.RSS=True 
     #in_msg.sat_nr=8
     #in_msg.RSS=False 
-    in_msg.sat_nr=9
-    in_msg.RSS=True 
-    #in_msg.sat_nr=10
-    #in_msg.RSS=False 
+    #in_msg.sat_nr=9
+    #in_msg.RSS=True 
+    in_msg.sat_nr=10
+    in_msg.RSS=True
 
     #in_msg.delay=5 # process image 'delay' minutes before now
 
@@ -191,6 +191,7 @@ def input(in_msg, timeslot=None):
     in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
 
     in_msg.add_title = True
+    in_msg.title = None
     in_msg.add_borders = True
     in_msg.add_rivers = False 
     in_msg.add_logos = True

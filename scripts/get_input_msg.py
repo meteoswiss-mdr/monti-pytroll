@@ -45,10 +45,11 @@ class input_msg_class:
       #self.title = None
       self.title = ' %(sat)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s'
       self.title_y_line_nr = 1        # at which line should the title be written
+      self.title_color='white'
       self.add_borders = True
-      self.border_color = 'red'
+      self.border_color = None  # default red  for RGB images, and white for BW images
       self.add_rivers = False
-      self.river_color = 'blue'
+      self.river_color = None   # default blue for RGB images, and white for BW images
       self.add_logos = True
       self.logos_dir = "/opt/users/common/logos/"
       self.add_colorscale = True

@@ -59,7 +59,7 @@ REGION: ccs4c2 {
 REGION: cosmo1 {
         NAME:           Swiss COSMO model area with 1km resolution
         PCS_ID:         cosmo1
-    PCS_DEF:    proj=ob_tran, ellps=WGS84, lat_0=46.15, lon_0=8.435, o_proj=stere, o_lat_p=90, o_lon_p=-1.565
+        PCS_DEF:        proj=ob_tran, ellps=WGS84, lat_0=46.15, lon_0=8.435, o_proj=stere, o_lat_p=90, o_lon_p=-1.565
         XSIZE:          584
         YSIZE:          398
         AREA_EXTENT:    (-754225.3130887491, -412056.2370343627, 531392.9480190033, 465627.48114979145)
@@ -68,7 +68,7 @@ REGION: cosmo1 {
 REGION: cosmo7 {
         NAME:           Swiss COSMO model area with 7km resolution
         PCS_ID:         cosmo7
-    	PCS_DEF:    proj=ob_tran, ellps=WGS84, lat_0=46, lon_0=4.535, o_proj=stere, o_lat_p=90, o_lon_p=-5.465
+    	PCS_DEF:        proj=ob_tran, ellps=WGS84, lat_0=46, lon_0=4.535, o_proj=stere, o_lat_p=90, o_lon_p=-5.465
         XSIZE:          597
         YSIZE:          510
         AREA_EXTENT:    (-1812933.5656552943, -1003565.2518504434, 814056.0017955909, 1243448.9654948832)
@@ -119,6 +119,17 @@ REGION: swiss02 {
         XSIZE:         701
         YSIZE:         551
         AREA_EXTENT:   (55430.855257,-2845872.431411,563494.664883,-2280086.192722)
+};
+
+# python coord2area_def_stere.py Switzerland_stereographic stere 45.7 47.8 5.8 10.6 0.5
+# python coord2area_def_stere.py SwitzerlandStereo500m stere 45.7 48.0 5.8 10.6 0.5
+REGION: SwitzerlandStereo500m {
+        NAME:   Switzerland_stereographic_500m
+        PCS_ID: stere_8.2_46.85
+        PCS_DEF:        proj=stere,lat_0=46.85,lon_0=8.2,ellps=WGS84
+        XSIZE:  747
+        YSIZE:  511
+        AREA_EXTENT:    (-186905.1483814532, -125009.82727901157, 186905.14838145344, 130619.09793495211)
 };
 
 #################

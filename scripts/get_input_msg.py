@@ -44,6 +44,7 @@ class input_msg_class:
       self.add_title = True
       #self.title = None
       self.title = ' %(sat)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s'
+      self.title_color = None
       self.title_y_line_nr = 1        # at which line should the title be written
       self.title_color='white'
       self.add_borders = True

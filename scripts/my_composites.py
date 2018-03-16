@@ -1,5 +1,6 @@
 from mpop.imageo.geo_image import GeoImage
 from copy import deepcopy
+from trollimage.colormap import rdbu, greys, rainbow, spectral
 
 def hr_visual(self):
     """Make a High Resolution visual BW image composite from Seviri
@@ -10,9 +11,10 @@ def hr_visual(self):
     img = GeoImage(self["HRV"].data, self.area, self.time_slot,
                    fill_value=0, mode="L")
     img.enhance(stretch="crude")
-    return img
+    return img 
 
 hr_visual.prerequisites = set(["HRV"])
+
 
 def hr_overview(self):
     """Make a High Resolution Overview RGB image composite from Seviri
@@ -41,33 +43,118 @@ def hr_overview(self):
 
 hr_overview.prerequisites = set(["HRV", 0.635, 0.85, 10.8])
 
+
+def hr_natural(self, stretch=None, gamma=1.8):
+    """Make a Natural Colors RGB image composite.
+
+    +--------------------+--------------------+--------------------+
+    | Channels           | Range (reflectance)| Gamma (default)    |
+    +====================+====================+====================+
+    | IR1.6              | 0 - 90             | gamma 1.8          |
+    +--------------------+--------------------+--------------------+
+    | VIS0.8             | 0 - 90             | gamma 1.8          |
+    +--------------------+--------------------+--------------------+
+    | VIS0.6             | 0 - 90             | gamma 1.8          |
+    +--------------------+--------------------+--------------------+
+    """
+    self.check_channels(0.635, 0.85, 1.63)
+
+    ch1 = self[1.63].check_range()
+    ch2 = self[0.85].check_range()
+    ch3 = self[0.635].check_range()
+
+    img = GeoImage((ch1, ch2, ch3),
+                      self.area,
+                      self.time_slot,
+                      fill_value=(0, 0, 0),
+                      mode="RGB",
+                      crange=((0, 90),
+                              (0, 90),
+                              (0, 90)))
+
+    if stretch:
+        img.enhance(stretch=stretch)
+    if gamma:
+        img.enhance(gamma=gamma)
+
+    luminance = GeoImage((self["HRV"].data), self.area, self.time_slot,
+                         crange=(0, 100), mode="L")
+
+    luminance.enhance(gamma=2.0)
+
+    img.replace_luminance(luminance.channels[0])
+
+    return img
+
+hr_natural.prerequisites = set(["HRV", 0.635, 0.85, 1.63])
+
+
+def hr_airmass(self):
+    """Make an airmass RGB image composite.
+
+    +--------------------+--------------------+--------------------+
+    | Channels           | Temp               | Gamma              |
+    +====================+====================+====================+
+    | WV6.2 - WV7.3      |     -25 to 0 K     | gamma 1            |
+    +--------------------+--------------------+--------------------+
+    | IR9.7 - IR10.8     |     -40 to 5 K     | gamma 1            |
+    +--------------------+--------------------+--------------------+
+    | WV6.2              |   243 to 208 K     | gamma 1            |
+    +--------------------+--------------------+--------------------+
+    """
+    self.check_channels(6.7, 7.3, 9.7, 10.8)
+
+    ch1 = self[6.7].data - self[7.3].data
+    ch2 = self[9.7].data - self[10.8].data
+    ch3 = self[6.7].data
+
+    img = GeoImage((ch1, ch2, ch3),
+                   self.area,
+                   self.time_slot,
+                   fill_value=(0, 0, 0),
+                   mode="RGB",
+                   crange=((-25, 0),
+                           (-40, 5),
+                           (243, 208)))
+
+    luminance = GeoImage((self["HRV"].data), self.area, self.time_slot,
+                         crange=(0, 100), mode="L")
+
+    luminance.enhance(gamma=2.0)
+
+    img.replace_luminance(luminance.channels[0])
+
+    return img
+
+hr_airmass.prerequisites = set(["HRV", 6.7, 7.3, 9.7, 10.8])
+
+
 def sandwich(self):
     """Make a colored 10.8 RGB image with HRV resolution enhacement 
     from Seviri channels.
     """
     from trollimage.image import Image as trollimage
-    from trollimage.colormap import rdbu, greys, rainbow, spectral
 
     self.check_channels(10.8, "HRV")
 
     ## use trollimage to create black white image
     #img = trollimage(self['IR_108'].data, mode="L")
-    img = GeoImage(self["IR_108"].data, self.area, self.time_slot,
-                   fill_value=0, mode="L")
+    img = GeoImage(self["IR_108"].data, self.area, self.time_slot, mode="L") #, fill_value=0
 
     # use trollimage to create a color map
     greys.set_range(-30 + 273.15, 30 + 273.15)
-    rainbow.set_range( -73 + 273.15, -30.00001 + 273.15)
-    rainbow.reverse()
-    my_cm = rainbow + greys
+    cm2 = deepcopy(rainbow)
+    cm2.set_range( -73 + 273.15, -30.00001 + 273.15)
+    cm2.reverse()
+    my_cm = cm2 + greys
 
-    luminance = GeoImage((self["HRV"].data), self.area, self.time_slot,
-                         crange=(0, 100), mode="L")
-    luminance.enhance(gamma=2.0)
-    img.replace_luminance(luminance.channels[0])
+    #luminance = GeoImage((self["HRV"].data), self.area, self.time_slot,
+    #                     crange=(0, 100), mode="L")
+    #luminance.enhance(gamma=2.0)
+    #img.replace_luminance(luminance.channels[0])
 
     ## colorize the image
-    #img.colorize(my_cm)
+    img.colorize(my_cm)
 
     return img
 
@@ -151,6 +238,114 @@ def ndvi(self):
 
 ndvi.prerequisites = set(['VIS006', 'VIS008'])
 
+
+def IR_039c_CO2(self):
+    """
+    IR_039 channel, but compensated for the CO2 absorption
+    """
+
+    from trollimage.image import Image as trollimage
+
+    self.co2corr_chan()
+    self.check_channels("_IR39Corr")
+
+    img = GeoImage(self["_IR39Corr"].data, self.area, self.time_slot, fill_value=(0,0,0), mode="L")
+
+    #min_data = prop.min()
+    #max_data = prop.max()
+    min_data = 210  # same as for IR_039 in get_input_msg.py 
+    max_data = 340  # same as for IR_039 in get_input_msg.py 
+
+    colorize = True
+    if colorize:
+        # use trollimage to create a color map
+        cm = deepcopy(rainbow)
+        cm.set_range( min_data, max_data)
+        # colorize the image
+        img.colorize(cm)
+
+    return img
+
+IR_039c_CO2.prerequisites = set([3.75, 10.8, 13.4])
+
+
+def VIS006_minus_IR_016(self):
+    """Make a colored image of the difference of two Seviri channels.
+    """
+
+    from trollimage.image import Image as trollimage
+
+    self.check_channels('VIS006','IR_016')
+
+    ch_diff = self['VIS006']-self['IR_016']
+
+    min_data = ch_diff.data.min()
+    max_data = ch_diff.data.max()
+    print "min/max", min_data, max_data
+
+    img = trollimage(ch_diff.data, mode="L", fill_value=(0,0,0))
+
+    cm = deepcopy(rainbow)
+    #cm.set_range(min_data, max_data)
+    cm.set_range(-15, 40)
+    img.colorize(cm)
+
+    #from trollimage.colormap import rdbu
+    #rdbu.set_range(min_data, max_data)
+    #rdbu.set_range(-50, +50)
+    #rdbu.reverse()
+    #img.colorize(rdbu)
+
+    #greys.set_range(-70, -25)
+    #greys.reverse()
+    #cm2 = deepcopy(rainbow)
+    #cm2.set_range(-25, 5)
+    #my_cm = greys + cm2
+    #img.colorize(my_cm)
+
+    return img
+
+VIS006_minus_IR_016.prerequisites = set(['VIS006','IR_016'])
+
+
+def IR_039_minus_IR_108(self):
+    """Make a colored image of the difference of two Seviri channels.
+    """
+
+    from trollimage.image import Image as trollimage
+
+    self.check_channels('IR_039','IR_108')
+
+    ch_diff = self['IR_039']-self['IR_108']
+
+    min_data = ch_diff.data.min()
+    max_data = ch_diff.data.max()
+    print "min/max", min_data, max_data
+
+    img = trollimage(ch_diff.data, mode="L", fill_value=(0,0,0))
+
+    from trollimage.colormap import rainbow
+    colormap = deepcopy(rainbow)
+    #colormap.set_range(min_data, max_data)
+    colormap.set_range(-5, 55)
+    img.colorize(colormap)
+
+    #rdbu.set_range(min_data, max_data)
+    #rdbu.set_range(-50, +50)
+    #rdbu.reverse()
+    #img.colorize(rdbu)
+
+    #greys.set_range(-70, -25)
+    #greys.reverse()
+    #cm2 = deepcopy(rainbow)
+    #cm2.set_range(-25, 5)
+    #my_cm = greys + cm2
+    #img.colorize(my_cm)
+
+    return img
+
+IR_039_minus_IR_108.prerequisites = set(['IR_039','IR_108'])
+
 def WV_062_minus_WV_073(self):
     """Make a colored image of the difference of two Seviri channels.
     """
@@ -165,7 +360,7 @@ def WV_062_minus_WV_073(self):
     max_data = ch_diff.data.max()
     print "min/max", min_data, max_data
 
-    img = trollimage(ch_diff.data, mode="L")
+    img = trollimage(ch_diff.data, mode="L", fill_value=(0,0,0))
 
     #from trollimage.colormap import rdbu
     #rdbu.set_range(min_data, max_data)
@@ -173,11 +368,11 @@ def WV_062_minus_WV_073(self):
     #rdbu.reverse()
     #img.colorize(rdbu)
 
-    from trollimage.colormap import rainbow, greys
     greys.set_range(-25, -15)
     greys.reverse()
-    rainbow.set_range(-15, 5)
-    my_cm = greys + rainbow
+    cm2 = deepcopy(rainbow)
+    cm2.set_range(-15, 5)
+    my_cm = greys + cm2
     img.colorize(my_cm)
 
     return img
@@ -199,7 +394,7 @@ def WV_062_minus_IR_108(self):
     max_data = ch_diff.data.max()
     print "min/max", min_data, max_data
 
-    img = trollimage(ch_diff.data, mode="L")
+    img = trollimage(ch_diff.data, mode="L", fill_value=(0,0,0))
 
     #from trollimage.colormap import rdbu
     #rdbu.set_range(min_data, max_data)
@@ -207,16 +402,17 @@ def WV_062_minus_IR_108(self):
     #rdbu.reverse()
     #img.colorize(rdbu)
 
-    from trollimage.colormap import rainbow, greys
     greys.set_range(-70, -25)
     greys.reverse()
-    rainbow.set_range(-25, 5)
-    my_cm = greys + rainbow
+    cm2 = deepcopy(rainbow)
+    cm2.set_range(-25, 5)
+    my_cm = greys + cm2
     img.colorize(my_cm)
 
     return img
 
 WV_062_minus_IR_108.prerequisites = set(['WV_062','IR_108'])
+
 
 def WV_073_minus_IR_134(self):
     """Make a colored image of the difference of two Seviri channels.
@@ -232,19 +428,19 @@ def WV_073_minus_IR_134(self):
     max_data = ch_diff.data.max()
     print "min/max", min_data, max_data
 
-    img = trollimage(ch_diff.data, mode="L")
+    img = trollimage(ch_diff.data, mode="L", fill_value=(0,0,0))
 
-    from trollimage.colormap import rainbow
-    rainbow.set_range(min_data, max_data)
-    rainbow.set_range(-15, +5)
-    rainbow.reverse()
-    img.colorize(rainbow)
+    cm2 = deepcopy(rainbow)
+    #rainbow.set_range(min_data, max_data)
+    cm2.set_range(-15, +5)
+    cm2.reverse()
+    img.colorize(cm2)
 
-    #from trollimage.colormap import rainbow, greys, rdpu
     #greys.set_range(-4, -1.5)
     #greys.reverse()
-    #rainbow.set_range(-1.5, 1.5)
-    #my_cm = greys + rainbow
+    #cm2 = deepcopy(rainbow)
+    #cm2.set_range(-1.5, 1.5)
+    #my_cm = greys + cm2
     #rdpu.set_range(1.5, 4)
     #my_cm2 = my_cm + rdpu
     #img.colorize(my_cm2)
@@ -268,7 +464,7 @@ def IR_087_minus_IR_108(self):
     max_data = ch_diff.data.max()
     print "min/max", min_data, max_data
 
-    img = trollimage(ch_diff.data, mode="L")
+    img = trollimage(ch_diff.data, mode="L", fill_value=(0,0,0))
 
     #from trollimage.colormap import rdbu
     #rdbu.set_range(min_data, max_data)
@@ -276,11 +472,11 @@ def IR_087_minus_IR_108(self):
     #rdbu.reverse()
     #img.colorize(rdbu)
 
-    from trollimage.colormap import rainbow, greys, rdpu
     greys.set_range(-4, -1.5)
     greys.reverse()
-    rainbow.set_range(-1.5, 1.5)
-    my_cm = greys + rainbow
+    cm2 = deepcopy(rainbow)
+    cm2.set_range(-1.5, 1.5)
+    my_cm = greys + cm2
     rdpu.set_range(1.5, 4)
     my_cm2 = my_cm + rdpu
     img.colorize(my_cm2)
@@ -303,19 +499,19 @@ def IR_087_minus_IR_120(self):
     max_data = ch_diff.data.max()
     print "min/max", min_data, max_data
 
-    img = trollimage(ch_diff.data, mode="L")
+    img = trollimage(ch_diff.data, mode="L", fill_value=(0,0,0))
 
-    from trollimage.colormap import rainbow
-    rainbow.set_range(min_data, max_data)
-    rainbow.set_range(-4, +4)
-    rainbow.reverse()
-    img.colorize(rainbow)
+    cm2 = deepcopy(rainbow)
+    cm2.set_range(min_data, max_data)
+    cm2.set_range(-4, +4)
+    cm2.reverse()
+    img.colorize(cm2)
 
-    #from trollimage.colormap import rainbow, greys, rdpu
     #greys.set_range(-4, -1.5)
     #greys.reverse()
-    #rainbow.set_range(-1.5, 1.5)
-    #my_cm = greys + rainbow
+    #cm2 = deepcopy(rainbow)
+    #cm2.set_range(-1.5, 1.5)
+    #my_cm = greys + cm2
     #rdpu.set_range(1.5, 4)
     #my_cm2 = my_cm + rdpu
     #img.colorize(my_cm2)
@@ -339,7 +535,7 @@ def IR_120_minus_IR_108(self):
     max_data = ch_diff.data.max()
     print "min/max", min_data, max_data
 
-    img = trollimage(ch_diff.data, mode="L")
+    img = trollimage(ch_diff.data, mode="L", fill_value=(0,0,0))
 
     #from trollimage.colormap import rdbu
     #rdbu.set_range(min_data, max_data)
@@ -347,14 +543,20 @@ def IR_120_minus_IR_108(self):
     #rdbu.reverse()
     #img.colorize(rdbu)
 
-    from trollimage.colormap import rainbow, greys
-    greys.set_range(-6, -1.6)
-    greys.reverse()
-    rainbow.set_range(-1.6, 0.6)
-    my_cm = greys + rainbow
-    greys.set_range(0.6, 2)
-    my_cm2 = my_cm + greys
-    img.colorize(my_cm2)
+    colormap = deepcopy(rainbow)
+    #colormap.set_range(min_data, max_data)
+    colormap.set_range(-5, +2)
+    colormap.reverse()
+    img.colorize(colormap)
+
+    #greys.set_range(-6, -1.6)
+    #greys.reverse()
+    #cm2 = deepcopy(rainbow)
+    #cm2.set_range(-1.6, 0.6)
+    #my_cm = greys + cm2
+    #greys.set_range(0.6, 2)
+    #my_cm2 = my_cm + greys
+    #img.colorize(my_cm2)
 
     return img
 
@@ -375,7 +577,7 @@ def trichannel(self):
     max_data = ch_diff.data.max()
     print "min/max", min_data, max_data
 
-    img = trollimage(ch_diff.data, mode="L")
+    img = trollimage(ch_diff.data, mode="L", fill_value=(0,0,0))
 
     #from trollimage.colormap import rdbu
     #rdbu.set_range(min_data, max_data)
@@ -383,11 +585,11 @@ def trichannel(self):
     #rdbu.reverse()
     #img.colorize(rdbu)
 
-    from trollimage.colormap import rainbow, greys
     greys.set_range(-9, -2.5)    # 2.5 according to Mecikalski, 2.2 maybe better?
     greys.reverse()
-    rainbow.set_range(-2.5, 1.34)
-    my_cm = greys + rainbow
+    cm2 = deepcopy(rainbow)
+    cm2.set_range(-2.5, 1.34)
+    my_cm = greys + cm2
     greys.set_range(1.34, 6)
     my_cm2 = my_cm + greys
     img.colorize(my_cm2)
@@ -438,7 +640,6 @@ def clouddepth(self):
     """
 
     from trollimage.image import Image as trollimage
-    from trollimage.colormap import rainbow
     from my_composites import mask_clouddepth
     
     mask = mask_clouddepth(self)
@@ -448,8 +649,9 @@ def clouddepth(self):
     max_data= mask.max()
 
     print "    use trollimage.image.image for colorized pictures (min="+str(min_data)+", max="+str(max_data)+")"
-    rainbow.set_range(min_data, max_data)
-    img.colorize(rainbow)
+    cm2 = deepcopy(rainbow)
+    cm2.set_range(min_data, max_data)
+    img.colorize(cm2)
 
     return img
 
@@ -462,7 +664,6 @@ clouddepth.prerequisites = set(['WV_062','WV_073','IR_087','IR_108','IR_120','IR
 #    """
 #
 #    from trollimage.image import Image as trollimage
-#    from trollimage.colormap import rdbu, greys, rainbow, spectral
 #
 #    ch1=rgb[0:6]
 #    ch2=rgb[7:13]
@@ -484,8 +685,10 @@ clouddepth.prerequisites = set(['WV_062','WV_073','IR_087','IR_108','IR_120','IR
 
 
 
-seviri = [hr_visual, hr_overview, sandwich, HRVir108, ndvi, WV_062_minus_WV_073, WV_062_minus_IR_108, WV_073_minus_IR_134, \
-          IR_120_minus_IR_108, IR_087_minus_IR_108, IR_087_minus_IR_120, trichannel, clouddepth, mask_clouddepth]
+seviri = [hr_visual, hr_overview, hr_natural, hr_airmass, sandwich, HRVir108, ndvi, IR_039c_CO2, \
+          VIS006_minus_IR_016, IR_039_minus_IR_108, WV_062_minus_WV_073, WV_062_minus_IR_108,\
+          WV_073_minus_IR_134, IR_120_minus_IR_108, IR_087_minus_IR_108, IR_087_minus_IR_120, \
+          trichannel, clouddepth, mask_clouddepth]
 
 
 def get_image(data, rgb): 
@@ -536,12 +739,22 @@ def get_image(data, rgb):
         obj_image = data.image.wv_low
     elif rgb=='HRoverview':
         obj_image = data.image.hr_overview
+    elif rgb=='hr_natural':
+        obj_image = data.image.hr_natural
+    elif rgb=='hr_airmass':
+        obj_image = data.image.hr_airmass
     elif rgb=='sandwich':
         obj_image = data.image.sandwich
     elif rgb=='HRVir108':
         obj_image = data.image.HRVir108
     elif rgb=='ndvi':
         obj_image = data.image.ndvi
+    elif rgb=='IR_039c_CO2':
+        obj_image = data.image.IR_039c_CO2
+    elif rgb=='VIS006-IR_016':
+        obj_image = data.image.VIS006_minus_IR_016
+    elif rgb=='IR_039-IR_108':
+        obj_image = data.image.IR_039_minus_IR_108
     elif rgb=='WV_062-WV_073':
         obj_image = data.image.WV_062_minus_WV_073
     elif rgb=='WV_062-IR_108':

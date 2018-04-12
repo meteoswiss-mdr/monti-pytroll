@@ -43,7 +43,7 @@ class input_msg_class:
       self.indicate_mask = True
       self.add_title = True
       #self.title = None
-      self.title = ' %(sat)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s'
+      self.title = None               # ' %(sat)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s'
       self.title_color = None
       self.title_y_line_nr = 1        # at which line should the title be written
       self.title_color='white'
@@ -441,3 +441,111 @@ def get_date_and_inputfile_from_commandline(print_usage=None):
    in_msg = get_input_msg(input_file, timeslot=timeslot)
 
    return in_msg
+
+
+def parse_commandline():
+   
+   from optparse import OptionParser, Option, OptionValueError
+   
+   class MyOption(Option):
+
+      # extend action to be able to convert input to list and (list of lists)
+      ACTIONS              = Option.ACTIONS              + ("extend","extend_list","extend_lists",)
+      STORE_ACTIONS        = Option.STORE_ACTIONS        + ("extend","extend_list","extend_lists",)
+      TYPED_ACTIONS        = Option.TYPED_ACTIONS        + ("extend","extend_list","extend_lists",)
+      ALWAYS_TYPED_ACTIONS = Option.ALWAYS_TYPED_ACTIONS + ("extend","extend_list","extend_lists",)
+      
+      def take_action(self, action, dest, opt, value, values, parser):
+         if action == "extend":
+            lvalue = value.split(",")
+            values.ensure_value(dest, []).extend(lvalue)
+         elif action == "extend_list":
+            import re
+            # convert (string representation of list) into a list
+            junkers = re.compile('[[" \]]')
+            lvalue = junkers.sub('', value).split(',')
+            values.ensure_value(dest, []).extend(lvalue)
+         elif action == "extend_lists":
+            strs = value.replace('[','').split('],')
+            lvalue = [ s.replace(']','').split(',') for s in strs]
+            values.ensure_value(dest, []).extend(lvalue)
+         else:
+            Option.take_action(
+               self, action, dest, opt, value, values, parser)
+            
+   parser = OptionParser(option_class=MyOption)
+   
+   #parser.add_option("-i", "--input_file", type="string", action="store")
+   parser.add_option("-d", "--date", type="int", nargs=5, dest="date",
+                     help="specify the start date of measurements in following format %Y %m %d %H %M, e.g. '-d 2017 12 31 23 45'" )
+   parser.add_option("-a", "--area", type="string", action="extend", dest="areas",
+                     help="specify projection of shown data, e.g. ccs4, see monti-pytroll/etc/area.def")
+   parser.add_option("--parea", "--postprocessing_areas", type="string", action="extend", dest="postprocessing_areas",
+                     help="specify projection for postprocessing, e.g. ccs4, see monti-pytroll/etc/area.def")
+   parser.add_option("-s", "--satellite", type="string", action="store", dest="sat",
+                     help="specify satellite name; default 'Meteosat'")
+   parser.add_option("--rss","--RSS", action="store_true", dest="RSS",
+                     help="switch on processing in rapid scan mode, e.g. search last rss time slot (each 5min); default 'True'")      
+   parser.add_option("--fd","--fulldisk", action="store_false", dest="RSS",
+                     help="switch on processing in full disk mode, e.g. search last full disk slot (each 15min)")      
+   parser.add_option("--rgb","--RGBs", type="string", action="extend", dest="RGBs",
+                     help="specify RGBs to process, see scripts/input_template.py, e.g. 'IR_108' or ['WV_062c','airmass']; default []")      
+   parser.add_option("--scp", action="store_true", dest="scpOutput",
+                     help="switch on secure copy to remote computer")
+   parser.add_option("--no_scp", action="store_false", dest="scpOutput",
+                     help="switch off secure copy to remote computer")
+   parser.add_option("--add_title", action="store_true",  dest="add_title", help="show title in image")
+   parser.add_option("--no_title",  action="store_false", dest="add_title", help="show no title in image")
+   parser.add_option("-t", "--title", type="string", action="store", dest="title",
+                     help="specify a title, possible to use wildcards such as %(sat)s or %(msg)s; default title is ' %(sat)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s\'")
+   parser.add_option("-c","--composite",  type="string", action="extend_list", dest="postprocessing_composite",
+                     help="creates an image composite, such as 'THX-IR_108', argument repetition '-c comp1 -c comp2' possible, lists of composite possible '-c [comp1, comp2]'")
+   parser.add_option("-m","--montage",    type="string", action="extend_lists", dest="postprocessing_montage",
+                     help="creates a montage (two images side by side), such as [\"MSG_h03-ir108\",\"MSG_HRV\"], argument repetition  '-m mont1 -m mont2' possible, list of montages possible [[im1,im2],[im3,im4]]")
+
+   (options, args) = parser.parse_args()
+   #print options
+   #print args
+
+   if len(args) < 1:
+      parser.error("*** Error, at least the input file is necessary, e.g. input_msg.py ")
+   else:
+      print ""
+
+   return (options, args)
+
+#########################################################################################
+
+def parse_commandline_and_read_inputfile():
+
+   #from get_input_msg import parse_commandline_and_read_inputfile
+   #from get_input_msg import parse_commandline
+   #from get_input_msg import get_input_msg
+
+   (options, args) = parse_commandline()
+
+   if options.date == None:
+       timeslot=None
+   else:
+       print options.date
+       from datetime import datetime
+       timeslot=datetime(options.date[0],options.date[1],options.date[2],options.date[3],options.date[4])
+
+   input_file = args[0]
+   if input_file[-3:] == '.py': 
+       input_file=input_file[:-3]
+
+   # read input file and initialize in_msg
+   in_msg = get_input_msg(input_file, timeslot=timeslot)
+
+   print '*** overwrite options of the input_file with command line arguments'
+   for opt, value in options.__dict__.items():
+       if value != None:
+           print '   ', opt, ' = ', value
+           setattr(in_msg, opt, value)
+   
+   print ""
+   
+   return in_msg
+
+#########################################################################################

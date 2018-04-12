@@ -150,11 +150,11 @@ def plot_msg(in_msg):
       print '*** Create plots for '
       print '    Satellite/Sensor: ' + in_msg.sat_str() 
       print '    Satellite number: ' + in_msg.sat_nr_str() + str(in_msg.sat_nr)
-      print '    Satellite isntrument: ' + in_msg.instrument
+      print '    Satellite instrument: ' + in_msg.instrument
       print '    Date/Time:        '+ str(in_msg.datetime)
       print '    RGBs:            ', in_msg.RGBs
       print '    Area:            ', in_msg.areas
-
+      print '    reader level:    ', in_msg.reader_level
 
    # define satellite data object
    #global_data = GeostationaryFactory.create_scene(in_msg.sat, in_msg.sat_nr_str(), "seviri", in_msg.datetime)
@@ -301,7 +301,7 @@ def plot_msg(in_msg):
             # do automatic chose if no input
             if in_msg.HRV_enhancement is None:
                                      # UTC is shifted by 1hour to local winter time ( more or less solar time)
-               if area == 'ccs4' and (5 < in_msg.datetime.hour) and (in_msg.datetime.hour < 19) and rgb in ['VIS006', 'VIS008','VIS006c','VIS008c','overview','overview_sun', 'natural','green_snow','red_snow','convection']:  
+               if area == 'ccs4' and (5 < in_msg.datetime.hour) and (in_msg.datetime.hour < 19) and rgb in ['VIS006','VIS008','VIS006c','VIS008c','overview','overview_sun','natural','green_snow','red_snow','convection']:  
                   HRV_enhancement=True
                   print "*** switch on HRV enhancement"
                else:
@@ -334,7 +334,8 @@ def plot_msg(in_msg):
 
             # add title to image
             if in_msg.add_title:
-               add_title(PIL_image, in_msg.title, HRV_enhance_str+rgb, in_msg.sat_str(), data.sat_nr(), in_msg.datetime, area, dc, in_msg.verbose ) # !!! needs change
+               add_title(PIL_image, in_msg.title, HRV_enhance_str+rgb, in_msg.sat_str(), data.sat_nr(), in_msg.datetime, area, dc, in_msg.verbose,
+                         title_color=in_msg.title_color, title_y_line_nr=in_msg.title_y_line_nr ) # !!! needs change
 
             # add MeteoSwiss and Pytroll logo
             if in_msg.add_logos:
@@ -661,7 +662,6 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
       plot_type='trollimage'
    elif rgb in (products.CTTH + products.PC + products.CRR + products.PPh):
       prop = ma.masked_array(data[rgb].data)
-      prop.mask = (prop <= 0)
       if in_msg.nwcsaf_calibrate==True:
          if rgb == 'CTH':
             prop /= 1000. # 1000. == m -> km
@@ -895,8 +895,8 @@ def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, verbose, 
 
    # determine font size
    if "EuropeCanary" in area:
-      fontsize=36
-   if "eurotv" in area:
+      fontsize=18
+   elif "eurotv" in area:
       fontsize=24
    elif area.find("ticino") != -1:
       fontsize=12
@@ -923,19 +923,26 @@ def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, verbose, 
       ## default title
       # if area is not Europe 
       if area.find("EuropeCanary") == -1:
+         print "... set default title for area: ", area
          if rgb=="CRR" or rgb=="CRPh" or rgb in products.CPP or rgb in products.HSAF:
             if rgb=="CRR":
                title= [' 2nd layer: '+rgb+", precip rate [mm/h]"]
-            if rgb=="CRPh":
+            elif rgb=="CRPh":
                title= [' 2nd layer: '+rgb+", precip rate [mm/h]"]
-            if rgb in products.CPP:
+            elif rgb in products.CPP:
                title= [' 2nd layer: CPP ' + rgb]
-            if rgb in products.HSAF:
+            elif rgb in products.HSAF:
                title= [" 2nd layer: HSAF "+ rgb + " [mm/h]"]
+            else:
+               title= [' %Y-%m-%d %H:%MUTC', rgb.replace("_","-")+", ("+sat+str(sat_nr)+' SEVIRI)']
+         else:
+            title= ['%(msg)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s']  
       else:
+         print "... set default title (EuropeCanary) for area: ", area
          if not (rgb in products.CPP or rgb in products.HSAF) : # normal case  
-            title= [' %y-%m-%d %H:%MUTC', ' '+rgb.replace("_","-")+", "+sat+str(sat_nr)+' SEVIRI']
-      #title = [' %(sat)s-%(sat_nr)s, %y-%m-%d %H:%MUTC, %(area)s, %(rgb)s']
+            title= ['%Y-%m-%d %H:%MUTC', rgb.replace("_","-")+" (%(msg)s SEVIRI)"]
+         else:
+            title = [' %(sat)s-%(sat_nr)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s']
    else:
       # backward compartibility: convert title to a list, if given as a string
       if isinstance(title, basestring):
@@ -946,10 +953,12 @@ def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, verbose, 
       x_pos_title = 10
       y_pos_title =  0
       dy = 20
+   # for the Europe aeras special position of title
    else:
       x_pos_title = 10  # x1 = 10
       y_pos_title =  5  # y1 = 10
-      dy = 1.1 * fontsize # dy = 20 dy = 50
+      dy = 1.11111 * fontsize # dy = 20 dy = 50
+      print "fontsize", fontsize, ", dy=", dy
 
    # replace wildcards such as %Y-%m-%d with values
    for idx, title_line in enumerate(title):

@@ -32,7 +32,7 @@ source set_paths.sh  # load functions from this script
 set_pytroll_paths
 cd $PYTROLLHOME
 
-if [ 1 -eq 0 ]; then 
+
 echo ""
 echo "*** Synchronize PyTroll modules (git submodule sync)"
 echo "===================================================="
@@ -70,8 +70,6 @@ read junk
 # enable the use of cython
 export USE_CYTHON=True
 
-fi
-
 
 
 echo ""
@@ -81,7 +79,7 @@ echo "============================ "
 for pack in $packages
 do 
     echo ""
-    echo "*** install"  $pack " with branch " ${branches[$pack]} 
+    echo "*** install"  $pack " with branch " ${branches[$pack]} " from repository " ${repositories[$pack]}
     cd $PYTROLLHOME
 
     cd packages/$pack

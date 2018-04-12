@@ -481,6 +481,12 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
     ## currently no check for hdf data
     if in_msg.reader_level == "seviri-level4":
        return in_msg.RGBs
+    ## currently no check for viewing geometry   
+    if in_msg.reader_level == "seviri-level6":
+       return in_msg.RGBs
+    ## currently no check for netCDF data   
+    if in_msg.reader_level == "seviri-level8":
+       return in_msg.RGBs
     ## currently no check for cpp
     if in_msg.sat == "cpp":
        return in_msg.RGBs
@@ -555,10 +561,14 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                             if in_msg.datetime < datetime.datetime(2016, 7, 1, 0, 0): 
                                 if in_msg.sat_nr == 9:
                                     in_msg.sat_nr = 8
+                                    fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
+                                    conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
                                     if in_msg.verbose:
                                         print "... try backup satellite ", in_msg.sat_nr
                                 elif in_msg.sat_nr == 8:
                                     in_msg.sat_nr = 10
+                                    fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
+                                    conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
                                     if in_msg.verbose:
                                         print "... try backup satellite ", in_msg.sat_nr
                                 elif in_msg.sat_nr == 10:
@@ -569,6 +579,8 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                             if in_msg.datetime < datetime.datetime(2018, 3, 3, 0, 0):
                                 if in_msg.sat_nr == 9:
                                     in_msg.sat_nr = 10
+                                    fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
+                                    conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
                                     if in_msg.verbose:
                                         print "... try backup satellite ", in_msg.sat_nr
                                 elif in_msg.sat_nr == 8:   # indian ocean data coverage, no backup
@@ -582,10 +594,14 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                             else:
                                 if in_msg.sat_nr == 10:
                                     in_msg.sat_nr = 9
+                                    fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
+                                    conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
                                     if in_msg.verbose:
                                         print "... try backup satellite ", in_msg.sat_nr
                                 elif in_msg.sat_nr == 9:
                                     in_msg.sat_nr = 11
+                                    fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
+                                    conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
                                     if in_msg.verbose:
                                         print "... try backup satellite ", in_msg.sat_nr
                                 elif in_msg.sat_nr == 11:

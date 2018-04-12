@@ -473,7 +473,8 @@ if __name__ == '__main__':
 
     in_msg.resolution = 'i'
     in_msg.sat="Meteosat-"
-    in_msg.sat_nr = 9
+    #in_msg.sat_nr = 9
+    print ('in_msg.sat_nr', in_msg.sat_nr)
     in_msg.add_title=False
     in_msg.outputDir='./pics/'
     in_msg.outputFile='WS_%(rgb)s-%(area)s_%y%m%d%H%M'

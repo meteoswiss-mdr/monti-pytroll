@@ -1,23 +1,16 @@
 #!/bin/bash
 
-# shell variables
-#----------------
-. ./set_python_paths.sh
-export dir1=/data/OWARNA/hau/pytroll/programs/
-export PPP_CONFIG_DIR=/data/OWARNA/hau/pytroll/cfg_nrt
-export PYTHONPATH=/home/cinesat/python/lib/python2.7/site-packages
-echo ''
+echo '***'
+echo '*** start plot_lightning.sh'
+. /opt/users/$LOGNAME/monti-pytroll/setup/bashrc no_virtual_environment
+#export python=/usr/bin/python
+#export python=/opt/users/common/packages/anaconda3/envs/PyTroll_$LOGNAME/bin/python
 
-echo 'PPP_CONFIG_DIR' $PPP_CONFIG_DIR
+cd $PYTROLLHOME/scripts
 
-echo "*** Start to make seviri pictures"
-## execute plot_msg pytroll script once 
-#/usr/bin/python ${dir1}/plot_msg.py input_MSG # > /tmp/plot_msg.txt 2>&1
-## execute plot_msg pytroll script in a loop until everything is processed 
-#/usr/bin/python ${dir1}/loop_msg.py input_MSG # > /tmp/plot_msg.txt 2>&1
+echo "*** Start to plot lightning images"
 ## execute plot_lightning pytroll script 
-/usr/bin/python ${dir1}/plot_lightning_cronjob.py # > /tmp/plot_msg.txt 2>&1
-
+python plot_lightning_cronjob.py           # > /tmp/plot_lightning_cronjob.txt 2>&1
 
 ## remove result files older than 1 hour (done in plot_ms.sh)
 #echo "*** Remove all result files older than 1 hour"

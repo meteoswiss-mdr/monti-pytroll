@@ -9,10 +9,10 @@ def input(in_msg, timeslot=None):
     # 8=MSG1, 9=MSG2, 10=MSG3
     #in_msg.sat_nr=8
     #in_msg.RSS=False 
-    in_msg.sat_nr=9
+    #in_msg.sat_nr=9
+    #in_msg.RSS=True
+    in_msg.sat_nr=10
     in_msg.RSS=True
-    #in_msg.sat_nr=10
-    #in_msg.RSS=False 
 
     # specify an delay (in minutes), when you like to process a time some minutes ago
     # e.g. current time               2015-05-31 12:33 UTC

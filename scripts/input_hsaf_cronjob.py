@@ -174,7 +174,7 @@ def input(in_msg, timeslot=None):
     #----------------
     #in_msg.areas.append('EuropeCanary')
     #in_msg.areas.append('EuropeCanary95')
-    in_msg.areas.append('EuropeCanaryS95')
+    #in_msg.areas.append('EuropeCanaryS95')
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
@@ -217,7 +217,7 @@ def input(in_msg, timeslot=None):
     # please download the shape file 
     in_msg.mapDir='/opt/users/common/shapes/'
 
-    in_msg.scpOutput = False  # !!!!
+    in_msg.scpOutput = True 
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
     

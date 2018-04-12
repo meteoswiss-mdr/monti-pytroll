@@ -14,6 +14,8 @@ def input(in_msg, timeslot=None):
     #in_msg.RSS=True 
     in_msg.sat_nr=10
     in_msg.RSS=True
+    #in_msg.sat_nr=11
+    #in_msg.RSS=False
 
     #in_msg.delay=5 # process image 'delay' minutes before now
 
@@ -84,7 +86,7 @@ def input(in_msg, timeslot=None):
     in_msg.RGBs.append('cloudtop')
     in_msg.RGBs.append('convection')         # WV_062-WV_073  IR_039-IR_108  IR_016-VIS006
     ##in_msg.RGBs.append('convection_co2')
-    #in_msg.RGBs.append('day_microphysics')   # VIS008         IR_039(solar)  IR_108     # requires the pyspectral modul
+    in_msg.RGBs.append('day_microphysics')   # VIS008         IR_039(solar)  IR_108     # requires the pyspectral modul
     in_msg.RGBs.append('dust')               # IR_120-IR_108  IR_108-IR_087  IR_108
     in_msg.RGBs.append('fog')
     in_msg.RGBs.append('green_snow')

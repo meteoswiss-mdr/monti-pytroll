@@ -1,19 +1,16 @@
 #!/bin/bash
 
-# shell variables
-#----------------
+echo '***'
+echo '*** start plot_trt.sh'
+. /opt/users/$LOGNAME/monti-pytroll/setup/bashrc no_virtual_environment
+#export python=/usr/bin/python
+#export python=/opt/users/common/packages/anaconda3/envs/PyTroll_$LOGNAME/bin/python
 
-export dir1=/data/OWARNA/hau/pytroll/programs/
-export PPP_CONFIG_DIR=/data/OWARNA/hau/pytroll/cfg_nrt
-export PYTHONPATH=/home/cinesat/python/lib/python2.7/site-packages
-echo ''
-#echo 'PPP_CONFIG_DIR' $PPP_CONFIG_DIR
+cd $PYTROLLHOME/scripts
 
-cd $dir1
-
-echo "*** Start to make trt pictures"
-## execute plot_trt pytroll script 
-/usr/bin/python $dir1/plot_trt_cronjob.py # > /tmp/plot_msg.txt 2>&1
+echo "*** Start to plot lightning images"
+## execute plot_lightning pytroll script 
+python plot_trt_cronjob.py           # > /tmp/plot_trt_cronjob.txt 2>&1
 
 ## remove result files older than 1 hour (done in plot_ms.sh)
 #echo "*** Remove all result files older than 1 hour"

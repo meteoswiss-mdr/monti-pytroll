@@ -1,3 +1,4 @@
+#!/bin/bash
 
 rgbs="[VIS006 VIS008 IR_016 IR_039 WV_062 WV_073 IR_087 IR_097 IR_108 IR_120 IR_134 HRV]"
 
@@ -5,13 +6,6 @@ rgbs="[VIS006 VIS008 IR_016 IR_039 WV_062 WV_073 IR_087 IR_097 IR_108 IR_120 IR_
 #areas="ccs4"
 
 echo ""
-#dir1=/data/OWARNA/hau/pytroll/test
-#export PYTHONPATH=/home/cinesat/python/lib/python2.7/site-packages:$dir1
-#export XRIT_DECOMPRESS_PATH=/data/OWARNA/hau/pytroll/bin/xRITDecompress
-#export PPP_CONFIG_DIR=/data/OWARNA/hau/pytroll/cfg_offline
-#echo 'PPP_CONFIG_DIR' $PPP_CONFIG_DIR
-#export python=/usr/bin/python
-export python=$CONDA_PATH/envs/PyTroll_$LOGNAME/bin/python
 
 echo "*** create dates"
 if [ 1 -eq 0 ]; then
@@ -29,8 +23,11 @@ else
     #date_start_s=$(echo "$date_end_s - $check_time" | bc)
     date_start_s=$(expr $date_end_s - $check_time )
     date_start=$(/bin/date -d @$date_start_s +"%Y-%m-%d %H:%M")
-    . /opt/users/cinesat/monti-pytroll/setup/bashrc no_virtual_environment
+    . /opt/users/cinesat/monti-pytroll/setup/bashrc_offline no_virtual_environment
 fi
+#export python=/usr/bin/python
+#export python=/opt/users/common/packages/anaconda3/envs/PyTroll_$LOGNAME/bin/python
+
 
 # round start date to 5 min (begin of MSG RSS scans)
 date_start_s=$(awk "BEGIN {printf \"%i\n\", $date_start_s - ($date_start_s % 300 ) }") # round by 5 min = 300 s
@@ -74,7 +71,7 @@ do
     rad_dir=/data/COALITION2/database/meteosat/ccs4/$year/$month/$day/
     radfile_wildcard=MSG?_ccs4_$year$month$day$hour${minute}_rad.nc
     radfile=$(find $rad_dir -name $radfile_wildcard -print)
-    
+
     if test -n "$radfile" 
     then
 	echo "*** MSG SEVIRI radiance file exits for date: " $year $month $day $hour $minute # $rgb $area
@@ -82,7 +79,7 @@ do
 	file_size_kb=`du -k $radfile | cut -f1`
 	echo "    filesize" $file_size_kb
 	if [ $file_size_kb -lt 1250 ]; then 
-	    echo "*** filesize too small"
+	    echo "*** filesize "$radfile" too small"
 	    calculate_radfile=1
 	fi
     else
@@ -93,8 +90,8 @@ do
     if [ $calculate_radfile -eq 1 ]; then 
 	echo '    calculate MSG SEVIRI radiance file'
 	cd $PYTROLLHOME/scripts # necessary to specify input file without path
-	echo "    "$python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles.py $year $month $day $hour $minute 
- 	$python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles.py $year $month $day $hour $minute 
+	echo "    "python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles.py $year $month $day $hour $minute 
+ 	python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles.py $year $month $day $hour $minute 
     fi
 
     # add 5min (dtime) to current date 

@@ -98,7 +98,7 @@ area='ccs4'
 obj_area = get_area_def(area)
 
 print "... read lightning data"
-global_data = GeostationaryFactory.create_scene("lightning", "", "thx", time_slot)
+global_data = GeostationaryFactory.create_scene("swisslightning", "", "thx", time_slot)
 global_data.load([prop_str], area=area)
 
 print "... global_data "

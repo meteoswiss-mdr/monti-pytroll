@@ -15,9 +15,10 @@ RGBs_buildin = ['airmass','ash','cloudtop','convection','convection_co2',\
                  'overview','overview_sun','red_snow','refl39_chan','snow',\
                  'vis06','wv_high','wv_low']
 
-RGBs_user = ['HRoverview','sandwich','HRVir108','HRVir108','ndvi',\
-             'WV_062_minus_WV_073','WV_062_minus_IR_108','IR_087_minus_IR_108','IR_087_minus_IR_120',\
-             'IR_120_minus_IR_108','WV_073_minus_IR_134','trichannel','clouddepth']
+RGBs_user = ['HRoverview','hr_natural','hr_airmass','sandwich','HRVir108','HRVir108','ndvi','IR_039c_CO2',\
+             'VIS006-IR_016','IR_039-IR_108','WV_062-WV_073','WV_062-IR_108','IR_087-IR_108',\
+             'IR_087-IR_120','IR_120-IR_108','WV_073-IR_134','trichannel','clouddepth']
+
 
 CMa =['CMa', 'CMa_DUST', 'CMa_QUALITY', 'CMa_VOLCANIC']  # PGE 1
 CT = ['CT', 'CT_PHASE', 'CT_QUALITY']                    # PGE 2

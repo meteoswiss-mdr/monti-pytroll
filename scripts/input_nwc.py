@@ -8,10 +8,10 @@ def input(in_msg, timeslot=None):
     # 8=MSG1, 9=MSG2, 10=MSG3
     #in_msg.sat_nr=8
     #in_msg.RSS=False 
-    in_msg.sat_nr=9
+    #in_msg.sat_nr=9
+    #in_msg.RSS=True
+    in_msg.sat_nr=10
     in_msg.RSS=True
-    #in_msg.sat_nr=10
-    #in_msg.RSS=False 
 
     # specify an delay (in minutes), when you like to process a time some minutes ago
     # e.g. current time               2015-05-31 12:33 UTC
@@ -110,7 +110,7 @@ def input(in_msg, timeslot=None):
     ## NWC SAF
     ##-------------------
     ## NWC SAF PEG 1
-    in_msg.RGBs.append('CMa')
+    #in_msg.RGBs.append('CMa')
     #in_msg.RGBs.append('CMa_DUST')
     #in_msg.RGBs.append('CMa_VOLCANIC')
     #in_msg.RGBs.append('CMa_QUALITY')
@@ -124,7 +124,7 @@ def input(in_msg, timeslot=None):
     #in_msg.RGBs.append('CTH')
     #in_msg.RGBs.append('CTP')
     ## NWC SAF PEG 4
-    #in_msg.RGBs.append('CRR')
+    in_msg.RGBs.append('CRR')
     ## NWC SAF PEG 5
     #in_msg.RGBs.append('PC')
     ## NWC SAF PEG 13 
@@ -158,6 +158,13 @@ def input(in_msg, timeslot=None):
     ## NWC SAF PEG 14
     #in_msg.RGBs.append('PCPh')
     #in_msg.RGBs.append('CRPh')
+    #-------------------
+    # H-SAF
+    #-------------------
+    #in_msg.sat = "HSAF"
+    #in_msg.sat_nr=""
+    #in_msg.RSS=False 
+    #in_msg.RGBs.append('h03')
     #-------------------
     # experimental
     #in_msg.RGBs.append('clouddepth')     # test according to Mecikalski, 2010
@@ -196,12 +203,18 @@ def input(in_msg, timeslot=None):
     # please download the shape file 
     #in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
     in_msg.mapDir='/opt/users/common/shapes/'
-
+    in_msg.mapResolution=None       ## f  full resolution: Original (full) data resolution.          
+                                    ## h  high resolution: About 80 % reduction in size and quality. 
+                                    ## i  intermediate resolution: Another ~80 % reduction.          
+                                    ## l  low resolution: Another ~80 % reduction.                   
+                                    ## c  crude resolution: Another ~80 % reduction.  
     in_msg.add_title = True
     in_msg.colormap='greys'
     in_msg.add_borders = True
+    in_msg.border_color = 'red'
     in_msg.add_rivers = False
-    in_msg.add_logos = False
+    in_msg.river_color = 'blue'
+    in_msg.add_logos = True
     in_msg.add_colorscale = False
     
     in_msg.check_input = False
@@ -210,4 +223,3 @@ def input(in_msg, timeslot=None):
     in_msg.reprojected_data_dir='/data/COALITION2/database/meteosat/ccs4/%Y/%m/%d/'
     in_msg.save_statistics=False
     in_msg.HRV_enhancement=False
-    

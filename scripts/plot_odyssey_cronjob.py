@@ -241,3 +241,15 @@ if add_title:
 
 PIL_image.save(outputFile)
 print '... save image as ', outputFile
+
+# make composite and scp composite
+if True:
+    from get_input_msg import get_input_msg
+    in_msg = get_input_msg('input_template')
+    from postprocessing import postprocessing
+    in_msg.postprocessing_areas=[area]
+    in_msg.scpOutput = False
+    in_msg.datetime = global_data.time_slot
+    in_msg.outputDir = outputDir
+    in_msg.postprocessing_composite=["RATE-HRV", "RATE-ir108"]   
+    postprocessing(in_msg, global_data.time_slot, global_data.number, area)

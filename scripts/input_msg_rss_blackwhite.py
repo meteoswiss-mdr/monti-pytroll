@@ -10,11 +10,14 @@ def input(in_msg, timeslot=None):
     #in_msg.RSS=True 
     #in_msg.sat_nr=8
     #in_msg.RSS=False 
-    in_msg.sat_nr=9
-    in_msg.RSS=True  
-    #in_msg.sat_nr=10
-    #in_msg.RSS=False 
+    #in_msg.sat_nr=9
+    #in_msg.RSS=True  
+    in_msg.sat_nr=10
+    in_msg.RSS=True 
+    #in_msg.sat_nr=11
+    #in_msg.RSS=False
 
+    
     #in_msg.delay=5 # process image 'delay' minutes before now
 
     if True:
@@ -197,7 +200,7 @@ def input(in_msg, timeslot=None):
     in_msg.fixed_minmax = True
     
     in_msg.postprocessing_areas=['ccs4']
-    in_msg.postprocessing_composite=["radar-ir108","radar-HRV"]
+    in_msg.postprocessing_composite=["radar-ir108","radar-HRV","CRR-ir108","CRR-HRV","CRPh-ir108","CRPh-HRV"]
 
     #in_msg.postprocessing_areas=['odysseyS25']
     #in_msg.postprocessing_composite=["RATE-ir108","RATE-HRV"]    

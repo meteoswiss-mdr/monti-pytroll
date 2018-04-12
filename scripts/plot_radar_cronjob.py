@@ -315,8 +315,9 @@ if add_logos:
     if verbose:
         print '... add logos'
     dc.align_right()
-    if add_colorscale:
-        dc.write_vertically()
+    #if add_colorscale:
+    #    dc.write_vertically()
+    dc.write_vertically()
     dc.add_logo("../logos/meteoSwiss3.jpg",height=60.0)
     dc.add_logo("../logos/pytroll3.jpg",height=60.0)
     dc.add_logo("../logos/EUMETSAT_logo2_tiny_white_square.png",height=60.0)

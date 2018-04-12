@@ -4,7 +4,8 @@
 
 # Source global definitions
 if [ -f /etc/bashrc ]; then
-        . /etc/bashrc
+    echo 'start /etc/bashrc'
+    . /etc/bashrc
 fi
 
 #PS1='\[[\u@ \e[1;31m\]\h \e[0;37m\W]\$\[\e[0m\] '
@@ -23,12 +24,15 @@ if ! test -n "${logname}"; then
     echo '... set logname to:' ${LOGNAME}
 fi
 
-
+echo ''
+echo '*** current SHELL variables'
+echo "SHELL "${SHELL}
 echo "USER" ${USER}
 echo "\$(logname)" $(logname)
 echo "\$LOGNAME" $LOGNAME
 echo "uname -mrs:" `uname -mrs`
 echo "whoami:" `/usr/bin/whoami`
+
 
 case $HOSTNAME in
     "zueub"[2-4][0-9][0-9])
@@ -61,12 +65,12 @@ set_pytroll_paths
 export PPP_CONFIG_DIR=$PYTROLLHOME/etc/
 echo "... set PPP_CONFIG_DIR to: "$PPP_CONFIG_DIR
 
-
+echo '... configure host dependent settings, HOSTNAME='$HOSTNAME
 case $HOSTNAME in
 "zueub"[2-4][0-9][0-9])
     # special settings only for zueub computers
     if [ $HOSTNAME == "zueub427" ] || [ $HOSTNAME == "zueub428" ]; then 
-	alias tkdiff='echo tkdiff is too old, use \"meld\" instead; echo  meld '
+    	alias tkdiff='echo tkdiff is too old, use \"meld\" instead; echo  meld '
     fi
     export http_proxy=http://proxy.meteoswiss.ch:8080
     export https_proxy=https://proxy.meteoswiss.ch:8080
@@ -95,7 +99,7 @@ case $HOSTNAME in
 esac
 
 #export PY_SHAPEFILES=$PYTROLLHOME/shapes/
-
+echo '... set PYTHONPATH to:'$CONDA_PATH/bin:$PYTROLLHOME/scripts
 export PYTHONPATH=$CONDA_PATH/bin:$PYTROLLHOME/scripts
 
 # activate virtual environment

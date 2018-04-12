@@ -8,7 +8,8 @@ from mpop.utils import debug_on
 debug_on()
 
 #sat_nr="09"   # for data from the MeteoSwiss processing (alps region)
-sat_nr="10"   # for data from the Eumetcast processing (FES == full earth service)
+#sat_nr="10"   # for data from the Eumetcast processing (FES == full earth service)
+sat_nr="11"   # for data from the Eumetcast processing (FES == full earth service)
 
 if sat_nr=="09":
     Rapid_Scan=True
@@ -21,20 +22,24 @@ elif sat_nr=="10":
     Rapid_Scan=False
     delay=10
     area="EuropeCanaryS"
+elif sat_nr=="11":
+    Rapid_Scan=False
+    delay=10
+    area="EuropeCanaryS"
 else:
     print "Unknown satellite"
     quit()
 
 print "... Meteosat ", sat_nr,", Rapid Scan mode: ", Rapid_Scan
-#time_slot = get_last_SEVIRI_date(Rapid_Scan, delay=delay)
-time_slot = datetime.datetime(2015, 11, 26, 15, 30)
+time_slot = get_last_SEVIRI_date(Rapid_Scan, delay=delay)
+#time_slot = datetime.datetime(2015, 11, 26, 15, 30)
 print str(time_slot)
 
 global_data = GeostationaryFactory.create_scene("meteosat", sat_nr, "seviri", time_slot)
 
 #prop="CMa"
-prop='CT'
-#prop="CTH"
+#prop='CT'
+prop="CTH"
 
 # e.g. return "CTTH" for prop "CTH"
 from my_msg_module import get_NWC_pge_name

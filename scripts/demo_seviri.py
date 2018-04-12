@@ -7,11 +7,11 @@ import datetime
 #debug_on()
 
 from my_msg_module import get_last_SEVIRI_date
-#time_slot = get_last_SEVIRI_date(True, delay=5)
-time_slot = datetime.datetime(2017, 06, 30, 12, 30)
+time_slot = get_last_SEVIRI_date(False, delay=5)
+#time_slot = datetime.datetime(2018, 3, 8, 17, 35)
 print str(time_slot)
 
-global_data = GeostationaryFactory.create_scene("Meteosat-10", "", "seviri", time_slot)
+global_data = GeostationaryFactory.create_scene("Meteosat-11", "", "seviri", time_slot)
 #europe = get_area_def("EuropeCanaryS95")
 global_data.load([0.6, 0.8, 10.8])  # , area_extent=europe.area_extent
 print global_data

@@ -18,7 +18,9 @@
 #. ./setup_anaconda_zueub428.sh
 
 #export packages="aggdraw pygrib pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate"
-export packages="pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate satpy"
+#export packages="pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate satpy"
+export packages='pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate satpy'
+
 
 declare -A branches
 branches=( ["aggdraw"]="master" ["pygrib"]="master" ["pyresample"]="master" ["pycoast"]="master" \
@@ -30,7 +32,7 @@ source set_paths.sh  # load functions from this script
 set_pytroll_paths
 cd $PYTROLLHOME
 
-
+if [ 1 -eq 0 ]; then 
 echo ""
 echo "*** Synchronize PyTroll modules (git submodule sync)"
 echo "===================================================="
@@ -50,18 +52,27 @@ read junk
 echo ""
 echo "*** Checkout branches of PyTroll modules (... git checkout $branch, in order to avoid the detached head state)"
 echo "=============================================================================================================="
-#git submodule foreach -q --recursive 'branch="$(git config -f $toplevel/.gitmodules submodule.$name.branch)"; git checkout $branch'
-git submodule foreach -q --recursive git pull 
+# use this line for the first time to specify the branch
+git submodule foreach -q --recursive 'branch="$(git config -f $toplevel/.gitmodules submodule.$name.branch)"; git checkout $branch'
+#git submodule foreach -q --recursive git pull 
 echo "Does this look good? (press enter to continue or CTRL+c to abort)"
 read junk
 
 
 echo ""
-echo "*** Activate virtual environment " PyTroll_$(logname)
+echo "*** Activate virtual environment " PyTroll_$LOGNAME
 echo "============================================= "
-source activate PyTroll_$(logname)
+#source activate PyTroll_$(logname) -> logname points to hau, even when using cinesat
+source activate PyTroll_${LOGNAME}
 echo "Is the virtual environement active? (press enter to continue or CTRL+c to abort)"
 read junk
+
+# enable the use of cython
+export USE_CYTHON=True
+
+fi
+
+
 
 echo ""
 echo "*** Install PyTroll packages "
@@ -70,7 +81,7 @@ echo "============================ "
 for pack in $packages
 do 
     echo ""
-    echo "*** install"  $pack " with branch " ${branches[$pack]} " from repository " ${repositories[$pack]}
+    echo "*** install"  $pack " with branch " ${branches[$pack]} 
     cd $PYTROLLHOME
 
     cd packages/$pack

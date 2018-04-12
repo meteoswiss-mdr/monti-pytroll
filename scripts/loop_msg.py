@@ -29,10 +29,10 @@ if __name__ == '__main__':
                 in_msg.area = sys.argv[8]
 
 
-    delta_time =  10             # time in seconds to wait between the tries
-    total_time = 600             # maximum total time in seconds trying to get images
-#    delta_time =  1             # time in seconds to wait between the tries
-#    total_time = 6             # maximum total time in seconds trying to get images
+    delta_time =   30             # time in seconds to wait between the tries
+    total_time = 1800             # maximum total time in seconds trying to get images
+#    delta_time =   1             # time in seconds to wait between the tries
+#    total_time =   6             # maximum total time in seconds trying to get images
 
     end_time = time()+total_time   # total time add time to try in seconds
     event_time=time()

@@ -3,13 +3,14 @@ from my_msg_module import format_name
 from os.path import isfile, join, exists, dirname
 from os import makedirs
 import subprocess
+import inspect
 
 def get_THX_filename(in_msg, time_slot, area):
     print "    get_THX_filename THX for ", area
     from ConfigParser import ConfigParser
     from mpop import CONFIG_PATH
     conf = ConfigParser()
-    conf.read(join(CONFIG_PATH, "lightning.cfg"))
+    conf.read(join(CONFIG_PATH, "swisslightning.cfg"))
     dx = int(conf.get("thx-level2", "dx"))
     dt = int(conf.get("thx-level2", "dt"))
     dt_str = ("%04d" % dt) + "min"
@@ -150,8 +151,36 @@ def n_file_composite(composite, in_msg, sat_nr, time_slot, area, bits_per_pixel=
     return composites_done
 
 #-----------------------------------------------------------------------------------------
-#-----------------------------------------------------------------------------------------
 
+## simplyfied wrapper to call inside a program
+#
+#def postprocessing_function (time_slot, sat, sat_nr, areas, composite, montage, input_file='input_template.py'):
+#
+#    # define an instant of the class 'input_msg_class'
+#    from get_input_msg import input_msg_class
+#    in_msg = input_msg_class()
+#
+#    # define satellite (pass arguements to the in_msg instant)
+#    in_msg.sat = sat
+#    in_msg.sat_nr = sat_nr
+#    in_msg.init_datetime(timeslot=timeslot)
+#    from my_msg_module import check_RSS
+#    in_msg.RSS = check_RSS(sat_nr, date)
+#
+#    # define postprocessing (pass arguements to the in_msg instant)
+#    in_msg.postprocessing_areas=areas
+#    in_msg.postprocessing_composite=composite
+#    in_msg.postprocessing_montage=montage
+#    print "*** start postprocessing for: "
+#    print "    area: ", in_msg.postprocessing_areas
+#    print "    composite: ", in_msg.postprocessing_composite
+#    print "    montage: ", in_msg.postprocessing_montage
+#
+#    # loop over all postprocessing areas
+#    for area in in_msg.postprocessing_areas:
+#        postprocessing(in_msg, in_msg.datetime, int(in_msg.sat_nr), area)
+    
+#-----------------------------------------------------------------------------------------
 
 def postprocessing (in_msg, time_slot, sat_nr, area):
 
@@ -311,42 +340,59 @@ def print_usage():
          print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG "
          print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 "
          print "                                 date and time must be completely given"
-         print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'h03-ir108' (use this as postprocessing_composite, not those written in the input file)"
-         print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'h03-ir108' 'ccs4' (use this as postprocessing_areas, not those written in the input file)"
-         print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ['h03-ir108','h03-airmass'] ['ccs4','euro4'] (several composites and areas)"
+         print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'ccs4'           (overwrite in_msg.postprocessing_areas)"
+         print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ['ccs4','euro4'] (overwrite in_msg.postprocessing_areas)"
+         print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'ccs4' 'h03-ir108'                 (overwrite postprocessing_composite)"
+         print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'ccs4' ['h03-ir108','h03-airmass'] (overwrite postprocessing_composite)"
+         print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ['ccs4','euro4'] ['h03-ir108','h03-airmass'] (several composites and areas)"
          print "***           "
          quit() # quit at this point
 #-----------------------------------------------------------------------------------------
 
+# call by command line
 if __name__ == '__main__':
 
-   import sys
-   from get_input_msg import get_date_and_inputfile_from_commandline
-   in_msg = get_date_and_inputfile_from_commandline(print_usage=print_usage)
+#   import sys
+#   import re
+#   from get_input_msg import get_date_and_inputfile_from_commandline
+#   in_msg = get_date_and_inputfile_from_commandline(print_usage=print_usage)
+#
+#   # interpret 7th argument as area/areas 
+#   if len(sys.argv) > 7:
+#       area= sys.argv[7]
+#       if area[0] != '[':  # user wants a list
+#           in_msg.postprocessing_areas = [sys.argv[7]]
+#       else:
+#           # convert (string representation of list) into a list
+#           junkers = re.compile('[[" \]]')
+#           in_msg.postprocessing_areas = junkers.sub('', sys.argv[7]).split(',')
+#           
+#       if len(sys.argv) > 8:
+#           composite = sys.argv[8]
+#           if composite[0] != '[':  # user wants a list
+#               in_msg.postprocessing_composite = [sys.argv[8]]
+#           else:
+#               # convert (string representation of list) into a list
+#               junkers = re.compile('[[" \]]')
+#               in_msg.postprocessing_composite = junkers.sub('', sys.argv[8]).split(',')
+# 
+#           #print "... produce composite: ", in_msg.postprocessing_composite, type(in_msg.postprocessing_composite)
+#           #print type(in_msg.postprocessing_composite)
+#
+#           if len(sys.argv) > 9:
+#               montage = sys.argv[9]
+#               if montage[0] != '[':  # user wants a list
+#                   in_msg.postprocessing_montage = [sys.argv[9]]
+#               else:
+#                   # convert (string representation of list) into a list
+#                   junkers = re.compile('[[" \]]')
+#                   in_msg.postprocessing_montage = junkers.sub('', sys.argv[9]).split(',')
 
-   if len(sys.argv) > 7:
-       in_msg.postprocessing_composite = sys.argv[7]
-       print in_msg.postprocessing_composite
-       print in_msg.postprocessing_composite[0]
-       print "bbb"
-       if in_msg.postprocessing_composite[0] != '[':  #type(sys.argv[7]) is str
-           print '[[[[['
-           in_msg.postprocessing_composite = [sys.argv[7]]
-       else:
-           # convert (string representation of list) into a list
-           import re
-           junkers = re.compile('[[" \]]')
-           in_msg.postprocessing_composite = junkers.sub('', sys.argv[7]).split(',')
-       print "... produce composite: ", in_msg.postprocessing_composite, type(in_msg.postprocessing_composite)
-       print type(in_msg.postprocessing_composite)
-       if len(sys.argv) > 8:
-           if type(sys.argv[8]) is str:
-               in_msg.postprocessing_areas = [sys.argv[8]]
-           else:
-               in_msg.postprocessing_areas = sys.argv[8]
- 
+   from get_input_msg import parse_commandline_and_read_inputfile
+   in_msg = parse_commandline_and_read_inputfile()
+    
    print "*** start postprocessing for: "
-   print "    area: ", in_msg.postprocessing_areas
+   print "    areas: ", in_msg.postprocessing_areas
    print "    composite: ", in_msg.postprocessing_composite
    print "    montage: ", in_msg.postprocessing_montage
               
@@ -360,3 +406,5 @@ if __name__ == '__main__':
    #RGBs_done = plot_msg(in_msg)
    #print "*** Satellite pictures produced for ", RGBs_done 
    #print " "
+
+   

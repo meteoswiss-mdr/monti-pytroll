@@ -110,28 +110,28 @@ def input(in_msg, timeslot=None):
     ## NWC SAF
     ##-------------------
     ## NWC SAF PEG 1
-    in_msg.nwcsaf_calibrate=True
-    #in_msg.RGBs.append('CMa')
+    in_msg.nwcsaf_calibrate=False
+    in_msg.RGBs.append('CMa')
     #in_msg.RGBs.append('CMa_DUST')
     #in_msg.RGBs.append('CMa_VOLCANIC')
     #in_msg.RGBs.append('CMa_QUALITY')
     ## NWC SAF PEG 2
-    #in_msg.RGBs.append('CT')
-    #in_msg.RGBs.append('CT_PHASE')
-    #in_msg.RGBs.append('CT_QUALITY')
+    in_msg.RGBs.append('CT')
+    in_msg.RGBs.append('CT_PHASE')
+    in_msg.RGBs.append('CT_QUALITY')
     ## NWC SAF PEG 3 
     #in_msg.nwcsaf_calibrate=True
-    in_msg.RGBs.append('CTT')
-    in_msg.RGBs.append('CTH')
-    #in_msg.RGBs.append('CTP')
+    #in_msg.RGBs.append('CTT')
+    #in_msg.RGBs.append('CTH')
+    in_msg.RGBs.append('CTP')
     ## NWC SAF PEG 4
-    in_msg.RGBs.append('CRR')
+    #in_msg.RGBs.append('CRR')
     ## NWC SAF PEG 5
     #in_msg.RGBs.append('PC')
     ## NWC SAF PEG 13 
     #in_msg.nwcsaf_calibrate=False
-    #in_msg.RGBs.append('sphr_bl')
-    in_msg.RGBs.append('sphr_cape')
+    in_msg.RGBs.append('sphr_bl')
+    #in_msg.RGBs.append('sphr_cape')
     #in_msg.RGBs.append('sphr_diffbl')
     #in_msg.RGBs.append('sphr_diffhl')
     #in_msg.RGBs.append('sphr_diffki')
@@ -139,14 +139,14 @@ def input(in_msg, timeslot=None):
     #in_msg.RGBs.append('sphr_diffml')
     #in_msg.RGBs.append('sphr_diffshw')
     #in_msg.RGBs.append('sphr_difftpw')
-    #in_msg.RGBs.append('sphr_hl')
-    #in_msg.RGBs.append('sphr_ki')
-    #in_msg.RGBs.append('sphr_li')
-    #in_msg.RGBs.append('sphr_ml')
+    in_msg.RGBs.append('sphr_hl')
+    in_msg.RGBs.append('sphr_ki')
+    in_msg.RGBs.append('sphr_li')
+    in_msg.RGBs.append('sphr_ml')
     #in_msg.RGBs.append('sphr_quality')
     #in_msg.RGBs.append('sphr_sflag')
-    #in_msg.RGBs.append('sphr_shw')
-    #in_msg.RGBs.append('sphr_tpw')
+    in_msg.RGBs.append('sphr_shw')
+    in_msg.RGBs.append('sphr_tpw')
     #in_msg.RGBs.append('SPhR_BL')      # old format
     #in_msg.RGBs.append('SPhR_CAPE')    # old format
     #in_msg.RGBs.append('SPhR_HL')      # old format
@@ -158,7 +158,7 @@ def input(in_msg, timeslot=None):
     #in_msg.RGBs.append('SPhR_TPW')     # old format
     ## NWC SAF PEG 14
     #in_msg.RGBs.append('PCPh')
-    in_msg.RGBs.append('CRPh')
+    #in_msg.RGBs.append('CRPh')
     #-------------------
     # H-SAF
     #-------------------
@@ -190,7 +190,7 @@ def input(in_msg, timeslot=None):
    
 
     in_msg.make_plots=True
-    in_msg.fill_value=None  # black (0,0,0) / white (1,1,1) / transparent None
+    in_msg.fill_value=(0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None
     in_msg.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
     in_msg.outputDir='./pics/'
     #in_msg.outputDir = "./%Y-%m-%d/%Y-%m-%d_%(rgb)s-%(area)s/"
@@ -211,19 +211,17 @@ def input(in_msg, timeslot=None):
                                     ## l  low resolution: Another ~80 % reduction.                   
                                     ## c  crude resolution: Another ~80 % reduction.  
     in_msg.add_title = True
-    in_msg.title_y_line_nr = 2
     in_msg.add_borders = True
     in_msg.border_color = 'red'
     in_msg.add_rivers = False
     in_msg.river_color = 'blue'
     in_msg.add_logos = True
-    in_msg.add_colorscale = True
+    in_msg.add_colorscale = False
     in_msg.HRV_enhancement = False
     
     in_msg.postprocessing_areas=['ccs4']
-    in_msg.postprocessing_composite=["CTH-ir108","CTT-ir108","CRR-ir108","CRR-HRV","CRPh-ir108","CRPh-HRV","sphr_cape-ir108"]    #
-    in_msg.postprocessing_montage=[["MSG_radar-ir108","MSG_CRR-ir108"],["MSG_radar-HRV","MSG_CRR-HRV"],["MSG_radar-ir108","MSG_CRPh-ir108"],["MSG_radar-HRV","MSG_CRPh-HRV"]]
-    
+    in_msg.postprocessing_composite=["CRR-ir108","CRPh-ir108"]   
+
     in_msg.check_input = False
     #in_msg.save_reprojected_data=['ccs4']
     in_msg.reprojected_data_filename='%(msg)s_%(area)s_%Y%m%d%H%M_nwcsaf.nc'

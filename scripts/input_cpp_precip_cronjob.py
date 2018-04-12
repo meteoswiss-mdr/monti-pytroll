@@ -1,32 +1,14 @@
 
-def input(in_msg, timeslot=None):
+def input(in_msg):
 
-    import inspect
-    in_msg.input_file = inspect.getfile(inspect.currentframe()) 
-    print "*** read input from ", in_msg.input_file
+    print "*** read input from input_template.py"
 
-    # 8=MSG1, 9=MSG2, 10=MSG3
-    #in_msg.sat_nr=8
-    #in_msg.RSS=False 
-    #in_msg.sat_nr=9
-    #in_msg.RSS=True
-    in_msg.sat_nr=10
-    in_msg.RSS=True 
-
-    # specify an delay (in minutes), when you like to process a time some minutes ago
-    # e.g. current time               2015-05-31 12:33 UTC
-    # delay 5 min                     2015-05-31 12:28 UTC
-    # last Rapid Scan Service picture 2015-05-31 12:25 UTC (Scan start) 
-    in_msg.delay=5
-
-    if True:
-        # choose timeslot of the satellite picture to process
-        # datetime according to command line arguments (if given)
-        # otherwise the last possible time of SEVIRI observation (depends on RSS mode and chosen delay)
-        # also sets the near real time marker: in_msg.nrt 
-        in_msg.init_datetime(timeslot=timeslot)
-    else:
-        # offline mode (always a fixed time) # ignores command line arguments
+    #------------------------------------------------------------------------
+    # if not specified (False), current (last) observation time is chosen  
+    # chosse specification, if you want a default time without command line arguments 
+    # (the specified time is overwritten by the command line arguments of plot_msg.py)
+    #------------------------------------------------------------------------
+    if False:
         year=2015
         month=2
         day=10
@@ -34,6 +16,13 @@ def input(in_msg, timeslot=None):
         minute=45
         in_msg.update_datetime(year, month, day, hour, minute)
         # !!!  if archive is used, adjust meteosat09.cfg accordingly !!!
+
+    # specify an delay (in minutes), when you like to process a time some minutes ago
+    # e.g. current time               2015-05-31 12:33 UTC
+    # delay 5 min                     2015-05-31 12:28 UTC
+    # last Rapid Scan Service picture 2015-05-31 12:25 UTC (Scan start) 
+    in_msg.delay=15
+
 
     #----------------------
     # choose RGBs 
@@ -67,6 +56,11 @@ def input(in_msg, timeslot=None):
     #in_msg.RGBs.append('IR_134c')      # colored version
     #in_msg.RGBs.append('HRVc')         # colored version
     #-------------------
+    # viewing geometry
+    #-------------------
+    #in_msg.sat = "vza"
+    #in_msg.sat = "vaa"
+
     # satellite channel differences
     #in_msg.RGBs.append('WV_062_minus_WV_073')
     #in_msg.RGBs.append('WV_062_minus_IR_108')
@@ -110,7 +104,6 @@ def input(in_msg, timeslot=None):
     ## NWC SAF
     ##-------------------
     ## NWC SAF PEG 1
-    in_msg.nwcsaf_calibrate=True
     #in_msg.RGBs.append('CMa')
     #in_msg.RGBs.append('CMa_DUST')
     #in_msg.RGBs.append('CMa_VOLCANIC')
@@ -120,18 +113,18 @@ def input(in_msg, timeslot=None):
     #in_msg.RGBs.append('CT_PHASE')
     #in_msg.RGBs.append('CT_QUALITY')
     ## NWC SAF PEG 3 
-    #in_msg.nwcsaf_calibrate=True
-    in_msg.RGBs.append('CTT')
-    in_msg.RGBs.append('CTH')
+    in_msg.nwcsaf_calibrate=True
+    #in_msg.RGBs.append('CTT')
+    #in_msg.RGBs.append('CTH')
     #in_msg.RGBs.append('CTP')
     ## NWC SAF PEG 4
-    in_msg.RGBs.append('CRR')
+    #in_msg.RGBs.append('CRR')
     ## NWC SAF PEG 5
     #in_msg.RGBs.append('PC')
     ## NWC SAF PEG 13 
     #in_msg.nwcsaf_calibrate=False
     #in_msg.RGBs.append('sphr_bl')
-    in_msg.RGBs.append('sphr_cape')
+    #in_msg.RGBs.append('sphr_cape')
     #in_msg.RGBs.append('sphr_diffbl')
     #in_msg.RGBs.append('sphr_diffhl')
     #in_msg.RGBs.append('sphr_diffki')
@@ -158,7 +151,7 @@ def input(in_msg, timeslot=None):
     #in_msg.RGBs.append('SPhR_TPW')     # old format
     ## NWC SAF PEG 14
     #in_msg.RGBs.append('PCPh')
-    in_msg.RGBs.append('CRPh')
+    #in_msg.RGBs.append('CRPh')
     #-------------------
     # H-SAF
     #-------------------
@@ -167,6 +160,37 @@ def input(in_msg, timeslot=None):
     #in_msg.RSS=False 
     #in_msg.RGBs.append('h03')
     #-------------------
+    # CPP (cloud physical products from KNMI)
+    #-------------------
+    in_msg.sat = "cpp"
+    #in_msg.RGBs.append('azidiff')
+    #in_msg.RGBs.append('cth')
+    #in_msg.RGBs.append('cldmask')
+    #in_msg.RGBs.append('cot')
+    #in_msg.RGBs.append('cph')
+    #in_msg.RGBs.append('ctt')
+    #in_msg.RGBs.append('cwp')
+    #in_msg.RGBs.append('dcld')
+    #in_msg.RGBs.append('dcot')
+    #in_msg.RGBs.append('dcwp')
+    #in_msg.RGBs.append('dndv')
+    #in_msg.RGBs.append('dreff')
+    in_msg.RGBs.append('precip')
+    #in_msg.RGBs.append('precip_ir')
+    #in_msg.RGBs.append('qa')
+    #in_msg.RGBs.append('reff')
+    #in_msg.RGBs.append('satz')
+    #in_msg.RGBs.append('sds')
+    #in_msg.RGBs.append('sds_cs')
+    #in_msg.RGBs.append('sds_diff')
+    #in_msg.RGBs.append('sds_diff_cs')
+    #in_msg.RGBs.append('sunz')
+    #in_msg.RGBs.append('lat')
+    #in_msg.RGBs.append('lon')
+    #in_msg.RGBs.append('time_offset')
+    #-------------------
+
+
     # experimental
     #in_msg.RGBs.append('clouddepth')     # test according to Mecikalski, 2010
     ##in_msg.RGBs.append('RII')
@@ -174,58 +198,78 @@ def input(in_msg, timeslot=None):
     #----------------
     # chose area
     #----------------
+    #in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
+    #in_msg.areas.append('germ')            # Germany 1024x1024
+    #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     #in_msg.areas.append('EuropeCanary')    # upper third of MSG disk, satellite at 0.0 deg East, full resolution 
     #in_msg.areas.append('EuropeCanary95')  # upper third of MSG disk, satellite at 9.5 deg East, full resolution 
     #in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
-    #in_msg.areas.append('germ')            # Germany 1024x1024
-    #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
-    in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
     #in_msg.areas.append('alps95')          # area around Switzerland processed by NWCSAF software 349x151 
     #in_msg.areas.append('ticino')          # stereographic proj of Ticino 342x311
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
     #in_msg.areas.append('fullearth')       # full earth 600x300                    # does not yet work
     #in_msg.areas.append('met09globe')      # Cropped globe MSG image 3620x3620     # does not yet work
     #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
-    
-   
-
-    in_msg.make_plots=True
-    in_msg.fill_value=None  # black (0,0,0) / white (1,1,1) / transparent None
-    in_msg.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
-    in_msg.outputDir='./pics/'
-    #in_msg.outputDir = "./%Y-%m-%d/%Y-%m-%d_%(rgb)s-%(area)s/"
-    in_msg.outputDir = '/data/cinesat/out/'
-    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
-    in_msg.compress_to_8bit=False
-
-    in_msg.scpOutput=True
-    #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
-    #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
+    #in_msg.areas.append('SeviriDiskFull00S4')
+    in_msg.areas.append('odysseyS25')
 
     # please download the shape file 
-    #in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
-    in_msg.mapDir='/opt/users/common/shapes/'
-    in_msg.mapResolution=None       ## f  full resolution: Original (full) data resolution.          
-                                    ## h  high resolution: About 80 % reduction in size and quality. 
-                                    ## i  intermediate resolution: Another ~80 % reduction.          
-                                    ## l  low resolution: Another ~80 % reduction.                   
-                                    ## c  crude resolution: Another ~80 % reduction.  
+    in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
+    in_msg.mapResolution=None      ## f  full resolution: Original (full) data resolution.          
+                                   ## h  high resolution: About 80 % reduction in size and quality. 
+                                   ## i  intermediate resolution: Another ~80 % reduction.          
+                                   ## l  low resolution: Another ~80 % reduction.                   
+                                   ## c  crude resolution: Another ~80 % reduction.   
+
+
+    # 8=MSG1, 9=MSG2, 10=MSG3
+    #in_msg.sat_nr=8
+    #in_msg.RSS=False 
+    #in_msg.sat_nr=9
+    #in_msg.RSS=True
+    in_msg.sat_nr=10
+    in_msg.RSS=False 
+    
+    # switch off Rapid scan, if large areas are wanted 
+    if ('fullearth' in in_msg.areas) or ('met09globe' in in_msg.areas) or ('met09globeFull' in in_msg.areas): 
+       in_msg.RSS=False 
+
+    in_msg.check_input = False
+    #in_msg.reader_level="seviri-level4" 
+    #in_msg.save_reprojected_data=['ccs4']
+    in_msg.reprojected_data_filename='%(msg)s_%(area)s_%Y%m%d%H%M_nwcsaf.nc'
+    in_msg.reprojected_data_dir='/data/COALITION2/database/meteosat/ccs4/%Y/%m/%d/'
+    in_msg.save_statistics=False
+
+    in_msg.make_plots=True
+    in_msg.fill_value=None  # black (0,0,0) / white (1,1,1) / transparent None  
     in_msg.add_title = True
-    in_msg.title_y_line_nr = 2
     in_msg.add_borders = True
     in_msg.border_color = 'red'
     in_msg.add_rivers = False
     in_msg.river_color = 'blue'
     in_msg.add_logos = True
-    in_msg.add_colorscale = True
+    in_msg.add_colorscale = False
     in_msg.HRV_enhancement = False
+
+    in_msg.outputFile = '%(sat)s_%(rgb)s-%(area)s_%y%m%d%H%M.png'
+    #in_msg.outputDir='./pics/'
+    #in_msg.outputDir = "./%Y-%m-%d/%Y-%m-%d_%(rgb)s-%(area)s/"
+    in_msg.outputDir = '/data/cinesat/out/'
+    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
+
+    in_msg.compress_to_8bit=False
+
+    in_msg.scpOutput = True
+    #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
+    #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
     
-    in_msg.postprocessing_areas=['ccs4']
-    in_msg.postprocessing_composite=["CTH-ir108","CTT-ir108","CRR-ir108","CRR-HRV","CRPh-ir108","CRPh-HRV","sphr_cape-ir108"]    #
-    in_msg.postprocessing_montage=[["MSG_radar-ir108","MSG_CRR-ir108"],["MSG_radar-HRV","MSG_CRR-HRV"],["MSG_radar-ir108","MSG_CRPh-ir108"],["MSG_radar-HRV","MSG_CRPh-HRV"]]
-    
-    in_msg.check_input = False
-    #in_msg.save_reprojected_data=['ccs4']
-    in_msg.reprojected_data_filename='%(msg)s_%(area)s_%Y%m%d%H%M_nwcsaf.nc'
-    in_msg.reprojected_data_dir='/data/COALITION2/database/meteosat/ccs4/%Y/%m/%d/'
-    in_msg.save_statistics=False 
+    #in_msg.postprocessing_areas=['odysseyS25','SeviriDiskFull00S4']
+    in_msg.postprocessing_areas=['odysseyS25']
+    in_msg.postprocessing_composite=['precip-ir108','precip-HRV']
+    in_msg.postprocessing_montage = [["MSG_RATE-ir108","cpp_precip-ir108"],["MSG_RATE-HRV","cpp_precip-HRV"]]
+    #in_msg.postprocessing_areas=['ccs4','EuropeCanaryS95']
+    #in_msg.postprocessing_composite=['cth-ir108', 'cot-ir108', 'ctt-ir108','reff-ir108', 'precip-ir108','precip_ir-ir108']    
+    #in_msg.postprocessing_composite=['reff-ir108','precip-ir108', 'cot-ir108']    
+    #in_msg.postprocessing_composite=['cth-ir108']    
+    #in_msg.postprocessing_composite=['cot-ir108']    

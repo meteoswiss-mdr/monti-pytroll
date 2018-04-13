@@ -124,6 +124,9 @@ def input(in_msg, timeslot=None):
     #in_msg.RGBs.append('HRoverview')
     ##in_msg.RGBs.append('sandwich')
     ##in_msg.RGBs.append('ndvi')
+    #in_msg.RGBs.append('sza')
+    #in_msg.RGBs.append('HRVFog')
+    #in_msg.RGBs.append('DayNightFog')
     ##-------------------
     ## NWC SAF
     ##-------------------

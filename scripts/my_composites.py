@@ -1,6 +1,7 @@
 from mpop.imageo.geo_image import GeoImage
 from copy import deepcopy
 from trollimage.colormap import rdbu, greys, rainbow, spectral
+import numpy as np
 
 def hr_visual(self):
     """Make a High Resolution visual BW image composite from Seviri
@@ -161,6 +162,139 @@ def sandwich(self):
 sandwich.prerequisites = set(["HRV", 10.8])
 #sandwich.prerequisites = set([10.8])   
 
+
+def HRVFog(self, downscale=False, return_data=False):
+    """Make an HRV RGB image composite.
+    +--------------------+--------------------+--------------------+
+    | Channels           | Temp               | Gamma              |
+    +====================+====================+====================+
+    | NIR1.6             |        0 -  70     | gamma 1            |
+    +--------------------+--------------------+--------------------+
+    | HRV                |        0 - 100     | gamma 1            |
+    +--------------------+--------------------+--------------------+
+    | HRV                |        0 - 100     | gamma 1            |
+    +--------------------+--------------------+--------------------+
+    """
+    self.check_channels(1.6, "HRV")
+
+    from pyorbital.astronomy import sun_zenith_angle
+    lonlats = self["HRV"].area.get_lonlats()
+    sza = sun_zenith_angle(self.time_slot, lonlats[0], lonlats[1])
+    cos_sza = np.cos(np.radians(sza)) + 0.05
+        
+    ch1 = self[1.6].data   / cos_sza
+    ch2 = self["HRV"].data / cos_sza
+    ch3 = self["HRV"].data / cos_sza
+
+    # this area exception is not nice!
+    if downscale or (self["HRV"].area.name=='ccs4' or self["HRV"].area.name=='Switzerland_stereographic_500m'):
+        print '... downscale NIR1.6'
+        from plot_coalition2 import downscale_array
+        ch1 = downscale_array(ch1)
+
+    if return_data:
+        return ch1, ch2, ch3
+        
+    img = GeoImage((ch1, ch2, ch3),
+                   self.area,
+                   self.time_slot,
+                   fill_value=(0, 0, 0),
+                   mode="RGB",
+                   crange=((0,  70),
+                           (0, 100),
+                           (0, 100)))
+
+    return img
+
+HRVFog.prerequisites = set(["HRV", "IR_016"])
+
+
+#def get_sza_mask(self, sza_max=80 ):
+#
+#    # calculate longitude/latitude and solar zenith angle 
+#    from pyorbital.astronomy import sun_zenith_angle
+#    lonlats = self.area.get_lonlats()
+#    sza = sun_zenith_angle(self.time_slot, lonlats[0], lonlats[1])
+#
+#    mask = np.array(sza > sza_max)
+#    return mask
+
+
+def DayNightFog(self, downscale=False, sza_max=88):
+    """Make an RGB image composite.
+    during day:   HRVFog
+    during night: night microphysics
+    """
+    self.check_channels(1.6, 3.9, 10.8, 12.0, "HRV")
+
+    # HRVFog recipe
+    # --------------
+    from pyorbital.astronomy import sun_zenith_angle
+    lonlats = self["HRV"].area.get_lonlats()
+    sza = sun_zenith_angle(self.time_slot, lonlats[0], lonlats[1])
+    import numpy as np
+    cos_sza = np.cos(np.radians(sza)) + 0.05
+        
+    ch1a = self[1.6].data   / cos_sza
+    ch2a = self["HRV"].data / cos_sza
+    ch3a = self["HRV"].data / cos_sza
+
+    # this area exception is not nice!
+    if downscale or (self["HRV"].area.name=='ccs4' or self["HRV"].area.name=='Switzerland_stereographic_500m'):
+        print '... downscale NIR1.6'
+        from plot_coalition2 import downscale_array
+        ch1a = downscale_array(ch1a)
+
+    # night microphysics recipe
+    # --------------------------       
+    ch1b = self[12.0].data - self[10.8].data
+    ch2b = self[10.8].data - self[3.9].data
+    ch3b = self[10.8].data
+
+    # this area exception is not nice!
+    if downscale or (self["HRV"].area.name=='ccs4' or self["HRV"].area.name=='Switzerland_stereographic_500m'):
+        print '... downscale night microphysics - red/green/blue'
+        ch1b = downscale_array(ch1b)
+        ch2b = downscale_array(ch2b)
+        ch3b = downscale_array(ch3b)
+    
+    # re-adjust range so that both are in in the same range
+    # ch1b [-4,2] -> [0,70]
+    ch1b = (ch1b+4.)*70./6.
+    # ch2b [0,10] -> [0,100]
+    ch2b = (ch2b)*10.
+    # ch3b [243, 293] -> [0,100]
+    ch3b = (ch3b-243.0)*100.0/(293.0-243.0)
+    
+    mask = np.array(sza > sza_max)
+    
+    # add two images:
+    ch1 = (1-mask)*ch1a + mask*ch1b
+    ch2 = (1-mask)*ch2a + mask*ch2b
+    ch3 = (1-mask)*ch3a + mask*ch3b
+
+    img = GeoImage((ch1, ch2, ch3),
+                   self.area,
+                   self.time_slot,
+                   fill_value=(0, 0, 0),
+                   mode="RGB",
+                   crange=((0,  70),
+                           (0, 100),
+                           (0, 100)))
+
+    #img = GeoImage((ch1, ch2, ch3),
+    #               self.area,
+    #               self.time_slot,
+    #               fill_value=(0, 0, 0),
+    #               mode="RGB",
+    #               crange=((-4, 2),
+    #                       (0, 10),
+    #                       (243, 293)))
+    
+    return img
+
+DayNightFog.prerequisites = set(["HRV","IR_016",'IR_039','IR_108','IR_120'])
+
 def HRVir108(self, cos_scaled=True, use_HRV=False, smooth=False):
 
     self.check_channels("VIS006", "HRV", "IR_108")
@@ -192,7 +326,7 @@ def HRVir108(self, cos_scaled=True, use_HRV=False, smooth=False):
         mask = np.array(sza > sza1)
     else:
         mask = np.zeros(ir108.shape)
-        mask[np.where( sza1 > sza1 )] = 1
+        mask[np.where( sza > sza1 )] = 1
 
     if not cos_scaled:
         ch1 = vis * (1-mask) 
@@ -210,6 +344,33 @@ def HRVir108(self, cos_scaled=True, use_HRV=False, smooth=False):
     return img
 
 HRVir108.prerequisites = set(["VIS006", "HRV", 10.8])
+
+
+def sza(self):
+
+    #self.check_channels("VIS006", "HRV", "IR_108")
+    import numpy as np
+
+    # calculate longitude/latitude and solar zenith angle 
+    from pyorbital.astronomy import sun_zenith_angle
+    lonlats = self.area.get_lonlats()
+    #lonlats = self["IR_108"].area.get_lonlats()
+    sza = sun_zenith_angle(self.time_slot, lonlats[0], lonlats[1])
+    ### stupid numbers for outside disk!!!
+    #import numpy.ma as ma
+    #sza=ma.masked_equal(sza, 8.24905797976)
+    #sza=ma.masked_equal(sza, 8.25871138053)
+    
+    img = GeoImage(sza, self.area, self.time_slot, fill_value=(0,0,0), mode="L")
+
+    from trollimage.colormap import rainbow
+    cm = deepcopy(rainbow)
+    cm.set_range(0, 90)
+    img.colorize(cm)
+
+    return img
+
+sza.prerequisites = set([])
 
 def ndvi(self):
     """Make a normalized vegitation index image 
@@ -685,7 +846,7 @@ clouddepth.prerequisites = set(['WV_062','WV_073','IR_087','IR_108','IR_120','IR
 
 
 
-seviri = [hr_visual, hr_overview, hr_natural, hr_airmass, sandwich, HRVir108, ndvi, IR_039c_CO2, \
+seviri = [hr_visual, hr_overview, hr_natural, hr_airmass, sandwich, HRVFog, DayNightFog, HRVir108, sza, ndvi, IR_039c_CO2, \
           VIS006_minus_IR_016, IR_039_minus_IR_108, WV_062_minus_WV_073, WV_062_minus_IR_108,\
           WV_073_minus_IR_134, IR_120_minus_IR_108, IR_087_minus_IR_108, IR_087_minus_IR_120, \
           trichannel, clouddepth, mask_clouddepth]
@@ -745,10 +906,16 @@ def get_image(data, rgb):
         obj_image = data.image.hr_airmass
     elif rgb=='sandwich':
         obj_image = data.image.sandwich
+    elif rgb=='HRVFog':
+        obj_image = data.image.HRVFog
+    elif rgb=='DayNightFog':
+        obj_image = data.image.DayNightFog
     elif rgb=='HRVir108':
         obj_image = data.image.HRVir108
     elif rgb=='ndvi':
         obj_image = data.image.ndvi
+    elif rgb=='sza':
+        obj_image = data.image.sza
     elif rgb=='IR_039c_CO2':
         obj_image = data.image.IR_039c_CO2
     elif rgb=='VIS006-IR_016':

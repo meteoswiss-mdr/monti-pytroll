@@ -358,9 +358,11 @@ def plot_msg(in_msg):
                #   unit = data[rgb].info['units']
                else:
                   unit = None
-                  if hasattr(data[rgb], 'info'):
-                     print "hasattr(data[rgb], 'info')", data[rgb].info.keys()
-                     if 'units' in data[rgb].info.keys():
+                  loaded_channels = [chn.name for chn in data.loaded_channels()]
+                  if rgb in loaded_channels:
+                    if hasattr(data[rgb], 'info'):
+                      print "hasattr(data[rgb], 'info')", data[rgb].info.keys()
+                      if 'units' in data[rgb].info.keys():
                         print "'units' in data[rgb].info.keys()"
                         unit = data[rgb].info['units']
                print "... units = ", unit
@@ -776,6 +778,10 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
          print "    use image function defined by my_msg_module.py"
       img = obj_image()
       in_msg.colormap[rgb] = None
+      if rgb == 'sza':
+        from trollimage.colormap import rainbow
+        in_msg.colormap[rgb] = deepcopy(rainbow.reverse())
+        in_msg.colormap[rgb].set_range(0, 90)
       #if rgb == 'ndvi':
       #   in_msg.colormap[rgb] = rdylgn_r
    else:
@@ -989,7 +995,7 @@ def add_colorscale(dc, rgb, in_msg, unit=None):
    if rgb.find("-") != -1: # for channel differences use tickmarks of 1 
       tick_marks=1
       minor_tick_marks=1
-
+      
    if in_msg.verbose:
       print '... add colorscale '
    dc.add_scale(in_msg.colormap[rgb], extend=True, tick_marks=tick_marks, minor_tick_marks=minor_tick_marks, font=font_scale, line_opacity=100, unit=unit) #

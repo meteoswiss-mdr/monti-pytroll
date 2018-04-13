@@ -15,7 +15,8 @@ RGBs_buildin = ['airmass','ash','cloudtop','convection','convection_co2',\
                  'overview','overview_sun','red_snow','refl39_chan','snow',\
                  'vis06','wv_high','wv_low']
 
-RGBs_user = ['HRoverview','hr_natural','hr_airmass','sandwich','HRVir108','HRVir108','ndvi','IR_039c_CO2',\
+RGBs_user = ['HRoverview','hr_natural','hr_airmass','sandwich','HRVFog','DayNightFog',\
+             'HRVir108','sza','ndvi','IR_039c_CO2',\
              'VIS006-IR_016','IR_039-IR_108','WV_062-WV_073','WV_062-IR_108','IR_087-IR_108',\
              'IR_087-IR_120','IR_120-IR_108','WV_073-IR_134','trichannel','clouddepth']
 

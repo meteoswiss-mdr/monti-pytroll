@@ -67,7 +67,7 @@ class input_msg_class:
                       'azidiff':0,'cth':0,'cldmask':0,'cot':0,'cph':0,'ctt':210.,'cwp':0,\
                       'dcld':0,'dcot':0,'dcwp':0,'dndv':0,'dreff':0,\
                       'precip':0,'precip_ir':0,'qa':0,'reff':0,'satz':0,'sds':0,'sds_cs':0,'sds_diff':0,'sds_diff_cs':0,\
-                      'vza':0,'vaa':0,'sunz':0,'lat':-80,'lon':-80,'time_offset':0,
+                      'vza':0,'vaa':0,'sunz':0,'sza':0,'lat':-80,'lon':-80,'time_offset':0,
                       'ot_anvilmean_brightness_temperature_difference':0}
       self.rad_max = {'VIS006':  85, 'VIS008':  90, 'IR_016':  80, 'IR_039': 340, 'WV_062': 260, 'WV_073': 280,\
                       'IR_087': 320, 'IR_097': 285, 'IR_108': 320, 'IR_120': 320, 'IR_134': 290, 'HRV': 100,\
@@ -81,7 +81,7 @@ class input_msg_class:
                       'azidiff':180,'cth':12,'cldmask':3,'cot':256,'cph':2,'ctt':320.,'cwp':10,\
                       'dcld':4,'dcot':50,'dcwp':10,'dndv':4,'dreff':20,\
                       'precip':256,'precip_ir':256,'qa':50,'reff':50,'satz':90,'sds':1200,'sds_cs':1200,'sds_diff':800,'sds_diff_cs':800,\
-                      'vza':90,'vaa':360,'sunz':90,'lat':80,'lon':80,'time_offset':750,
+                      'vza':90,'vaa':360,'sunz':90,'sza':90,'lat':80,'lon':80,'time_offset':750,
                       'ot_anvilmean_brightness_temperature_difference':6}
       self.tick_marks= {'VIS006': 20, 'VIS008': 20, 'IR_016': 20, 'IR_039': 20, 'WV_062': 20, 'WV_073': 20,\
                         'IR_087': 20, 'IR_097': 20, 'IR_108': 20, 'IR_120': 20, 'IR_134': 20, 'HRV': 20,\
@@ -93,7 +93,7 @@ class input_msg_class:
                         'azidiff':10,'cth':1,'cldmask':1,'cot':10,'cph':1,'ctt':10.,'cwp':2,\
                         'dcld':1,'dcot':10,'dcwp':2,'dndv':1,'dreff':20,\
                         'precip':10,'precip_ir':10,'qa':10,'reff':10,'satz':10,'sds':100,'sds_cs':100,'sds_diff':100,'sds_diff_cs':100,\
-                        'sunz':10,'lat':10,'lon':10,'time_offset':100,
+                        'sunz':10,'sza':10,'lat':10,'lon':10,'time_offset':100,
                         'ot_anvilmean_brightness_temperature_difference':1}
       self.minor_tick_marks = {'VIS006': 5, 'VIS008': 5, 'IR_016': 5, 'IR_039': 5, 'WV_062': 5, 'WV_073': 5,\
                         'IR_087': 5, 'IR_097': 5, 'IR_108': 5, 'IR_120': 5, 'IR_134': 5, 'HRV': 5,\
@@ -105,7 +105,7 @@ class input_msg_class:
                         'azidiff':2,'cth':0.2,'cldmask':1,'cot':2,'cph':1,'ctt':5.,'cwp':1,\
                         'dcld':1,'dcot':5,'dcwp':1,'dndv':1,'dreff':5,\
                         'precip':5,'precip_ir':5,'qa':2,'reff':2,'satz':2,'sds':10,'sds_cs':10,'sds_diff':10,'sds_diff_cs':10,\
-                        'sunz':2,'lat':2,'lon':2,'time_offset':10,
+                        'sunz':2,'sza':2,'lat':2,'lon':2,'time_offset':10,
                         'ot_anvilmean_brightness_temperature_difference':0.5 }
 
       self.postprocessing_areas     = []

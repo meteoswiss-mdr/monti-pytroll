@@ -50,3 +50,23 @@
 	path = packages/satpy
 	url = https://github.com/pytroll/satpy.git
 	branch = develop
+[submodule "packages/pytroll-collectors"]
+	path = packages/pytroll-collectors
+	url = https://github.com/pytroll/pytroll-collectors.git
+	branch = develop
+[submodule "packages/trollflow-sat"]
+	path = packages/trollflow-sat
+	url = https://github.com/pytroll/trollflow-sat.git
+	branch = develop
+[submodule "packages/trollflow"]
+	path = packages/trollflow
+	url = https://github.com/pytroll/trollflow.git
+	branch = develop
+[submodule "packages/trollbufr"]
+	path = packages/trollbufr
+	url = https://github.com/pytroll/trollbufr
+	branch = develop
+[submodule "packages/trollmoves"]
+	path = packages/trollmoves
+	url = https://github.com/pytroll/trollmoves.git
+	branch = develop

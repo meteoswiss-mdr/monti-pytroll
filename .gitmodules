@@ -50,3 +50,7 @@
 	path = packages/satpy
 	url = https://github.com/pytroll/satpy.git
 	branch = develop
+[submodule "packages/pytroll-examples"]
+	path = packages/pytroll-examples
+	url = https://github.com/pytroll/pytroll-examples.git
+	branch = master

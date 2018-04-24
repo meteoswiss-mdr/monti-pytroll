@@ -26,7 +26,13 @@ declare -A branches
 branches=( ["aggdraw"]="master" ["pygrib"]="master" ["pyresample"]="master" ["pycoast"]="master" \
            ["pyorbital"]="master" ["posttroll"]="develop" ["trollsift"]="master" \
            ["pytroll-schedule"]="master" ["trollimage"]="develop" ["mipp"]="master" \
-           ["mpop"]="master" ["trollduction"]="develop" ["pyspectral"]="master" ["pydecorate"]="master" ["satpy"]="develop")
+           ["mpop"]="master" ["trollduction"]="develop" ["pyspectral"]="master" ["pydecorate"]="master" \
+	   ["satpy"]="develop" ["pytroll-collectors"]="develop" ["trollflow-sat"]="develop" \
+	   ["trollflow"]="develop" ["trollbufr"]="develop" ["trollmoves"]="develop" ["pytroll-examples"]="master" \
+	   ["pytroll-cspp-runner"]="master" ["pytroll-pps-runner"]="master" ["pytroll-aapp-runner"]="master" ["pygac"]="master" \
+	   ["pyninjotiff"]="master" ["pykdtree"]="master" ["pytroll-product-filter"]="master" ["pytroll-modis-runner"]="master" \
+	   ["pytroll-osisaf-runner"]="master" ["python-bufr"]="master" ["pytroll-db"]="master" ["pygranule"]="master" \
+	 )
 
 source set_paths.sh  # load functions from this script
 set_pytroll_paths

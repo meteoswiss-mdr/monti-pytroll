@@ -85,7 +85,10 @@ echo "============================ "
 for pack in $packages
 do 
     echo ""
+    echo ""
+    echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     echo "*** install"  $pack " with branch " ${branches[$pack]} " from repository " ${repositories[$pack]}
+    echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     cd $PYTROLLHOME
 
     cd packages/$pack

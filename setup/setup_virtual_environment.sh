@@ -53,6 +53,12 @@ echo "*** Activate virtual environment" PyTroll_${LOGNAME}
 source activate PyTroll_${LOGNAME}
 echo "Is the virtual environment active? (press enter to continue or CTRL+c to abort)"
 read junk
+echo "*** Make sure a few packages are really really installed" PyTroll_${LOGNAME}
+conda install netcdf4
+conda install h5py
+conda install hdf5
+echo "Does the installation look good? (press enter to continue or CTRL+c to abort)"
+read junk
 echo ""
 echo "*** Installation of additional packages with pip (inside the virtual env)"
 echo "========================================================================="

@@ -74,3 +74,51 @@
 	path = packages/pytroll-examples
 	url = https://github.com/pytroll/pytroll-examples.git
 	branch = master
+[submodule "packages/pytroll-cspp-runner"]
+	path = packages/pytroll-cspp-runner
+	url = https://github.com/pytroll/pytroll-cspp-runner.git
+	branch = master
+[submodule "packages/pytroll-pps-runner"]
+	path = packages/pytroll-pps-runner
+	url = https://github.com/pytroll/pytroll-pps-runner.git
+	branch = master
+[submodule "packages/pytroll-aapp-runner"]
+	path = packages/pytroll-aapp-runner
+	url = https://github.com/pytroll/pytroll-aapp-runner.git
+	branch = master
+[submodule "packages/pygac"]
+	path = packages/pygac
+	url = https://github.com/pytroll/pygac.git
+	branch = master
+[submodule "packages/pyninjotiff"]
+	path = packages/pyninjotiff
+	url = https://github.com/pytroll/pyninjotiff.git
+	branch = master
+[submodule "packages/pykdtree"]
+	path = packages/pykdtree
+	url = https://github.com/pytroll/pykdtree.git
+	branch = master
+[submodule "packages/pytroll-product-filter"]
+	path = packages/pytroll-product-filter
+	url = https://github.com/pytroll/pytroll-product-filter.git
+	branch = master
+[submodule "packages/pytroll-modis-runner"]
+	path = packages/pytroll-modis-runner
+	url = https://github.com/pytroll/pytroll-modis-runner.git
+	branch = master
+[submodule "packages/pytroll-osisaf-runner"]
+	path = packages/pytroll-osisaf-runner
+	url = https://github.com/pytroll/pytroll-osisaf-runner.git
+	branch = master
+[submodule "packages/python-bufr"]
+	path = packages/python-bufr
+	url = https://github.com/pytroll/python-bufr.git
+	branch = master
+[submodule "packages/pytroll-db"]
+	path = packages/pytroll-db
+	url = https://github.com/pytroll/pytroll-db.git
+	branch = master
+[submodule "packages/pygranule"]
+	path = packages/pygranule
+	url = https://github.com/pytroll/pygranule.git
+	branch = master

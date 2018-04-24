@@ -19,7 +19,7 @@
 
 #export packages="aggdraw pygrib pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate"
 #export packages="pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate satpy"
-export packages='pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate satpy'
+export packages='pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate satpy pytroll-collectors trollflow-sat trollflow trollbufr trollmoves pytroll-examples pytroll-cspp-runner pytroll-pps-runner pytroll-aapp-runner pygac pyninjotiff pykdtree pytroll-product-filter pytroll-modis-runner pytroll-osisaf-runner python-bufr pytroll-db pygranule'
 
 
 declare -A branches

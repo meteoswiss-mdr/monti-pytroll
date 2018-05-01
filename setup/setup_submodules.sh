@@ -19,14 +19,20 @@
 
 #export packages="aggdraw pygrib pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate"
 #export packages="pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate satpy"
-export packages='pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate satpy'
+export packages='pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate satpy pytroll-collectors trollflow-sat trollflow trollbufr trollmoves pytroll-examples pytroll-cspp-runner pytroll-pps-runner pytroll-aapp-runner pygac pyninjotiff pykdtree pytroll-product-filter pytroll-modis-runner pytroll-osisaf-runner python-bufr pytroll-db pygranule'
 
 
 declare -A branches
-branches=( ["aggdraw"]="master" ["pygrib"]="master" ["pyresample"]="master" ["pycoast"]="master" \
+branches=( ["aggdraw"]="master" ["pygrib"]="master" ["pykdtree"]="master" ["pyresample"]="master" ["pycoast"]="master"  \
            ["pyorbital"]="master" ["posttroll"]="develop" ["trollsift"]="master" \
            ["pytroll-schedule"]="master" ["trollimage"]="develop" ["mipp"]="master" \
-           ["mpop"]="master" ["trollduction"]="develop" ["pyspectral"]="master" ["pydecorate"]="master" ["satpy"]="develop")
+           ["mpop"]="master" ["trollduction"]="develop" ["pyspectral"]="master" ["pydecorate"]="master" \
+	   ["satpy"]="develop" ["pytroll-collectors"]="develop" ["trollflow-sat"]="develop" \
+	   ["trollflow"]="develop" ["trollbufr"]="develop" ["trollmoves"]="develop" ["pytroll-examples"]="master" \
+	   ["pytroll-cspp-runner"]="master" ["pytroll-pps-runner"]="master" ["pytroll-aapp-runner"]="master" ["pygac"]="master" \
+	   ["pyninjotiff"]="master" ["pytroll-product-filter"]="master" ["pytroll-modis-runner"]="master" \
+	   ["pytroll-osisaf-runner"]="master" ["python-bufr"]="master" ["pytroll-db"]="master" ["pygranule"]="master" \
+	 )
 
 source set_paths.sh  # load functions from this script
 set_pytroll_paths
@@ -70,6 +76,10 @@ read junk
 # enable the use of cython
 export USE_CYTHON=True
 
+##
+## maybe better use
+# pip install (python setup install) and
+# pip install -e (python setup.py develop)
 
 
 echo ""
@@ -79,7 +89,10 @@ echo "============================ "
 for pack in $packages
 do 
     echo ""
+    echo ""
+    echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     echo "*** install"  $pack " with branch " ${branches[$pack]} " from repository " ${repositories[$pack]}
+    echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     cd $PYTROLLHOME
 
     cd packages/$pack

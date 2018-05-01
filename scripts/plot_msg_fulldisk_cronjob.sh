@@ -20,4 +20,8 @@ python $PYTROLLHOME/scripts/loop_msg.py input_msg_fulldisk_blackwhite_cronjob.py
 echo "    python" $PYTROLLHOME/scripts/loop_msg.py input_msg_fulldisk_blackwhite_cronjob2.py  
 python $PYTROLLHOME/scripts/loop_msg.py input_msg_fulldisk_blackwhite_cronjob2.py
 
+python postprocessing.py --scp --parea EuropeCanaryS95  -c ["h03-ir108","h03-HRV"] input_hsaf_cronjob.py
+python postprocessing.py --scp --parea odysseyS25       -c ["h03-ir108","h03-HRV","RATE-ir108","RATE-HRV"] input_hsaf_cronjob.py
+python postprocessing.py --scp --parea odysseyS25       -c '' -m [["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]] input_hsaf_cronjob.py
+
 echo ""

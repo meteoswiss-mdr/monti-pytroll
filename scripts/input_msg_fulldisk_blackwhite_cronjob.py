@@ -46,7 +46,7 @@ def input(in_msg, timeslot=None):
     # chose RGB mode
     #-------------------
     ## satellite channels
-    ##in_msg.RGBs.append('VIS006')       # black and white
+    in_msg.RGBs.append('VIS006')       # black and white
     ##in_msg.RGBs.append('VIS008')       # black and white
     ##in_msg.RGBs.append('IR_016')       # black and white
     ##in_msg.RGBs.append('IR_039')       # black and white
@@ -57,7 +57,7 @@ def input(in_msg, timeslot=None):
     in_msg.RGBs.append('IR_108')       # black and white
     ##in_msg.RGBs.append('IR_120')       # black and white
     ##in_msg.RGBs.append('IR_134')       # black and white
-    in_msg.RGBs.append('HRV')          # black and white
+    #in_msg.RGBs.append('HRV')          # black and white
     #in_msg.RGBs.append('VIS006c')      # colored version
     #in_msg.RGBs.append('VIS008c')      # colored version
     #in_msg.RGBs.append('IR_016c')      # colored version
@@ -311,7 +311,7 @@ def input(in_msg, timeslot=None):
     in_msg.postprocessing_areas=['EuropeCanaryS95']
     #in_msg.postprocessing_composite=["THX-IR_108","radar-convection","THX-radar-convection"]    
     #in_msg.postprocessing_composite=["RATE-HRV", "RATE-ir108","h03-HRV", "h03-ir108"]
-    in_msg.postprocessing_composite=["h03-HRV", "h03-ir108"]
+    in_msg.postprocessing_composite=["h03-VIS006", "h03-ir108"]
     #in_msg.postprocessing_montage=[["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]]
         
     in_msg.scpOutput = True
@@ -320,4 +320,4 @@ def input(in_msg, timeslot=None):
     #default: in_msg.scpProducts = ['all']
     #in_msg.scpProducts = ['IR_108c', "radar-convection"] # list of rgb, composite and montage strings
     #in_msg.scpProducts = ["C2rgb-IR_108"]
-    in_msg.scpProducts = ["h03-HRV", "h03-ir108"]
+    in_msg.scpProducts = ["h03-VIS006", "h03-ir108"]

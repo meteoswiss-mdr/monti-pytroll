@@ -309,8 +309,7 @@ def input(in_msg, timeslot=None):
 
     in_msg.postprocessing_areas=['EuropeCanaryS95','odysseyS25']
     #in_msg.postprocessing_composite=["THX-IR_108","radar-convection","THX-radar-convection"]    
-    in_msg.postprocessing_composite=["RATE-HRV", "RATE-ir108","h03-HRV", "h03-ir108"]
-    in_msg.postprocessing_composite=["RATE-HRV", "RATE-ir108","h03-HRV", "h03-ir108"]
+    in_msg.postprocessing_composite=["RATE-HRV", "RATE-ir108", "h03-HRV", "h03-ir108"]
     in_msg.postprocessing_montage=[["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]]
         
     in_msg.scpOutput = True

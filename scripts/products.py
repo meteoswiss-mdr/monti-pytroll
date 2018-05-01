@@ -46,10 +46,9 @@ CPP=['azidiff','cth','cldmask','cot','cph','ctt','cwp','dcld','dcot','dcwp','dnd
 
 MSG_all = MSG + MSG_color + RGBs_buildin + RGBs_user + NWCSAF
 
-Radar = ['precip','poh','mesh','vil', 'maxecho','echotop15','echotop20','echotop45','echotop50']
-HSAF  = ['h03']
-
 SEVIRI_viewing_geometry = ['vza','vaa','lat','lon']
+
+HSAF  = ['h03']
 
 MSG_OT = ['ir_brightness_temperature',
                'ot_rating_ir',
@@ -72,6 +71,24 @@ MSG_OT = ['ir_brightness_temperature',
                'ot_pressure',
                'parallax_correction_latitude',
                'parallax_correction_longitude']
+
+#################
+
+Radar = ['precip','poh','mesh','vil', 'maxecho','echotop15','echotop20','echotop45','echotop50']
+
+#################
+
+cosmo_vars_2d=["lon_1", "lat_1",\
+               "TWATER", "tropopause_height", "tropopause_temperature", "tropopause_pressure", \
+               "FF_10M", "VMAX_10M", "CAPE_MU", "CAPE_ML", "CIN_MU", "CIN_ML", \
+               "SLI", "LCL_ML", "LFC_ML", "T_2M", "TD_2M", "GLOB", "PS", \
+               "PMSL", "PMSLr", "HZEROCL", "WSHEAR_0-3km", "WSHEAR_0-6km", "SYNMSG_BT_CL_IR10.8"]
+cosmo_vars_3d=["POT_VORTIC", "THETAE", "MCONV", "geopotential_height",\
+               "T_SO", "RELHUM"]
+
+cosmo = cosmo_vars_2d+cosmo_vars_3d
+
+#################
 
 ninjo_chan_id = {'THX-ic_nrEURO1km':     8300015,
                  'THX-cg_nrEURO1km':     8400015,

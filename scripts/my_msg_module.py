@@ -539,6 +539,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                     if in_msg.verbose:
                         print "... check input files for ", MSG, str(in_msg.datetime), in_msg.RGBs
                     #pro_file = "?-000-"+MSG+"__-"+MSG+"_"+RSSS+"_???-_________-PRO______-"+yearS+monthS+dayS+hourS+minuteS+"-__"
+                    inputDirectory = time_slot.strftime(conf.get("seviri-level1", "dir"))
                     pro_file = time_slot.strftime(conf.get("seviri-level1", "filename_pro"))
                     #if len(filter(listdir(inputDirectory), pro_file)) == 0:
                     pro_filename = glob.glob(inputDirectory+'/'+pro_file)

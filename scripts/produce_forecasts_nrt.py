@@ -469,7 +469,7 @@ if __name__ == '__main__':
 
     # load a few standard things 
     from get_input_msg import get_input_msg
-    in_msg = get_input_msg('input_coalition2_crontab')
+    in_msg = get_input_msg('input_coalition2_cronjob')
 
     in_msg.resolution = 'i'
     in_msg.sat="Meteosat-"

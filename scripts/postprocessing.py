@@ -4,6 +4,7 @@ from os.path import isfile, join, exists, dirname
 from os import makedirs
 import subprocess
 import inspect
+from copy import deepcopy
 
 def get_THX_filename(in_msg, time_slot, area):
     print "    get_THX_filename THX for ", area
@@ -120,7 +121,7 @@ def n_file_composite(composite, in_msg, sat_nr, time_slot, area, bits_per_pixel=
         sat = 'MSG'
     else:
         sat = in_msg.sat
-
+    
     # get the filename of the last two files to compose  
     file_list = get_file_list(composite, in_msg, sat, sat_nr, time_slot, area, n=2)
     if file_list == None:  # if not all files are found 
@@ -144,10 +145,23 @@ def n_file_composite(composite, in_msg, sat_nr, time_slot, area, bits_per_pixel=
 
     if in_msg.scpOutput:
         if (composite in in_msg.scpProducts) or ('all' in [x.lower() for x in in_msg.scpProducts if type(x)==str]):
+            scpOutputDir = format_name (in_msg.scpOutputDir, time_slot, area=area, rgb=composite, sat=sat, sat_nr=sat_nr )
             if in_msg.verbose:
-                print "... secure copy "+comp_file+ " to "+in_msg.scpOutputDir
-            subprocess.call("/usr/bin/scp "+in_msg.scpID+" "+comp_file+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
-
+                print "/usr/bin/scp "+in_msg.scpID+" "+comp_file+" "+scpOutputDir+" 2>&1 &"
+            subprocess.call("/usr/bin/scp "+in_msg.scpID+" "+comp_file+" "+scpOutputDir+" 2>&1 &", shell=True)
+            
+    if in_msg.scpOutput and in_msg.scpID2 != None and in_msg.scpOutputDir2 != None:
+        if (composite in in_msg.scpProducts2) or ('all' in [x.lower() for x in in_msg.scpProducts2 if type(x)==str]):
+            scpOutputDir2 = format_name (in_msg.scpOutputDir2, time_slot, area=area, rgb=composite, sat=sat, sat_nr=sat_nr )
+            if in_msg.compress_to_8bit:
+                if in_msg.verbose:
+                    print "... secure copy "+comp_file.replace(".png","-fs8.png")+ " to "+scpOutputDir2
+                subprocess.call("scp "+in_msg.scpID2+" "+comp_file.replace(".png","-fs8.png")+" "+scpOutputDir2+" 2>&1 &", shell=True)
+            else:
+                if in_msg.verbose:
+                    print "... secure copy "+comp_file+ " to "+scpOutputDir2
+                subprocess.call("scp "+in_msg.scpID2+" "+comp_file+" "+scpOutputDir2+" 2>&1 &", shell=True)
+    
     return composites_done
 
 #-----------------------------------------------------------------------------------------
@@ -257,6 +271,7 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
             files = ""
             outfile = ""
             files_exist=True
+            nr_files_exist=0
             files_complete=True
             
             for mfile in montage:
@@ -278,6 +293,7 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
                         files_exist=False
                 else:
                     files += " "+outputDir+"/"+format_name(mfile+'-'+area+'_%y%m%d%H%M.png', time_slot, area=area)
+                    nr_files_exist+=1
                     outfile += mfile[mfile.index("_")+1:]+"-"
 
             outputDir = format_name(in_msg.outputDir,  time_slot, rgb=outfile[:-1], area=area)
@@ -285,6 +301,8 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
                if in_msg.verbose:
                   print '... create output directory: ' + outputDir
                makedirs(outputDir)
+
+            montage_name=deepcopy(outfile[:-1])
             outfile = outputDir+"/"+format_name( "MSG_"+ outfile[:-1] + '-'+area + '_%y%m%d%H%M.png', time_slot, area=area)
 
             #filename1 = format_name(mfile+'-'+area+'_%y%m%d%H%M.png', time_slot, area=area)
@@ -296,7 +314,7 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
             #outfilename = format_name(montage[0]+'-'+m1+"-"+area+'_%y%m%d%H%M.png', time_slot, area=area)
             #outfile = outputDir + outfilename
 
-            if files_exist:
+            if files_exist and nr_files_exist>0:
                 if in_msg.verbose:
                     print "/usr/bin/montage -tile "+tile+" -geometry +0+0 "+files + " " + outfile  +" 2>&1 "+sleep_str
                 subprocess.call("/usr/bin/montage -tile "+tile+" -geometry +0+0 "+files + " " + outfile  +" 2>&1 "+sleep_str, shell=True)
@@ -310,13 +328,26 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
                 # check if file is produced
                 if isfile(outfile) and files_complete:
                     montage_done.append(montage)
-
+                    
                 if in_msg.scpOutput:
                     if (montage in in_msg.scpProducts) or ('all' in [x.lower() for x in in_msg.scpProducts if type(x)==str]):
+                        scpOutputDir = format_name (in_msg.scpOutputDir, time_slot, area=area, rgb=montage_name, sat=in_msg.sat, sat_nr=sat_nr )
                         if in_msg.verbose:
-                            print "... secure copy "+outfile+ " to "+in_msg.scpOutputDir
-                        subprocess.call("/usr/bin/scp "+in_msg.scpID+" "+outfile+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
+                            print "    /usr/bin/scp "+in_msg.scpID+" "+outfile+" "+scpOutputDir+" 2>&1 &"
+                        subprocess.call("/usr/bin/scp "+in_msg.scpID+" "+outfile+" "+scpOutputDir+" 2>&1 &", shell=True)
 
+                if in_msg.scpOutput and in_msg.scpID2 != None and in_msg.scpOutputDir2 != None:
+                    if (montage in in_msg.scpProducts2) or ('all' in [x.lower() for x in in_msg.scpProducts2 if type(x)==str]):
+                        scpOutputDir2 = format_name (in_msg.scpOutputDir2, time_slot, area=area, rgb=montage_name, sat=in_msg.sat, sat_nr=sat_nr )
+                        if in_msg.compress_to_8bit:
+                            if in_msg.verbose:
+                                print "    scp "+in_msg.scpID2+" "+outfile.replace(".png","-fs8.png")+" "+scpOutputDir2+" 2>&1 &"
+                            subprocess.call("scp "+in_msg.scpID2+" "+outfile.replace(".png","-fs8.png")+" "+scpOutputDir2+" 2>&1 &", shell=True)
+                        else:
+                            if in_msg.verbose:
+                                print "    scp "+in_msg.scpID2+" "+outfile+" "+scpOutputDir2+" 2>&1 &"
+                            subprocess.call("scp "+in_msg.scpID2+" "+outfile+" "+scpOutputDir2+" 2>&1 &", shell=True)
+                        
         if in_msg.verbose:
             if len(montage_done) > 0:
                 print "... produced montages: "
@@ -393,6 +424,7 @@ if __name__ == '__main__':
     
    print "*** start postprocessing for: "
    print "    areas: ", in_msg.postprocessing_areas
+   print "    date: ", in_msg.datetime
    print "    composite: ", in_msg.postprocessing_composite
    print "    montage: ", in_msg.postprocessing_montage
               

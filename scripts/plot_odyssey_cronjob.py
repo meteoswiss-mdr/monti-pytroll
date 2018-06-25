@@ -215,8 +215,8 @@ if indicate_range:
     mask = global_data[prop_str+'-MASK'].data
     img = trollimage(mask, mode="L", fill_value=None) #fill_value,[1,1,1], None
     from trollimage.colormap import greys
-    img.colorize(greys)
-    img.putalpha(mask*0+0.4)
+    img.colorize(greys.reverse())
+    img.putalpha(mask*0+0.25)
     PIL_mask = img.pil_image()
     from PIL import Image as PILimage 
     PIL_image = PILimage.alpha_composite(PIL_mask, PIL_image)
@@ -251,5 +251,5 @@ if True:
     in_msg.scpOutput = False
     in_msg.datetime = global_data.time_slot
     in_msg.outputDir = outputDir
-    in_msg.postprocessing_composite=["RATE-HRV", "RATE-ir108"]   
+    in_msg.postprocessing_composite=["RATE-HRV", "RATE-ir108", "RATE-VIS006ir108"]   
     postprocessing(in_msg, global_data.time_slot, global_data.number, area)

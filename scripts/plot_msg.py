@@ -52,7 +52,7 @@ from trollimage.colormap import rdbu, greys, rainbow, spectral
 from my_composites import mask_clouddepth, get_image
 
 from my_msg_module import get_last_SEVIRI_date, check_input, channel_str2ind
-from my_msg_module import choose_msg, convert_NWCSAF_to_radiance_format, get_NWC_pge_name, format_name
+from my_msg_module import choose_msg, choose_area_loaded_msg, convert_NWCSAF_to_radiance_format, get_NWC_pge_name, format_name
 from my_msg_module import check_loaded_channels
 from postprocessing import postprocessing
 
@@ -94,48 +94,7 @@ def plot_msg(in_msg):
    if in_msg.sat_nr==None:
       in_msg.sat_nr=choose_msg(in_msg.datetime,in_msg.RSS)
 
-   if in_msg.sat=="Meteosat" or in_msg.sat=="meteosat":
-     if in_msg.datetime > datetime(2018, 3, 1):
-        # MSG4 prime satellite, MSG3 RSS, MSG2 backup, MSG1 Indian Ocean Data Coverage
-        if in_msg.sat_nr == 8:
-           area_loaded = get_area_def("IODC")
-        elif in_msg.sat_nr ==  9: # rapid scan service satellite
-           area_loaded = get_area_def("EuropeCanary35")  
-        elif in_msg.sat_nr == 10: # default satellite
-           area_loaded = get_area_def("EuropeCanary95")  # full disk service, like EUMETSATs NWC-SAF products
-        elif in_msg.sat_nr == 11: # fake satellite for reprojected ccs4 data in netCDF
-           area_loaded = get_area_def("SeviriDiskFull00")  # full disk service, like EUMETSATs NWC-SAF products        
-        elif in_msg.sat_nr == 0: # fake satellite for reprojected ccs4 data in netCDF
-           area_loaded = get_area_def("ccs4")  # 
-           #area_loaded = get_area_def("EuropeCanary")
-           #area_loaded = get_area_def("alps")  # new projection of SAM
-        else:
-          print "*** Error (A), unknown satellite number ", in_msg.sat_nr, "in plot_msg (plot_msg.py)"
-          area_loaded = get_area_def("hsaf")  # 
-     elif in_msg.datetime.year > 2012:
-        if in_msg.sat_nr == 8:
-           area_loaded = get_area_def("EuropeCanary35")
-        elif in_msg.sat_nr ==  9: # rapid scan service satellite
-           area_loaded = get_area_def("EuropeCanary95")  
-        elif in_msg.sat_nr == 10: # default satellite
-           area_loaded = get_area_def("SeviriDiskFull00")  # full disk service, like EUMETSATs NWC-SAF products
-        elif in_msg.sat_nr == 0: # fake satellite for reprojected ccs4 data in netCDF
-           area_loaded = get_area_def("ccs4")  # 
-           #area_loaded = get_area_def("EuropeCanary")
-           #area_loaded = get_area_def("alps")  # new projection of SAM
-        else:
-           print "*** Error (B), unknown satellite number ", in_msg.sat_nr, "in plot_msg (plot_msg.py)"
-           area_loaded = get_area_def("hsaf")  # 
-     else:
-        if in_msg.sat_nr == 8:
-           area_loaded = get_area_def("EuropeCanary95") 
-        elif in_msg.sat_nr ==  9: # default satellite
-           area_loaded = get_area_def("EuropeCanary")
-   elif in_msg.sat=="cosmo":
-     area_loaded = get_area_def("ccs4") # might be different, depending on product
-   else:
-     area_loaded = None
-
+   area_loaded = choose_area_loaded_msg(in_msg.sat, in_msg.sat_nr, in_msg.datetime)  
            
    # define contour write for coasts, borders, rivers
    cw = ContourWriterAGG(in_msg.mapDir)
@@ -372,7 +331,7 @@ def plot_msg(in_msg):
                      loaded_channels = [chn.name for chn in data.loaded_channels()]
                      if rgb in loaded_channels:
                        if hasattr(data[rgb], 'info'):
-                         print "hasattr(data[rgb], 'info')", data[rgb].info.keys()
+                         print "    hasattr(data[rgb], 'info')", data[rgb].info.keys()
                          if 'units' in data[rgb].info.keys():
                            print "'units' in data[rgb].info.keys()"
                            unit = data[rgb].info['units']
@@ -425,15 +384,29 @@ def plot_msg(in_msg):
                # secure copy file to another place
                if in_msg.scpOutput:
                   if (rgb in in_msg.scpProducts) or ('all' in [x.lower() for x in in_msg.scpProducts if type(x)==str]):
+                     scpOutputDir = format_name (in_msg.scpOutputDir, data.time_slot, area=area, rgb=rgb, sat=data.satname, sat_nr=data.sat_nr() )
                      if in_msg.compress_to_8bit:
                         if in_msg.verbose:
-                           print "... secure copy "+outputFile.replace(".png","-fs8.png")+ " to "+in_msg.scpOutputDir
-                        subprocess.call("scp "+in_msg.scpID+" "+outputFile.replace(".png","-fs8.png")+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
+                           print "... secure copy "+outputFile.replace(".png","-fs8.png")+ " to "+scpOutputDir
+                        subprocess.call("scp "+in_msg.scpID+" "+outputFile.replace(".png","-fs8.png")+" "+scpOutputDir+" 2>&1 &", shell=True)
                      else:
                         if in_msg.verbose:
-                           print "... secure copy "+outputFile+ " to "+in_msg.scpOutputDir
-                        subprocess.call("scp "+in_msg.scpID+" "+outputFile+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True) 
- 
+                           print "... secure copy "+outputFile+ " to "+scpOutputDir
+                        subprocess.call("scp "+in_msg.scpID+" "+outputFile+" "+scpOutputDir+" 2>&1 &", shell=True)
+
+               if in_msg.scpOutput and in_msg.scpID2 != None and in_msg.scpOutputDir2 != None:
+                  if (rgb in in_msg.scpProducts2) or ('all' in [x.lower() for x in in_msg.scpProducts2 if type(x)==str]):
+                     scpOutputDir2 = format_name (in_msg.scpOutputDir2, data.time_slot, area=area, rgb=rgb, sat=data.satname, sat_nr=data.sat_nr() )
+                     if in_msg.compress_to_8bit:
+                        if in_msg.verbose:
+                           print "... secure copy "+outputFile.replace(".png","-fs8.png")+ " to "+scpOutputDir2
+                        subprocess.call("scp "+in_msg.scpID2+" "+outputFile.replace(".png","-fs8.png")+" "+scpOutputDir2+" 2>&1 &", shell=True)
+                     else:
+                        if in_msg.verbose:
+                           print "... secure copy "+outputFile+ " to "+scpOutputDir2
+                        subprocess.call("scp "+in_msg.scpID2+" "+outputFile+" "+scpOutputDir2+" 2>&1 &", shell=True)
+
+                           
                if 'ninjotif' in in_msg.outputFormats:
                   ninjotif_file = format_name (outputDir+'/'+in_msg.ninjotifFilename, data.time_slot, sat_nr=data.sat_nr(), RSS=in_msg.RSS, area=area, rgb=rgb )
                   from plot_coalition2 import pilimage2geoimage
@@ -465,7 +438,7 @@ def plot_msg(in_msg):
 def load_products(data_object, RGBs, in_msg, area_loaded, load_CTH=True):
 
    if in_msg.verbose:
-      print "*** load products ", RGBs
+     print "*** load products ", RGBs
  
    # check if PyResample is loaded
    try:
@@ -821,7 +794,7 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
    #   if in_msg.verbose:
    #      print "    add coastlines to image by add_averlay"
    #   img.add_overlay(color=(0, 0, 0), width=0.5, resolution=None)
-
+   
    # convert image to PIL image 
    if hasattr(img, 'pil_image'):
       if in_msg.verbose:
@@ -830,7 +803,8 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
    else:
       if in_msg.verbose:
          print "    convert to PIL_image by saving and reading"
-      tmp_file = outputDir +satS+'_'+dateS+'_'+timeS+'__'+area+'_'+rgb.replace("_","-")+'_tmp.png'  # in_msg.
+      
+      tmp_file = format_name ("/tmp/%Y-%m-%d_%m-%d_%(rgb)s_%(area)s_tmp.png", in_msg.datetime, rgb=rgb, area=obj_area)
       img.save(tmp_file)
       PIL_image = Image.open(tmp_file)
       subprocess.call("rm "+tmp_file, shell=True)

@@ -10,6 +10,7 @@ import products
 import inspect
 import logging
 import datetime
+from mpop.projector import get_area_def
 from copy import deepcopy 
 
 LOG = logging.getLogger(__name__)
@@ -281,7 +282,60 @@ def choose_msg(date, RSS=True):
 
     return sat_nr
 
+'''
+input:
+  date -> date you want to chosse msg satellite
+          (output of datetime.datetime)
+  RSS  -> Rapid Scan Service desired (True or False)
+output:
+  MSG number
+'''
+def choose_area_loaded_msg(sat, sat_nr, date_time):
+    
+   if sat=="Meteosat" or sat=="meteosat":
+     if date_time > datetime.datetime(2018, 3, 1):
+        # MSG4 prime satellite, MSG3 RSS, MSG2 backup, MSG1 Indian Ocean Data Coverage
+        if sat_nr == 8:
+           area_loaded = get_area_def("IODC")
+        elif sat_nr ==  9: # rapid scan service satellite
+           area_loaded = get_area_def("EuropeCanary35")  
+        elif sat_nr == 10: # default satellite
+           area_loaded = get_area_def("EuropeCanary95")  # full disk service, like EUMETSATs NWC-SAF products
+        elif sat_nr == 11: # fake satellite for reprojected ccs4 data in netCDF
+           area_loaded = get_area_def("SeviriDiskFull00")  # full disk service, like EUMETSATs NWC-SAF products        
+        elif sat_nr == 0: # fake satellite for reprojected ccs4 data in netCDF
+           area_loaded = get_area_def("ccs4")  # 
+           #area_loaded = get_area_def("EuropeCanary")
+           #area_loaded = get_area_def("alps")  # new projection of SAM
+        else:
+          print "*** Error (A), unknown satellite number ", sat_nr, "in plot_msg (plot_msg.py)"
+          area_loaded = get_area_def("hsaf")  # 
+     elif date_time.year > 2012:
+        if sat_nr == 8:
+           area_loaded = get_area_def("EuropeCanary35")
+        elif sat_nr ==  9: # rapid scan service satellite
+           area_loaded = get_area_def("EuropeCanary95")  
+        elif sat_nr == 10: # default satellite
+           area_loaded = get_area_def("SeviriDiskFull00")  # full disk service, like EUMETSATs NWC-SAF products
+        elif sat_nr == 0: # fake satellite for reprojected ccs4 data in netCDF
+           area_loaded = get_area_def("ccs4")  # 
+           #area_loaded = get_area_def("EuropeCanary")
+           #area_loaded = get_area_def("alps")  # new projection of SAM
+        else:
+           print "*** Error (B), unknown satellite number ", sat_nr, "in plot_msg (plot_msg.py)"
+           area_loaded = get_area_def("hsaf")  # 
+     else:
+        if sat_nr == 8:
+           area_loaded = get_area_def("EuropeCanary95") 
+        elif sat_nr ==  9: # default satellite
+           area_loaded = get_area_def("EuropeCanary")
+   elif sat=="cosmo":
+     area_loaded = get_area_def("ccs4") # might be different, depending on product
+   else:
+     area_loaded = None
 
+   return area_loaded
+     
 '''
 input:
   MSG number 
@@ -601,6 +655,8 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                                         print "... try backup satellite ", in_msg.sat_nr
                                 elif in_msg.sat_nr == 9:
                                     in_msg.sat_nr = 11
+                                    # change RSS
+                                    # change processing time 
                                     fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
                                     conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
                                     if in_msg.verbose:

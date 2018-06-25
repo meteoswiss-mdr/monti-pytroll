@@ -14,10 +14,13 @@ from os.path import exists
 from os import makedirs
 from mpop.imageo.HRWimage import HRWimage, HRW_2dfield, HRWstreamplot
 from datetime import timedelta
+from my_msg_module import format_name
 
-import scp_settings
-scpOutputDir = scp_settings.scpOutputDir
-scpID = scp_settings.scpID 
+#import scp_settings
+#scpOutputDir = scp_settings.scpOutputDir
+#scpID = scp_settings.scpID 
+#scpOutputDir="las@zueub241:/srn/las/www/satellite/DATA/"
+#scpID="-i /opt/users/$LOGNAME/monti-pytroll/scripts/id_rsa_las"
 
 # debug_on()
 
@@ -46,39 +49,47 @@ min_conf_no_nwp = 80
 
 HRWimages = ['channel','pressure','correlation','conf_nwp','conf_no_nwp']
 
-if len(sys.argv) > 1:
-    if len(sys.argv) < 6:
-        print "***           "
-        print "*** Warning, please specify date and time completely, e.g."
-        print "***          python plot_radar.py 2014 07 23 16 10 "
-        print "***           "
-        quit() # quit at this point
-    else:
-        year   = int(sys.argv[1])
-        month  = int(sys.argv[2])
-        day    = int(sys.argv[3])
-        hour   = int(sys.argv[4])
-        minute = int(sys.argv[5])
-else:
-    if True:  # automatic choise of last 5min 
-        from my_msg_module import get_last_SEVIRI_date
-        datetime1 = get_last_SEVIRI_date(True)
-        if delay != 0:
-            datetime1 -= timedelta(minutes=delay)
-        year  = datetime1.year
-        month = datetime1.month
-        day   = datetime1.day
-        hour  = datetime1.hour
-        minute = datetime1.minute
-    else: # fixed date for text reasons
-        year=2014          # 2014 09 15 21 35
-        month= 7           # 2014 07 23 18 30
-        day= 23
-        hour= 18
-        minute=00
+from postprocessing import postprocessing
+from get_input_msg import get_date_and_inputfile_from_commandline
 
-# read data for the current time
-time_slot = datetime(year, month, day, hour, minute)
+in_msg = get_date_and_inputfile_from_commandline()
+
+
+#if len(sys.argv) > 1:
+#    if len(sys.argv) < 6:
+#        print "***           "
+#        print "*** Warning, please specify date and time completely, e.g."
+#        print "***          python plot_radar.py 2014 07 23 16 10 "
+#        print "***           "
+#        quit() # quit at this point
+#    else:
+#        year   = int(sys.argv[1])
+#        month  = int(sys.argv[2])
+#        day    = int(sys.argv[3])
+#        hour   = int(sys.argv[4])
+#        minute = int(sys.argv[5])
+#else:
+#    if True:  # automatic choise of last 5min 
+#        from my_msg_module import get_last_SEVIRI_date
+#        datetime1 = get_last_SEVIRI_date(True)
+#        if delay != 0:
+#            datetime1 -= timedelta(minutes=delay)
+#        year  = datetime1.year
+#        month = datetime1.month
+#        day   = datetime1.day
+#        hour  = datetime1.hour
+#        minute = datetime1.minute
+#    else: # fixed date for text reasons
+#        year=2014          # 2014 09 15 21 35
+#        month= 7           # 2014 07 23 18 30
+#        day= 23
+#        hour= 18
+#        minute=00
+
+## read data for the current time
+#time_slot = datetime(year, month, day, hour, minute)
+time_slot = in_msg.datetime
+
 #print time_slot
 global_data = GeostationaryFactory.create_scene("meteosat", "09", "seviri", time_slot)
 global_data.load(['HRW'], reader_level="seviri-level5", read_basic_or_detailed='detailed', \
@@ -107,23 +118,6 @@ area="ccs4"
 #area="EuropeCanary95"
 #area="ticino"
 obj_area = get_area_def(area)
-
-yearS = str(year)
-#yearS = yearS[2:]
-monthS = "%02d" % month
-dayS   = "%02d" % day
-hourS  = "%02d" % hour
-minS   = "%02d" % minute
-dateS = yearS+'-'+monthS+'-'+dayS
-timeS = hourS+':'+minS+" UTC"
-
-#output_dir='/data/COALITION2/PicturesSatellite/'+yearS+'-'+monthS+'-'+dayS+'/'+yearS+'-'+monthS+'-'+dayS+'_HRW_'+area+'/'
-output_dir='/data/cinesat/out/'
-#output_dir='./pics/'
-
-if not exists(output_dir):
-    print '... create output directory: ' + output_dir
-    makedirs(output_dir)
 
 image_type ='.png'
 
@@ -158,7 +152,6 @@ if add_title:
 for plot_mode in plot_modes:
 
     print "    create HRW plot, plot mode = ", plot_mode
-
     if plot_mode in HRWimages:
         if detailed:
             PIL_image = HRWimage( global_data['HRW'].HRW_detailed, obj_area, color_mode=plot_mode, legend=legend)  
@@ -177,7 +170,8 @@ for plot_mode in plot_modes:
         elif plot_mode=='conf_no_nwp':
             color_char='cnnwp'
 
-        outputFile = output_dir+'/MSG_hrw'+detailed_char+color_char+'-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS 
+        rgb_str='hrw'+detailed_char+color_char
+        #outputFile = output_dir+'/MSG_hrw'+detailed_char+color_char+'-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS
         title = layer+' '+detailed_str+' High Resolution Winds' # [white v. weak, green weak, yellow med., red strong]
 
     elif plot_mode == 'stream':
@@ -187,7 +181,8 @@ for plot_mode in plot_modes:
         # create PIL image
         PIL_image = HRWstreamplot( u2d, v2d, obj_area, HRW_data.interpol_method, color_mode='speed') # , legend=True, legend_loc=3
 
-        outputFile = output_dir+'/MSG_stream'+detailed_char+'-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS 
+        #outputFile = output_dir+'/MSG_stream'+detailed_char+'-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS
+        rgb_str='stream'+detailed_char
         title = layer+' '+detailed_str+' High Resolution Winds streamplot' # [white v. weak, green weak, yellow med., red strong]
 
 
@@ -196,6 +191,11 @@ for plot_mode in plot_modes:
         print "    unknown plot_mode"
         quit()
 
+    output_dir = format_name(in_msg.outputDir,  time_slot, area=area, rgb=rgb_str, sat='MSG', sat_nr=10)
+    outputFile = output_dir+'/' + format_name(in_msg.outputFile, time_slot, area=area, rgb=rgb_str, sat='MSG', sat_nr=10)
+    if not exists(output_dir):
+        print '... create output directory: ' + output_dir
+        makedirs(output_dir)
 
     # create decorator 
     dc = DecoratorAGG(PIL_image)
@@ -220,40 +220,42 @@ for plot_mode in plot_modes:
         draw = ImageDraw.Draw(PIL_image)
         draw.text((0, y_pos_title),title, title_color, font=font)
 
-    print '... save image as ', outputFile+image_type
-    PIL_image.save(outputFile+image_type)
+    print '... save image as ', outputFile
+    PIL_image.save(outputFile)
 
-    # copy to another place
-    if False:
-        import subprocess
-    #    if in_msg.verbose:
-    #        print "... secure copy "+outputFile+ " to "+in_msg.scpOutputDir
-        print "scp "+scpID+" "+outputFile+image_type +" "+" "+scpOutputDir+" 2>&1 &"
-        subprocess.call("scp "+scpID+" "+outputFile+image_type +" "+" "+scpOutputDir+" 2>&1 &", shell=True)
-    #    if in_msg.compress_to_8bit:
-    #        if in_msg.verbose:
-    #            print "... secure copy "+outputFile.replace(".png","-fs8.png")+ " to "+in_msg.scpOutputDir
-    #        subprocess.call("scp "+in_msg.scpID+" "+outputFile.replace(".png","-fs8.png")+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
+postprocessing(in_msg, time_slot, int(10), area)
+    
+###    # copy to another place
+###    if False:
+###        import subprocess
+###    #    if in_msg.verbose:
+###    #        print "... secure copy "+outputFile+ " to "+in_msg.scpOutputDir
+###        print "scp "+scpID+" "+outputFile+image_type +" "+" "+scpOutputDir+" 2>&1 &"
+###        subprocess.call("scp "+scpID+" "+outputFile+image_type +" "+" "+scpOutputDir+" 2>&1 &", shell=True)
+###    #    if in_msg.compress_to_8bit:
+###    #        if in_msg.verbose:
+###    #            print "... secure copy "+outputFile.replace(".png","-fs8.png")+ " to "+in_msg.scpOutputDir
+###    #        subprocess.call("scp "+in_msg.scpID+" "+outputFile.replace(".png","-fs8.png")+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
+###
+###    # make composite and scp composite
+###    if True:
+###        import subprocess
+###        if plot_mode in ['channel','pressure']:
+###            product = 'hrw'+detailed_char+color_char
+###        elif plot_mode == 'stream':
+###            product = 'stream'+detailed_char
 
-    # make composite and scp composite
-    if True:
-        import subprocess
-        if plot_mode in ['channel','pressure']:
-            product = 'hrw'+detailed_char+color_char
-        elif plot_mode == 'stream':
-            product = 'stream'+detailed_char
-
-        ir_file    = output_dir+'/MSG_ir108-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS+".png"
-        hrv_file   = output_dir+'/MSG_HRV-'  +area+'_'+yearS[2:]+monthS+dayS+hourS+minS+".png"
-        ir_outfile  = output_dir+'/MSG_'+product+'-ir108-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS+".png"
-        hrv_outfile = output_dir+'/MSG_'+product+'-HRV-'  +area+'_'+yearS[2:]+monthS+dayS+hourS+minS+".png"
-        print "/usr/bin/composite "+outputFile+image_type+" "+ir_file+" "+" "+ir_outfile+" && sleep 1"
-        subprocess.call("/usr/bin/composite "+outputFile+image_type+" "+ir_file +" "+" "+ir_outfile +" 2>&1 && sleep 1 ", shell=True)
-        print "/usr/bin/composite "+outputFile+image_type+" "+hrv_file+" "+" "+hrv_outfile+" && sleep 1"
-        subprocess.call("/usr/bin/composite "+outputFile+image_type+" "+hrv_file+" "+" "+hrv_outfile+" 2>&1 && sleep 1 ", shell=True)
-
-        if True:
-            print "scp "+scpID+" "+ir_outfile  +" "+" "+scpOutputDir+" 2>&1 &"
-            subprocess.call("scp "+scpID+" "+ir_outfile  +" "+" "+scpOutputDir+" 2>&1 && sleep 1", shell=True)
-            print "scp "+scpID+" "+hrv_outfile +" "+" "+scpOutputDir+" 2>&1 &"
-            subprocess.call("scp "+scpID+" "+hrv_outfile +" "+" "+scpOutputDir+" 2>&1 && sleep 1", shell=True)
+###        ir_file    = output_dir+'/MSG_ir108-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS+".png"
+###        hrv_file   = output_dir+'/MSG_HRV-'  +area+'_'+yearS[2:]+monthS+dayS+hourS+minS+".png"
+###        ir_outfile  = output_dir+'/MSG_'+product+'-ir108-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS+".png"
+###        hrv_outfile = output_dir+'/MSG_'+product+'-HRV-'  +area+'_'+yearS[2:]+monthS+dayS+hourS+minS+".png"
+###        print "/usr/bin/composite "+outputFile+image_type+" "+ir_file+" "+" "+ir_outfile+" && sleep 1"
+###        subprocess.call("/usr/bin/composite "+outputFile+image_type+" "+ir_file +" "+" "+ir_outfile +" 2>&1 && sleep 1 ", shell=True)
+###        print "/usr/bin/composite "+outputFile+image_type+" "+hrv_file+" "+" "+hrv_outfile+" && sleep 1"
+###        subprocess.call("/usr/bin/composite "+outputFile+image_type+" "+hrv_file+" "+" "+hrv_outfile+" 2>&1 && sleep 1 ", shell=True)
+###
+###        if True:
+###            print "scp "+scpID+" "+ir_outfile  +" "+" "+scpOutputDir+" 2>&1 &"
+###            subprocess.call("scp "+scpID+" "+ir_outfile  +" "+" "+scpOutputDir+" 2>&1 && sleep 1", shell=True)
+###            print "scp "+scpID+" "+hrv_outfile +" "+" "+scpOutputDir+" 2>&1 &"
+###            subprocess.call("scp "+scpID+" "+hrv_outfile +" "+" "+scpOutputDir+" 2>&1 && sleep 1", shell=True)

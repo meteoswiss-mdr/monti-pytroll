@@ -295,32 +295,19 @@ def DayNightFog(self, downscale=False, sza_max=88):
 
 DayNightFog.prerequisites = set(["HRV","IR_016",'IR_039','IR_108','IR_120'])
 
-def HRVir108(self, cos_scaled=True, use_HRV=False, smooth=False):
 
-    self.check_channels("VIS006", "HRV", "IR_108")
+#def daynight_blackground(self, cos_scaled=True, use_HRV=False, smooth=False, stretch=(0.005, 0.005), colorscale='greys'):
+def daynight_blackground(self, cos_scaled=True, use_HRV=False, smooth=False, stretch=False, colorscale='greys', fixed_minmax=False, white_clouds=True):
+
     import numpy as np
 
+    # threshold sza
+    sza1 = 80.
+    
     # calculate longitude/latitude and solar zenith angle 
     from pyorbital.astronomy import sun_zenith_angle
     lonlats = self["IR_108"].area.get_lonlats()
     sza = sun_zenith_angle(self.time_slot, lonlats[0], lonlats[1])
-
-    # threshold sza
-    sza1 = 80.
-    ir1 = 190.
-    ir2 = 320.
-    vis1 =  0.
-    if not cos_scaled:
-        vis2 = 75. #for pure vis/hrv
-    else:
-        vis2 = 110. #for scaling with cos(sza)
-
-    # scale the vis and ir channel to appropriate min / max 
-    ir108 = (self["IR_108"].data - ir1) / (ir2-ir1)
-    if not use_HRV:
-        vis   = (self["VIS006"].data - vis1) / (vis2-vis1) 
-    else:
-        vis   = (self["HRV"].data    - vis1) / (vis2-vis1)
 
     if not smooth:
         mask = np.array(sza > sza1)
@@ -328,23 +315,131 @@ def HRVir108(self, cos_scaled=True, use_HRV=False, smooth=False):
         mask = np.zeros(ir108.shape)
         mask[np.where( sza > sza1 )] = 1
 
-    if not cos_scaled:
-        ch1 = vis * (1-mask) 
+    # select, if you want HRV or VIS006
+    if use_HRV:
+        vis   = self["HRV"].data
     else:
-        ch1 = vis * (1-mask) / (np.cos(np.radians(sza))+0.05)
-    ch2 = (1 - ir108) * mask
+        vis   = self["VIS006"].data
 
-    img = GeoImage(ch1+ch2, self.area, self.time_slot, fill_value=(0,0,0), mode="L")
+    # sceen out data at night/day part of the disk 
+    ir108 = self["IR_108"].data * mask
+    
+    # ... and apply cos scaling to mitigate effect of solar zenith angle
+    if not cos_scaled:
+        vis = vis * (1-mask) 
+    else:
+        vis = vis * (1-mask) / (np.cos(np.radians(sza))+0.05)
 
-    from trollimage.colormap import rainbow
-    cm = deepcopy(rainbow)
+    # normilize vis reflectivity and ir brightness temperature
+    # to comparable range between 0 and 1
+    if fixed_minmax:
+        # minimum and maximum for ir108
+        ir1 = 190.
+        ir2 = 290.
+        # minimum and maximum for HRV (or VIS006) scale
+        vis1 =  0.
+        if not cos_scaled:
+            vis2 = 75. #for pure vis/hrv
+        else:
+            vis2 = 110. #for scaling with cos(sza)
+    else:
+        # linear stretch from p1 percentile to p2 percentile
+        
+        #import matplotlib.pyplot as plt
+        #plt.hist(ir108[np.where(ir108 > 100)], bins='auto')
+        #plt.title("Histogram with 'auto' bins")
+        #plt.show()
+        
+        #print "    min/max(1) IR:", ir108.min(), ir108.max() 
+        #print "    min/max(1) VIS:", vis.min(), vis.max()
+        # percentile limits 
+        p1= 5
+        p2=95
+        #
+        ind_ir108 = np.where(ir108 > 100)
+        if len(ind_ir108) > 5:
+            ir1  = np.percentile( ir108[ind_ir108], p1 )
+            ir2  = np.percentile( ir108[ind_ir108], p2 )
+        else:
+            ir1 = 190.
+            ir2 = 290.
+        ind_vis=np.where(vis > 0)
+        if len(ind_vis) > 5:        
+            vis1 = np.percentile( vis[np.where(vis > 0)], p1 )
+            vis2 = np.percentile( vis[np.where(vis > 0)], p2 )
+        else:
+            vis1 =  5.
+            if not cos_scaled:
+                vis2 = 75.
+            else:
+                vis2 = 110.
+        #print "    min/max(2) IR:", ir1, ir2
+        #print "    min/max(2) VIS:", vis1, vis2
+        
+    # scale the vis and ir channel to the range [0,1] # multiply with mask to keep the zeros for day/night area
+    ir108 = (ir108 - ir1) / ( ir2- ir1) *  mask
+    vis   = (vis  - vis1) / (vis2-vis1) * (1-mask)
+    
+    #print "    min/max scaled ir: ", ir108.min(), ir108.max()
+    #print "    min/max scaled vis:", vis.min(), vis.max()
+
+    # invert ir108
+    ir108 = (1 - ir108) *  mask
+        
+    img = GeoImage(vis + ir108, self.area, self.time_slot, fill_value=(0,0,0), mode="L")
+
+    if colorscale=='rainbow':
+        from trollimage.colormap import rainbow
+        cm = deepcopy(rainbow)
+    elif colorscale=='greys':
+        from trollimage.colormap import greys
+        cm = deepcopy(greys)
+        if white_clouds:
+            cm = cm.reverse()
+
     cm.set_range(0, 1)
     img.colorize(cm)
 
+    #if stretch:
+    #    img.enhance(stretch=stretch)
+
     return img
 
-HRVir108.prerequisites = set(["VIS006", "HRV", 10.8])
+def HRVir108c(self, smooth=False):
+    self.check_channels("HRV", "IR_108")
+    return daynight_blackground(self, cos_scaled=True, use_HRV=True, smooth=smooth, colorscale='rainbow')
 
+HRVir108c.prerequisites = set(["HRV", 10.8])
+
+def HRVir108(self, smooth=False):
+    self.check_channels("HRV", "IR_108")
+    return daynight_blackground(self, cos_scaled=True, use_HRV=True, smooth=smooth, colorscale='greys')
+
+HRVir108.prerequisites = set(["HRV", 10.8])
+
+def hrvIR108(self, smooth=False):
+    self.check_channels("HRV", "IR_108")
+    return daynight_blackground(self, cos_scaled=True, use_HRV=True, smooth=smooth, colorscale='greys', white_clouds=False)
+
+hrvIR108.prerequisites = set(["HRV", 10.8])
+
+def VIS006ir108c(self, smooth=False):
+    self.check_channels("VIS006", "IR_108")
+    return daynight_blackground(self, cos_scaled=True, use_HRV=False, smooth=smooth, colorscale='rainbow')
+
+VIS006ir108c.prerequisites = set(["VIS006", 10.8])
+
+def VIS006ir108(self, smooth=False):
+    self.check_channels("VIS006", "IR_108")
+    return daynight_blackground(self, cos_scaled=True, use_HRV=False, smooth=smooth, colorscale='greys')
+
+VIS006ir108.prerequisites = set(["VIS006", 10.8])
+
+def vis006IR108(self, smooth=False):
+    self.check_channels("VIS006", "IR_108")
+    return daynight_blackground(self, cos_scaled=True, use_HRV=False, smooth=smooth, colorscale='greys', white_clouds=False)
+
+vis006IR108.prerequisites = set(["VIS006", 10.8])
 
 def sza(self):
 
@@ -442,7 +537,7 @@ def VIS006_minus_IR_016(self):
 
     min_data = ch_diff.data.min()
     max_data = ch_diff.data.max()
-    print "min/max", min_data, max_data
+    print "    min/max", min_data, max_data
 
     img = trollimage(ch_diff.data, mode="L", fill_value=(0,0,0))
 
@@ -846,7 +941,8 @@ clouddepth.prerequisites = set(['WV_062','WV_073','IR_087','IR_108','IR_120','IR
 
 
 
-seviri = [hr_visual, hr_overview, hr_natural, hr_airmass, sandwich, HRVFog, DayNightFog, HRVir108, sza, ndvi, IR_039c_CO2, \
+seviri = [hr_visual, hr_overview, hr_natural, hr_airmass, sandwich, HRVFog, DayNightFog, \
+          HRVir108c, HRVir108, hrvIR108, VIS006ir108c, VIS006ir108, vis006IR108, sza, ndvi, IR_039c_CO2, \
           VIS006_minus_IR_016, IR_039_minus_IR_108, WV_062_minus_WV_073, WV_062_minus_IR_108,\
           WV_073_minus_IR_134, IR_120_minus_IR_108, IR_087_minus_IR_108, IR_087_minus_IR_120, \
           trichannel, clouddepth, mask_clouddepth]
@@ -910,8 +1006,18 @@ def get_image(data, rgb):
         obj_image = data.image.HRVFog
     elif rgb=='DayNightFog':
         obj_image = data.image.DayNightFog
+    elif rgb=='HRVir108c':
+        obj_image = data.image.HRVir108c
     elif rgb=='HRVir108':
         obj_image = data.image.HRVir108
+    elif rgb=='hrvIR108':
+        obj_image = data.image.hrvIR108
+    elif rgb=='VIS006ir108c':
+        obj_image = data.image.VIS006ir108c
+    elif rgb=='VIS006ir108':
+        obj_image = data.image.VIS006ir108
+    elif rgb=='vis006IR108':
+        obj_image = data.image.vis006IR108
     elif rgb=='ndvi':
         obj_image = data.image.ndvi
     elif rgb=='sza':

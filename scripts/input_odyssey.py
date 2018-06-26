@@ -1,5 +1,5 @@
 
-def input(in_msg, timeslot=None):
+def input(in_msg, timeslot=None, delay=None):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 

@@ -1,5 +1,5 @@
 
-def input(in_msg, timeslot=None):
+def input(in_msg, timeslot=None, delay=None):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -122,6 +122,10 @@ def input(in_msg, timeslot=None):
     #in_msg.RGBs.append('HRoverview')
     ##in_msg.RGBs.append('sandwich')
     ##in_msg.RGBs.append('ndvi')
+    #in_msg.RGBs.append('HRVir108c')
+    #in_msg.RGBs.append('HRVir108')
+    #in_msg.RGBs.append('VIS006ir108c')
+    in_msg.RGBs.append('VIS006ir108')
     ##-------------------
     ## NWC SAF
     ##-------------------
@@ -309,8 +313,8 @@ def input(in_msg, timeslot=None):
 
     in_msg.postprocessing_areas=['EuropeCanaryS95','odysseyS25']
     #in_msg.postprocessing_composite=["THX-IR_108","radar-convection","THX-radar-convection"]    
-    in_msg.postprocessing_composite=["RATE-HRV", "RATE-ir108", "h03-HRV", "h03-ir108"]
-    in_msg.postprocessing_montage=[["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]]
+    in_msg.postprocessing_composite=["RATE-HRV", "RATE-ir108", "RATE-VIS006ir108", "h03-HRV", "h03-ir108", "h03-VIS006ir108"]
+    in_msg.postprocessing_montage=[["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"],["MSG_RATE-VIS006ir108","MSG_h03-VIS006ir108"]]
         
     in_msg.scpOutput = True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"

@@ -1,5 +1,5 @@
 
-def input(in_msg, timeslot=None):
+def input(in_msg, timeslot=None, delay=None):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -19,6 +19,8 @@ def input(in_msg, timeslot=None):
 
     #in_msg.delay=5 # process image 'delay' minutes before now
 
+    print "BBBBBBBBBBB", timeslot
+    
     if True:
         # choose timeslot of the satellite picture to process
         # datetime according to command line arguments (if given)
@@ -54,28 +56,28 @@ def input(in_msg, timeslot=None):
     ##in_msg.RGBs.append('IR_120')       # black and white
     ##in_msg.RGBs.append('IR_134')       # black and white
     #in_msg.RGBs.append('HRV')          # black and white
-    in_msg.RGBs.append('VIS006c')      # colored version
-    in_msg.RGBs.append('VIS008c')      # colored version
-    in_msg.RGBs.append('IR_016c')      # colored version
-    in_msg.RGBs.append('IR_039c')      # colored version
-    in_msg.RGBs.append('WV_062c')      # colored version
-    in_msg.RGBs.append('WV_073c')      # colored version
-    in_msg.RGBs.append('IR_087c')      # colored version
-    in_msg.RGBs.append('IR_097c')      # colored version
-    in_msg.RGBs.append('IR_108c')      # colored version
-    in_msg.RGBs.append('IR_120c')      # colored version
-    in_msg.RGBs.append('IR_134c')      # colored version
-    in_msg.RGBs.append('HRVc')         # colored version
+    #in_msg.RGBs.append('VIS006c')      # colored version
+    #in_msg.RGBs.append('VIS008c')      # colored version
+    #in_msg.RGBs.append('IR_016c')      # colored version
+    #in_msg.RGBs.append('IR_039c')      # colored version
+    #in_msg.RGBs.append('WV_062c')      # colored version
+    #in_msg.RGBs.append('WV_073c')      # colored version
+    #in_msg.RGBs.append('IR_087c')      # colored version
+    #in_msg.RGBs.append('IR_097c')      # colored version
+    #in_msg.RGBs.append('IR_108c')      # colored version
+    #in_msg.RGBs.append('IR_120c')      # colored version
+    #in_msg.RGBs.append('IR_134c')      # colored version
+    #in_msg.RGBs.append('HRVc')         # colored version
     #-------------------
     # satellite channel differences
-    in_msg.RGBs.append('WV_062-WV_073')
+    #in_msg.RGBs.append('WV_062-WV_073')
     #in_msg.RGBs.append('WV_062-IR_108')
     #in_msg.RGBs.append('WV_073-IR_134')
     #in_msg.RGBs.append('IR_087-IR_108')      
     #in_msg.RGBs.append('IR_087-IR_120')      
-    in_msg.RGBs.append('IR_120-IR_108')
+    #in_msg.RGBs.append('IR_120-IR_108')
     #in_msg.RGBs.append('trichannel')
-    in_msg.RGBs.append('IR_039-IR_108')
+    #in_msg.RGBs.append('IR_039-IR_108')
     #in_msg.RGBs.append('VIS006-IR_016')
     #-------------------
     # buil in RGBs, see http://mpop.readthedocs.org/en/latest/pp.html
@@ -107,7 +109,11 @@ def input(in_msg, timeslot=None):
     # user defined RGBs
     in_msg.RGBs.append('HRoverview')
     ##in_msg.RGBs.append('sandwich')
+    #in_msg.RGBs.append('sza')
     ##in_msg.RGBs.append('ndvi')
+    #in_msg.RGBs.append('HRVFog')
+    in_msg.RGBs.append('DayNightFog')
+    #in_msg.RGBs.append('HRVir108')    
     #-------------------
     # NWC SAF
     ## NWC SAF PEG 1
@@ -188,6 +194,13 @@ def input(in_msg, timeslot=None):
     in_msg.scpOutput = True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
+    #default: in_msg.scpProducts = ['all']
+    in_msg.scpID2="-i /opt/users/cinesat/monti-pytroll/scripts/id_rsa_las"
+    in_msg.scpOutputDir2='las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s-%(area)s_'
+    #in_msg.scpProducts2 = ['airmass','convection','HRoverview','natural']
+    in_msg.scpProducts2 = ['airmass','ash','cloudtop','convection','day_microphysics','dust','fog',\
+                           'DayNightFog','green_snow','natural','night_fog','night_microphysics','night_overview','overview','red_snow',\
+                           'HRoverview','THX-radar-convection','TRT-radar-convection','radar-convection']
 
     # please download the shape file 
     in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'

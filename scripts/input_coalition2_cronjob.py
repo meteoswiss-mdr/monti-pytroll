@@ -1,4 +1,4 @@
-def input(in_msg, timeslot=None):
+def input(in_msg, timeslot=None, delay=None):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -211,7 +211,13 @@ def input(in_msg, timeslot=None):
     in_msg.scpOutput = True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
+    in_msg.scpID="-i /opt/users/$LOGNAME/monti-pytroll/scripts/id_rsa_las"
+    in_msg.scpOutputDir="las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s_%(area)s_"
 
+    #in_msg.scpID2="-i /home/cinesat/.ssh/id_dsa_las"
+    #in_msg.scpOutputDir2='las@lomux240:/www/proj/OTL/WOL/cll/satimages/'
+    #in_msg.scpProducts2 = ['all']
+    
     in_msg.chosen_settings={}
     #settings: set to None for automatic choice
     if in_msg.settings == "manual":

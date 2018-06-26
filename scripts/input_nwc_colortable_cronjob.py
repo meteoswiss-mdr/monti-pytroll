@@ -1,5 +1,5 @@
 
-def input(in_msg, timeslot=None):
+def input(in_msg, timeslot=None, delay=None):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -201,7 +201,10 @@ def input(in_msg, timeslot=None):
     in_msg.scpOutput=True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
-
+    in_msg.scpID="-i /opt/users/$LOGNAME/monti-pytroll/scripts/id_rsa_las"
+    in_msg.scpOutputDir="las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s_%(area)s_"
+    in_msg.scpProducts = ["CTH-HRVir108","CTT-HRVir108","sphr_cape-HRVir108",["MSG_radar-HRVir108","MSG_CRR-HRVir108","MSG_CRPh-HRVir108"]]
+    
     # please download the shape file 
     #in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
     in_msg.mapDir='/opt/users/common/shapes/'
@@ -221,8 +224,9 @@ def input(in_msg, timeslot=None):
     in_msg.HRV_enhancement = False
     
     in_msg.postprocessing_areas=['ccs4']
-    in_msg.postprocessing_composite=["CTH-ir108","CTT-ir108","CRR-ir108","CRR-HRV","CRPh-ir108","CRPh-HRV","sphr_cape-ir108"]    #
-    in_msg.postprocessing_montage=[["MSG_radar-ir108","MSG_CRR-ir108"],["MSG_radar-HRV","MSG_CRR-HRV"],["MSG_radar-ir108","MSG_CRPh-ir108"],["MSG_radar-HRV","MSG_CRPh-HRV"]]
+    in_msg.postprocessing_composite=["CTH-HRVir108","CTT-HRVir108","CRR-HRVir108","CRPh-HRVir108","sphr_cape-HRVir108"]
+    in_msg.postprocessing_montage=[["MSG_radar-HRVir108","MSG_CRR-HRVir108","MSG_CRPh-HRVir108"]]
+    in_msg.resize_montage = 75
     
     in_msg.check_input = False
     #in_msg.save_reprojected_data=['ccs4']

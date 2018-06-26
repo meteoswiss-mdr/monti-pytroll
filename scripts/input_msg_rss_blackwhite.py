@@ -1,5 +1,5 @@
 
-def input(in_msg, timeslot=None):
+def input(in_msg, timeslot=None, delay=None):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -107,6 +107,10 @@ def input(in_msg, timeslot=None):
     #in_msg.RGBs.append('HRoverview')
     ##in_msg.RGBs.append('sandwich')
     ##in_msg.RGBs.append('ndvi')
+    #in_msg.RGBs.append('HRVir108c')
+    in_msg.RGBs.append('HRVir108')
+    #in_msg.RGBs.append('VIS006ir108c')
+    in_msg.RGBs.append('VIS006ir108')
     #-------------------
     # NWC SAF
     ## NWC SAF PEG 1
@@ -186,21 +190,30 @@ def input(in_msg, timeslot=None):
     in_msg.compress_to_8bit=False
 
     in_msg.scpOutput = False
-    #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
-    #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
-
+    in_msg.scpID="-i /opt/users/$LOGNAME/monti-pytroll/scripts/id_rsa_las"
+    in_msg.scpOutputDir="las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s_%(area)s_"
+    #in_msg.scpProducts = [["MSG_radar-HRVir108","MSG_CRR-HRVir108","MSG_CRPh-HRVir108"]]
+    
+    in_msg.scpID2="-i /home/cinesat/.ssh/id_dsa_las"
+    in_msg.scpOutputDir2='las@lomux240:/www/proj/OTL/WOL/cll/satimages'
+    #in_msg.scpProducts2 = ['all']
+    
     # please download the shape file 
     in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
 
     in_msg.add_title = True
     in_msg.add_borders = True
     in_msg.add_rivers = False 
-    in_msg.add_logos = True
+    in_msg.add_logos = False
     in_msg.add_colorscale = False
     in_msg.fixed_minmax = True
     
     in_msg.postprocessing_areas=['ccs4']
-    in_msg.postprocessing_composite=["radar-ir108","radar-HRV","CRR-ir108","CRR-HRV","CRPh-ir108","CRPh-HRV"]
+    in_msg.postprocessing_composite=["radar-HRVir108","CRR-HRVir108","CRPh-HRVir108","THX-HRVir108"]
+    # CRR and CRPh usually arrives later than the radar image -> 
+    #in_msg.postprocessing_montage=[["MSG_radar-HRVir108","MSG_CRR-HRVir108","MSG_CRPh-HRVir108"]]
+    #in_msg.resize_montage = 70
+    #in_msg.scpProducts = ['all']
 
     #in_msg.postprocessing_areas=['odysseyS25']
     #in_msg.postprocessing_composite=["RATE-ir108","RATE-HRV"]    

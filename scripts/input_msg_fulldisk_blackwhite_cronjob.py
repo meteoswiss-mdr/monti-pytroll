@@ -1,5 +1,5 @@
 
-def input(in_msg, timeslot=None):
+def input(in_msg, timeslot=None, delay=None):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -122,6 +122,10 @@ def input(in_msg, timeslot=None):
     #in_msg.RGBs.append('HRoverview')
     ##in_msg.RGBs.append('sandwich')
     ##in_msg.RGBs.append('ndvi')
+    #in_msg.RGBs.append('HRVir108c')
+    #in_msg.RGBs.append('HRVir108')
+    #in_msg.RGBs.append('VIS006ir108c')
+    in_msg.RGBs.append('VIS006ir108')
     ##-------------------
     ## NWC SAF
     ##-------------------
@@ -255,8 +259,9 @@ def input(in_msg, timeslot=None):
     #in_msg.areas.append('met09globe')      # Cropped globe MSG image 3620x3620     # does not yet work
     #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
     #in_msg.areas.append('odysseyS25')      # Area of Odyssey composite (factor 2.5 smaller)
+    in_msg.areas.append('SeviriDiskFull00S4')    
     in_msg.check_RSS_coverage()
-
+    
     # please download the shape file 
     in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
     in_msg.mapResolution=None      ## f  full resolution: Original (full) data resolution.          
@@ -311,7 +316,7 @@ def input(in_msg, timeslot=None):
     in_msg.postprocessing_areas=['EuropeCanaryS95']
     #in_msg.postprocessing_composite=["THX-IR_108","radar-convection","THX-radar-convection"]    
     #in_msg.postprocessing_composite=["RATE-HRV", "RATE-ir108","h03-HRV", "h03-ir108"]
-    in_msg.postprocessing_composite=["h03-VIS006", "h03-ir108"]
+    in_msg.postprocessing_composite=["h03-VIS006", "h03-ir108", "h03-VIS006ir108"]
     #in_msg.postprocessing_montage=[["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]]
         
     in_msg.scpOutput = True

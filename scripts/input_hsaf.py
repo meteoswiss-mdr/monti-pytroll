@@ -1,5 +1,5 @@
 
-def input(in_msg, timeslot=None):
+def input(in_msg, timeslot=None, delay=None):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -229,3 +229,8 @@ def input(in_msg, timeslot=None):
     #in_msg.postprocessing_composite=["h03-ir108"] 
     #in_msg.postprocessing_composite=["THX-IR_108","radar-convection","THX-radar-convection"]    
     #in_msg.postprocessing_montage = [["MSG_h03-ir108","MSG_HRV"]]
+
+    in_msg.scpID2="-i /opt/users/cinesat/monti-pytroll/scripts/id_rsa_las"
+    in_msg.scpOutputDir2='las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s-%(area)s_'
+    #in_msg.scpProducts2 = ['airmass','convection','HRoverview','natural']
+    in_msg.scpProducts2 = ["h03-ir108"]

@@ -1,5 +1,5 @@
 
-def input(in_msg, timeslot=None):
+def input(in_msg, timeslot=None, delay=None):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -117,8 +117,8 @@ def input(in_msg, timeslot=None):
     #in_msg.RGBs.append('CMa_QUALITY')
     ## NWC SAF PEG 2
     in_msg.RGBs.append('CT')
-    in_msg.RGBs.append('CT_PHASE')
-    in_msg.RGBs.append('CT_QUALITY')
+    #in_msg.RGBs.append('CT_PHASE')
+    #in_msg.RGBs.append('CT_QUALITY')
     ## NWC SAF PEG 3 
     #in_msg.nwcsaf_calibrate=True
     #in_msg.RGBs.append('CTT')
@@ -130,7 +130,7 @@ def input(in_msg, timeslot=None):
     #in_msg.RGBs.append('PC')
     ## NWC SAF PEG 13 
     #in_msg.nwcsaf_calibrate=False
-    in_msg.RGBs.append('sphr_bl')
+    ###in_msg.RGBs.append('sphr_bl')
     #in_msg.RGBs.append('sphr_cape')
     #in_msg.RGBs.append('sphr_diffbl')
     #in_msg.RGBs.append('sphr_diffhl')
@@ -139,14 +139,14 @@ def input(in_msg, timeslot=None):
     #in_msg.RGBs.append('sphr_diffml')
     #in_msg.RGBs.append('sphr_diffshw')
     #in_msg.RGBs.append('sphr_difftpw')
-    in_msg.RGBs.append('sphr_hl')
-    in_msg.RGBs.append('sphr_ki')
-    in_msg.RGBs.append('sphr_li')
-    in_msg.RGBs.append('sphr_ml')
+    ###in_msg.RGBs.append('sphr_hl')
+    ###in_msg.RGBs.append('sphr_ki')
+    ###in_msg.RGBs.append('sphr_li')
+    ###in_msg.RGBs.append('sphr_ml')
     #in_msg.RGBs.append('sphr_quality')
     #in_msg.RGBs.append('sphr_sflag')
-    in_msg.RGBs.append('sphr_shw')
-    in_msg.RGBs.append('sphr_tpw')
+    ###in_msg.RGBs.append('sphr_shw')
+    ###in_msg.RGBs.append('sphr_tpw')
     #in_msg.RGBs.append('SPhR_BL')      # old format
     #in_msg.RGBs.append('SPhR_CAPE')    # old format
     #in_msg.RGBs.append('SPhR_HL')      # old format
@@ -220,7 +220,7 @@ def input(in_msg, timeslot=None):
     in_msg.HRV_enhancement = False
     
     in_msg.postprocessing_areas=['ccs4']
-    in_msg.postprocessing_composite=["CRR-ir108","CRPh-ir108"]   
+    #in_msg.postprocessing_composite=["CRR-ir108","CRPh-ir108"]   
 
     in_msg.check_input = False
     #in_msg.save_reprojected_data=['ccs4']

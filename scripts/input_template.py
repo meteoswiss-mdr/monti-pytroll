@@ -1,5 +1,5 @@
 
-def input(in_msg, timeslot=None):
+def input(in_msg, timeslot=None, delay=None):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -127,6 +127,10 @@ def input(in_msg, timeslot=None):
     #in_msg.RGBs.append('sza')
     #in_msg.RGBs.append('HRVFog')
     #in_msg.RGBs.append('DayNightFog')
+    #in_msg.RGBs.append('HRVir108c')
+    #in_msg.RGBs.append('HRVir108')
+    #in_msg.RGBs.append('VIS006ir108c')
+    #in_msg.RGBs.append('VIS006ir108')
     ##-------------------
     ## NWC SAF
     ##-------------------

@@ -1,5 +1,5 @@
 
-def input(in_msg, timeslot=None):
+def input(in_msg, timeslot=None, delay=None):
 
     import inspect
     #from my_msg_module import check_RSS
@@ -127,6 +127,8 @@ def input(in_msg, timeslot=None):
     in_msg.RGBs.append('HRoverview')
     ##in_msg.RGBs.append('sandwich')
     #########in_msg.RGBs.append('ndvi')
+    #in_msg.RGBs.append('HRVFog')
+    in_msg.RGBs.append('DayNightFog')       
     ##-------------------
     ## NWC SAF
     ##-------------------
@@ -322,3 +324,8 @@ def input(in_msg, timeslot=None):
     #default: in_msg.scpProducts = ['all']
     #in_msg.scpProducts = ['airmass'] # list of rgb, composite and montage strings
     #in_msg.scpProducts = ["C2rgb-IR_108"]
+    in_msg.scpID2="-i /opt/users/cinesat/monti-pytroll/scripts/id_rsa_las"
+    in_msg.scpOutputDir2='las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s-%(area)s_'
+    in_msg.scpProducts2 = ['airmass','ash','cloudtop','convection','day_microphysics','dust','fog',\
+                           'DayNightFog','green_snow','natural','night_fog','night_microphysics','night_overview','overview','red_snow',\
+                           'HRoverview']

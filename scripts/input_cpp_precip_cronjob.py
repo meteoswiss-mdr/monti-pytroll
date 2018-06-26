@@ -1,5 +1,5 @@
 
-def input(in_msg):
+def input(in_msg, timeslot=None, delay=None):
 
     print "*** read input from input_template.py"
 

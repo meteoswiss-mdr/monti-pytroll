@@ -1,4 +1,4 @@
-def input(in_msg, timeslot=None):
+def input(in_msg, timeslot=None, delay=None):
 
     import getpass
     import inspect

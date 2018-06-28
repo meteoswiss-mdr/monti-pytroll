@@ -37,6 +37,10 @@ def input(in_msg):
         in_msg.update_datetime(year, month, day, hour, minute)
         # !!!  if archive is used, adjust meteosat09.cfg accordingly !!!
 
+    # near real time or offline (will be overwritten depending on the date) ###changed: should know, based on the date, where to look for things!!!
+    in_msg.nrt = False
+    #in_msg.nrt = True 
+        
     in_msg.no_NWCSAF = False
 
     #----------------

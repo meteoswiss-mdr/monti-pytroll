@@ -12,6 +12,8 @@ echo
 cd $PYTROLLHOME/scripts
 python plot_coalition2.py input_coalition2_cronjob #> /tmp/plot_coalition2.txt 2>&1
 
+#python postprocessing.py --parea ccs4 -c "" -m [["MSG_C2rgb-IR-108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-HRVir108"]] --delay 24 input_coalition2_cronjob
+
 # remove uncompressed data older than 10min
 export mm=60
 echo "*** Remove uncompressed data files older than " ${mm} "min"

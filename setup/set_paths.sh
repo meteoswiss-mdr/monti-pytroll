@@ -39,6 +39,7 @@ set_conda_path() {
 
     # easy access to the easy-install file
     alias easy-install.pth='emacs '$CONDA_PATH'/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth &'
+    alias site-packages='cd '$CONDA_PATH'/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/ '
 
     # easier activation and deactivation of the virtual environment PyTroll
     alias activate='source activate PyTroll_$LOGNAME'

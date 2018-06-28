@@ -95,7 +95,7 @@ def plot_msg(in_msg):
       in_msg.sat_nr=choose_msg(in_msg.datetime,in_msg.RSS)
 
    area_loaded = choose_area_loaded_msg(in_msg.sat, in_msg.sat_nr, in_msg.datetime)  
-           
+   
    # define contour write for coasts, borders, rivers
    cw = ContourWriterAGG(in_msg.mapDir)
 
@@ -438,7 +438,7 @@ def plot_msg(in_msg):
 def load_products(data_object, RGBs, in_msg, area_loaded, load_CTH=True):
 
    if in_msg.verbose:
-     print "*** load products ", RGBs
+      print "*** load products ", RGBs
  
    # check if PyResample is loaded
    try:

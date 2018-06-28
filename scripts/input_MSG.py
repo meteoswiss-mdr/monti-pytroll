@@ -1,5 +1,5 @@
 
-def input(in_msg, timeslot=None, delay=None):
+def input(in_msg):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -23,14 +23,8 @@ def input(in_msg, timeslot=None, delay=None):
     # last Rapid Scan Service picture 2015-05-31 12:25 UTC (Scan start) 
     in_msg.delay=5
 
-    # initialize self.datetime
-    if True:
-        # choose timeslot of the satellite picture to process
-        # datetime according to command line arguments (if given)
-        # otherwise the last possible time of SEVIRI observation (depends on RSS mode and chosen delay)
-        # also sets the near real time marker: in_msg.nrt 
-        in_msg.init_datetime(timeslot=timeslot)
-    else:
+    # initialize self.datetime with a fixed date (for testing purpose)
+    if False:
         # offline mode (always a fixed time) # ignores command line arguments
         year=2015
         month=2
@@ -226,12 +220,12 @@ def input(in_msg, timeslot=None, delay=None):
     in_msg.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
     #in_msg.outputDir='./pics/'
     #in_msg.outputDir = "./%Y-%m-%d/%Y-%m-%d_%(rgb)s-%(area)s/"
-    if in_msg.nrt:
-        in_msg.outputDir = '/data/cinesat/out/'
-    else:
-        in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
-        #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%(rgb)s/%Y-%m-%d/'
-        #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/GPM/%Y-%m-%d/'
+    #if in_msg.nrt:
+    #    in_msg.outputDir = '/data/cinesat/out/'
+    #else:
+    #    in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
+    #    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%(rgb)s/%Y-%m-%d/'
+    #    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/GPM/%Y-%m-%d/'
     in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
         
     in_msg.compress_to_8bit=False

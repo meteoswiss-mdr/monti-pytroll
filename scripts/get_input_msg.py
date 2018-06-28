@@ -1,4 +1,3 @@
-
 from datetime import datetime, timedelta
 from my_msg_module import check_near_real_time
 import sys
@@ -375,7 +374,7 @@ class input_msg_class:
 # =====================================================================================================================
 
 
-def get_input_msg(input_file, timeslot=None, delay=None):
+def get_input_msg(input_file):
 
    from os import getcwd
    from os import path
@@ -392,9 +391,6 @@ def get_input_msg(input_file, timeslot=None, delay=None):
          # get input from (user specified) file 
          input_module = __import__(input_file)
          input_module.input(in_msg)
-         
-         if timeslot != None:
-            in_msg.datetime = timeslot
             
          return in_msg
       else:
@@ -448,8 +444,17 @@ def get_date_and_inputfile_from_commandline(print_usage=None):
             timeslot = datetime(year, month, day, hour, minute)
 
    # read input file and initialize in_msg
-   in_msg = get_input_msg(input_file, timeslot=timeslot)
+   in_msg = get_input_msg(input_file)
 
+   # initialize datetime, if not yet done in the input file 
+   if in_msg.datetime==None:
+      # choose timeslot of the satellite picture to process
+      # datetime according to command line arguments (if given)
+      # otherwise the latest possible time of SEVIRI observation (depends on RSS mode and chosen delay)
+      # also sets the near real time marker: in_msg.nrt
+      # input: in_msg.rss and in_msg.delay 
+      in_msg.init_datetime()
+   
    return in_msg
 
 # =====================================================================================================================
@@ -538,45 +543,44 @@ def parse_commandline_and_read_inputfile():
    #from get_input_msg import parse_commandline_and_read_inputfile
    #from get_input_msg import parse_commandline
    #from get_input_msg import get_input_msg
-      
-   # skip the py at the end of the input filename
+
+   # interpret command line arguments 
+   (options, args) = parse_commandline()
+   
+   # first obligatory argument is the input file
+   # skip the '.py' at the end of the input filename
    input_file = args[0]
    if input_file[-3:] == '.py': 
        input_file=input_file[:-3]
    # read input file and initialize 'in_msg'
    in_msg = get_input_msg(input_file)
-
-   # interpret command line arguments 
-   (options, args) = parse_commandline()
-   
-   # convert date information into a datetime object
-   if options.date == None:
-      timeslot=None
-   else:
-      print options.date
-      from datetime import datetime
-      in_msg.timeslot=datetime(options.date[0],options.date[1],options.date[2],options.date[3],options.date[4])
-      #options['datetime']=datetime(options.date[0],options.date[1],options.date[2],options.date[3],options.date[4])
-   print "AAAAAAA timeslot: ", in_msg.timeslot
    
    print '*** overwrite options of the input_file with command line arguments'
    for opt, value in options.__dict__.items():
-       if value != None:
-           print '   ', opt, ' = ', value
-           setattr(in_msg, opt, value)
-
+      if value != None:
+         if opt!='date':
+            print '...', opt, ' = ', value
+            setattr(in_msg, opt, value)
+         else:
+            in_msg.update_datetime(options.date[0],options.date[1],options.date[2],options.date[3],options.date[4])
+            
    # initialize datetime, if not yet done per command line comment or in the input file 
    if in_msg.datetime==None:
-      # choose timeslot of the satellite picture to process
-      # datetime according to command line arguments (if given)
-      # otherwise the last possible time of SEVIRI observation (depends on RSS mode and chosen delay)
+      # choose timeslot of the latest possible satellite picture 
+      # depends on RSS mode and chosen delay == input: in_msg.rss and in_msg.delay
       # also sets the near real time marker: in_msg.nrt
-      # input: in_msg.rss and in_msg.delay 
       in_msg.init_datetime()
-           
-   print "CCCCCCCCC", in_msg.delay, in_msg.rss
-   print "DDDDDDD", in_msg.datetime
-   print ""
+
+   from datetime import datetime
+   if datetime.now() < in_msg.datetime:
+      print "*** ERROR in parse_commandline_and_read_inputfile ("+inspect.getfile(inspect.currentframe())+")"
+      print '    in_msg.datetime is in the future ', in_msg.datetime
+      raise TypeError('*** ERROR: in_msg.datetime is in the future '+str(in_msg.datetime))
+      quit()
+      
+   print "  date:", in_msg.datetime
+   print "  NRT: ", in_msg.nrt
+   #print in_msg.__dict__
    
    return in_msg
 

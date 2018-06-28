@@ -1,5 +1,5 @@
 
-def input(in_msg, timeslot=None, delay=None):
+def input(in_msg):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -18,16 +18,8 @@ def input(in_msg, timeslot=None, delay=None):
     #in_msg.RSS=False
 
     #in_msg.delay=5 # process image 'delay' minutes before now
-
-    print "BBBBBBBBBBB", timeslot
     
-    if True:
-        # choose timeslot of the satellite picture to process
-        # datetime according to command line arguments (if given)
-        # otherwise the last possible time of SEVIRI observation (depends on RSS mode and chosen delay)
-        # also sets the near real time marker: in_msg.nrt 
-        in_msg.init_datetime(timeslot=timeslot)
-    else:
+    if False:
         # offline mode (always a fixed time) # ignores command line arguments
         year=2015
         month=2

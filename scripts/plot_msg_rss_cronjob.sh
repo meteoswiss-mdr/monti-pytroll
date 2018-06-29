@@ -12,10 +12,18 @@ echo "*** Start to make seviri pictures (loop until all data is there)"
 echo "************************************************************"
 echo 
 cd $PYTROLLHOME/scripts
-echo "    python plot_msg.py input_rad_pngfiles"
-python plot_msg.py input_rad_pngfiles
-echo "    python plot_msg.py input_msg_rss_blackwhite"
-python plot_msg.py input_msg_rss_blackwhite      #> /tmp/plot_msg_input_msg2_blackwhite.txt 2>&1
+echo " "
+echo "--------------------------------------------------------"
+echo "    python loop_msg.py input_rad_pngfiles"
+python loop_msg.py input_rad_pngfiles
+echo " "
+echo "--------------------------------------------------------"
+echo "    python loop_msg.py input_msg_rss_blackwhite"
+python loop_msg.py input_msg_rss_blackwhite      #> /tmp/plot_msg_input_msg2_blackwhite.txt 2>&1
+echo " "
+echo "--------------------------------------------------------"
+echo "    loop_msg.py input_rad_ncfiles_PLAX.py"
+python loop_msg.py input_rad_ncfiles_PLAX.py
 
 # remove uncompressed data older than 10min
 export mm=60

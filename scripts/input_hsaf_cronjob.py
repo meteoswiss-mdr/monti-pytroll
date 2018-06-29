@@ -211,17 +211,18 @@ def input(in_msg):
     # please download the shape file 
     in_msg.mapDir='/opt/users/common/shapes/'
 
-    in_msg.scpOutput = True 
-    #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
-    #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
-    
     in_msg.postprocessing_areas=['ccs4','EuropeCanaryS95','odysseyS25'] # !!!!
-    in_msg.postprocessing_composite = ["h03-ir108", "h03-HRV", "h03-HRVir108", "h03-VIS006ir108"]
+    in_msg.postprocessing_composite = ["h03-HRVir108", "h03-VIS006ir108"]
     #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03-ir108"],["MSG_radar-HRV","MSG_h03-HRV"]]
     #                                 only ccs4                           only ccs4                       only odyssey                      only odyssey
     #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03-ir108"],["MSG_radar-HRV","MSG_h03-HRV"],["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]] # !!!!
 
-    in_msg.scpID2="-i /opt/users/cinesat/monti-pytroll/scripts/id_rsa_las"
-    in_msg.scpOutputDir2='las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s-%(area)s_'
+    in_msg.scpOutput = True 
+    #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
+    #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
+    in_msg.scpProducts = ["h03-VIS006ir108",["MSG_RATE-VIS006ir108","MSG_h03-VIS006ir108"],["MSG_radar-HRVir108","MSG_h03-HRVir108"]]
+
+    #in_msg.scpID2="-i /opt/users/cinesat/monti-pytroll/scripts/id_rsa_las"
+    #in_msg.scpOutputDir2='las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s-%(area)s_'
     #in_msg.scpProducts2 = ['airmass','convection','HRoverview','natural']
-    in_msg.scpProducts2 = ["h03-VIS006ir108",["MSG_RATE-VIS006ir108","MSG_h03-VIS006ir108"],["MSG_radar-HRVir108","MSG_h03-HRVir108"]]
+    #in_msg.scpProducts2 = ["h03-VIS006ir108",["MSG_RATE-VIS006ir108","MSG_h03-VIS006ir108"],["MSG_radar-HRVir108","MSG_h03-HRVir108"]]

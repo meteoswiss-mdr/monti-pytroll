@@ -184,12 +184,12 @@ def input(in_msg):
     in_msg.compress_to_8bit=False
 
     in_msg.scpOutput = False
-    in_msg.scpID="-i /opt/users/$LOGNAME/monti-pytroll/scripts/id_rsa_las"
-    in_msg.scpOutputDir="las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s_%(area)s_"
+    #in_msg.scpID="-i /opt/users/$LOGNAME/monti-pytroll/scripts/id_rsa_las"
+    #in_msg.scpOutputDir="las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s-%(area)s_"
     #in_msg.scpProducts = [["MSG_radar-HRVir108","MSG_CRR-HRVir108","MSG_CRPh-HRVir108"]]
     
-    in_msg.scpID2="-i /home/cinesat/.ssh/id_dsa_las"
-    in_msg.scpOutputDir2='las@lomux240:/www/proj/OTL/WOL/cll/satimages'
+    #in_msg.scpID2="-i /home/cinesat/.ssh/id_dsa_las"
+    #in_msg.scpOutputDir2='las@lomux240:/www/proj/OTL/WOL/cll/satimages'
     #in_msg.scpProducts2 = ['all']
     
     # please download the shape file 

@@ -195,8 +195,8 @@ def input(in_msg):
     in_msg.scpOutput = True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
-    in_msg.scpID="-i /opt/users/$LOGNAME/monti-pytroll/scripts/id_rsa_las"
-    in_msg.scpOutputDir="las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s_%(area)s_"
+    #in_msg.scpID="-i /opt/users/$LOGNAME/monti-pytroll/scripts/id_rsa_las"
+    #in_msg.scpOutputDir="las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s_%(area)s_"
 
     #in_msg.scpID2="-i /home/cinesat/.ssh/id_dsa_las"
     #in_msg.scpOutputDir2='las@lomux240:/www/proj/OTL/WOL/cll/satimages/'
@@ -429,3 +429,7 @@ def input(in_msg):
 
     #in_msg.compress_to_8bit=False
     
+    #in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-HRVir108"]]
+    
+    #in_msg.resize_composite = 100
+    in_msg.resize_montage = 70

@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 rgbs="[VIS006 VIS008 IR_016 IR_039 WV_062 WV_073 IR_087 IR_097 IR_108 IR_120 IR_134 HRV]"
@@ -9,14 +10,14 @@ echo ""
 
 echo "*** create dates"
 if [ 1 -eq 0 ]; then
-    # check old dates from archive (offline modus)
+    # specify start and end date manually (use the archive == offline modus)
     date_start="2015-06-30 23:52"
     date_start_s=$(/bin/date --date "$date_start" +"%s")
     date_end="2015-07-01 01:04"
     date_end_s=$(/bin/date --date "$date_end" +"%s")
     . /opt/users/cinesat/monti-pytroll/setup/bashrc_offline no_virtual_environment
 else
-    # check near real time dates for the last "check_time" seconds (nrt modus)
+    # choose automatically the last 6 hours (also use the archive == offline modus)
     date_end=$(/bin/date  +$"%Y-%m-%d %H:%M")  # now (current date)
     date_end_s=$(/bin/date --date "$date_end" +"%s") 
     check_time=$(expr 6 \* 60 \* 60 )          # check for the last 6 hours 

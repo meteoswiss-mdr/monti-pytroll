@@ -435,11 +435,11 @@ def plot_msg(in_msg):
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
 
-def load_products(data_object, RGBs, in_msg, area_loaded, load_CTH=True):
+def load_products(data_object, RGBs, in_options, area_loaded, load_CTH=True):
 
-   if in_msg.verbose:
+   if in_options.verbose:
       print "*** load products ", RGBs
- 
+      
    # check if PyResample is loaded
    try:
       # Work around for on demand import of pyresample. pyresample depends
@@ -450,12 +450,12 @@ def load_products(data_object, RGBs, in_msg, area_loaded, load_CTH=True):
    except ImportError:
       LOGGER.warning("pyresample missing. Can only work in satellite projection")
 
-   if in_msg.parallax_correction and in_msg.estimate_cth==False:
+   if in_options.parallax_correction and in_options.estimate_cth==False:
       if 'CTH' not in RGBs and load_CTH:
          RGBs.append('CTH')
-      if in_msg.nwcsaf_calibrate == False:
+      if in_options.nwcsaf_calibrate == False:
          print "*** Error in plot_msg ("+inspect.getfile(inspect.currentframe())+")"
-         print "    in_msg.nwcsaf_calibrate = ", in_msg.nwcsaf_calibrate
+         print "    in_options.nwcsaf_calibrate = ", in_options.nwcsaf_calibrate
          print "    parallax correction needs physical (calibrated) CTH values"
          quit()
 
@@ -464,30 +464,30 @@ def load_products(data_object, RGBs, in_msg, area_loaded, load_CTH=True):
       if rgb in products.MSG or rgb in products.MSG_color: 
          for channel in products.MSG:
             if rgb.find(channel) != -1:                   # if a channel name (IR_108) is in the rgb name (IR_108c)
-               if in_msg.verbose: 
-                  print "    load prerequisites by name: ", channel, ", reader:", in_msg.reader_level,"+++"
-               if in_msg.reader_level == None:
+               if in_options.verbose: 
+                  print "    load prerequisites by name: ", channel, ", reader:", in_options.reader_level,"+++"
+               if in_options.reader_level == None:
                   data_object.load([channel], area_extent=area_loaded.area_extent)   # try all reader levels  load the corresponding data
                else:
-                  data_object.load([channel], area_extent=area_loaded.area_extent, reader_level=in_msg.reader_level)  # load the corresponding data
+                  data_object.load([channel], area_extent=area_loaded.area_extent, reader_level=in_options.reader_level)  # load the corresponding data
 
       elif rgb in products.RGBs_buildin or rgb in products.RGBs_user:
          obj_image = get_image(data_object, rgb)          # find corresponding RGB image object
-         if in_msg.verbose:
+         if in_options.verbose:
             print "    load prerequisites by function: ", obj_image.prerequisites
-         if in_msg.reader_level == None:
+         if in_options.reader_level == None:
             data_object.load(obj_image.prerequisites, area_extent=area_loaded.area_extent)   # load prerequisites
          else:
-            data_object.load(obj_image.prerequisites, area_extent=area_loaded.area_extent, reader_level=in_msg.reader_level)  # load prerequisites
+            data_object.load(obj_image.prerequisites, area_extent=area_loaded.area_extent, reader_level=in_options.reader_level)  # load prerequisites
 
       elif rgb in products.NWCSAF:
 
          pge = get_NWC_pge_name(rgb)
 
-         if in_msg.verbose:
+         if in_options.verbose:
             print "    load NWC-SAF product: "+pge.replace('_', '') 
 
-         data_object.load([pge.replace('_', '')], calibrate=in_msg.nwcsaf_calibrate, reader_level="seviri-level3") 
+         data_object.load([pge.replace('_', '')], calibrate=in_options.nwcsaf_calibrate, reader_level="seviri-level3") 
 
          # False, area_extent=area_loaded.area_extent (difficulties to find correct h5 input file)
          #print data_object.loaded_channels()
@@ -498,24 +498,24 @@ def load_products(data_object, RGBs, in_msg, area_loaded, load_CTH=True):
             print "*** Warning: NWC-SAF input file on a differnt grid ("+data_object[pge].area.name+") than suggested input area ("+area_loaded.name+")"
             print "    use "+data_object[pge].area.name+" as standard grid"
             area_loaded = data_object[pge].area
-         convert_NWCSAF_to_radiance_format(data_object, area_loaded, rgb, in_msg.nwcsaf_calibrate, IS_PYRESAMPLE_LOADED)
+         convert_NWCSAF_to_radiance_format(data_object, area_loaded, rgb, in_options.nwcsaf_calibrate, IS_PYRESAMPLE_LOADED)
 
       elif rgb in products.SEVIRI_viewing_geometry:
-         if in_msg.verbose:
-            print "    load SEVIRI viewing geometry: ", rgb, " with reader_level: ", in_msg.reader_level
-         data_object.load([rgb], reader_level=in_msg.reader_level)
+         if in_options.verbose:
+            print "    load SEVIRI viewing geometry: ", rgb, " with reader_level: ", in_options.reader_level
+         data_object.load([rgb], reader_level=in_options.reader_level)
          #print data_object[rgb].data.shape, data_object[rgb].data.min(), data_object[rgb].data.max()
          area_loaded = data_object[rgb].area
 
       else: 
-         if in_msg.verbose:
-            print "    load " + str(in_msg.sat_str()) +" product by name: ", rgb
+         if in_options.verbose:
+            print "    load " + str(in_options.sat_str()) +" product by name: ", rgb
          data_object.load([rgb])   # , area_extent=area_loaded.area_extent load the corresponding data
          area_loaded = data_object[rgb].area
 
-      if in_msg.HRV_enhancement==True or in_msg.HRV_enhancement==None:
+      if in_options.HRV_enhancement==True or in_options.HRV_enhancement==None:
          # load also the HRV channel (there is a check inside in the load function, if the channel is already loaded)
-         if in_msg.verbose:
+         if in_options.verbose:
             print "    load additionally the HRV channel for HR enhancement"
          data_object.load(["HRV"], area_extent=area_loaded.area_extent)
 

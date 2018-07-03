@@ -862,7 +862,7 @@ def indicate_mask(rgb, PIL_image, data, verbose):
    elif rgb in ['CRPh']:
       mask = get_sza_mask(data, sza_max=71.0)
    elif rgb == 'h03':
-      mask = get_box_mask(data, lat_min=25., lat_max=75., lon_min=-25., lon_max=46.)
+      mask = get_box_mask(data, lat_min=25., lat_max=75., lon_min=-25., lon_max=45.5)
       #hsaf_merc == 28 75 -21.5 47.5
       
    if mask != None:

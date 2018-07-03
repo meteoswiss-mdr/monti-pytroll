@@ -73,7 +73,7 @@ class input_msg_class:
                       'precip':0,'precip_ir':0,'qa':0,'reff':0,'satz':0,'sds':0,'sds_cs':0,'sds_diff':0,'sds_diff_cs':0,\
                       'vza':0,'vaa':0,'sunz':0,'sza':0,'lat':-80,'lon':-80,'time_offset':0,\
                       'ot_anvilmean_brightness_temperature_difference':0,\
-                      'SYNMSG_BT_CL_IR10.8': 205}
+                      'SYNMSG_BT_CL_IR10.8': 205,'IR_108-COSMO-minus-MSG':-40}
       self.rad_max = {'VIS006':  85, 'VIS008':  90, 'IR_016':  80, 'IR_039': 340, 'WV_062': 260, 'WV_073': 280,\
                       'IR_087': 320, 'IR_097': 285, 'IR_108': 320, 'IR_120': 320, 'IR_134': 290, 'HRV': 100,\
                       'VIS006c':  85, 'VIS008c':  90, 'IR_016c':  80, 'IR_039c': 340, 'WV_062c': 260, 'WV_073c': 280,\
@@ -88,7 +88,7 @@ class input_msg_class:
                       'precip':256,'precip_ir':256,'qa':50,'reff':50,'satz':90,'sds':1200,'sds_cs':1200,'sds_diff':800,'sds_diff_cs':800,\
                       'vza':90,'vaa':360,'sunz':90,'sza':90,'lat':80,'lon':80,'time_offset':750,
                       'ot_anvilmean_brightness_temperature_difference':6,\
-                      'SYNMSG_BT_CL_IR10.8': 320}
+                      'SYNMSG_BT_CL_IR10.8': 320,'IR_108-COSMO-minus-MSG':40}
       self.tick_marks= {'VIS006': 20, 'VIS008': 20, 'IR_016': 20, 'IR_039': 20, 'WV_062': 20, 'WV_073': 20,\
                         'IR_087': 20, 'IR_097': 20, 'IR_108': 20, 'IR_120': 20, 'IR_134': 20, 'HRV': 20,\
                         'vza': 5, 'vaa': 5, 'lat': 5, 'lon': 5,\
@@ -453,7 +453,7 @@ def get_date_and_inputfile_from_commandline(print_usage=None):
       # otherwise the latest possible time of SEVIRI observation (depends on RSS mode and chosen delay)
       # also sets the near real time marker: in_msg.nrt
       # input: in_msg.rss and in_msg.delay 
-      in_msg.init_datetime()
+      in_msg.init_datetime(timeslot=timeslot)
    
    return in_msg
 
@@ -538,7 +538,7 @@ def parse_commandline():
 
 #########################################################################################
 
-def parse_commandline_and_read_inputfile():
+def parse_commandline_and_read_inputfile(input_file=None):
 
    #from get_input_msg import parse_commandline_and_read_inputfile
    #from get_input_msg import parse_commandline
@@ -546,12 +546,14 @@ def parse_commandline_and_read_inputfile():
 
    # interpret command line arguments 
    (options, args) = parse_commandline()
-   
-   # first obligatory argument is the input file
+
+   # first obligatory argument is the input file (or as optional argument)
+   if input_file==None:
+      input_file = args[0]
+
    # skip the '.py' at the end of the input filename
-   input_file = args[0]
    if input_file[-3:] == '.py': 
-       input_file=input_file[:-3]
+      input_file=input_file[:-3]
    # read input file and initialize 'in_msg'
    in_msg = get_input_msg(input_file)
    

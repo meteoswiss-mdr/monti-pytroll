@@ -219,6 +219,20 @@ def get_sza_mask(self, sza_max=80 ):
     mask = np.array(sza > sza_max)
     return mask
 
+def get_box_mask(self, lon_min=-180, lon_max=180, lat_min=-90, lat_max=90):
+
+    # calculate longitude/latitude and solar zenith angle 
+    from pyorbital.astronomy import sun_zenith_angle
+    lonlats = self.area.get_lonlats()
+    print dir(self.area)
+
+    mask = np.array(lonlats[0] > lon_min)
+    mask[lon_max < lonlats[0]] = False
+    mask[lonlats[1] < lat_min] = False
+    mask[lat_max < lonlats[1]] = False
+
+    return mask
+
 
 def DayNightFog(self, downscale=False, sza_max=88):
     """Make an RGB image composite.

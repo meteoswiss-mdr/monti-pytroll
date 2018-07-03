@@ -49,7 +49,7 @@ from PIL import ImageFont
 from PIL import ImageDraw 
 from trollimage.colormap import rdbu, greys, rainbow, spectral
 
-from my_composites import mask_clouddepth, get_image, get_sza_mask
+from my_composites import mask_clouddepth, get_image, get_sza_mask, get_box_mask
 
 from my_msg_module import get_last_SEVIRI_date, check_input, channel_str2ind
 from my_msg_module import choose_msg, choose_area_loaded_msg, convert_NWCSAF_to_radiance_format, get_NWC_pge_name, format_name
@@ -861,7 +861,11 @@ def indicate_mask(rgb, PIL_image, data, verbose):
          mask = data['MASK'].data
    elif rgb in ['CRPh']:
       mask = get_sza_mask(data, sza_max=71.0)
-
+   elif rgb == 'h03':
+      print type(data['h03'].data)
+      mask = get_box_mask(data, lat_min=25., lat_max=75., lon_min=-25., lon_max=46.)
+      #hsaf_merc == 28 75 -21.5 47.5
+      
    if mask != None:
       if verbose:
          print "    indicate measurement mask "

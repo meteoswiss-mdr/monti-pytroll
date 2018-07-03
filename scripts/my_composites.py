@@ -209,15 +209,15 @@ def HRVFog(self, downscale=False, return_data=False):
 HRVFog.prerequisites = set(["HRV", "IR_016"])
 
 
-#def get_sza_mask(self, sza_max=80 ):
-#
-#    # calculate longitude/latitude and solar zenith angle 
-#    from pyorbital.astronomy import sun_zenith_angle
-#    lonlats = self.area.get_lonlats()
-#    sza = sun_zenith_angle(self.time_slot, lonlats[0], lonlats[1])
-#
-#    mask = np.array(sza > sza_max)
-#    return mask
+def get_sza_mask(self, sza_max=80 ):
+
+    # calculate longitude/latitude and solar zenith angle 
+    from pyorbital.astronomy import sun_zenith_angle
+    lonlats = self.area.get_lonlats()
+    sza = sun_zenith_angle(self.time_slot, lonlats[0], lonlats[1])
+
+    mask = np.array(sza > sza_max)
+    return mask
 
 
 def DayNightFog(self, downscale=False, sza_max=88):

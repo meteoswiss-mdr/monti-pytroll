@@ -49,7 +49,7 @@ from PIL import ImageFont
 from PIL import ImageDraw 
 from trollimage.colormap import rdbu, greys, rainbow, spectral
 
-from my_composites import mask_clouddepth, get_image
+from my_composites import mask_clouddepth, get_image, get_sza_mask
 
 from my_msg_module import get_last_SEVIRI_date, check_input, channel_str2ind
 from my_msg_module import choose_msg, choose_area_loaded_msg, convert_NWCSAF_to_radiance_format, get_NWC_pge_name, format_name
@@ -858,8 +858,9 @@ def indicate_mask(rgb, PIL_image, data, verbose):
    if rgb in products.CPP:
       if rgb in ['cth','cldmask','cot','cph','ctt','cwp','dcld','dcot','dcwp','dndv','dreff',\
                     'precip','qa','reff','sds','sds_cs','sds_diff','sds_diff_cs']:
-
          mask = data['MASK'].data
+   elif rgb in ['CRPh']:
+      mask = get_sza_mask(data, sza_max=71.0)
 
    if mask != None:
       if verbose:

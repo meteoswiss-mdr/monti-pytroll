@@ -216,7 +216,7 @@ def get_sza_mask(self, sza_max=80 ):
     lonlats = self.area.get_lonlats()
     sza = sun_zenith_angle(self.time_slot, lonlats[0], lonlats[1])
 
-    mask = np.array(sza > sza_max)
+    mask = np.array(sza < sza_max)
     return mask
 
 def get_box_mask(self, lon_min=-180, lon_max=180, lat_min=-90, lat_max=90):

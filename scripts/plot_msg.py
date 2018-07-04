@@ -872,7 +872,8 @@ def indicate_mask(rgb, PIL_image, data, verbose):
       img = trollimage(mask, mode="L", fill_value=None) #fill_value,[1,1,1], None
       from trollimage.colormap import greys
       img.colorize(greys)
-      img.putalpha(mask*0 + 0.5)
+      #img.putalpha(mask*0 + 0.5)
+      img.putalpha((1-mask) * 0.5)
       PIL_mask = img.pil_image()
       from PIL import Image as PILimage 
       PIL_image = PILimage.alpha_composite(PIL_mask, PIL_image)

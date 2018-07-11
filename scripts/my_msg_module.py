@@ -331,6 +331,8 @@ def choose_area_loaded_msg(sat, sat_nr, date_time):
            area_loaded = get_area_def("EuropeCanary")
    elif sat=="cosmo":
      area_loaded = get_area_def("ccs4") # might be different, depending on product
+   elif sat=="swissradar":
+     area_loaded = get_area_def("ccs4") # might be different, depending on product
    else:
      area_loaded = None
 
@@ -518,7 +520,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
     dayS    = "%02d" % in_msg.datetime.day
     hourS   = "%02d" % in_msg.datetime.hour 
     minuteS = "%02d" % in_msg.datetime.minute
-
+    
     sat="MSG"
     #if in_msg.RSS:
     #    RSSS='RSS'

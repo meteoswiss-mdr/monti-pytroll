@@ -74,7 +74,7 @@ MSG_OT = ['ir_brightness_temperature',
 
 #################
 
-Radar = ['precip','poh','mesh','vil', 'maxecho','echotop15','echotop20','echotop45','echotop50']
+swissradar = ['PRECIP','POH','MESHS','VIL', 'MaxEcho','EchoTOP15','EchoTOP20','EchoTOP45','echoTOP50']
 
 #################
 

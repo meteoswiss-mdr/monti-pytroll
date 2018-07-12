@@ -3,7 +3,7 @@ abstract-rendering
 alabaster
 anaconda-client
 argcomplete
-argh
+#argh
 #astropy
 Babel
 backports-abc
@@ -31,16 +31,16 @@ enum34
 fastcache
 Flask
 funcsigs
-python-geotiepoints
+#python-geotiepoints
 gevent
 gevent-websocket
-Glymur
+#Glymur
 greenlet
 grin
-h5netcdf
+#h5netcdf
 h5py
 idna
-inotify
+#inotify
 ipaddress
 ipykernel
 ipython
@@ -66,7 +66,7 @@ multipledispatch
 nbconvert
 nbformat
 netCDF4
-netifaces
+#netifaces
 networkx
 nltk
 nose
@@ -77,8 +77,8 @@ numpy
 odo
 openpyxl
 pandas
-path.py
-pathtools
+#path.py
+#pathtools
 patsy
 pep8
 pexpect
@@ -101,14 +101,14 @@ pycurl
 pyflakes
 Pygments
 #pygrib
-pyinotify
-pykdtree
+#pyinotify
+#pykdtree
 pyOpenSSL
 #-e git+https://github.com/pytroll/pyorbital.git@a2aa5e10f70f4cc8218050e43a961755c37e4d44#egg
 pyparsing
 pyproj
 #-e git+https://github.com/pytroll/pyresample.git@fda439a4cce7a8c9e02b502fc7881f1973cfd9ca#egg
-pyshp
+#pyshp
 #-e git+https://github.com/adybbroe/pyspectral.git@cc86078993786799ae0bcf78e9d5021ae7805d1d#egg
 pytest
 python-dateutil
@@ -145,7 +145,7 @@ traitlets
 #-e git+https://github.com/pytroll/trollsift.git@0eec9cc8a743e2b7d1f374880213b18fea84ba23#egg
 ujson
 unicodecsv
-watchdog
+#watchdog
 Werkzeug
 wheel
 xlrd

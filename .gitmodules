@@ -21,7 +21,7 @@
 [submodule "packages/pytroll-schedule"]
 	path = packages/pytroll-schedule
 	url = https://github.com/pytroll/pytroll-schedule.git
-	branch = develop
+	branch = master
 [submodule "packages/trollimage"]
 	path = packages/trollimage
 	url = https://github.com/meteoswiss-mdr/trollimage.git
@@ -49,7 +49,7 @@
 [submodule "packages/satpy"]
 	path = packages/satpy
 	url = https://github.com/pytroll/satpy.git
-	branch = develop
+	branch = master
 [submodule "packages/pytroll-collectors"]
 	path = packages/pytroll-collectors
 	url = https://github.com/pytroll/pytroll-collectors.git
@@ -65,7 +65,7 @@
 [submodule "packages/trollbufr"]
 	path = packages/trollbufr
 	url = https://github.com/pytroll/trollbufr
-	branch = develop
+	branch = master
 [submodule "packages/trollmoves"]
 	path = packages/trollmoves
 	url = https://github.com/pytroll/trollmoves.git

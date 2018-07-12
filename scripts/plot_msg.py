@@ -75,8 +75,7 @@ except NameError:
 
 
 def plot_msg(in_msg):
-
-
+ 
    # get date of the last SEVIRI observation
    if in_msg.datetime == None:
       in_msg.get_last_SEVIRI_date()
@@ -98,7 +97,7 @@ def plot_msg(in_msg):
    
    # define contour write for coasts, borders, rivers
    cw = ContourWriterAGG(in_msg.mapDir)
-
+   
    # check if input data is complete 
    if in_msg.verbose:
       print "*** check input data for ", in_msg.sat_str()
@@ -522,7 +521,7 @@ def load_products(data_object, RGBs, in_options, area_loaded, load_CTH=True):
    # loaded_channels = [chn.name for chn in data_object.loaded_channels()]
    # print loaded_channels
 
-   print "area_loaded", area_loaded
+   #print "area_loaded", area_loaded
    
    return area_loaded
 
@@ -701,6 +700,19 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
       prop = data[rgb].data
       plot_type='trollimage'
       colormap = deepcopy(rainbow)
+   elif rgb in products.swissradar:
+      prop = data[rgb].data
+      plot_type='trollimage'
+      colormap = deepcopy(rainbow)      
+      if rgb=='POH':
+        from trollimage.colormap import ProbabilityOfHail
+        colormap = ProbabilityOfHail
+      elif rgb == 'MESHS':
+        from trollimage.colormap import MESHS
+        colormap = MESHS
+      elif rgb == 'VIL':
+        from trollimage.colormap import VIL
+        colormap = VIL
    else:
       # includes products.RGBs_buildin
       prop = ma.asarray([-999.,-999.])
@@ -992,7 +1004,15 @@ def add_colorscale(dc, rgb, in_msg, unit=None):
    if rgb.find("-") != -1: # for channel differences use tickmarks of 1 
       tick_marks=1
       minor_tick_marks=1
-      
+
+   print in_msg.colormap[rgb]
+   print tick_marks
+   print minor_tick_marks
+   print font_scale
+   print unit
+   print in_msg.colormap[rgb].values[0]
+   print in_msg.colormap[rgb].values[-1]
+   
    if in_msg.verbose:
       print '... add colorscale '
    dc.add_scale(in_msg.colormap[rgb], extend=True, tick_marks=tick_marks, minor_tick_marks=minor_tick_marks, font=font_scale, line_opacity=100, unit=unit) #

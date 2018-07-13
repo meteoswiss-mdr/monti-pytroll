@@ -88,15 +88,15 @@ time_slot = datetime(year, month, day, hour, minute)
 print "*** "
 print "*** read radar data (plot_radar.py)"
 global_data = GeostationaryFactory.create_scene("swissradar", "", "radar", time_slot)
-prop_str='precip'                     # RZC
-#prop_str='poh'   # does not work!!!  # BZC
-#prop_str='mesh'  # does not work!!!  # MZC
-#prop_str='vil'                       # LZC
-#prop_str='maxecho'                   # CZC
-#prop_str='echotop15'                 # EZC
-#prop_str='echotop20'                 # EZC                 
-#prop_str='echotop45'                 # EZC
-#prop_str='echotop50'                 # EZC
+prop_str='PRECIP'                     # RZC
+#prop_str='POH'    # does not work!!!  # BZC
+#prop_str='MESHS' # does not work!!!  # MZC
+#prop_str='VIL'                       # LZC
+#prop_str='MaxEcho'                   # CZC
+#prop_str='EchoTOP15'                 # EZC
+#prop_str='EchoTOP20'                 # EZC                 
+#prop_str='EchoTOP45'                 # EZC
+#prop_str='EchoTOP50'                 # EZC
 #global_data = GeostationaryFactory.create_scene("dem", "", "dem", time_slot)
 #prop_str = 'dem'
 

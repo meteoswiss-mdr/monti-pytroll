@@ -10,5 +10,7 @@ packages/anacon*
 **/*_save
 **/backup/*
 **/save/*
+**/id_dsa_las
+**/id_rsa_las
 ### ignore emacs backup files ### 
 **/*~

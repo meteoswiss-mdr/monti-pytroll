@@ -82,7 +82,7 @@ cosmo_vars_2d=["lon_1", "lat_1",\
                "TWATER", "tropopause_height", "tropopause_temperature", "tropopause_pressure", \
                "FF_10M", "VMAX_10M", "CAPE_MU", "CAPE_ML", "CIN_MU", "CIN_ML", \
                "SLI", "LCL_ML", "LFC_ML", "T_2M", "TD_2M", "GLOB", "PS", \
-               "PMSL", "PMSLr", "HZEROCL", "WSHEAR_0-3km", "WSHEAR_0-6km", "SYNMSG_BT_CL_IR10.8"]
+               "PMSL", "PMSLr", "HZEROCL", "WSHEAR_0-3km", "WSHEAR_0-6km", "SYNMSG_BT_CL_IR10.8","IR_108-COSMO-minus-MSG"]
 cosmo_vars_3d=["POT_VORTIC", "THETAE", "MCONV", "geopotential_height",\
                "T_SO", "RELHUM"]
 

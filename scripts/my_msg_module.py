@@ -429,7 +429,9 @@ def format_name (folder, time_slot, rgb=None, sat=None, sat_nr=None, RSS=None, a
     if product != None:
         #new_folder = (new_folder % {"product": product})
         new_folder = new_folder.replace("%(product)s", str(product))
-                      
+
+    new_folder = new_folder.replace("IR10.8", "IR-108")
+        
     return new_folder
 
 '''

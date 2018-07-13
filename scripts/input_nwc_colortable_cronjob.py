@@ -119,7 +119,7 @@ def input(in_msg):
     in_msg.RGBs.append('CTH')
     #in_msg.RGBs.append('CTP')
     ## NWC SAF PEG 4
-    in_msg.RGBs.append('CRR')
+    #in_msg.RGBs.append('CRR')
     ## NWC SAF PEG 5
     #in_msg.RGBs.append('PC')
     ## NWC SAF PEG 13 
@@ -152,7 +152,7 @@ def input(in_msg):
     #in_msg.RGBs.append('SPhR_TPW')     # old format
     ## NWC SAF PEG 14
     #in_msg.RGBs.append('PCPh')
-    in_msg.RGBs.append('CRPh')
+    #in_msg.RGBs.append('CRPh')
     #-------------------
     # H-SAF
     #-------------------

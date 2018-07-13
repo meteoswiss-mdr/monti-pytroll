@@ -59,8 +59,8 @@ echo ""
 echo "*** Checkout branches of PyTroll modules (... git checkout $branch, in order to avoid the detached head state)"
 echo "=============================================================================================================="
 # use this line for the first time to specify the branch
-git submodule foreach -q --recursive 'branch="$(git config -f $toplevel/.gitmodules submodule.$name.branch)"; git checkout $branch'
-#git submodule foreach -q --recursive git pull 
+git submodule foreach -q --recursive 'branch="$(git config -f $toplevel/.gitmodules submodule.$name.branch)"; path="$(git config -f $toplevel/.gitmodules submodule.$name.path)"; echo $path; git checkout $branch'
+#git submodule foreach -q --recursive 'path="$(git config -f $toplevel/.gitmodules submodule.$name.path)"; echo $path; git pull'
 echo "Does this look good? (press enter to continue or CTRL+c to abort)"
 read junk
 

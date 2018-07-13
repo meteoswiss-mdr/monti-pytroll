@@ -73,7 +73,8 @@ class input_msg_class:
                       'precip':0,'precip_ir':0,'qa':0,'reff':0,'satz':0,'sds':0,'sds_cs':0,'sds_diff':0,'sds_diff_cs':0,\
                       'vza':0,'vaa':0,'sunz':0,'sza':0,'lat':-80,'lon':-80,'time_offset':0,\
                       'ot_anvilmean_brightness_temperature_difference':0,\
-                      'SYNMSG_BT_CL_IR10.8': 205,'IR_108-COSMO-minus-MSG':-40}
+                      'SYNMSG_BT_CL_IR10.8': 205,'IR_108-COSMO-minus-MSG':-40,\
+                      'POH':0,'MESHS':2,'VIL':0}
       self.rad_max = {'VIS006':  85, 'VIS008':  90, 'IR_016':  80, 'IR_039': 340, 'WV_062': 260, 'WV_073': 280,\
                       'IR_087': 320, 'IR_097': 285, 'IR_108': 320, 'IR_120': 320, 'IR_134': 290, 'HRV': 100,\
                       'VIS006c':  85, 'VIS008c':  90, 'IR_016c':  80, 'IR_039c': 340, 'WV_062c': 260, 'WV_073c': 280,\
@@ -88,7 +89,8 @@ class input_msg_class:
                       'precip':256,'precip_ir':256,'qa':50,'reff':50,'satz':90,'sds':1200,'sds_cs':1200,'sds_diff':800,'sds_diff_cs':800,\
                       'vza':90,'vaa':360,'sunz':90,'sza':90,'lat':80,'lon':80,'time_offset':750,
                       'ot_anvilmean_brightness_temperature_difference':6,\
-                      'SYNMSG_BT_CL_IR10.8': 320,'IR_108-COSMO-minus-MSG':40}
+                      'SYNMSG_BT_CL_IR10.8': 320,'IR_108-COSMO-minus-MSG':40,\
+                      'POH':100,'MESHS':6,'VIL':75}
       self.tick_marks= {'VIS006': 20, 'VIS008': 20, 'IR_016': 20, 'IR_039': 20, 'WV_062': 20, 'WV_073': 20,\
                         'IR_087': 20, 'IR_097': 20, 'IR_108': 20, 'IR_120': 20, 'IR_134': 20, 'HRV': 20,\
                         'vza': 5, 'vaa': 5, 'lat': 5, 'lon': 5,\
@@ -101,7 +103,7 @@ class input_msg_class:
                         'precip':10,'precip_ir':10,'qa':10,'reff':10,'satz':10,'sds':100,'sds_cs':100,'sds_diff':100,'sds_diff_cs':100,\
                         'sunz':10,'sza':10,'lat':10,'lon':10,'time_offset':100,
                         'ot_anvilmean_brightness_temperature_difference':1,\
-                        'SYNMSG_BT_CL_IR10.8': 20}
+                        'SYNMSG_BT_CL_IR10.8': 20,'MESHS':1}
       self.minor_tick_marks = {'VIS006': 5, 'VIS008': 5, 'IR_016': 5, 'IR_039': 5, 'WV_062': 5, 'WV_073': 5,\
                         'IR_087': 5, 'IR_097': 5, 'IR_108': 5, 'IR_120': 5, 'IR_134': 5, 'HRV': 5,\
                         'vza': 1, 'vaa': 1, 'lat': 1, 'lon': 1,\
@@ -114,7 +116,7 @@ class input_msg_class:
                         'precip':5,'precip_ir':5,'qa':2,'reff':2,'satz':2,'sds':10,'sds_cs':10,'sds_diff':10,'sds_diff_cs':10,\
                         'sunz':2,'sza':2,'lat':2,'lon':2,'time_offset':10,
                         'ot_anvilmean_brightness_temperature_difference':0.5,\
-                        'SYNMSG_BT_CL_IR10.8': 5}
+                               'SYNMSG_BT_CL_IR10.8': 5,'MESHS':0.5}
 
       self.postprocessing_areas     = []
       self.postprocessing_composite = []
@@ -231,6 +233,8 @@ class input_msg_class:
            return ""
       elif self.sat[0:5].lower() == "cosmo":
          return "cosmo"
+      elif self.sat == "swissradar":
+         return "swissradar"
       else:
          if self.sat_nr != "":
            d={'sat':self.sat, 'sat_nr':str(int(self.sat_nr)), '0sat_nr':str(self.sat_nr).zfill(2)}

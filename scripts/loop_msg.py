@@ -59,7 +59,8 @@ if __name__ == '__main__':
         RGBs_done = plot_msg(in_msg)
         # remove the processed RGBs from the list of RGBs to do 
         for rgb in RGBs_done:
-            in_msg.RGBs.remove(rgb)
+            if rgb in in_msg.RGBs:
+                in_msg.RGBs.remove(rgb)
             if os.path.isfile("/tmp/NO_RSS_INPUT.txt"):
                 print "A) remove NO_RSS_INPUT.txt"
                 remove("/tmp/NO_RSS_INPUT.txt")

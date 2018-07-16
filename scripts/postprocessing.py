@@ -92,7 +92,7 @@ def get_file_list(composite, in_msg, sat, sat_nr, time_slot, area, n=None):
             file_list.append (get_TRT_filename(in_msg, time_slot, area))
         elif rgb in products.MSG_all:
             file_list.append (get_sat_filename(in_msg, rgb, 'MSG', sat_nr, time_slot, area))
-        elif (rgb == 'radar' or rgb in products.Radar) and in_msg.sat != 'cpp':
+        elif (rgb == 'radar' or rgb in products.swissradar) and in_msg.sat != 'cpp':
             file_list.append (get_radar_filename(in_msg, time_slot, area))
         elif rgb == 'RATE':
             file_list.append (get_odyssey_filename(in_msg, time_slot, area))

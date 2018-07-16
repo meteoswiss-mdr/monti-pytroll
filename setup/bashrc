@@ -73,6 +73,7 @@ case $HOSTNAME in
     	alias tkdiff='echo tkdiff is too old, use \"meld\" instead; echo  meld '
     fi
     alias ncdump=/usr/bin/ncdump
+    echo "... open proxy ports 8080"
     export http_proxy=http://proxy.meteoswiss.ch:8080
     export https_proxy=https://proxy.meteoswiss.ch:8080
     if [ $HOSTNAME == "hau" ]; then

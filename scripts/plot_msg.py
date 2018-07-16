@@ -341,11 +341,12 @@ def plot_msg(in_msg):
                   parallax_correction_str='pc'
                else:
                   parallax_correction_str=''
-               rgb+=parallax_correction_str
+              
+               #rgb+=parallax_correction_str
 
                # create output filename
-               outputDir =              format_name(in_msg.outputDir,  data.time_slot, area=area, rgb=rgb, sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
-               outputFile = outputDir +"/"+ format_name(in_msg.outputFile, data.time_slot, area=area, rgb=rgb, sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
+               outputDir =              format_name(in_msg.outputDir,  data.time_slot, area=area, rgb=rgb+parallax_correction_str, sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
+               outputFile = outputDir +"/"+ format_name(in_msg.outputFile, data.time_slot, area=area, rgb=rgb+parallax_correction_str, sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
 
                # check if output directory exists, if not create it
                path= dirname(outputFile)
@@ -383,7 +384,7 @@ def plot_msg(in_msg):
                # secure copy file to another place
                if in_msg.scpOutput:
                   if (rgb in in_msg.scpProducts) or ('all' in [x.lower() for x in in_msg.scpProducts if type(x)==str]):
-                     scpOutputDir = format_name (in_msg.scpOutputDir, data.time_slot, area=area, rgb=rgb, sat=data.satname, sat_nr=data.sat_nr() )
+                     scpOutputDir = format_name (in_msg.scpOutputDir, data.time_slot, area=area, rgb=rgb+parallax_correction_str, sat=data.satname, sat_nr=data.sat_nr() )
                      if in_msg.compress_to_8bit:
                         if in_msg.verbose:
                            print "... secure copy "+outputFile.replace(".png","-fs8.png")+ " to "+scpOutputDir
@@ -395,7 +396,7 @@ def plot_msg(in_msg):
 
                if in_msg.scpOutput and in_msg.scpID2 != None and in_msg.scpOutputDir2 != None:
                   if (rgb in in_msg.scpProducts2) or ('all' in [x.lower() for x in in_msg.scpProducts2 if type(x)==str]):
-                     scpOutputDir2 = format_name (in_msg.scpOutputDir2, data.time_slot, area=area, rgb=rgb, sat=data.satname, sat_nr=data.sat_nr() )
+                     scpOutputDir2 = format_name (in_msg.scpOutputDir2, data.time_slot, area=area, rgb=rgb+parallax_correction_str, sat=data.satname, sat_nr=data.sat_nr() )
                      if in_msg.compress_to_8bit:
                         if in_msg.verbose:
                            print "... secure copy "+outputFile.replace(".png","-fs8.png")+ " to "+scpOutputDir2
@@ -407,7 +408,7 @@ def plot_msg(in_msg):
 
                            
                if 'ninjotif' in in_msg.outputFormats:
-                  ninjotif_file = format_name (outputDir+'/'+in_msg.ninjotifFilename, data.time_slot, sat_nr=data.sat_nr(), RSS=in_msg.RSS, area=area, rgb=rgb )
+                  ninjotif_file = format_name (outputDir+'/'+in_msg.ninjotifFilename, data.time_slot, sat_nr=data.sat_nr(), RSS=in_msg.RSS, area=area, rgb=rgb+parallax_correction_str )
                   from plot_coalition2 import pilimage2geoimage
                   GEO_image = pilimage2geoimage(PIL_image, obj_area, data.time_slot)
                   GEO_image.save(ninjotif_file,

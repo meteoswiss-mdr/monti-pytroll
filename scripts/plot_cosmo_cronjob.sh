@@ -8,13 +8,24 @@ echo '*** start plot_msg_cosmo_cronjob.sh'
 #export python=/opt/users/common/packages/anaconda3/envs/PyTroll_$LOGNAME/bin/python
 #which python
 
-day=`date --utc '+%d'`
-month=`date --utc '+%m'`
-year=`date --utc '+%Y'`
-hour=`date --utc '+%H'`
-minute=`date --utc '+%M'`
-
-echo "current time: " $year $month $day $hour $minute
+if [ "$#" -eq 0 ]; then
+    echo "automatic processing date determination"
+    year=`date --utc '+%Y'`
+    month=`date --utc '+%m'`
+    day=`date --utc '+%d'`
+    hour=`date --utc '+%H'`
+    minute=`date --utc '+%M'`
+elif [ "$#" -eq 5 ]; then
+    echo "processing date given by command line arguments" 
+    year=$1
+    month=$2
+    day=$3
+    hour=$4
+    minute=$5
+else
+    echo "wrong number of arguments"
+fi 
+echo "*** processing time: " $year $month $day $hour $minute
 
 echo "*** Start to make seviri pictures (loop until all data is there)"
 echo "************************************************************"

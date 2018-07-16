@@ -34,9 +34,11 @@ case $HOSTNAME in
     "zueub"[2-4][0-9][0-9])
 	if [ -d /opt/users/$LOGNAME/monti-pytroll/ ]
         then
+	    echo ". /opt/users/$LOGNAME/monti-pytroll/setup/set_paths.sh"
             #source /opt/users/$LOGNAME/monti-pytroll/setup/set_paths.sh   # source is not supported by cronjobs
 	    . /opt/users/$LOGNAME/monti-pytroll/setup/set_paths.sh
         else
+	    echo ". /opt/users/$LOGNAME/PyTroll/setup/set_paths.sh"
             #source /opt/users/$LOGNAME/PyTroll/setup/set_paths.sh         # source is not supported by cronjobs
 	    . /opt/users/$LOGNAME/PyTroll/setup/set_paths.sh
         fi

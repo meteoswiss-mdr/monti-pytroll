@@ -8,7 +8,7 @@ in_msg = parse_commandline_and_read_inputfile()
 
 #(options, args) = parse_commandline()
 #
-#if options.date == None:
+#if options.date is None:
 #    timeslot=None
 #else:
 #    print options.date
@@ -24,7 +24,7 @@ in_msg = parse_commandline_and_read_inputfile()
 #
 #print '*** overwrite input from input file with command line arguments'
 #for opt, value in options.__dict__.items():
-#    if value != None:
+#    if value is not None:
 #        print '   ', opt, ' = ', value
 #        setattr(in_msg, opt, value)
         

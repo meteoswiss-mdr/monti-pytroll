@@ -185,7 +185,7 @@ def downscale_array(array, mode='gaussian_225_125', mask=None):
         quit()
 
     # force mask and fill the whole array with closest pixel
-    if mask != None:
+    if mask is not None:
         array[mask] = no_data
         array = fill_with_closest_pixel(array)
 
@@ -193,12 +193,12 @@ def downscale_array(array, mode='gaussian_225_125', mask=None):
     array_downscaled = downscale_func(array, weights, mode='nearest')
 
     # restore mask
-    if mask != None:
+    if mask is not None:
         array_downscaled[mask] = no_data
 
     """
     # convert to mask array and change array.mask 
-    if mask != None:
+    if mask is not None:
         np.ma.masked_array(array, mask)
     """
 
@@ -275,11 +275,11 @@ def make_figure(values, obj_area, outputFile,
 
     mappable = plt.imshow(np.flipud(values), vmin = vmin, vmax = vmax, origin="lower")
 
-    if contour_value != None:
+    if contour_value is not None:
         plt.contour( values, contour_value, linewidths=linewidth, origin='upper' )
         #plt.contour( values, contour_value, linewidths=linewidth, origin='lower' )
 
-    if text_to_write != None:
+    if text_to_write is not None:
         ax.text(0.95, 0.01, text_to_write,
                 verticalalignment='bottom', horizontalalignment='right',
                 transform=ax.transAxes,
@@ -468,7 +468,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     area_loaded = load_products(global_data, ['CTH'], in_msg, area_loaded )
                 
                 print ('... project data to desired area ', area)
-                data = global_data.project(area)
+                data = global_data.project(area, precompute=True)
                 
                 # fill placeholders in directory names with content
                 outputDir = format_name(in_msg.outputDir, time_slot, area=area, rgb='C2rgb', sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
@@ -499,7 +499,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                         print ("    unknown area scale", area, scale )
                         quit() 
                     load_products(global_CT_data, ['CT'], in_msg, area_loaded ) 
-                    CT_data = global_CT_data.project(area)
+                    CT_data = global_CT_data.project(area, precompute=True)
                     if "CloudType" in in_msg.aux_results:
                         outputFile = outputDir +"/aux_results/%s_%s_CloudType.png"%(yearS+monthS+dayS,hourS+minS)
                         img = GeoImage( CT_data['CT'].data, CT_data['CT'].area, CT_data.time_slot, mode="P", palette=CT_data['CT'].palette, fill_value=0 )
@@ -630,7 +630,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     area_loaded = get_area_def(area2load)#(in_windshift.areaExtraction)  
                     # load product, global_data is changed in this step!
                     area_loaded = load_products(global_data30, in_msg.channels30, in_msg, area_loaded)
-                    data30 = global_data30.project(area)           
+                    data30 = global_data30.project(area, precompute=True)           
                     data30 = downscale(data30,chosen_settings['mode_downscaling'],mask = mask_NoClouds) #mask = data30[in_msg.channels30[0].data.mask)      
                     
                     # read the observations of the channels at -15 min
@@ -640,7 +640,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     area_loaded15 = get_area_def(area2load)#(in_windshift.areaExtraction)  
                     # load product, global_data is changed in this step!
                     area_loaded15 = load_products(global_data15, in_msg.channels15, in_msg, area_loaded15)
-                    data15 = global_data15.project(area)              
+                    data15 = global_data15.project(area, precompute=True)              
                     data15 = downscale(data15,chosen_settings['mode_downscaling'],mask = mask_NoClouds) #mask = data30[in_msg.channels30[0].data.mask)
                     
                     wv_062_t15 = deepcopy(data15['WV_062'].data)
@@ -1003,6 +1003,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     g = cmin_cd + (cd/n_tests_cd) * (cmax_cd - cmin_cd)
                     b = cmin_gi + (gi/n_tests_gi) * (cmax_gi - cmin_gi)
                 elif rgb_display == 'cd-us-gi':
+                    # this is the currect pre-operational setting
                     r = cmin_cd + (cd/n_tests_cd) * (cmax_cd - cmin_cd)
                     g = cmin_us + (us/n_tests_us) * (cmax_us - cmin_us)
                     b = cmin_gi + (gi/n_tests_gi) * (cmax_gi - cmin_gi)
@@ -1312,17 +1313,17 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                         c2_data.channels.append(Channel(name='a', wavelength_range=[0.,0.,0.], resolution=1000., data=rgbArray[:,:,3], area=area))
 
 
-                        c2_data = c2_data.project(area_ninjotif) # (default) mode='quick' || mode="bilinear", radius=50e3 || mode="ewa" || mode="nearest"
+                        c2_data = c2_data.project(area_ninjotif, precompute=True) # (default) mode='quick' || mode="bilinear", radius=50e3 || mode="ewa" || mode="nearest"
 
                         """
                         # !!! FIX ME !!!
                         # reproject all channels to the area needed by NINJO
                         if area_ninjotif == 'nrEURO3km':
                             # normal reprojection
-                            c2_data = c2_data.project(area_ninjotif) 
+                            c2_data = c2_data.project(area_ninjotif, precompute=True) 
                         elif area_ninjotif == 'nrEURO1km':
                             # take care of area outside of ccs4, which is filled with nearest neighbour...
-                            c2_data = c2_data.project(area_ninjotif, mode='quick') # , mode='quick' || mode="bilinear", radius=50e3 || mode="ewa" || mode="nearest"
+                            c2_data = c2_data.project(area_ninjotif, mode='quick', precompute=True) # , mode='quick' || mode="bilinear", radius=50e3 || mode="ewa" || mode="nearest"
 
                             ##c2_data['a'].data = np.where(c2_data['r'].data==c2_data['r'].data[0,0], 255, c2_data['a'].data)
                             ##c2_data['a'].data = np.where(isinstance(c2_data['r'].data, np.ma.core.MaskedConstant), 0, c2_data['a'].data)
@@ -1335,7 +1336,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                             #print ("******************", c2_data['r'].data.max(), c2_data['g'].data.max(), c2_data['b'].data.max(), type(c2_data['r'].data[0,0]), np.isnan(c2_data['r'].data[0,0]))
                         else:
                             print ("... Warning, unknown projection in save ninjotiff")
-                            c2_data = c2_data.project(area_ninjotif)
+                            c2_data = c2_data.project(area_ninjotif, precompute=True)
                         """
 
                         nx2,ny2 = c2_data['r'].data.shape

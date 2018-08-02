@@ -136,7 +136,7 @@ if parallax_correction:
         IR_data = GeostationaryFactory.create_scene("Meteosat-9", "", "seviri", time_slot)
         IR_data.load(['IR_108'], reader_level="seviri-level2")
         print "    reproject IR_108 to projection of hsaf"  
-        IR_data = IR_data.project('hsaf')  # return statement is necessary
+        IR_data = IR_data.project('hsaf', precompute=True)  # return statement is necessary
         global_data.parallax_corr(fill="nearest", estimate_cth=True, IR_108=IR_data['IR_108'], cth_atm="best", time_slot=time_slot, replace=True)
         parallax_str='-PC-ECTH'
         #plot.show_quicklook(global_data['CTH'].area_def, global_data['CTH'].data)
@@ -148,7 +148,7 @@ if parallax_correction:
         convert_NWCSAF_to_radiance_format(global_data, global_data['CTTH'].area, 'CTH', True, True)
         global_data.channels.remove('CTTH')
         print "reproject CTH to projection of hsaf"  
-        global_data = global_data.project('hsaf')  # return statement is necessary
+        global_data = global_data.project('hsaf', precompute=True)  # return statement is necessary
         global_data.parallax_corr(fill="nearest", estimate_cth=False, replace=True)  # fill="False", "nearest" or "bilinear"
         parallax_str='-PC-CTH'
 
@@ -168,7 +168,7 @@ for area in areas:
     if area.find('hsaf_merc') != -1:
         resolution='c'
 
-    data = global_data.project(area)
+    data = global_data.project(area, precompute=True)
     #data[prop_str].product_name = global_data[prop_str].product_name
     #data[prop_str].units = global_data[prop_str].units
 
@@ -179,7 +179,6 @@ for area in areas:
         statisticFile = outputDir + 'RAD_'+data[prop_str].product_name+'-'+area+'_'+yearS[2:]+monthS+dayS+'.txt'
         f1 = open(statisticFile,'a')   # mode append 
         ind = (prop > 0.0001) &  (prop < 500.0)
-        print "prop.data[ind]"
         #for pp in prop.data[ind]:
         #    print pp
         prop_mean=prop.data[ind].mean()
@@ -210,7 +209,7 @@ for area in areas:
     outputFile = outputDir+'/MSG_'+'h03'+parallax_str+'-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS +'.png'
 
     prop=data[prop_str].data
-
+    
     #min_data=prop.min()
     min_data =  0.
     if color_mode=='hsaf':

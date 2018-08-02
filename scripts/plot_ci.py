@@ -202,8 +202,8 @@ def plot_msg(in_msg):
             print "*** Reproject data to area: ", area, "(org projection: ",  area_loaded.name, ")"     
          obj_area = get_area_def(area)
          # PROJECT data to new area 
-         data    = global_data.project(area)
-         data_m1 = global_data_m1.project(area)
+         data    = global_data.project(area, precompute=True)
+         data_m1 = global_data_m1.project(area, precompute=True)
          resolution='i'
 
       loaded_products = [chn.name for chn in data.loaded_channels()]

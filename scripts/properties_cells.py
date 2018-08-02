@@ -135,7 +135,7 @@ def make_figureLabels(values, all_cells, obj_area, outputFile, colorbar = True, 
         position=fig.add_axes([0.93,0.2,0.02,0.35])  ## the parameters are the specified position you set: left, bottom, width, height
         color_bar = fig.colorbar(mappable,cax=position) ## 
         plt.setp(plt.getp(color_bar.ax.axes, 'yticklabels'), color='cyan')
-    if t!=None:
+    if t is not None:
         #position=fig.add_axes([0.93,0.2,0.02,0.35])
         plt.text(500,50,t,color = color, size = 14)
     
@@ -209,7 +209,7 @@ def properties_cells(t1, tStop, current_labels=None, metadata=None, labels_dir=N
     #    in_dir = '/opt/users/'+in_msg.user+'/PyTroll/scripts//Mecikalski/cosmo/Channels/labels/'   
        
     # load a few standard things 
-    if in_msg == None:
+    if in_msg is None:
         print "*** Error, in property_cells (property_cells)"
         print "    no input class passed as argument"
         quit()
@@ -253,7 +253,7 @@ def properties_cells(t1, tStop, current_labels=None, metadata=None, labels_dir=N
     count_double = 0
     
     #labels_dir = '/data/cinesat/out/labels/'
-    if labels_dir == None:
+    if labels_dir is None:
         labels_dir = '/opt/users/'+in_msg.user+'/PyTroll/scripts/labels/' #compatible to all users
         print "... use default directory to save labels: " + labels_dir
 
@@ -262,7 +262,7 @@ def properties_cells(t1, tStop, current_labels=None, metadata=None, labels_dir=N
           
           print in_msg.sat, str(in_msg.sat_nr), "seviri", t1
           
-          if sat_data == None:
+          if sat_data is None:
               # now read the data we would like to forecast
               global_data = GeostationaryFactory.create_scene(in_msg.sat, str(in_msg.sat_nr), "seviri", t1)
               #global_data_RGBforecast = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
@@ -274,7 +274,7 @@ def properties_cells(t1, tStop, current_labels=None, metadata=None, labels_dir=N
               area_loaded = load_products(global_data, rgb_load, in_msg, area_loaded)
               
               print '... project data to desired area ', area
-              data = global_data.project(area)
+              data = global_data.project(area, precompute=True)
           
           else:
               data = sat_data
@@ -294,7 +294,7 @@ def properties_cells(t1, tStop, current_labels=None, metadata=None, labels_dir=N
           for rrgb in range(len(rgb_load)):
               values_rgb[rrgb,:,:] =  deepcopy(data[rgb_load[rrgb]].data) #-data_108[rgb_load[1]].data
           
-          if current_labels == None:
+          if current_labels is None:
                 print "--- reading labels from shelve files"
                 filename =labels_dir +  'Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)
                 
@@ -583,7 +583,7 @@ def properties_cells(t1, tStop, current_labels=None, metadata=None, labels_dir=N
       
               labels, numobjects = ndimage.label(data_new)
               print("....starting updating cells")
-              if outputDir_labels != None:
+              if outputDir_labels is not None:
                   make_figureLabels(deepcopy(data_new), all_cells, obj_area, outputDir_labels, colorbar = False, vmin = False, vmax = False, white_background = True, t = t1)
               data_new = data_new.astype('uint32') #unsigned char int  https://docs.python.org/2/library/array.html
               

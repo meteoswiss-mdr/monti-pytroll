@@ -52,7 +52,7 @@ import socket
 hostname=socket.gethostname()
 
 if "zueub" in hostname:
-    data_dir = "/data/COALITION2/database/meteosat/native_test/"
+    data_dir = "/data/COALITION2/database/meteosat/radiance_nat/native_test/"
     #data_file="MSG3-SEVI-MSG15-0100-NA-20170326101240.438000000Z-20170326101257-1213498.nat"
     data_file="MSG3-SEVI-MSG15-0100-NA-20170326102740.340000000Z-20170326102757-1213498.nat"
     #data_file="MSG2-SEVI-MSG15-0100-NA-20150531235918.139000000Z-20150531235936-1178986.nat"   # does not work, as number of columns cant be devided by 4 
@@ -102,11 +102,29 @@ reader="native_msg"
 
 ## different ways to define the satellite data object 
 from satpy import Scene
-global_scene = Scene(platform_name="Meteosat-9", sensor="seviri", reader=reader, filenames=filenames)
+
+#   def __init__(self, filenames=None, reader=None, filter_parameters=None, reader_kwargs=None, 
+#                  ppp_config_dir=get_environ_config_dir(), 
+#                  base_dir=None, 
+#                  sensor=None, 
+#                  start_time=None, 
+#                  end_time=None, 
+#                  area=None): 
+
+
+global_scene = Scene(sensor="seviri", reader=reader, filenames=filenames)
+#global_scene = Scene(platform_name="Meteosat-9", sensor="seviri", reader=reader, filenames=filenames)
 #global_scene = Scene(platform_name="Meteosat-10", sensor="seviri", start_time=datetime(2015, 4, 20, 10, 0), base_dir="/home/a001673/data/satellite/Meteosat-10/seviri/lvl1.5/2015/04/20/HRIT") 
 #global_scene = Scene(platform_name="Meteosat-10", sensor="seviri", start_time=lastdate, base_dir="/data/cinesat/in/eumetcast1")
 #global_scene = Scene(platform_name="Meteosat-10", sensor="seviri", start_time=lastdate, reader="hrit_msg", basedir="/data/cinesat/in/eumetcast1/")  
 #global_scene = Scene(platform_name="Meteosat-9", sensor="seviri", reader="hrit_msg", start_time=lastdate)
+
+### there is no satellite in satpy !!!
+#from satpy.satellites import GeostationaryFactory
+#global_scene = GeostationaryFactory.create_scene("meteosat", "09", "seviri", time_slot)
+
+
+
 
 ## get some infos about the satellite data object
 print("========================")

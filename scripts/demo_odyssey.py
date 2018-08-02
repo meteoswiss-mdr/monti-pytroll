@@ -23,7 +23,7 @@ print(global_radar)
 #area="EuropeCanaryS95"
 area='EuropeOdyssey95'
 #europe = get_area_def(area)
-local_radar = global_radar.project(area)
+local_radar = global_radar.project(area, precompute=True)
 
 fill_value=None # transparent background 
 #fill_value=(1,1,1) # white background 

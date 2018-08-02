@@ -48,7 +48,7 @@ testfile="MSG3-SEVI-MSG15-0100-NA-20170326102740.340000000Z-20170326102757-12134
 #testfile="MSG2-SEVI-MSG15-0100-NA-20150531235918.139000000Z-20150531235936-1178986.nat"   # does not work, as number of column cant be devided by 4 
 
 if "zueub" in hostname:
-    data_dir = "/data/COALITION2/database/meteosat/native_test/"
+    data_dir = "/data/COALITION2/database/meteosat/radiance_nat/native_test/"
 elif "kesch" in hostname:
     if test_data:
         data_dir = "/scratch/hamann/"
@@ -73,7 +73,8 @@ filenames=[data_dir+testfile]
 
 print(filenames)
 
-global_scene = Scene(platform_name="Meteosat-9", sensor="seviri", reader=reader, filenames=filenames)
+#global_scene = Scene(platform_name="Meteosat-9", sensor="seviri", reader=reader, filenames=filenames)
+global_scene = Scene(sensor="seviri", reader=reader, filenames=filenames)
 
 #global_scene.load([0.6, 0.8, 10.8])
 global_scene.load(['overview'])
@@ -89,7 +90,7 @@ local_scene.save_dataset('overview', data_dir+'/overview_'+area+'.png')
 #print global_scene
 #print global_scene[0.6]
 
-#local_scene = global_scene.project("ccs4")
+#local_scene = global_scene.project("ccs4", precompute=True)
 
 # print global_scene.available_datasets()  ## does not work
 

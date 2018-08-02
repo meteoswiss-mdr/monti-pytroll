@@ -23,14 +23,14 @@ def get_colormap(colors, min_data, max_data):
     return colormap
 
 def show_image(data, dataname, save_png, colors="rainbow", min_data=None, max_data=None, title=None):
-    if min_data == None:
+    if min_data is None:
         min_data=data.min()
-    if max_data == None:
+    if max_data is None:
         max_data=data.max()
     img = trollimage(data, mode="L", fill_value=[0,0,0])
     colormap = get_colormap(colors, min_data, max_data)
     img.colorize(colormap)
-    if title != None:
+    if title is not None:
         title_color=(255,255,255)
         from PIL import ImageFont
         from PIL import ImageDraw 
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     #area="EuropeCanaryS95"
     area="ccs4"
     #area="germ"
-    data = global_data.project(area)
+    data = global_data.project(area, precompute=True)
 
     if True:
 

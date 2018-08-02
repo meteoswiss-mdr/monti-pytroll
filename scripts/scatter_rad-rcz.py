@@ -58,6 +58,8 @@ from postprocessing import postprocessing
 
 import products 
 
+import inspect
+
 #from mpop.utils import debug_on
 #debug_on() 
 
@@ -69,7 +71,7 @@ def scatter_rad_rcz(in_msg):
 
 
    # get date of the last SEVIRI observation
-   if in_msg.datetime == None:
+   if in_msg.datetime is None:
       in_msg.get_last_SEVIRI_date()
 
    yearS = str(in_msg.datetime.year)
@@ -82,7 +84,7 @@ def scatter_rad_rcz(in_msg):
    dateS=yearS+'-'+monthS+'-'+dayS
    timeS=hourS+'-'+minS
 
-   if in_msg.sat_nr==None:
+   if in_msg.sat_nr is None:
       in_msg.sat_nr=choose_msg(in_msg.datetime,in_msg.RSS)
 
    # check if PyResample is loaded
@@ -172,7 +174,7 @@ def scatter_rad_rcz(in_msg):
             if rgb.find(channel) != -1:                   # if a channel name (IR_108) is in the rgb name (IR_108c)
                if in_msg.verbose:
                   print "    load prerequisites by name: ", channel
-               if in_msg.reader_level == None:
+               if in_msg.reader_level is None:
                   global_data.load([channel], area_extent=area_loaded.area_extent)   # try all reader levels  load the corresponding data
                else:
                   global_data.load([channel], area_extent=area_loaded.area_extent, reader_level=in_msg.reader_level)  # load the corresponding data
@@ -193,7 +195,7 @@ def scatter_rad_rcz(in_msg):
          elif rgb in products.SPhR:
             pge = "SPhR"
          else:
-            print "*** Error in plot_msg (plot_msg.py)"
+            print "*** Error in scatter_rad_rcz ("+inspect.getfile(inspect.currentframe())+")"
             print "    unknown NWC-SAF PGE ", rgb
             quit()
          if in_msg.verbose:
@@ -262,7 +264,7 @@ def scatter_rad_rcz(in_msg):
          data = global_data.project(area)
          resolution='i'
 
-      if in_msg.mapResolution==None:
+      if in_msg.mapResolution is None:
          if area.find("EuropeCanary") != -1:
             resolution='l'
          if area.find("ccs4") != -1:
@@ -537,7 +539,7 @@ def scatter_rad_rcz(in_msg):
    
 
             # add colorscale
-            if in_msg.add_colorscale and in_msg.colormap[rgb] != None:
+            if in_msg.add_colorscale and in_msg.colormap[rgb] is not None:
 
                dc.align_right()
                dc.write_vertically()
@@ -716,7 +718,7 @@ def create_PIL_image(rgb, data, in_msg):
       #if rgb == 'ndvi':
       #   in_msg.colormap[rgb] = rdylgn_r
    else:
-      print "*** Error in create_PIL_image (plot_msg.py)"
+      print "*** Error in create_PIL_image ("+inspect.getfile(inspect.currentframe())+")"
       print "    unknown plot_type ", plot_type
       quit()
 

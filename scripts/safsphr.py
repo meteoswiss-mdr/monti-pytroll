@@ -37,7 +37,7 @@ prod = "SPhR"
 
 global_data.load([prod], calibrate=False)
 
-global_data = global_data.project("ccs4")
+global_data = global_data.project("ccs4", precompute=True)
 
 
 img = trollimage(global_data[prod].sphr_bl, mode="P",palette=global_data[prod].sphr_bl_palette)
@@ -90,7 +90,7 @@ del global_data
 
 global_data = GeostationaryFactory.create_scene("meteosat", "09", "seviri", time_slot)
 global_data.load(["SPhR"]) #, calibrate=False
-global_data = global_data.project("ccs4")
+global_data = global_data.project("ccs4", precompute=True)
 
 # no palette 
 img = trollimage(global_data[prod].sphr_tpw, mode="L") 

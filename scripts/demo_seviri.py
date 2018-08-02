@@ -18,7 +18,7 @@ print global_data
 
 area="EuropeCanaryS95"
 #area="ccs4"
-data = global_data.project(area)
+data = global_data.project(area, precompute=True)
 
 from trollimage.colormap import rainbow
 colormap = rainbow

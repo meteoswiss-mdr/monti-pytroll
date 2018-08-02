@@ -165,7 +165,7 @@ def plot_msg_minus_cosmo(in_msg):
                print "*** Reproject data to area: ", area, "(org projection: ",  area_loaded.name, ")"     
             obj_area = get_area_def(area)
             # PROJECT data to new area 
-            data = global_data.project(area)
+            data = global_data.project(area, precompute=True)
             resolution='i'
 
          if in_msg.parallax_correction:

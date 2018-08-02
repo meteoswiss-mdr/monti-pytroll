@@ -78,7 +78,7 @@ def figure_labels(labels, outputFile, timeObs, dt, area_plot="ccs4", add_name = 
     plt.contour(labels,[0.5],colors='y')
     #plt.imshow(labels, origin="lower")
     PIL_image = fig2img ( fig )
-    if add_name != None:
+    if add_name is not None:
           PIL_image.save(create_dir(outputFile)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_Forc"+hourSf+minSf+add_name+".png")
           path = (outputFile)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_Forc"+hourSf+minSf+add_name+".png"
     else:
@@ -95,7 +95,7 @@ def figure_labels(labels, outputFile, timeObs, dt, area_plot="ccs4", add_name = 
 #if __name__ == '__main__':
 def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None, BackgroundFile=None, ForeGroundRGBFile=None, labels_dir = '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/', in_msg = None):
     verbose = True
-    if t_stop == None:
+    if t_stop is None:
         t_stop = ttt
     
     ylabel = "area"
@@ -105,7 +105,7 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
         if verbose:
             print("******** read cell properties from shelve")
         
-        if current_labels == None:
+        if current_labels is None:
               yearS, monthS, dayS, hourS, minS = string_date(ttt)
               filename = 'Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)
               myShelve = shelve.open(filename)
@@ -133,7 +133,7 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
               # calculate backward history for 1 hour and save it in labels_dir
               ind, area, displacement, time, center = history_backward(ttt,  interesting_cell, True, in_msg, ttt-timedelta(hours = 1), labels_dir=labels_dir) #-timedelta(minutes = 10))
               #                                                        current time, cell_id, backward?   time_stop
-              if area == None or len(area)<=1:  
+              if area is None or len(area)<=1:  
                   if verbose:
                         print "new cell or cell with COM outside domain"
                   continue
@@ -351,7 +351,7 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
         t_composite = deepcopy(ttt)
         
         # merge coalition2 file with 
-        if ForeGroundRGBFile == None:
+        if ForeGroundRGBFile is None:
             currentRGB_im_filename = "/opt/users/"+getpass.getuser()+"/PyTroll/scripts/Mecikalski/cosmo/Channels/indicators_in_time/RGB_dam/"+yearS+monthS+dayS+"_"+hourS+minS+"*ccs4.png"
         else:
             currentRGB_im_filename = ForeGroundRGBFile
@@ -361,7 +361,7 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
             print "No file found:", currentRGB_im_filename
 
         # get background file 
-        if BackgroundFile == None:
+        if BackgroundFile is None:
             background_im_filename = '/data/COALITION2/PicturesSatellite/LEL_results_wind/'+yearS+'-'+monthS+'-'+dayS+'/RGB-HRV_dam/'+yearS+monthS+dayS+'_'+hourS+minS+'*.png'
         else:
             background_im_filename = BackgroundFile
@@ -394,7 +394,7 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
                   plt.imshow(np.flipud(data['IR_108'].data),cmap = pylab.gray())
         
         # background file form function argument or default
-        if BackgroundFile == None:
+        if BackgroundFile is None:
             background_im_filename = '/data/COALITION2/PicturesSatellite/LEL_results_wind/'+yearS+'-'+monthS+'-'+dayS+'/RGB-HRV_dam/'+yearS+monthS+dayS+'_'+hourS+minS+'*.png'
         else:
             if verbose:
@@ -468,7 +468,7 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
         standardOutputName = in_msg.standardOutputName.replace('%y%m%d%H%M',strftime('%y%m%d%H%M',ttt.timetuple()))
         
         #PIL_image.paste(img1, (0, 0), img1)
-        if in_msg == None:
+        if in_msg is None:
             PIL_image.save(create_dir(outputDir)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+".png")
             path = (outputDir)+yearS+monthS+dayS+hourS+minS+"Forecast.png"
         else:
@@ -507,7 +507,7 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
             if verbose:
                 print "path foreground", currentRGB_im[0]
             
-            if in_msg == None:
+            if in_msg is None:
                 path_composite = (outputFile)+yearS+monthS+dayS+"_Obs"+hourS+minS+"Forecast_composite.png"     
             else:
                 # dic_figure={}
@@ -581,7 +581,7 @@ cset1 = plt.contourf(X, Y, Z, levels,
     plt.contour(labels,[0.5],colors='y')
     #plt.imshow(labels, origin="lower")
     PIL_image = fig2img ( fig )
-    if add_name != None:
+    if add_name is not None:
           PIL_image.save(create_dir(outputDir)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_Forc"+hourSf+minSf+add_name+".png")
           path = (outputDir)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_Forc"+hourSf+minSf+add_name+".png"
     else:

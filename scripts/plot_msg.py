@@ -77,7 +77,7 @@ except NameError:
 def plot_msg(in_msg):
  
    # get date of the last SEVIRI observation
-   if in_msg.datetime == None:
+   if in_msg.datetime is None:
       in_msg.get_last_SEVIRI_date()
 
    yearS = str(in_msg.datetime.year)
@@ -90,7 +90,7 @@ def plot_msg(in_msg):
    dateS=yearS+'-'+monthS+'-'+dayS
    timeS=hourS+'-'+minS
 
-   if in_msg.sat_nr==None:
+   if in_msg.sat_nr is None:
       in_msg.sat_nr=choose_msg(in_msg.datetime,in_msg.RSS)
 
    area_loaded = choose_area_loaded_msg(in_msg.sat, in_msg.sat_nr, in_msg.datetime)  
@@ -196,7 +196,7 @@ def plot_msg(in_msg):
                print "*** Reproject data to area: ", area, "(org projection: ",  area_loaded.name, ")"     
             obj_area = get_area_def(area)
             # PROJECT data to new area 
-            data = global_data.project(area)
+            data = global_data.project(area, precompute=True)
             resolution='i'
 
 
@@ -320,7 +320,7 @@ def plot_msg(in_msg):
                      dc.add_logo(in_msg.logos_dir+"/EUMETSAT_logo2_tiny_white_square.png",height=height)  # height=60.0
 
                # add colorscale
-               if in_msg.add_colorscale and in_msg.colormap[rgb] != None:
+               if in_msg.add_colorscale and (in_msg.colormap[rgb] is not None):
                   if rgb in products.MSG_color:
                      unit = data[rgb.replace("c","")].info['units']
                   #elif rgb in products.MSG or rgb in products.NWCSAF or rgb in products.HSAF:
@@ -394,7 +394,7 @@ def plot_msg(in_msg):
                            print "... secure copy "+outputFile+ " to "+scpOutputDir
                         subprocess.call("scp "+in_msg.scpID+" "+outputFile+" "+scpOutputDir+" 2>&1 &", shell=True)
 
-               if in_msg.scpOutput and in_msg.scpID2 != None and in_msg.scpOutputDir2 != None:
+               if in_msg.scpOutput and (in_msg.scpID2 is not None) and (in_msg.scpOutputDir2 is not None):
                   if (rgb in in_msg.scpProducts2) or ('all' in [x.lower() for x in in_msg.scpProducts2 if type(x)==str]):
                      scpOutputDir2 = format_name (in_msg.scpOutputDir2, data.time_slot, area=area, rgb=rgb+parallax_correction_str, sat=data.satname, sat_nr=data.sat_nr() )
                      if in_msg.compress_to_8bit:
@@ -466,7 +466,7 @@ def load_products(data_object, RGBs, in_options, area_loaded, load_CTH=True):
             if rgb.find(channel) != -1:                   # if a channel name (IR_108) is in the rgb name (IR_108c)
                if in_options.verbose: 
                   print "    load prerequisites by name: ", channel, ", reader:", in_options.reader_level,"+++"
-               if in_options.reader_level == None:
+               if in_options.reader_level is None:
                   data_object.load([channel], area_extent=area_loaded.area_extent)   # try all reader levels  load the corresponding data
                else:
                   data_object.load([channel], area_extent=area_loaded.area_extent, reader_level=in_options.reader_level)  # load the corresponding data
@@ -475,7 +475,7 @@ def load_products(data_object, RGBs, in_options, area_loaded, load_CTH=True):
          obj_image = get_image(data_object, rgb)          # find corresponding RGB image object
          if in_options.verbose:
             print "    load prerequisites by function: ", obj_image.prerequisites
-         if in_options.reader_level == None:
+         if in_options.reader_level is None:
             data_object.load(obj_image.prerequisites, area_extent=area_loaded.area_extent)   # load prerequisites
          else:
             data_object.load(obj_image.prerequisites, area_extent=area_loaded.area_extent, reader_level=in_options.reader_level)  # load prerequisites
@@ -513,7 +513,7 @@ def load_products(data_object, RGBs, in_options, area_loaded, load_CTH=True):
          data_object.load([rgb])   # , area_extent=area_loaded.area_extent load the corresponding data
          area_loaded = data_object[rgb].area
 
-      if in_options.HRV_enhancement==True or in_options.HRV_enhancement==None:
+      if in_options.HRV_enhancement==True or in_options.HRV_enhancement is None:
          # load also the HRV channel (there is a check inside in the load function, if the channel is already loaded)
          if in_options.verbose:
             print "    load additionally the HRV channel for HR enhancement"
@@ -540,7 +540,7 @@ def choose_map_resolution(area, resolution, MapResolutionInputfile):
    ## l  low resolution: Another ~80 % reduction.                   
    ## c  crude resolution: Another ~80 % reduction.   
 
-   if MapResolutionInputfile == None:         # if the user did not specify the resolution 
+   if MapResolutionInputfile is None:         # if the user did not specify the resolution 
       if area.find("EuropeCanary") != -1: # make a somewhat clever choise  
          resolution='l'
       if area.find("ccs4") != -1:
@@ -831,15 +831,15 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
 def add_borders_and_rivers(PIL_image, cw, area_tuple, add_borders=True, border_color=None, add_rivers=False, river_color=None, verbose=True, resolution='c'):
 
    if PIL_image.mode == 'RGB' or PIL_image.mode == 'RGBA': 
-      if border_color==None:
+      if border_color is None:
          border_color='red'
-      if river_color==None:
+      if river_color is None:
          river_color='blue'
    elif PIL_image.mode == 'L':
       # replace input colors with white
-      if border_color==None:
+      if border_color is None:
          border_color = 'white'
-      if river_color==None:
+      if river_color is None:
          river_color  = 'white'
    else:
       print "*** Error in add_borders_and_rivers ("+inspect.getfile(inspect.currentframe())+")"
@@ -878,7 +878,7 @@ def indicate_mask(rgb, PIL_image, data, verbose):
       mask = get_box_mask(data, lat_min=25., lat_max=75., lon_min=-25., lon_max=45.5)
       #hsaf_merc == 28 75 -21.5 47.5
       
-   if mask != None:
+   if mask is not None:
       if verbose:
          print "    indicate measurement mask "
 
@@ -902,7 +902,7 @@ def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, verbose, 
    if verbose:
       print "*** add title to image "
 
-   if title_color==None:
+   if title_color is None:
       if PIL_image.mode == 'RGB' or PIL_image.mode == 'RGBA':    # color 
          title_color=(255,255,255)
          #title_color=(0,0,0)
@@ -935,7 +935,7 @@ def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, verbose, 
 
    rgb = rgb.replace("_","-")+day_str
 
-   if title == None:
+   if title is None:
       ## default title
       # if area is not Europe 
       if area.find("EuropeCanary") == -1:

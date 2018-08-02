@@ -79,7 +79,7 @@ def get_comp_filename(in_msg, comp_str, sat_nr, time_slot, area):
 def get_file_list(composite, in_msg, sat, sat_nr, time_slot, area, n=None):
 
     import products 
-    if n==None:
+    if n is None:
         rgb_list  = composite.split("-")
     else:
         rgb_list  = composite.split("-",n-1)
@@ -124,7 +124,7 @@ def n_file_composite(composite, in_msg, sat_nr, time_slot, area, bits_per_pixel=
     
     # get the filename of the last two files to compose  
     file_list = get_file_list(composite, in_msg, sat, sat_nr, time_slot, area, n=2)
-    if file_list == None:  # if not all files are found 
+    if file_list is None:  # if not all files are found 
         return composites_done   # return [] as error marker 
 
     # get result filename 
@@ -150,7 +150,7 @@ def n_file_composite(composite, in_msg, sat_nr, time_slot, area, bits_per_pixel=
                 print "/usr/bin/scp "+in_msg.scpID+" "+comp_file+" "+scpOutputDir+" 2>&1 &"
             subprocess.call("/usr/bin/scp "+in_msg.scpID+" "+comp_file+" "+scpOutputDir+" 2>&1 &", shell=True)
             
-    if in_msg.scpOutput and in_msg.scpID2 != None and in_msg.scpOutputDir2 != None:
+    if in_msg.scpOutput and (in_msg.scpID2 is not None) and (in_msg.scpOutputDir2 is not None):
         if (composite in in_msg.scpProducts2) or ('all' in [x.lower() for x in in_msg.scpProducts2 if type(x)==str]):
             scpOutputDir2 = format_name (in_msg.scpOutputDir2, time_slot, area=area, rgb=composite, sat=sat, sat_nr=sat_nr )
             if in_msg.compress_to_8bit:
@@ -336,7 +336,7 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
                             print "    /usr/bin/scp "+in_msg.scpID+" "+outfile+" "+scpOutputDir+" 2>&1 &"
                         subprocess.call("/usr/bin/scp "+in_msg.scpID+" "+outfile+" "+scpOutputDir+" 2>&1 &", shell=True)
 
-                if in_msg.scpOutput and in_msg.scpID2 != None and in_msg.scpOutputDir2 != None:
+                if in_msg.scpOutput and (in_msg.scpID2 is not None) and (in_msg.scpOutputDir2 is not None):
                     if (montage in in_msg.scpProducts2) or ('all' in [x.lower() for x in in_msg.scpProducts2 if type(x)==str]):
                         scpOutputDir2 = format_name (in_msg.scpOutputDir2, time_slot, area=area, rgb=montage_name, sat=in_msg.sat, sat_nr=sat_nr )
                         if in_msg.compress_to_8bit:

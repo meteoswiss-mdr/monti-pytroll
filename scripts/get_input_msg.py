@@ -116,7 +116,7 @@ class input_msg_class:
                         'precip':5,'precip_ir':5,'qa':2,'reff':2,'satz':2,'sds':10,'sds_cs':10,'sds_diff':10,'sds_diff_cs':10,\
                         'sunz':2,'sza':2,'lat':2,'lon':2,'time_offset':10,
                         'ot_anvilmean_brightness_temperature_difference':0.5,\
-                               'SYNMSG_BT_CL_IR10.8': 5,'MESHS':0.5}
+                        'SYNMSG_BT_CL_IR10.8': 5,'MESHS':0.5}
 
       self.postprocessing_areas     = []
       self.postprocessing_composite = []

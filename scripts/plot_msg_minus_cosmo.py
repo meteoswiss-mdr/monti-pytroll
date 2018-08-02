@@ -217,7 +217,7 @@ def plot_msg_minus_cosmo(in_msg):
          if in_msg.make_plots: 
  
             # choose map resolution 
-            in_msg.resolution = choose_map_resolution(area, resolution, in_msg.mapResolution) 
+            in_msg.resolution = choose_map_resolution(area, in_msg.mapResolution) 
 
             # define area
             proj4_string = obj_area.proj4_string            

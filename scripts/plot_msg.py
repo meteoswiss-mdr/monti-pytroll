@@ -255,7 +255,7 @@ def plot_msg(in_msg):
          if in_msg.make_plots: 
  
             # choose map resolution 
-            in_msg.resolution = choose_map_resolution(area, resolution, in_msg.mapResolution) 
+            in_msg.resolution = choose_map_resolution(area, in_msg.mapResolution) 
 
             # define area
             proj4_string = obj_area.proj4_string            
@@ -529,7 +529,7 @@ def load_products(data_object, RGBs, in_options, area_loaded, load_CTH=True):
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
 
-def choose_map_resolution(area, resolution, MapResolutionInputfile):
+def choose_map_resolution(area, MapResolutionInputfile):
 
    ## add coasts, borders, and rivers, database is heree 
    ## http://www.soest.hawaii.edu/pwessel/gshhs/index.html
@@ -543,10 +543,12 @@ def choose_map_resolution(area, resolution, MapResolutionInputfile):
    if MapResolutionInputfile == None:         # if the user did not specify the resolution 
       if area.find("EuropeCanary") != -1: # make a somewhat clever choise  
          resolution='l'
-      if area.find("ccs4") != -1:
+      elif area.find("ccs4") != -1:
          resolution='i' 
-      if area.find("ticino") != -1:
+      elif area.find("ticino") != -1:
          resolution='h'
+      else:
+         resolution='l'
    else:
       resolution = MapResolutionInputfile     # otherwise take specification of user 
 

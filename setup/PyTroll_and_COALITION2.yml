@@ -3,13 +3,10 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - ca-certificates=2018.4.16=0
-  - certifi=2018.4.16=py27_0
   - cloudpickle=0.5.3=py_0
   - decorator=4.3.0=py_0
   - imageio=2.3.0=py_1
   - networkx=2.1=py_1
-  - openssl=1.0.2o=h470a237_1
   - pywavelets=0.5.2=py27h7eb728f_2
   - scikit-image=0.14.0=py27hfc679d8_1
   - backports=1.0=py27_1
@@ -17,6 +14,8 @@ dependencies:
   - backports_abc=0.5=py27_0
   - blas=1.0=mkl
   - bzip2=1.0.6=h14c3975_5
+  - ca-certificates=2018.03.07=0
+  - certifi=2018.4.16=py27_0
   - cftime=1.0.0b1=py27h035aef0_0
   - curl=7.61.0=h84994c4_0
   - cycler=0.10.0=py27_0
@@ -62,6 +61,9 @@ dependencies:
   - numpy=1.15.0=py27h1b885b7_0
   - numpy-base=1.15.0=py27h3dfced4_0
   - olefile=0.45.1=py27_0
+  - openssl=1.0.2o=h14c3975_1
+  - pandas=0.23.3=py27h04863e7_0
+  - patsy=0.5.0=py27_0
   - pcre=8.42=h439df22_0
   - pillow=5.2.0=py27heded4f4_0
   - pip=10.0.1=py27_0
@@ -80,6 +82,7 @@ dependencies:
   - sip=4.19.8=py27hf484d3e_0
   - six=1.11.0=py27_1
   - sqlite=3.24.0=h84994c4_0
+  - statsmodels=0.9.0=py27h035aef0_0
   - subprocess32=3.5.2=py27h14c3975_0
   - tk=8.6.7=hc745277_3
   - toolz=0.9.0=py27_0
@@ -108,7 +111,6 @@ dependencies:
     - mpop==1.4.0
     - netifaces==0.10.7
     - osisaf-runner==0.0.1
-    - pandas==0.23.3
     - paramiko==2.4.1
     - posttroll==1.3.0
     - pps-runner==0.0.1

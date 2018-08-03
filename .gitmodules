@@ -9,7 +9,7 @@
 [submodule "packages/pyorbital"]
 	path = packages/pyorbital
 	url = https://github.com/meteoswiss-mdr/pyorbital.git
-	branch = master
+	branch = develop
 [submodule "packages/posttroll"]
 	path = packages/posttroll
 	url = https://github.com/pytroll/posttroll.git

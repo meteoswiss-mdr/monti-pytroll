@@ -22,7 +22,8 @@ set_conda_path() {
 #function set_conda_path {  # function syntax is not supported crontab
     case $HOSTNAME in
     "zueub"[2-4][0-9][0-9])
-	export CONDA_PATH="/opt/users/common/packages/anaconda3/" ;;
+	#export CONDA_PATH="/opt/users/common/packages/anaconda3/" ;;
+        export CONDA_PATH="/opt/users/common/packages/anaconda2_$LOGNAME/" ;;
     "keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
 	export CONDA_PATH="/store/msrad/utils/anaconda3/" ;;
     *)

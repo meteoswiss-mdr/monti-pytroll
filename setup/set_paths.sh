@@ -25,7 +25,7 @@ set_conda_path() {
 	#export CONDA_PATH="/opt/users/common/packages/anaconda3/" ;;
         export CONDA_PATH="/opt/users/common/packages/anaconda2_$LOGNAME/" ;;
     "keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
-	export CONDA_PATH="/store/msrad/utils/anaconda3/" ;;
+        export CONDA_PATH="/store/msrad/utils/anaconda3/" ;;
     *)
 	echo "ERROR in set_conda_path: unknown computer "$HOSTNAME
 	return ;;

@@ -370,7 +370,7 @@ def load_rgb(satellite, satellite_nr, satellites_name, time_slot, rgb, area, in_
       # load product, global_data is changed in this step!
       area_loaded = load_products(global_data_RGBforecast, [rgb], in_msg, area_loaded)
       print '... project data to desired area ', area
-      fns = global_data_RGBforecast.project(area)
+      fns = global_data_RGBforecast.project(area, precompute=True)
 
     else:
       fns = deepcopy(data_CTP["CTP"].data)  
@@ -663,7 +663,7 @@ if __name__ == '__main__':
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
           #area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
           area_loaded = load_products(global_data_CTP, ['CTP'], in_msg, get_area_def("ccs4"))
-          data_CTP = global_data_CTP.project(area)
+          data_CTP = global_data_CTP.project(area, precompute=True)
               
           [nx,ny]=data_CTP['CTP'].data.shape
 
@@ -673,7 +673,7 @@ if __name__ == '__main__':
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
           area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
           area_loaded = load_products(global_data, rgbs, in_msg, area_loaded)
-          data = global_data.project(area)
+          data = global_data.project(area, precompute=True)
 
           # check if all needed channels are loaded
           #for rgb in rgbs:

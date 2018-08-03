@@ -43,7 +43,7 @@ from os.path import dirname, exists
 from os import makedirs
 import subprocess
 from mpop.projector import get_area_def
-
+from plot_msg import choose_map_resolution
 
 from PIL import Image
 from trollimage.image import Image as trollimage
@@ -202,8 +202,8 @@ def plot_msg(in_msg):
             print "*** Reproject data to area: ", area, "(org projection: ",  area_loaded.name, ")"     
          obj_area = get_area_def(area)
          # PROJECT data to new area 
-         data    = global_data.project(area)
-         data_m1 = global_data_m1.project(area)
+         data    = global_data.project(area, precompute=True)
+         data_m1 = global_data_m1.project(area, precompute=True)
          resolution='i'
 
       loaded_products = [chn.name for chn in data.loaded_channels()]
@@ -251,7 +251,7 @@ def plot_msg(in_msg):
       if in_msg.make_plots:
       
          # choose map resolution 
-         resolution = choose_map_resolution(area, resolution, in_msg.mapResolution)
+         resolution = choose_map_resolution(area, in_msg.mapResolution)
 
          # define area
          proj4_string = obj_area.proj4_string            
@@ -435,28 +435,28 @@ def load_products(data_object, RGBs, in_msg, area_loaded):
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
 
-def choose_map_resolution(area, resolution, MapResolutionInputfile):
-
-   ## add coasts, borders, and rivers, database is heree 
-   ## http://www.soest.hawaii.edu/pwessel/gshhs/index.html
-   ## possible resolutions                                          
-   ## f  full resolution: Original (full) data resolution.          
-   ## h  high resolution: About 80 % reduction in size and quality. 
-   ## i  intermediate resolution: Another ~80 % reduction.          
-   ## l  low resolution: Another ~80 % reduction.                   
-   ## c  crude resolution: Another ~80 % reduction.   
-
-   if MapResolutionInputfile == None:         # if the user did not specify the resolution 
-      if area.find("EuropeCanary") != -1: # make a somewhat clever choise  
-         resolution='l'
-      if area.find("ccs4") != -1:
-         resolution='i' 
-      if area.find("ticino") != -1:
-         resolution='h'
-   else:
-      resolution = MapResolutionInputfile     # otherwise take specification of user 
-
-   return resolution 
+#def choose_map_resolution(area, resolution, MapResolutionInputfile):
+#
+#   ## add coasts, borders, and rivers, database is heree 
+#   ## http://www.soest.hawaii.edu/pwessel/gshhs/index.html
+#   ## possible resolutions                                          
+#   ## f  full resolution: Original (full) data resolution.          
+#   ## h  high resolution: About 80 % reduction in size and quality. 
+#   ## i  intermediate resolution: Another ~80 % reduction.          
+#   ## l  low resolution: Another ~80 % reduction.                   
+#   ## c  crude resolution: Another ~80 % reduction.   
+#
+#   if MapResolutionInputfile == None:         # if the user did not specify the resolution 
+#      if area.find("EuropeCanary") != -1: # make a somewhat clever choise  
+#         resolution='l'
+#      if area.find("ccs4") != -1:
+#         resolution='i' 
+#      if area.find("ticino") != -1:
+#         resolution='h'
+#   else:
+#      resolution = MapResolutionInputfile     # otherwise take specification of user 
+#
+#   return resolution 
 
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------

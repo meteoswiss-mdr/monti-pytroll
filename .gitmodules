@@ -122,3 +122,7 @@
 	path = packages/pygranule
 	url = https://github.com/pytroll/pygranule.git
 	branch = master
+[submodule "packages/aggdraw"]
+	path = packages/aggdraw
+	url = https://github.com/pytroll/aggdraw.git
+	branch = master

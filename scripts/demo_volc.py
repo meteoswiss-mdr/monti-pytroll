@@ -26,7 +26,7 @@ print global_data
 #area="SeviriDiskFull00S4"
 area="EuropeCanaryS95"
 #area="Etna"
-data = global_data.project(area)
+data = global_data.project(area, precompute=True)
 #data = global_data
 
 from trollimage.colormap import rainbow

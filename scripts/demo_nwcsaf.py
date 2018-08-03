@@ -69,7 +69,7 @@ convert_NWCSAF_to_radiance_format(global_data, None, prop, nwcsaf_calibrate, IS_
 
 # project data to anther projection defined in etc/area.def
 #area = get_area_def("euro")
-data = global_data.project(area)
+data = global_data.project(area, precompute=True)
 
 from trollimage.colormap import rainbow
 colormap = rainbow

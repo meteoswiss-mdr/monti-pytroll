@@ -314,7 +314,7 @@ if __name__ == '__main__':
     area='ccs4'
 
     print '... project data to desired area ', area
-    data = global_data.project(area)
+    data = global_data.project(area, precompute=True)
     data2 = deepcopy(data)
 
     print '... calculate gridded 2d wind field' 

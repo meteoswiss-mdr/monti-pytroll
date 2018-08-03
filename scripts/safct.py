@@ -34,7 +34,7 @@ print global_data
 
 prod = "CloudType"
 
-global_data = global_data.project("ccs4")
+global_data = global_data.project("ccs4", precompute=True)
 
 img = trollimage(global_data[prod].cloudtype, mode="P",palette=global_data[prod].cloudtype_palette)
 

@@ -141,7 +141,7 @@ if hasattr(global_data[prop_str], 'product_name'):
 if prop_str == 'h03':
     # PROJECT data to new area 
     area='ccs4'
-    data = global_data.project(area)
+    data = global_data.project(area, precompute=True)
     data[prop_str].product_name = global_data[prop_str].product_name
     data[prop_str].units = global_data[prop_str].units
     global_data = data

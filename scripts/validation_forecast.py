@@ -68,7 +68,7 @@ def validation_forecast(cell, t, t_end, in_msg, history_correction):####LEL#vali
                 history108.append(ind[2])
                 break
     
-        if area == None or len(area)<=1:  
+        if area is None or len(area)<=1:  
             print "The cell is outside of the area of interest or the history is not long enough (less than 1 timestep)"
         print "starting forecasts"    
         if len(area)<=3:

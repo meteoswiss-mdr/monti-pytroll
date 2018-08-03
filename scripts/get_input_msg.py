@@ -116,7 +116,7 @@ class input_msg_class:
                         'precip':5,'precip_ir':5,'qa':2,'reff':2,'satz':2,'sds':10,'sds_cs':10,'sds_diff':10,'sds_diff_cs':10,\
                         'sunz':2,'sza':2,'lat':2,'lon':2,'time_offset':10,
                         'ot_anvilmean_brightness_temperature_difference':0.5,\
-                               'SYNMSG_BT_CL_IR10.8': 5,'MESHS':0.5}
+                        'SYNMSG_BT_CL_IR10.8': 5,'MESHS':0.5}
 
       self.postprocessing_areas     = []
       self.postprocessing_composite = []
@@ -152,7 +152,7 @@ class input_msg_class:
          quit()
 
    def update_datetime(self, year, month, day, hour, minute):
-      if year != None and month != None and day != None and hour != None and minute != None: 
+      if (year is not None) and (month is not None) and (day is not None) and (hour is not None) and (minute is not None): 
          self.datetime = datetime(year, month, day, hour, minute, 0)
       else:
          print "*** WARNING: cannot update time!"
@@ -343,7 +343,7 @@ class input_msg_class:
             default_settings = global_settings
 
          for key, value in chosen_settings.iteritems():
-            if value == None:
+            if value is None:
                chosen_settings[key] = deepcopy(default_settings[key])
 
       if scale == "broad":
@@ -433,7 +433,7 @@ def get_date_and_inputfile_from_commandline(print_usage=None):
       # check for more arguments 
       if len(sys.argv) > 2:
          if len(sys.argv) < 7:
-            if print_usage==None:
+            if print_usage is None:
                   print "*** Error, not enough command line arguments"
             else:
                print_usage()
@@ -451,7 +451,7 @@ def get_date_and_inputfile_from_commandline(print_usage=None):
    in_msg = get_input_msg(input_file)
 
    # initialize datetime, if not yet done in the input file 
-   if in_msg.datetime==None:
+   if in_msg.datetime is None:
       # choose timeslot of the satellite picture to process
       # datetime according to command line arguments (if given)
       # otherwise the latest possible time of SEVIRI observation (depends on RSS mode and chosen delay)
@@ -552,7 +552,7 @@ def parse_commandline_and_read_inputfile(input_file=None):
    (options, args) = parse_commandline()
 
    # first obligatory argument is the input file (or as optional argument)
-   if input_file==None:
+   if input_file is None:
       input_file = args[0]
 
    # skip the '.py' at the end of the input filename
@@ -563,7 +563,7 @@ def parse_commandline_and_read_inputfile(input_file=None):
    
    print '*** overwrite options of the input_file with command line arguments'
    for opt, value in options.__dict__.items():
-      if value != None:
+      if value is not None:
          if opt!='date':
             print '...', opt, ' = ', value
             setattr(in_msg, opt, value)
@@ -571,7 +571,7 @@ def parse_commandline_and_read_inputfile(input_file=None):
             in_msg.update_datetime(options.date[0],options.date[1],options.date[2],options.date[3],options.date[4])
             
    # initialize datetime, if not yet done per command line comment or in the input file 
-   if in_msg.datetime==None:
+   if in_msg.datetime is None:
       # choose timeslot of the latest possible satellite picture 
       # depends on RSS mode and chosen delay == input: in_msg.rss and in_msg.delay
       # also sets the near real time marker: in_msg.nrt

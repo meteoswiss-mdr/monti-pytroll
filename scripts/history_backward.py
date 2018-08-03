@@ -97,7 +97,7 @@ def make_figureLabels(values, all_cells, obj_area, outputFile, colorbar = True, 
     fig, ax = prepare_figure(obj_area) 
     
     mappable = plt.imshow(np.flipud(values), vmin = vmin, vmax = vmax, origin="lower")
-    if center!=None:
+    if center is not None:
             x = center[0]
             y = center[1]
             plt.scatter(int(y),int(values.shape[0]-x), color = 'y',s=15)
@@ -651,7 +651,7 @@ def history_backward(time1, id_interesting_cell, backward, in_msg, t_stop = None
         
         # comment what exactly is t_startDay and t_stopDay !HAU!
         if backward:
-            if t_stop != None:
+            if t_stop is not None:
                 t_startDay = t_stop 
             else:
                 # t_startDay might be undefined !HAU!
@@ -665,7 +665,7 @@ def history_backward(time1, id_interesting_cell, backward, in_msg, t_stop = None
         else:
             t_startDay = deepcopy(time1) - timedelta(minutes = 5)
             
-            if t_stop != None:
+            if t_stop is not None:
                 t_stopDay = t_stop
             else:
                 # default stop time is 19:00 UTC
@@ -682,7 +682,7 @@ def history_backward(time1, id_interesting_cell, backward, in_msg, t_stop = None
         # add some information from the shelve to the data_container
         string_id, data_container = get_info_current_time(time1, data_container, labels_dir)
         
-        if string_id == None:
+        if string_id is None:
             return None, None, None, None, None
         
         labels_id = np.unique(data_container['all_labels'][string_id])
@@ -1064,7 +1064,7 @@ def plot_results_history(t1, value1, label1, t2, value2, label2, t3, value3, lab
                          time1, variable, interesting_cell, 
                          times = None, split = None, merge = None):
     
-    if times != None:
+    if times is not None:
         minimum_data = min(min(value1),min(value2),min(value3))
         val_to_subtract = (max(max(value1),max(value2),max(value3)) - minimum_data)/15
         min_value_split = [minimum_data - val_to_subtract]
@@ -1082,7 +1082,7 @@ def plot_results_history(t1, value1, label1, t2, value2, label2, t3, value3, lab
     ax.plot_date(t1,value1, "*", markeredgewidth=1,markeredgecolor='red',markerfacecolor = 'None',label=label1)           
     ax.plot_date(t2,value2, "^", markeredgewidth=1,markeredgecolor='magenta',markerfacecolor = 'None',label=label2)  
     ax.plot_date(t3, value3, 'o',markeredgewidth=1,markeredgecolor='black', markerfacecolor = 'None',label=label3)           
-    if times != None:
+    if times is not None:
         ax.plot_date(t_split, min_value_split*t_split.size, 'o',markersize = 4, color = "cyan",label="Split")
         ax.plot_date(t_merge, min_value_merge*t_merge.size, 'o',markersize = 4, color = "blue",label="Merge")
     

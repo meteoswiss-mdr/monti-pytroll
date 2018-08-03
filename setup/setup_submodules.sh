@@ -64,6 +64,9 @@ git submodule foreach -q --recursive 'branch="$(git config -f $toplevel/.gitmodu
 echo "Does this look good? (press enter to continue or CTRL+c to abort)"
 read junk
 
+which conda
+echo "Is the correct anaconda activated? (press enter to continue or CTRL+c to abort)"
+read junk
 
 echo ""
 echo "*** Activate virtual environment " PyTroll_$LOGNAME
@@ -94,9 +97,10 @@ do
     echo "*** install"  $pack " with branch " ${branches[$pack]} " from repository " ${repositories[$pack]}
     echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     cd $PYTROLLHOME
-
+    
     cd packages/$pack
-
+    export USE_CYTHON=True
+    
     # For pygrib specify libraries in the setup.cfg
     if [ "$pack" == "pygrib" ]
     then

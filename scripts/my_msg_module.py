@@ -551,6 +551,9 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
     ## currently no check for overshooting tops
     if in_msg.sat == "msg-ot":
        return in_msg.RGBs
+       ## currently no check for cosmo data
+    if in_msg.sat == "cosmo":
+       return in_msg.RGBs
 
     ## check all RGBs, if not some are defined explecitly
     if RGBs is None:
@@ -560,6 +563,10 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
     if type(RGBs) is str:
         RGBs = [RGBs]
 
+    needed_input=deepcopy(RGBs)
+    if in_msg.parallax_correction:
+        needed_input.append('CTH')
+        
     rgb_complete=[]
     channels_complete=[False,False,False,False,False,False,False,False,False,False,False,False]
     pro_file_checked=False
@@ -567,7 +574,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
     print "... read config file ", os.path.join(CONFIG_PATH, fullname + ".cfg")
     print "... use satellite "+in_msg.sat_str()
 
-    for rgb in RGBs:
+    for rgb in needed_input:
 
         if in_msg.verbose:
             print "... check input for ", rgb
@@ -811,6 +818,11 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
             if len(glob.glob(filename)) == 0:
                 if in_msg.verbose:
                     print "*** Warning, no NWC SAF file found: "+filename
+
+                # if parallax correction is desired and there is not CTH,
+                # tell main program that no images can be produced
+                if in_msg.parallax_correction and rgb=='CTH':
+                    return []
             else:
                 print "    NWC SAF file found: "+glob.glob(filename)[0]
                 rgb_complete.append(rgb)

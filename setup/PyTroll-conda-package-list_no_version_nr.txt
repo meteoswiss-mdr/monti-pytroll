@@ -32,6 +32,7 @@ decorator
 docutils
 dynd-python
 enum34
+ephem
 fastcache
 flask
 fontconfig

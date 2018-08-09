@@ -31,7 +31,14 @@ export https_proxy=https://proxy.meteoswiss.ch:8080
 
 # add Anaconda directory to the path and check, if it is installed
 source set_paths.sh  # load functions from this script
-set_conda_path
+#set_conda_path
+echo "rechange conda"
+export CONDA_PATH="/opt/users/common/packages/anaconda2_$LOGNAME/"
+conda -V
+which conda
+which python
+conda config --set ssl_verify false
+read junk
 
 #echo "*** Update anaconda itself"
 #conda update conda
@@ -43,8 +50,9 @@ read junk
 
 echo "*** Create virtual environement PyTroll_${LOGNAME} and install python packages according to PyTroll-conda-package-list.txt"
 echo "=========================================================================================================================="
-conda create -n PyTroll_${LOGNAME} python=2.7 --copy --file PyTroll-conda-package-list_no_version_nr.txt  # _${LOGNAME}
+##conda create -n PyTroll_${LOGNAME} python=2.7 --copy --file PyTroll-conda-package-list_no_version_nr.txt  # _${LOGNAME}
 ### !!! without copy conda does not create shaired library files !!!
+conda create -n PyTroll_${LOGNAME} --copy python=2.7 numpy ephem
 echo "Could you create the virtual environment? (press enter to continue or CTRL+c to abort)"
 read junk
 
@@ -53,7 +61,7 @@ echo "*** Activate virtual environment" PyTroll_${LOGNAME}
 source activate PyTroll_${LOGNAME}
 echo "Is the virtual environment active? (press enter to continue or CTRL+c to abort)"
 read junk
-echo "*** Make sure a few packages are really really installed" PyTroll_${LOGNAME}
+echo "*** Make sure a few packages are really (really!) installed" PyTroll_${LOGNAME}
 conda install netcdf4
 conda install h5py
 conda install hdf5
@@ -63,7 +71,7 @@ echo ""
 echo "*** Installation of additional packages with pip (inside the virtual env)"
 echo "========================================================================="
 echo ""
-pip install --trusted-host pypi.python.org -r PyTroll-pip-requirements_no_version_nr.txt  #_${LOGNAME}
+#pip install --trusted-host pypi.python.org -r PyTroll-pip-requirements_no_version_nr.txt  #_${LOGNAME}
 echo "Does the installation look fine? (press enter to continue or CTRL+c to abort)"
 read junk
 
@@ -71,37 +79,41 @@ source set_paths.sh  # load functions from this script
 set_utils_path
 export INSTALL_DIR=$UTILS_PATH/packages/
 
-#echo ""
-#echo "*** Install basemap (inside the virtual env)"
-#echo "============================================"
-cd $INSTALL_DIR/basemap
-## specify preinstalled GEOS_DIR library directory
-export GEOS_DIR=$INSTALL_DIR/basemap/GEOS-3.3.3
-## install basemap
-python setup.py install
-echo "did the installation of basemap work fine? (press enter to continue or CTRL+c to abort)"
-read junk
+# INSTALLATION OF BASEMAP REQUIRES A LOT OF DOWNGRADES OF OTHER PACKAGES, WE SKIP IT
+##echo ""
+##echo "*** Install basemap (inside the virtual env)"
+##echo "============================================"
+#cd $INSTALL_DIR/basemap
+### specify preinstalled GEOS_DIR library directory
+#export GEOS_DIR=$INSTALL_DIR/basemap/GEOS-3.3.3
+### install basemap
+#python setup.py install
+#echo "did the installation of basemap work fine? (press enter to continue or CTRL+c to abort)"
+#read junk
  
 
 echo ""
 echo "*** Install pygrib (inside the virtual env)"
 echo "============================================"
 cd $INSTALL_DIR/pygrib
-# install pygrib (note jasper and grib_api libraries were already installed
-#                 and setup.cfg was modified accordingly on zueub428)
+# install pygrib
+# Note: jasper and grib_api libraries have to be already installed
+#       and setup.cfg has to be modified accordingly
+# Note: pygrib has to be build before virtual env is activated
 python setup.py install
-##### works now automatically and also installs the package: ecmwf_grib
-####conda install -c conda-forge pygrib   ## very unfortunately in conflict with PIL
+###### works now automatically and also installs the package: ecmwf_grib
+#####conda install -c conda-forge pygrib   ## very unfortunately in conflict with PIL
 echo "Did the installation of pygrib work fine? (press enter to continue or CTRL+c to abort)"
 read junk
 
-echo ""
-echo "*** Install aggdraw (inside the virtual env)"
-echo "============================================"
-cd $INSTALL_DIR/aggdraw
-python setup.py install
-echo "Did the installation of aggdraw work fine? (press enter to continue or CTRL+c to abort)"
-read junk
+# !!! THIS IS NOW A PYTROLL PACKAGE. Hence, it is installed as submodule!
+#echo ""
+#echo "*** Install aggdraw (inside the virtual env)"
+#echo "============================================"
+#cd $INSTALL_DIR/aggdraw
+#python setup.py install
+#echo "Did the installation of aggdraw work fine? (press enter to continue or CTRL+c to abort)"
+#read junk
 
 echo ""
 echo "*** Deactivate virtual environment"

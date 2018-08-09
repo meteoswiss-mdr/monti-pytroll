@@ -5,7 +5,7 @@ def particles_displacement(u_func, v_func,method,dt,pts,size_x,size_y,wind_sourc
     import numpy as np
     from matplotlib import mlab
     from scipy import integrate
-        
+    from math import floor        
     
     def euler(f, pts, dt):
         vel = np.asarray([f(xy) for xy in pts])
@@ -36,8 +36,8 @@ def particles_displacement(u_func, v_func,method,dt,pts,size_x,size_y,wind_sourc
             """Return (u, v) velocities for given (x, y) coordinates."""
             # Dummy `t` variable required to work with integrators
             # Must return a list (not a tuple) for scipy's integrate functions.
-            x_px=(xy[0]//size_x)
-            y_px=(xy[1]//size_y)
+            x_px=int(floor(xy[0]//size_x))    # floor is equivalent to using float as index in old python
+            y_px=int(floor(xy[1]//size_y))    # floor is equivalent to using float as index in old python
             
             if x_px<u_func.shape[0] and y_px<u_func.shape[1] and x_px>=0 and y_px>=0:
                 return [u_func[x_px,y_px], v_func[x_px,y_px]]

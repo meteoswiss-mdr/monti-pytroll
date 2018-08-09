@@ -4,7 +4,7 @@ import logging
 #sys.path.insert(0, "/home/lom/users/cll/pytroll/install/lib/python2.6/site-packages")
 from mpop.satellites import GeostationaryFactory
 from mpop.projector import get_area_def
-from mpop.satin.lightning import unfold_lightning
+from mpop.satin.swisslightning import unfold_lightning
 from math import pi
 from pyresample import plot
 #from trollimage.colormap import rainbow, purples, prgn, pubugn, brbg, piyg, spectral, greens, greens2
@@ -160,7 +160,7 @@ if unfold_lightning:
     ### !!! pixel_size_x != pixel_size_y !!!
     ### !!! pixel_size_x not constant over image !!!
     dpixel = dx / obj_area.pixel_size_x  
-
+    
     form = 'gauss'
     # expand the area of the lightning to +- dx km depending on the form
     prop     = unfold_lightning(prop, dpixel, form)             
@@ -169,9 +169,6 @@ if unfold_lightning:
     #curr_abs = unfold_lightning(curr_abs.data, dpixel, form)
     #curr_neg = unfold_lightning(curr_neg.data, dpixel, form)
     #curr_pos = unfold_lightning(curr_neg.data, dpixel, form)
-
-    # define the non-data values 
-    prop.mask = (prop == 0)
 
     if form == 'circle':
         dArea =  pi*dx/1000.*dx/1000.

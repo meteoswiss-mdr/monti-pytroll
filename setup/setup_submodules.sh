@@ -17,10 +17,14 @@
 # set paths for anaconda (again, for security)
 #. ./setup_anaconda_zueub428.sh
 
+# ATTENTION: The order of the packages needs to be optimized!!!
+#            when installing with setup.py develop, requirements with be installed without develop option
+#            even other Pytroll packages (and this we dont link!) 
+#            SO CHECK THE EASY-INSTALL file after installation   
 #export packages="aggdraw pygrib pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate"
 #export packages="pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate satpy"
-export packages='pykdtree pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate satpy pytroll-collectors trollflow-sat trollflow trollbufr trollmoves pytroll-examples pytroll-cspp-runner pytroll-pps-runner pytroll-aapp-runner pygac pyninjotiff pytroll-product-filter pytroll-modis-runner pytroll-osisaf-runner python-bufr pytroll-db pygranule'
-
+export packages='pykdtree pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate satpy pytroll-collectors trollflow-sat trollflow trollbufr trollmoves pytroll-examples pytroll-cspp-runner pytroll-pps-runner pytroll-aapp-runner pygac pyninjotiff pytroll-product-filter pytroll-modis-runner pytroll-osisaf-runner python-bufr pygranule'
+#pytroll-db is not recommended by Martin R.
 
 declare -A branches
 branches=( ["aggdraw"]="master" ["pygrib"]="master" ["pykdtree"]="master" ["pyresample"]="master" ["pycoast"]="master"  \

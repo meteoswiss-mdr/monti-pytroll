@@ -44,7 +44,6 @@ import shelve
 from trollimage.colormap import rainbow
 from trollimage.image import Image as trollimage
 
-from skimage import morphology
 from scipy import ndimage
 from my_msg_module import check_input
 #from astropy.convolution import MexicanHat2DKernel
@@ -1080,10 +1079,12 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
       
                     not_cirrus = np.where(cirrus == 1,0,1)
                     mask = np.logical_and( mask, not_cirrus )
-                    
+
+                
                           
                 if chosen_settings['clean_mask'] == 'skimage':
                     if in_msg.show_clouds != 'all':
+                        from skimage import morphology
                         mask = morphology.remove_small_objects(mask, min_cloud) #,connectivity=2)
                         mask = morphology.remove_small_objects(~mask, max_holes)
                         mask = deepcopy(~mask)
@@ -1095,6 +1096,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                         mask = ndimage.binary_closing(mask)  
                 elif chosen_settings['clean_mask'] == 'both':
                     if in_msg.show_clouds != 'all':
+                        from skimage import morphology
                         mask = morphology.remove_small_objects(mask, min_cloud) #,connectivity=2)
                         mask = morphology.remove_small_objects(~mask, max_holes)                            
                         # Remove small white regions

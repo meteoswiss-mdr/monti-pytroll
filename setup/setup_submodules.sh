@@ -17,9 +17,13 @@
 # set paths for anaconda (again, for security)
 #. ./setup_anaconda_zueub428.sh
 
+# ATTENTION: The order of the packages needs to be optimized!!!
+#            when installing with setup.py develop, requirements with be installed without develop option
+#            even other Pytroll packages (and this we dont link!) 
+#            SO CHECK THE EASY-INSTALL file after installation   
 #export packages="aggdraw pygrib pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate"
 #export packages="pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate satpy"
-export packages='pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate satpy pytroll-collectors trollflow-sat trollflow trollbufr trollmoves pytroll-examples pytroll-cspp-runner pytroll-pps-runner pytroll-aapp-runner pygac pyninjotiff pykdtree pytroll-product-filter pytroll-modis-runner pytroll-osisaf-runner python-bufr pygranule'
+export packages='pykdtree pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate satpy pytroll-collectors trollflow-sat trollflow trollbufr trollmoves pytroll-examples pytroll-cspp-runner pytroll-pps-runner pytroll-aapp-runner pygac pyninjotiff pytroll-product-filter pytroll-modis-runner pytroll-osisaf-runner python-bufr pygranule'
 #pytroll-db is not recommended by Martin R.
 
 declare -A branches
@@ -59,11 +63,14 @@ echo ""
 echo "*** Checkout branches of PyTroll modules (... git checkout $branch, in order to avoid the detached head state)"
 echo "=============================================================================================================="
 # use this line for the first time to specify the branch
-git submodule foreach -q --recursive 'branch="$(git config -f $toplevel/.gitmodules submodule.$name.branch)"; git checkout $branch'
-#git submodule foreach -q --recursive git pull 
+git submodule foreach -q --recursive 'branch="$(git config -f $toplevel/.gitmodules submodule.$name.branch)"; path="$(git config -f $toplevel/.gitmodules submodule.$name.path)"; echo $path; git checkout $branch'
+#git submodule foreach -q --recursive 'path="$(git config -f $toplevel/.gitmodules submodule.$name.path)"; echo $path; git pull'
 echo "Does this look good? (press enter to continue or CTRL+c to abort)"
 read junk
 
+which conda
+echo "Is the correct anaconda activated? (press enter to continue or CTRL+c to abort)"
+read junk
 
 echo ""
 echo "*** Activate virtual environment " PyTroll_$LOGNAME
@@ -94,9 +101,10 @@ do
     echo "*** install"  $pack " with branch " ${branches[$pack]} " from repository " ${repositories[$pack]}
     echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     cd $PYTROLLHOME
-
+    
     cd packages/$pack
-
+    export USE_CYTHON=True
+    
     # For pygrib specify libraries in the setup.cfg
     if [ "$pack" == "pygrib" ]
     then

@@ -61,7 +61,7 @@ print "... load sat data"
 glbd.load(['VIS006','VIS008','IR_016','IR_039','IR_108','IR_134'], area_extent=europe.area_extent)
 #area="EuropeCanaryS95"
 area="EuroMercator" # blitzortung projection
-local_data = glbd.project(area)
+local_data = glbd.project(area, precompute=True)
 
 print "... read responce functions"
 from pyspectral.near_infrared_reflectance import Calculator

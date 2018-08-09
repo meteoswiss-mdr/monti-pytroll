@@ -1,4 +1,4 @@
-def input(in_msg, timeslot=None, delay=None):
+def input(in_msg):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -27,13 +27,7 @@ def input(in_msg, timeslot=None, delay=None):
     # choose specification, if you want a default time without command line arguments 
     # (the specified time is overwritten by the command line arguments of plot_msg.py)
     #------------------------------------------------------------------------
-    if True:
-        # choose timeslot of the satellite picture to process
-        # datetime according to command line arguments (if given)
-        # otherwise the last possible time of SEVIRI observation (depends on RSS mode and chosen delay)
-        # also sets the near real time marker: in_msg.nrt 
-        in_msg.init_datetime(timeslot=timeslot)
-    else:
+    if False:
         # offline mode (always a fixed time) # ignores command line arguments
         year=2015
         month=2
@@ -43,6 +37,10 @@ def input(in_msg, timeslot=None, delay=None):
         in_msg.update_datetime(year, month, day, hour, minute)
         # !!!  if archive is used, adjust meteosat09.cfg accordingly !!!
 
+    # near real time or offline (will be overwritten depending on the date) ###changed: should know, based on the date, where to look for things!!!
+    in_msg.nrt = False
+    #in_msg.nrt = True 
+        
     in_msg.no_NWCSAF = False
 
     #----------------

@@ -1,5 +1,5 @@
 
-def input(in_msg, timeslot=None, delay=None):
+def input(in_msg):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -19,13 +19,7 @@ def input(in_msg, timeslot=None, delay=None):
     # last Rapid Scan Service picture 2015-05-31 12:25 UTC (Scan start) 
     in_msg.delay=5
 
-    if True:
-        # choose timeslot of the satellite picture to process
-        # datetime according to command line arguments (if given)
-        # otherwise the last possible time of SEVIRI observation (depends on RSS mode and chosen delay)
-        # also sets the near real time marker: in_msg.nrt 
-        in_msg.init_datetime(timeslot=timeslot)
-    else:
+    if False:
         # offline mode (always a fixed time) # ignores command line arguments
         year=2015
         month=2
@@ -125,7 +119,7 @@ def input(in_msg, timeslot=None, delay=None):
     in_msg.RGBs.append('CTH')
     #in_msg.RGBs.append('CTP')
     ## NWC SAF PEG 4
-    in_msg.RGBs.append('CRR')
+    #in_msg.RGBs.append('CRR')
     ## NWC SAF PEG 5
     #in_msg.RGBs.append('PC')
     ## NWC SAF PEG 13 
@@ -158,7 +152,7 @@ def input(in_msg, timeslot=None, delay=None):
     #in_msg.RGBs.append('SPhR_TPW')     # old format
     ## NWC SAF PEG 14
     #in_msg.RGBs.append('PCPh')
-    in_msg.RGBs.append('CRPh')
+    #in_msg.RGBs.append('CRPh')
     #-------------------
     # H-SAF
     #-------------------
@@ -201,8 +195,8 @@ def input(in_msg, timeslot=None, delay=None):
     in_msg.scpOutput=True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
-    in_msg.scpID="-i /opt/users/$LOGNAME/monti-pytroll/scripts/id_rsa_las"
-    in_msg.scpOutputDir="las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s_%(area)s_"
+    #in_msg.scpID="-i /opt/users/$LOGNAME/monti-pytroll/scripts/id_rsa_las"
+    #in_msg.scpOutputDir="las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s-%(area)s_"
     in_msg.scpProducts = ["CTH-HRVir108","CTT-HRVir108","sphr_cape-HRVir108",["MSG_radar-HRVir108","MSG_CRR-HRVir108","MSG_CRPh-HRVir108"]]
     
     # please download the shape file 

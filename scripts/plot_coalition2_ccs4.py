@@ -475,7 +475,7 @@ if __name__ == '__main__':
           area_loaded = load_products(global_data, channels, in_msg, area_loaded ) #
           
           print '... project data to desired area ', area
-          data = global_data.project(area)
+          data = global_data.project(area, precompute=True)
           
           # print type(data)
           loaded_channels = [chn.name for chn in data.loaded_channels()]
@@ -570,7 +570,7 @@ if __name__ == '__main__':
               area_loaded = get_area_def(area2load)#(in_windshift.areaExtraction)  
               # load product, global_data is changed in this step!
               area_loaded = load_products(global_data30, channels30, in_msg, area_loaded)
-              data30 = global_data30.project(area)           
+              data30 = global_data30.project(area, precompute=True)           
               data30 = downscale(data30,mode_downscaling)
 
               # now read the observations of the channels at -15 min
@@ -580,7 +580,7 @@ if __name__ == '__main__':
               area_loaded15 = get_area_def(area2load)#(in_windshift.areaExtraction)  
               # load product, global_data is changed in this step!
               area_loaded15 = load_products(global_data15, channels15, in_msg, area_loaded15)
-              data15 = global_data15.project(area)              
+              data15 = global_data15.project(area, precompute=True)              
               data15 = downscale(data15,mode_downscaling)
               
               if False:

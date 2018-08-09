@@ -7,7 +7,6 @@
 from datetime import datetime
 import sys, string, os
 import logging
-sys.path.insert(0, "/home/lom/users/cll/pytroll/install/lib/python2.6/site-packages")
 from mpop.satellites import GeostationaryFactory
 from mpop.projector import get_area_def
 from mpop.utils import debug_on
@@ -125,7 +124,7 @@ def check_cosmo_area (nc_cosmo, nx, ny, area):
     else:
         print "Error: the area chosen ("+area+") is larger than the wind data (cosmo) area available"
  
-    return x_min_cut, x_max_cut, y_min_cut, y_max_cut
+    return int(x_min_cut), int(x_max_cut), int(y_min_cut), int(y_max_cut)
 
 def get_cosmo_filenames (t_sat, nrt=True, runs_before = 0 ):
 
@@ -261,7 +260,7 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
         print "... temporal interpolation for wind field at", p_chosen[g], "(",p_chosen,")"
         i1 = np.where(pressure1==p_chosen[g])[0][0]
         i2 = np.where(pressure2==p_chosen[g])[0][0]
-        print g, len(p_chosen), np.where(pressure1==p_chosen[g])[0][0]
+
         u1 = u_all1[0, i1, x_max_cut1 : nx1-x_min_cut1, y_min_cut1 : ny1 - y_max_cut1] #20:nx-40,85:ny-135
         u2 = u_all2[0, i2, x_max_cut2 : nx2-x_min_cut2, y_min_cut2 : ny2 - y_max_cut2]     #### UH index changed i1 -> i2 !!! ###
         v1 = v_all1[0, i1, x_max_cut1 : nx1-x_min_cut1, y_min_cut1 : ny1 - y_max_cut1]     #### UH index changed i2 -> i1 !!! ###
@@ -333,7 +332,6 @@ def add_points_outside(forecast,x_matrix,y_matrix, xy_inside):
     xy_new = xy_new[~np.isnan(xy_new).any(axis=1)]                      
     print "*** add new particles for empty pixels"
     #store tracking coordinates for next step of this level
-    print "xy2.shape, xy_new.shape", xy2.shape, xy_new.shape
     xy_new = np.vstack((xy2, xy_new))
     print "... number of particles for next step (xy_new.shape)", xy_new.shape
     xy_levels = deepcopy(xy_new)
@@ -370,7 +368,7 @@ def load_rgb(satellite, satellite_nr, satellites_name, time_slot, rgb, area, in_
       # load product, global_data is changed in this step!
       area_loaded = load_products(global_data_RGBforecast, [rgb], in_msg, area_loaded)
       print '... project data to desired area ', area
-      fns = global_data_RGBforecast.project(area)
+      fns = global_data_RGBforecast.project(area, precompute=True)
 
     else:
       fns = deepcopy(data_CTP["CTP"].data)  
@@ -663,7 +661,7 @@ if __name__ == '__main__':
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
           #area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
           area_loaded = load_products(global_data_CTP, ['CTP'], in_msg, get_area_def("ccs4"))
-          data_CTP = global_data_CTP.project(area)
+          data_CTP = global_data_CTP.project(area, precompute=True)
               
           [nx,ny]=data_CTP['CTP'].data.shape
 
@@ -673,7 +671,7 @@ if __name__ == '__main__':
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
           area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
           area_loaded = load_products(global_data, rgbs, in_msg, area_loaded)
-          data = global_data.project(area)
+          data = global_data.project(area, precompute=True)
 
           # check if all needed channels are loaded
           #for rgb in rgbs:

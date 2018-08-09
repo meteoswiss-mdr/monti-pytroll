@@ -1,7 +1,7 @@
 '''
 input: a data object 
  as returned by GeostationaryFactory.create_scene(sat, str(sat_nr).zfill(2), "seviri", time_slot)
- or by global_data.project(area)
+ or by global_data.project(area, precompute=True)
 output:
   image function according to the input string
 '''
@@ -42,7 +42,7 @@ def get_last_SEVIRI_date(RSS, delay=0, time_slot=None):
     else:
         nmin = 15
 
-    if (time_slot==None):
+    if (time_slot is None):
         # get the current time
         gmt = gmtime()
         #print "GMT time: "+ str(gmt)
@@ -331,6 +331,8 @@ def choose_area_loaded_msg(sat, sat_nr, date_time):
            area_loaded = get_area_def("EuropeCanary")
    elif sat=="cosmo":
      area_loaded = get_area_def("ccs4") # might be different, depending on product
+   elif sat=="swissradar":
+     area_loaded = get_area_def("ccs4") # might be different, depending on product
    else:
      area_loaded = None
 
@@ -401,19 +403,19 @@ def format_name (folder, time_slot, rgb=None, sat=None, sat_nr=None, RSS=None, a
     # replace time placeholders like %Y%m%d%H%M
     new_folder = time_slot.strftime(folder)
 
-    if rgb != None:
+    if rgb is not None:
         #new_folder = (new_folder % {"rgb": rgb.replace("_","-")})
         new_folder = new_folder.replace("%(rgb)s",rgb.replace("_","-"))
 
-    if area != None:
+    if area is not None:
         #new_folder = (new_folder % {"area": area})
         new_folder = new_folder.replace("%(area)s", area)
 
-    if sat != None:
+    if sat is not None:
         #new_folder = (new_folder % {"msg": "MSG"+str(int(sat_nr)-7)})
         new_folder = new_folder.replace("%(sat)s", sat )
 
-    if sat_nr != None and sat_nr != "":
+    if (sat_nr is not None) and sat_nr != "":
         #print "... replace sat_nr", sat_nr
         #new_folder = (new_folder % {"msg": "MSG"+str(int(sat_nr)-7)})
         new_folder = new_folder.replace("%(msg)s", "MSG-"+str(int(sat_nr)-7))
@@ -426,10 +428,12 @@ def format_name (folder, time_slot, rgb=None, sat=None, sat_nr=None, RSS=None, a
     else:
         new_folder = new_folder.replace("%(RSS)s", "___")
 
-    if product != None:
+    if product is not None:
         #new_folder = (new_folder % {"product": product})
         new_folder = new_folder.replace("%(product)s", str(product))
-                      
+
+    new_folder = new_folder.replace("IR10.8", "IR-108")
+        
     return new_folder
 
 '''
@@ -510,7 +514,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
     import glob
 
     # get date of the last SEVIRI observation
-    if in_msg.datetime == None:
+    if in_msg.datetime is None:
         in_msg.datetime = get_last_SEVIRI_date(in_msg.RSS)
 
     yearS   = str(in_msg.datetime.year)
@@ -518,7 +522,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
     dayS    = "%02d" % in_msg.datetime.day
     hourS   = "%02d" % in_msg.datetime.hour 
     minuteS = "%02d" % in_msg.datetime.minute
-
+    
     sat="MSG"
     #if in_msg.RSS:
     #    RSSS='RSS'
@@ -529,7 +533,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
     print in_msg.check_input
 
     # choose MSG satellite
-    if in_msg.sat_nr == None:
+    if in_msg.sat_nr is None:
         in_msg.sat_nr = choose_msg(in_msg.datetime, RSS=in_msg.RSS)
 
     ## currently no check for hdf data
@@ -547,15 +551,22 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
     ## currently no check for overshooting tops
     if in_msg.sat == "msg-ot":
        return in_msg.RGBs
+       ## currently no check for cosmo data
+    if in_msg.sat == "cosmo":
+       return in_msg.RGBs
 
     ## check all RGBs, if not some are defined explecitly
-    if RGBs == None:
+    if RGBs is None:
         RGBs = in_msg.RGBs
 
     # convert str to array, if only one string is given
     if type(RGBs) is str:
         RGBs = [RGBs]
 
+    needed_input=deepcopy(RGBs)
+    if in_msg.parallax_correction:
+        needed_input.append('CTH')
+        
     rgb_complete=[]
     channels_complete=[False,False,False,False,False,False,False,False,False,False,False,False]
     pro_file_checked=False
@@ -563,7 +574,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
     print "... read config file ", os.path.join(CONFIG_PATH, fullname + ".cfg")
     print "... use satellite "+in_msg.sat_str()
 
-    for rgb in RGBs:
+    for rgb in needed_input:
 
         if in_msg.verbose:
             print "... check input for ", rgb
@@ -807,6 +818,11 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
             if len(glob.glob(filename)) == 0:
                 if in_msg.verbose:
                     print "*** Warning, no NWC SAF file found: "+filename
+
+                # if parallax correction is desired and there is not CTH,
+                # tell main program that no images can be produced
+                if in_msg.parallax_correction and rgb=='CTH':
+                    return []
             else:
                 print "    NWC SAF file found: "+glob.glob(filename)[0]
                 rgb_complete.append(rgb)
@@ -999,7 +1015,7 @@ def convert_NWCSAF_to_radiance_format(satscene, area, rgb, nwcsaf_calibrate, IS_
         quit()
 
     print "... append ", rgb, satscene[pge].resolution, data.min(), data.max() 
-    if units==None:
+    if units is None:
         satscene.channels.append(Channel(name=rgb,
                                          wavelength_range=[0.,0.,0.],
                                          resolution=satscene[pge].resolution, 
@@ -1027,11 +1043,14 @@ def convert_NWCSAF_to_radiance_format(satscene, area, rgb, nwcsaf_calibrate, IS_
 
     satscene[rgb].area = satscene[pge].area
     satscene[rgb].area_def = satscene[pge].area_def
-    if palette != None:
-        print "(my_msg_module) copy palette for ", rgb
-        satscene[rgb].palette = palette
-        #print "(my_msg_module) palette ", palette
-
+    
+    if palette is not None:
+        if palette.size > 0:
+            print "(my_msg_module) copy palette for ", rgb
+            satscene[rgb].palette = palette
+            #print "(my_msg_module) palette ", palette
+        else:
+            print "*** Warning, empty palette"
 
     #if IS_PYRESAMPLE_LOADED:
     #
@@ -1200,18 +1219,18 @@ def ContourImage(prop, area, clevels=[0.0], vmin=None, vmax=None, alpha=None, li
 
     prop_filled = prop.filled()
 
-    if vmin == None:
+    if vmin is None:
       vmin=prop_filled.min()
-    if vmax == None:
+    if vmax is None:
       vmax=prop_filled.max()
 
-    if colormap==None: 
+    if colormap is None: 
       import matplotlib.cm as cm
       colormap=cm.autumn_r
 
     print "... CountourImage with clevels = ", clevels, ", (vmin/vmax) =", vmin, vmax, ', alpha=', alpha
 
-    if alpha == None: 
+    if alpha is None: 
       CS = plt.contour(X, Y, prop.filled(), clevels, linewidths=linewidths, cmap=colormap, vmin=vmin, vmax=vmax) # , linestyles='solid'
     else:
       print "    half transparent plotting with alpha = ", alpha

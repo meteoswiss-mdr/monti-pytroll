@@ -18,7 +18,9 @@ RGBs_buildin = ['airmass','ash','cloudtop','convection','convection_co2',\
 RGBs_user = ['HRoverview','hr_natural','hr_airmass','sandwich','HRVFog','DayNightFog',\
              'HRVir108c','HRVir108','hrvIR108','VIS006ir108c','VIS006ir108','vis006IR108','sza','ndvi','IR_039c_CO2',\
              'VIS006-IR_016','IR_039-IR_108','WV_062-WV_073','WV_062-IR_108','IR_087-IR_108',\
-             'IR_087-IR_120','IR_120-IR_108','WV_073-IR_134','trichannel','clouddepth']
+             'IR_087-IR_120','IR_120-IR_108','WV_073-IR_134','trichannel','clouddepth','streamplot',\
+             'streamplot-100hPa','streamplot-200hPa','streamplot-300hPa','streamplot-400hPa','streamplot-500hPa',\
+             'streamplot-600hPa','streamplot-700hPa','streamplot-800hPa','streamplot-900hPa','streamplot-1000hPa']
 
 
 CMa =['CMa', 'CMa_DUST', 'CMa_QUALITY', 'CMa_VOLCANIC']  # PGE 1
@@ -74,7 +76,7 @@ MSG_OT = ['ir_brightness_temperature',
 
 #################
 
-Radar = ['precip','poh','mesh','vil', 'maxecho','echotop15','echotop20','echotop45','echotop50']
+swissradar = ['PRECIP','POH','MESHS','VIL', 'MaxEcho','EchoTOP15','EchoTOP20','EchoTOP45','echoTOP50']
 
 #################
 
@@ -82,9 +84,11 @@ cosmo_vars_2d=["lon_1", "lat_1",\
                "TWATER", "tropopause_height", "tropopause_temperature", "tropopause_pressure", \
                "FF_10M", "VMAX_10M", "CAPE_MU", "CAPE_ML", "CIN_MU", "CIN_ML", \
                "SLI", "LCL_ML", "LFC_ML", "T_2M", "TD_2M", "GLOB", "PS", \
-               "PMSL", "PMSLr", "HZEROCL", "WSHEAR_0-3km", "WSHEAR_0-6km", "SYNMSG_BT_CL_IR10.8"]
+               "PMSL", "PMSLr", "HZEROCL", "WSHEAR_0-3km", "WSHEAR_0-6km", "SYNMSG_BT_CL_IR10.8","IR_108-COSMO-minus-MSG"]
 cosmo_vars_3d=["POT_VORTIC", "THETAE", "MCONV", "geopotential_height",\
-               "T_SO", "RELHUM"]
+               "T_SO", "RELHUM",\
+               "U", "U-100hPa", "U-200hPa", "U-300hPa", "U-400hPa", "U-500hPa", "U-600hPa", "U-700hPa", "U-800hPa", "U-900hPa", "U-1000hPa",\
+               "V", "V-100hPa", "V-200hPa", "V-300hPa", "V-400hPa", "V-500hPa", "V-600hPa", "V-700hPa", "V-800hPa", "V-900hPa", "V-1000hPa"]
 
 cosmo = cosmo_vars_2d+cosmo_vars_3d
 

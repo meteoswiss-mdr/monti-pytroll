@@ -57,17 +57,27 @@ if __name__ == '__main__':
         i=i+1
         # call of the plot function
         RGBs_done = plot_msg(in_msg)
+        
         # remove the processed RGBs from the list of RGBs to do 
         for rgb in RGBs_done:
-            in_msg.RGBs.remove(rgb)
+            if rgb in in_msg.RGBs:
+                in_msg.RGBs.remove(rgb)
             if os.path.isfile("/tmp/NO_RSS_INPUT.txt"):
                 print "A) remove NO_RSS_INPUT.txt"
                 remove("/tmp/NO_RSS_INPUT.txt")
+
         # exit loop, if no more images need to be processed 
         if len(in_msg.RGBs) == 0:
             break
         else:
-            print "processing not complete, still need to process: ", in_msg.RGBs
+            if not in_msg.make_plots:
+                # if netCDF is supposed to be produced, check this!!!
+                print "... exit loop, as no images are supposed to be produced"
+                in_msg.RGBs=[]
+                break
+            else:
+                print "processing not complete, still need to process: ", in_msg.RGBs
+            
         # sleep before next try
         sleep(delta_time)
         event_time=time()

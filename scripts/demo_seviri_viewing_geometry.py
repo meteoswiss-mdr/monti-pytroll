@@ -18,7 +18,7 @@ global_data.load(['vza'])  # , area_extent=europe.area_extent
 print global_data
 
 area="EuropeCanaryS95"
-data = global_data.project(area)
+data = global_data.project(area, precompute=True)
 
 from trollimage.colormap import rainbow
 colormap = rainbow

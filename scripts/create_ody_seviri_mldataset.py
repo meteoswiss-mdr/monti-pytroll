@@ -113,12 +113,12 @@ if reproject:
    print "start projection"
    # PROJECT data to new area 
    if load_radar:
-       data_radar = global_radar.project(area)
+       data_radar = global_radar.project(area, precompute=True)
        #data[prop_str].product_name = global_radar[prop_str].product_name
        #data[prop_str].units = global_radar[prop_str].units
        global_radar = data_radar
    if load_sat:
-       data_sat = global_sat.project(area)
+       data_sat = global_sat.project(area, precompute=True)
        global_sat = data_sat
 
        from pyorbital.astronomy import sun_zenith_angle

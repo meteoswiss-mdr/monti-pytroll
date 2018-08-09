@@ -96,7 +96,7 @@ if reproject:
    print '-------------------'
    print "start projection"
    # PROJECT data to new area 
-   data = global_data.project(area)
+   data = global_data.project(area, precompute=True)
    #data[prop_str].product_name = global_data[prop_str].product_name
    #data[prop_str].units = global_data[prop_str].units
    global_data = data

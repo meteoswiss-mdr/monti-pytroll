@@ -1,4 +1,4 @@
-def input(in_msg, timeslot=None, delay=None):
+def input(in_msg):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -28,13 +28,7 @@ def input(in_msg, timeslot=None, delay=None):
     # choose specification, if you want a default time without command line arguments 
     # (the specified time is overwritten by the command line arguments of plot_msg.py)
     #------------------------------------------------------------------------
-    if True:
-        # choose timeslot of the satellite picture to process
-        # datetime according to command line arguments (if given)
-        # otherwise the last possible time of SEVIRI observation (depends on RSS mode and chosen delay)
-        # also sets the near real time marker: in_msg.nrt 
-        in_msg.init_datetime(timeslot=timeslot)
-    else:
+    if False:
         # offline mode (always a fixed time) # ignores command line arguments
         year=2015
         month=2
@@ -109,17 +103,12 @@ def input(in_msg, timeslot=None, delay=None):
     in_msg.show_clouds = 'developing_and_mature'
 
     # directory containing the forecasted brightness temperatures
-    if in_msg.nrt:
-        in_msg.nowcastDir = "/data/cinesat/out/"
-    else:
-        in_msg.nowcastDir = '/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels/'
-
+    in_msg.nowcastDir = "/data/cinesat/out/"
+        
     #directors with labels
-    if in_msg.nrt:
-        in_msg.labelsDir = '/data/cinesat/out/labels/'
-    else:
-        #in_msg.labelsDir = '/opt/users/'+in_msg.user+'/PyTroll/scripts/labels/'
-        in_msg.labelsDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_labels_%(area)s/'
+    in_msg.labelsDir = '/data/cinesat/out/labels/'
+    #in_msg.labelsDir = '/opt/users/'+in_msg.user+'/PyTroll/scripts/labels/'
+    #in_msg.labelsDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_labels_%(area)s/'
 
     # channels needed to produce the coalition2 product
     in_msg.RGBs=[]
@@ -197,22 +186,17 @@ def input(in_msg, timeslot=None, delay=None):
     in_msg.choose_forecast_times()
 
     in_msg.standardOutputName = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
-    if in_msg.nrt:
-        in_msg.outputDir = '/data/cinesat/out/'
-    else:
-        #in_msg.outputDir='./pics/'
-        in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
+    in_msg.outputDir = '/data/cinesat/out/'
+    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
 
-    if in_msg.nrt:
-        in_msg.outputDirForecasts = "/data/cinesat/out/" #'/opt/users/'+in_msg.user+'/PyTroll/scripts/nrt_test/' #
-    else:
-        in_msg.outputDirForecasts = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_forecasts_%(area)s/'
+    in_msg.outputDirForecasts = "/data/cinesat/out/" #'/opt/users/'+in_msg.user+'/PyTroll/scripts/nrt_test/' #
+    #in_msg.outputDirForecasts = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_forecasts_%(area)s/'
    
     in_msg.scpOutput = True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
-    in_msg.scpID="-i /opt/users/$LOGNAME/monti-pytroll/scripts/id_rsa_las"
-    in_msg.scpOutputDir="las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s_%(area)s_"
+    #in_msg.scpID="-i /opt/users/$LOGNAME/monti-pytroll/scripts/id_rsa_las"
+    #in_msg.scpOutputDir="las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s_%(area)s_"
 
     #in_msg.scpID2="-i /home/cinesat/.ssh/id_dsa_las"
     #in_msg.scpOutputDir2='las@lomux240:/www/proj/OTL/WOL/cll/satimages/'
@@ -392,8 +376,6 @@ def input(in_msg, timeslot=None, delay=None):
     
     in_msg.channels15 = ['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134']
     in_msg.channels30 = ['WV_062','WV_073','IR_097','IR_108','IR_134']
-
-    nrt = True # !HAU! ???    
     
     # -------------   
     # input checks 
@@ -447,3 +429,7 @@ def input(in_msg, timeslot=None, delay=None):
 
     #in_msg.compress_to_8bit=False
     
+    #in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-HRVir108"]]
+    
+    #in_msg.resize_composite = 100
+    in_msg.resize_montage = 70

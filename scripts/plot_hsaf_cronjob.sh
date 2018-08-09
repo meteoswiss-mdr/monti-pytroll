@@ -15,9 +15,12 @@ python loop_msg.py input_hsaf_EuropeCanaryS95_cronjob
 
 
 # create composite 
-python postprocessing.py --scp -a odysseyS25 -c 'h03-ir108'                  input_hsaf_cronjob.py
-python postprocessing.py --scp --parea ccs4  -c ["h03-ir108","h03-HRV"] -m [["MSG_radar-ir108","MSG_h03-ir108"],["MSG_radar-HRV","MSG_h03-HRV"]] input_hsaf_cronjob.py
+python postprocessing.py --scp --parea odysseyS25 -c ['h03-ir108']            input_hsaf_cronjob.py
+python postprocessing.py       --parea odysseyS25 -c ['h03-VIS006ir108']      input_hsaf_cronjob.py
+python postprocessing.py --scp --parea ccs4  -c ["h03-ir108","h03-HRV","h03-HRVir108"] -m [["MSG_radar-ir108","MSG_h03-ir108"],["MSG_radar-HRV","MSG_h03-HRV"]] input_hsaf_cronjob.py
+python postprocessing.py --scp --parea ccs4  -c ["h03-HRVir108"]                       -m [["MSG_radar-HRVir108","MSG_h03-HRVir108"]]                           input_hsaf_cronjob.py
 python postprocessing.py --scp --parea odysseyS25  -c '' -m [["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]] input_hsaf_cronjob.py
+python postprocessing.py --scp --parea odysseyS25  -c ["RATE-VIS006ir108"] -m [["MSG_RATE-VIS006ir108","MSG_h03-VIS006ir108"]]                          input_hsaf_cronjob.py
 
 ## remove result files older than 1 hour
 #echo "*** Remove all result files older than 1 hour"

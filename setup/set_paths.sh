@@ -22,9 +22,10 @@ set_conda_path() {
 #function set_conda_path {  # function syntax is not supported crontab
     case $HOSTNAME in
     "zueub"[2-4][0-9][0-9])
-	export CONDA_PATH="/opt/users/common/packages/anaconda3/" ;;
+	#export CONDA_PATH="/opt/users/common/packages/anaconda3/" ;;
+        export CONDA_PATH="/opt/users/common/packages/anaconda2_$LOGNAME/" ;;
     "keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
-	export CONDA_PATH="/store/msrad/utils/anaconda3/" ;;
+        export CONDA_PATH="/store/msrad/utils/anaconda3/" ;;
     *)
 	echo "ERROR in set_conda_path: unknown computer "$HOSTNAME
 	return ;;
@@ -39,6 +40,7 @@ set_conda_path() {
 
     # easy access to the easy-install file
     alias easy-install.pth='emacs '$CONDA_PATH'/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth &'
+    alias site-packages='cd '$CONDA_PATH'/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/ '
 
     # easier activation and deactivation of the virtual environment PyTroll
     alias activate='source activate PyTroll_$LOGNAME'

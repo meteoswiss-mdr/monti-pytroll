@@ -1,5 +1,5 @@
 
-def input(in_msg, timeslot=None, delay=None):
+def input(in_msg):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -18,16 +18,8 @@ def input(in_msg, timeslot=None, delay=None):
     #in_msg.RSS=False
 
     #in_msg.delay=5 # process image 'delay' minutes before now
-
-    print "BBBBBBBBBBB", timeslot
     
-    if True:
-        # choose timeslot of the satellite picture to process
-        # datetime according to command line arguments (if given)
-        # otherwise the last possible time of SEVIRI observation (depends on RSS mode and chosen delay)
-        # also sets the near real time marker: in_msg.nrt 
-        in_msg.init_datetime(timeslot=timeslot)
-    else:
+    if False:
         # offline mode (always a fixed time) # ignores command line arguments
         year=2015
         month=2
@@ -195,12 +187,15 @@ def input(in_msg, timeslot=None, delay=None):
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
     #default: in_msg.scpProducts = ['all']
-    in_msg.scpID2="-i /opt/users/cinesat/monti-pytroll/scripts/id_rsa_las"
-    in_msg.scpOutputDir2='las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s-%(area)s_'
-    #in_msg.scpProducts2 = ['airmass','convection','HRoverview','natural']
-    in_msg.scpProducts2 = ['airmass','ash','cloudtop','convection','day_microphysics','dust','fog',\
+    in_msg.scpProducts = ['airmass','ash','cloudtop','convection','day_microphysics','dust','fog',\
                            'DayNightFog','green_snow','natural','night_fog','night_microphysics','night_overview','overview','red_snow',\
                            'HRoverview','THX-radar-convection','TRT-radar-convection','radar-convection']
+    #in_msg.scpID2="-i /opt/users/cinesat/monti-pytroll/scripts/id_rsa_las"
+    #in_msg.scpOutputDir2='las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s-%(area)s_'
+    #in_msg.scpProducts2 = ['airmass','convection','HRoverview','natural']
+    #in_msg.scpProducts2 = ['airmass','ash','cloudtop','convection','day_microphysics','dust','fog',\
+    #                       'DayNightFog','green_snow','natural','night_fog','night_microphysics','night_overview','overview','red_snow',\
+    #                       'HRoverview','THX-radar-convection','TRT-radar-convection','radar-convection']
 
     # please download the shape file 
     in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'

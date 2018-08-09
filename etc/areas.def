@@ -53,7 +53,16 @@ REGION: ccs4c2 {
         PCS_DEF:        proj=somerc, lat_0=46.9524055555556, lon_0=7.43958333333333, ellps=bessel, x_0=600000, y_0=200000, k_0=1 
         XSIZE:          930
         YSIZE:          700
-        AREA_EXTENT:    (170000.0, -200000, 1100000, 500000)
+        AREA_EXTENT:    (170000.0, -200000.0, 1100000.0, 500000.0)
+};
+
+REGION: swissXXL {
+        NAME:           CCS4 Swiss projection (wind fields, maximum extent of COSMO1, not tested yet)
+        PCS_ID:         somerc
+        PCS_DEF:        proj=somerc, lat_0=46.9524055555556, lon_0=7.43958333333333, ellps=bessel, x_0=600000, y_0=200000, k_0=1 
+        XSIZE:          1000
+        YSIZE:           700
+        AREA_EXTENT:    (100000.0, -200000.0, 1100000.0, 500000.0)
 };
 
 REGION: cosmo1 {

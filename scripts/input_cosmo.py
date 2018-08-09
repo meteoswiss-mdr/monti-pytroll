@@ -1,35 +1,19 @@
 
-def input(in_msg, timeslot=None, delay=None):
+def input(in_msg):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
     print "*** read input from ", in_msg.input_file
 
-    # 8=MSG1, 9=MSG2, 10=MSG3
-    in_msg.sat = "Meteosat"
-    #in_msg.sat = "meteosat"
-    #in_msg.sat_nr=8
-    #in_msg.RSS=False 
-    #in_msg.sat_nr=9
-    #in_msg.RSS=True
-    in_msg.sat_nr=10
-    in_msg.RSS=True    # better determine RSS automatically
-    #in_msg.sat_nr=11
-    #in_msg.RSS=False  # better determine RSS automatically
+    in_msg.sat = "cosmo"
+    in_msg.instrument = "cosmo"
+    in_msg.sat_nr="1"
+    in_msg.RSS=False  # better determine RSS automatically
 
-    # specify an delay (in minutes), when you like to process a time some minutes ago
-    # e.g. current time               2015-05-31 12:33 UTC
-    # delay 5 min                     2015-05-31 12:28 UTC
-    # last Rapid Scan Service picture 2015-05-31 12:25 UTC (Scan start) 
-    in_msg.delay=5
+    # if forecast is not yet ready, the model run before is used 
+    in_msg.delay=0
 
-    if True:
-        # choose timeslot of the satellite picture to process
-        # datetime according to command line arguments (if given)
-        # otherwise the last possible time of SEVIRI observation (depends on RSS mode and chosen delay)
-        # also sets the near real time marker: in_msg.nrt 
-        in_msg.init_datetime(timeslot=timeslot)
-    else:
+    if False:
         # offline mode (always a fixed time) # ignores command line arguments
         year=2015
         month=2
@@ -342,61 +326,31 @@ def input(in_msg, timeslot=None, delay=None):
 
     in_msg.outputFormats = ['png'] 
     #in_msg.outputFormats = ['png','ninjotif'] 
-    in_msg.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
+    in_msg.outputFile = 'COSMO_%(rgb)s-%(area)s_%y%m%d%H%M.png'
     in_msg.outputDir='./pics/'
     #in_msg.outputDir = "./%Y-%m-%d/%Y-%m-%d_%(rgb)s-%(area)s/"
-    #in_msg.outputDir = '/data/cinesat/out/'
-    in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
+    in_msg.outputDir = '/data/cinesat/out/'
+    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
     in_msg.compress_to_8bit=False
 
     
     in_msg.ninjotifFilename = 'MET%(sat_nr)s_%(RSS)s_%(rgb)s_%(area)s_%Y%m%d%H%M.tif' 
     in_msg.upload_ninjotif = False
 
-    #in_msg.postprocessing_areas=['ccs4']
+    in_msg.postprocessing_areas=['ccs4']
     #in_msg.postprocessing_areas=['EuropeCanaryS95']
     #in_msg.postprocessing_areas=["EuroMercator"]
 
-    #in_msg.postprocessing_composite=["h03-ir108"]
-    #in_msg.postprocessing_composite=["hrwdp-ir108"]
-    #in_msg.postprocessing_composite=["CTT-ir108","CTH-ir108"]
-    #in_msg.postprocessing_composite=["hrwdp-ir108", "hrwdc-ir108","streamd-ir108","hrwdr-ir108", "hrwdcnwp-ir108", "hrwdcnnwp-ir108"]
-    #in_msg.postprocessing_composite=["hrwdr-ir108", "hrwdcnwp-ir108", "hrwdcnnwp-ir108", "streamd-ir108"]
-    #in_msg.postprocessing_composite=["TRT-streamd-ir108", "TRT-streamd-HRV"] #"hrwdCT-ir108", "hrwdCT-HRV"
-    #in_msg.postprocessing_composite=["TRT-radar-ir108pc"] #"hrwdCT-ir108", "hrwdCT-HRV"
-    #in_msg.postprocessing_composite=["THX-IR_108","radar-convection","THX-radar-convection"]    
-    #in_msg.postprocessing_composite=["THX-IR_108"] #"hrwdCT-ir108", "hrwdCT-HRV"
-    #in_msg.postprocessing_composite=["THX-HRV"] #"hrwdCT-ir108", "hrwdCT-HRV"
-    #in_msg.postprocessing_composite=["THX-HRVpc"] #"hrwdCT-ir108", "hrwdCT-HRV"
-    #in_msg.postprocessing_composite=["TRT-radar-ir108pc","THX-HRVpc"]
-    #in_msg.postprocessing_composite=["C2rgb-IR_108","C2rgb-ir108"]
-    #in_msg.postprocessing_composite=["C2rgb-IR_108pc"]
-    #in_msg.postprocessing_composite=["C2rgb-IR_108"]
-    #in_msg.postprocessing_composite=["C2rgb-ir108"]
-    #in_msg.postprocessing_composite=["hrwdpH-streamdH-HRV", "hrwdpM-streamdM-HRV", "hrwdpL-streamdL-HRV"] #"hrwdCT-ir108", "hrwdCT-HRV"
-    #in_msg.postprocessing_composite=["hrwdp-streamd-HRV", "hrwdp-streamd-ir108"] #"hrwdCT-ir108", "hrwdCT-HRV"
-    #in_msg.postprocessing_composite=["hrwdpL-streamdL-HRV","hrwdpL-streamdL-ir108"]
-    #in_msg.postprocessing_composite=["hrwdpH-streamdH-HRV","hrwdpH-streamdH-ir108"]
-    #in_msg.postprocessing_composite=["hrwdp-streamd-ir108","TRT-streamd-ir108"]
-    #in_msg.postprocessing_composite=["TRT-radar-convection"] # "radar-convection",
-
-    #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03-ir108"],["MSG_radar-HRV","MSG_h03-HRV"],["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]]
-    #in_msg.postprocessing_montage = [["MSG_h03-ir108","MSG_HRV"],["MSG_h03-ir108","MSG_test"]]
-    #in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-radar-convection"]]
-    #in_msg.postprocessing_montage = [["MSG_C2rgb-Forecast-IR_108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-radar-convection"]]
-    #in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-ir108","MSG_radar-ir108","MSG_THX-ir108"]]
-    #in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-ir108","MSG_radar-ir108","MSG_THX-ir108"]]
-    #in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-HRV"]]
-    #in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-ir108","MSG_radar-ir108","MSG_THX-HRV"]]
-    #in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108","MSG_CT","MSG_overview","MSG_convection","MSG_RATE-convection","MSG_THX-IR-108"]]
-    #in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-ir108","MSG_radar-ir108","MSG_THX-ir108"]]
-    #in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108","MSG_CTpc","MSG_HRoverviewpc","MSG_TRT-radar-ir108pc","MSG_radar-ir108pc","MSG_THX-HRVpc"]]
+    #in_msg.postprocessing_montage = [["MSG_IR-108c","COSMO_SYNMSG-BT-CL-IR10.8"]]
+    in_msg.postprocessing_montage = [["MSG_IR-108cpc","COSMO_SYNMSG-BT-CL-IR10.8"]]
 
     #in_msg.resize_montage = 70
     #in_msg.resize_composite = 100
 
-    #in_msg.scpOutput = True
+    in_msg.scpOutput = False
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
     #default: in_msg.scpProducts = ['all']
+    #in_msg.scpProducts = [["MSG_IR-108cpc","COSMO_SYNMSG-BT-CL-IR10.8"]]
+    in_msg.scpProducts = ["IR-108cpc-SYNMSG-BT-CL-IR10.8"]
     #in_msg.scpProducts = ['IR_108c', "radar-convection"] # list of rgb, composite and montage strings

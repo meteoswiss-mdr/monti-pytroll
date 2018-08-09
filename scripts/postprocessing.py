@@ -6,7 +6,7 @@ import subprocess
 import inspect
 from copy import deepcopy
 
-def get_THX_filename(in_msg, time_slot, area):
+def get_THX_filename(time_slot, area, outDir, outFile):
     print "    get_THX_filename THX for ", area
     from ConfigParser import ConfigParser
     from mpop import CONFIG_PATH
@@ -16,70 +16,65 @@ def get_THX_filename(in_msg, time_slot, area):
     dt = int(conf.get("thx-level2", "dt"))
     dt_str = ("%04d" % dt) + "min"
     dx_str = ("%03d" % dx) + "km"
-    #outputDir = format_name('./%Y-%m-%d/THX/',  time_slot, area=area)
-    #outputDir = "/data/cinesat/out/"
-    outputDir = format_name(in_msg.outputDir,  time_slot, area=area, rgb="THX")
+    outputDir = format_name(outDir, time_slot, area=area, rgb="THX")
     rgb='dens'
     filename =  format_name('THX_'+rgb+'-'+area+'_%y%m%d%H%M_'+dt_str+'_'+dx_str+'.png', time_slot, area=area, rgb="THX")
     return outputDir+filename
 
-def get_radar_filename(in_msg, time_slot, area):
+def get_radar_filename(time_slot, area, outDir, outFile):
     print "    get_radar_filename radar for ", area
     #outputDir = format_name('./%Y-%m-%d/radar/',  time_slot, area=area)
     #outputDir = "/data/cinesat/out/"
-    outputDir = format_name(in_msg.outputDir,  time_slot, area=area, rgb="radar")
+    outputDir = format_name(outDir, time_slot, area=area, rgb="radar")
     filename =  format_name('RAD_RZC-'+area+'_%y%m%d%H%M.png', time_slot, area=area)
     return outputDir+filename
 
-def get_odyssey_filename(in_msg, time_slot, area):
+def get_odyssey_filename(time_slot, area, outDir, outFile):
     print "    get_odyssey_filename radar for ", area
     #outputDir = format_name('./%Y-%m-%d/radar/',  time_slot, area=area)
     #outputDir = "/data/cinesat/out/"
-    outputDir = format_name(in_msg.outputDir,  time_slot, area=area, rgb="radar")
+    outputDir = format_name(outDir, time_slot, area=area, rgb="radar")
     filename =  format_name('ODY_RATE-'+area+'_%y%m%d%H%M.png', time_slot, area=area)
     return outputDir+filename
 
-def get_TRT_filename(in_msg, time_slot, area):
+def get_TRT_filename(time_slot, area, outDir, outFile):
     print "    get_TRT_filename TRT for ", area 
     #outputDir = format_name('./%Y-%m-%d/radar/',  time_slot, area=area)
     #outputDir = "/data/cinesat/out/"
-    outputDir = format_name(in_msg.outputDir,  time_slot, area=area, rgb="TRT")
+    outputDir = format_name(outDir, time_slot, area=area, rgb="TRT")
     filename =  format_name('RAD_TRT-'+area+'_%y%m%d%H%M.png', time_slot, area=area)
     return outputDir+filename
     
-def get_OT_filename(in_msg, rgb, time_slot, area):
+def get_OT_filename(rgb, time_slot, area, outDir, outFile):
     print "    get_OT_filename (overshooting top) for ", area 
     #outputDir = format_name('./%Y-%m-%d/radar/',  time_slot, area=area)
     #outputDir = "/data/cinesat/out/"
-    outputDir = format_name(in_msg.outputDir,  time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
-    filename  = format_name(in_msg.outputFile, time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
+    outputDir = format_name(outDir, time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
+    filename  = format_name(outFile, time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
     return outputDir+filename
 
-def get_sat_filename(in_msg, rgb, sat, sat_nr, time_slot, area):
+def get_sat_filename(rgb, sat, sat_nr, time_slot, area, outDir, outFile):
     print "    get_sat_filename for ", rgb, area
     #outputDir = "/data/cinesat/out/"
-    outputDir = format_name(in_msg.outputDir,  time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
-    filename  = format_name(in_msg.outputFile, time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
+    outputDir = format_name(outDir, time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
+    filename  = format_name(outFile, time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
     return outputDir+filename
 
-def get_comp_filename(in_msg, comp_str, sat_nr, time_slot, area):
+def get_comp_filename(comp_str, sat_nr, time_slot, area, outDir, outFile):
     print "    get_comp_filename ", comp_str
-    #outputDir = format_name('./%Y-%m-%d/'+prop_str+'-ccs4/', time_slot, area=area)
-    #outputDir = "/data/cinesat/out/"
-    outputDir = format_name(in_msg.outputDir,  time_slot, area=area, rgb=comp_str.replace("_","-"), sat_nr=sat_nr)
+    outputDir = format_name(outDir, time_slot, area=area, rgb=comp_str.replace("_","-"), sat_nr=sat_nr)
     if not exists(outputDir):
-        if in_msg.verbose:
-            print '... create output directory: ' + outputDir
+        print '... create output directory: ' + outputDir
         from os import makedirs
         makedirs(outputDir)
     filename  = format_name('/MSG_'+comp_str.replace("_","-")+'-'+area+'_%y%m%d%H%M.png', time_slot, area=area, sat_nr=sat_nr) 
     return outputDir+'/'+filename
 
 # ---
-def get_file_list(composite, in_msg, sat, sat_nr, time_slot, area, n=None):
+def get_file_list(composite, sat, sat_nr, time_slot, area, outDir, outFile, n=None):
 
     import products 
-    if n==None:
+    if n is None:
         rgb_list  = composite.split("-")
     else:
         rgb_list  = composite.split("-",n-1)
@@ -87,17 +82,17 @@ def get_file_list(composite, in_msg, sat, sat_nr, time_slot, area, n=None):
 
     for rgb in rgb_list:
         if rgb == 'THX':
-            file_list.append (get_THX_filename(in_msg, time_slot, area))
+            file_list.append (get_THX_filename(time_slot, area, outDir, outFile))
         elif rgb == 'TRT':
-            file_list.append (get_TRT_filename(in_msg, time_slot, area))
+            file_list.append (get_TRT_filename(time_slot, area, outDir, outFile))
         elif rgb in products.MSG_all:
-            file_list.append (get_sat_filename(in_msg, rgb, 'MSG', sat_nr, time_slot, area))
-        elif (rgb == 'radar' or rgb in products.Radar) and in_msg.sat != 'cpp':
-            file_list.append (get_radar_filename(in_msg, time_slot, area))
+            file_list.append (get_sat_filename(rgb, 'MSG', sat_nr, time_slot, area, outDir, outFile))
+        elif (rgb == 'radar' or rgb in products.swissradar) and sat != 'cpp':
+            file_list.append (get_radar_filename(time_slot, area, outDir, outFile))
         elif rgb == 'RATE':
-            file_list.append (get_odyssey_filename(in_msg, time_slot, area))
+            file_list.append (get_odyssey_filename(time_slot, area, outDir, outFile))
         else:
-            file_list.append (get_sat_filename(in_msg, rgb, sat, sat_nr, time_slot, area))
+            file_list.append (get_sat_filename(rgb, sat, sat_nr, time_slot, area, outDir, outFile))
 
         if not isfile(file_list[-1]):
             print "*** ERROR, can not find "+rgb+" file: "+file_list[-1]
@@ -106,61 +101,67 @@ def get_file_list(composite, in_msg, sat, sat_nr, time_slot, area, n=None):
     return file_list
 
 # ---
-def n_file_composite(composite, in_msg, sat_nr, time_slot, area, bits_per_pixel=8, composites_done=[]):
-
+def n_file_composite(composite, satellite, sat_nr, time_slot, area, outDir, outFile,
+                     scpOutput=False, scpOutDir="/tmp/", scpID=None, scpProducts=[],
+                     scpOutDir2="/tmp/", scpID2=None, scpProducts2=[], 
+                     bits_per_pixel=8, compress_to_8bit=False, composites_done=[], verbose=True):
+    
     n_rgb = composite.count('-') + 1
 
     # create smaller required composites 
     if n_rgb-1 >= 2:
         rgb_list  = composite.split("-",n_rgb-2)
-        n_file_composite(rgb_list[-1], in_msg, sat_nr, time_slot, area)
+        n_file_composite(rgb_list[-1], satellite, sat_nr, time_slot, area, outDir, outFile,
+                         scpOutput=scpOutput, scpOutDir=scpOutDir, scpID=scpID, scpProducts=scpProducts,
+                         scpOutDir2=scpOutDir2, scpID2=scpID2, scpProducts2=scpProducts2, 
+                         bits_per_pixel=bits_per_pixel, compress_to_8bit=compress_to_8bit, verbose=verbose)
 
     print "    create ", n_rgb ," file composite ", composite
 
-    if in_msg.sat == "meteosat":
+    if satellite == "meteosat":
         sat = 'MSG'
     else:
-        sat = in_msg.sat
+        sat = satellite
     
     # get the filename of the last two files to compose  
-    file_list = get_file_list(composite, in_msg, sat, sat_nr, time_slot, area, n=2)
-    if file_list == None:  # if not all files are found 
+    file_list = get_file_list(composite, sat, sat_nr, time_slot, area, outDir, outFile, n=2)
+    if file_list is None:  # if not all files are found 
         return composites_done   # return [] as error marker 
 
     # get result filename 
-    comp_file = get_sat_filename(in_msg, composite, sat, sat_nr, time_slot, area) 
+    comp_file = get_sat_filename(composite, sat, sat_nr, time_slot, area, outDir, outFile) 
     comp_dir = dirname(comp_file)
     if not exists(comp_dir):
-        if in_msg.verbose:
+        if verbose:
             print '... create output directory: ' + comp_dir
         makedirs(comp_dir)
 
     command="/usr/bin/composite -depth "+str(bits_per_pixel)+" "+file_list[0]+" "+file_list[1]+" "+comp_file
-    if in_msg.verbose:
+    if verbose:
         print "    "+command
     subprocess.call(command, shell=True) #+" 2>&1 &"
     # check if file is produced
     if isfile(comp_file):
         composites_done.append(composite)
 
-    if in_msg.scpOutput:
-        if (composite in in_msg.scpProducts) or ('all' in [x.lower() for x in in_msg.scpProducts if type(x)==str]):
-            scpOutputDir = format_name (in_msg.scpOutputDir, time_slot, area=area, rgb=composite, sat=sat, sat_nr=sat_nr )
-            if in_msg.verbose:
-                print "/usr/bin/scp "+in_msg.scpID+" "+comp_file+" "+scpOutputDir+" 2>&1 &"
-            subprocess.call("/usr/bin/scp "+in_msg.scpID+" "+comp_file+" "+scpOutputDir+" 2>&1 &", shell=True)
+    if scpOutput:
+        if (composite in scpProducts) or ('all' in [x.lower() for x in scpProducts if type(x)==str]):
+            scpOutputDir = format_name (scpOutDir, time_slot, area=area, rgb=composite, sat=sat, sat_nr=sat_nr )
+            if verbose:
+                print "/usr/bin/scp "+scpID+" "+comp_file+" "+scpOutputDir+" 2>&1 &"
+            subprocess.call("/usr/bin/scp "+scpID+" "+comp_file+" "+scpOutputDir+" 2>&1 &", shell=True)
             
-    if in_msg.scpOutput and in_msg.scpID2 != None and in_msg.scpOutputDir2 != None:
-        if (composite in in_msg.scpProducts2) or ('all' in [x.lower() for x in in_msg.scpProducts2 if type(x)==str]):
-            scpOutputDir2 = format_name (in_msg.scpOutputDir2, time_slot, area=area, rgb=composite, sat=sat, sat_nr=sat_nr )
-            if in_msg.compress_to_8bit:
-                if in_msg.verbose:
+    if scpOutput and (scpID2 is not None) and (scpOutDir2 is not None):
+        if (composite in scpProducts2) or ('all' in [x.lower() for x in scpProducts2 if type(x)==str]):
+            scpOutputDir2 = format_name (scpOutDir2, time_slot, area=area, rgb=composite, sat=sat, sat_nr=sat_nr )
+            if compress_to_8bit:
+                if verbose:
                     print "... secure copy "+comp_file.replace(".png","-fs8.png")+ " to "+scpOutputDir2
-                subprocess.call("scp "+in_msg.scpID2+" "+comp_file.replace(".png","-fs8.png")+" "+scpOutputDir2+" 2>&1 &", shell=True)
+                subprocess.call("scp "+scpID2+" "+comp_file.replace(".png","-fs8.png")+" "+scpOutputDir2+" 2>&1 &", shell=True)
             else:
-                if in_msg.verbose:
+                if verbose:
                     print "... secure copy "+comp_file+ " to "+scpOutputDir2
-                subprocess.call("scp "+in_msg.scpID2+" "+comp_file+" "+scpOutputDir2+" 2>&1 &", shell=True)
+                subprocess.call("scp "+scpID2+" "+comp_file+" "+scpOutputDir2+" 2>&1 &", shell=True)
     
     return composites_done
 
@@ -222,7 +223,10 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
         for composite in in_msg.postprocessing_composite:
 
             print "... creating composite: ", composite
-            composites_done = n_file_composite(composite, in_msg, sat_nr, time_slot, area, composites_done=composites_done)
+            composites_done = n_file_composite(composite, in_msg.sat, sat_nr, time_slot, area, in_msg.outputDir, in_msg.outputFile,
+                                               scpOutput=in_msg.scpOutput, scpOutDir=in_msg.scpOutputDir, scpID=in_msg.scpID, scpProducts=in_msg.scpProducts,
+                                               scpOutDir2=in_msg.scpOutputDir2, scpID2=in_msg.scpID2, scpProducts2=in_msg.scpProducts2,
+                                               composites_done=composites_done, verbose=in_msg.verbose)
 
         if in_msg.verbose:
             if len(composites_done) > 0:
@@ -336,7 +340,7 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
                             print "    /usr/bin/scp "+in_msg.scpID+" "+outfile+" "+scpOutputDir+" 2>&1 &"
                         subprocess.call("/usr/bin/scp "+in_msg.scpID+" "+outfile+" "+scpOutputDir+" 2>&1 &", shell=True)
 
-                if in_msg.scpOutput and in_msg.scpID2 != None and in_msg.scpOutputDir2 != None:
+                if in_msg.scpOutput and (in_msg.scpID2 is not None) and (in_msg.scpOutputDir2 is not None):
                     if (montage in in_msg.scpProducts2) or ('all' in [x.lower() for x in in_msg.scpProducts2 if type(x)==str]):
                         scpOutputDir2 = format_name (in_msg.scpOutputDir2, time_slot, area=area, rgb=montage_name, sat=in_msg.sat, sat_nr=sat_nr )
                         if in_msg.compress_to_8bit:

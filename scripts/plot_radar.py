@@ -35,6 +35,7 @@ layer=' 2nd layer'
 
 #color_mode='rainbow'
 color_mode='RainRate'
+#color_mode='datalevels256'
 
 add_rivers=True
 add_borders=True 
@@ -44,7 +45,7 @@ if len(layer) > 0:
     add_borders = False # no map    if an overlay is needed
 add_title=True
 add_logos=False
-add_colorscale=False
+add_colorscale=True
 fill_value=None # transparent background 
 #fill_value=(1,1,1)  # white background
 #title_color=(0,0,0)
@@ -89,15 +90,15 @@ time_slot = datetime(year, month, day, hour, minute)
 print "*** "
 print "*** read radar data (plot_radar.py)"
 global_data = GeostationaryFactory.create_scene("swissradar", "", "radar", time_slot)
-prop_str='precip'                     # RZC
-#prop_str='poh'   # does not work!!!  # BZC
-#prop_str='mesh'  # does not work!!!  # MZC
-#prop_str='vil'                       # LZC
-#prop_str='maxecho'                   # CZC
-#prop_str='echotop15'                 # EZC
-#prop_str='echotop20'                 # EZC                 
-#prop_str='echotop45'                 # EZC
-#prop_str='echotop50'                 # EZC
+prop_str='PRECIP'                     # RZC
+#prop_str='POH'    # does not work!!!  # BZC
+#prop_str='MESHS' # does not work!!!  # MZC
+#prop_str='VIL'                       # LZC
+#prop_str='MaxEcho'                   # CZC
+#prop_str='EchoTOP15'                 # EZC
+#prop_str='EchoTOP20'                 # EZC                 
+#prop_str='EchoTOP45'                 # EZC
+#prop_str='EchoTOP50'                 # EZC
 #global_data = GeostationaryFactory.create_scene("dem", "", "dem", time_slot)
 #prop_str = 'dem'
 
@@ -111,7 +112,6 @@ area="ccs4"
 
 obj_area = get_area_def(area)
 global_data.load([prop_str])
-
 
 #plot.show_quicklook(obj_area, global_data[prop_str].data )
 #print "global_data[prop_str].data", global_data[prop_str].data
@@ -139,15 +139,6 @@ if hasattr(global_data[prop_str], 'product_name'):
     if global_data[prop_str].product_name == 'EZC':
         top_str=global_data[prop_str].name[-2:]
 
-if prop_str == 'h03':
-    # PROJECT data to new area 
-    area='ccs4'
-    data = global_data.project(area)
-    data[prop_str].product_name = global_data[prop_str].product_name
-    data[prop_str].units = global_data[prop_str].units
-    global_data = data
-    resolution='i'
-    obj_area = get_area_def(area)
 
 #output_dir='./'+yearS+'-'+monthS+'-'+dayS+'/'+yearS+'-'+monthS+'-'+dayS+'_'+prop_str+'-'+area+'/'
 #output_dir='./pics/'
@@ -220,8 +211,9 @@ elif prop_str=='vil':
     max_data=15
     tick_marks=5
     minor_tick_marks=1  # default
-elif prop_str=='poh':
-    max_data=1
+elif prop_str=='POH':
+    min_data=0
+    max_data=100
 #    tick_marks=5
 #    minor_tick_marks=1  # default
 #elif prop_str.find('echotop') != -1:
@@ -237,6 +229,7 @@ method='linear'
 method='logarithmic'
 units = '['+global_data[prop_str].units+']'
 
+print color_mode
 if color_mode == 'rainbow':
 
     colormap = rainbow
@@ -260,7 +253,49 @@ elif color_mode == 'RainRate':
     max_data = 250
     colormap = RainRate
     units='mm/h'
+elif color_mode == 'datalevels256':
 
+    if prop_str == 'PRECIP':
+        from trollimage.colormap import RainRate
+        colormap = RainRate        
+    elif prop_str == 'POH':
+        from trollimage.colormap import ProbabilityOfHail
+        colormap = ProbabilityOfHail
+        #from trollimage.colormap import rainbow
+        #colormap = rainbow
+    elif prop_str == 'MESHS':
+        from trollimage.colormap import MESHS
+        colormap = MESHS
+    elif prop_str == 'VIL':
+        from trollimage.colormap import VerticalIntegratedLiquid
+        colormap = VerticalIntegratedLiquid
+    elif prop_str == 'MaxEcho':
+        from trollimage.colormap import Reflectivity
+        colormap = Reflectivity
+    elif prop_str[0:7] == 'EchoTOP':
+        from trollimage.colormap import EchoTop
+        colormap = EchoTop
+
+    #from ConfigParser import ConfigParser
+    #from mpop import CONFIG_PATH
+    #conf = ConfigParser()
+    #conf.read(os.path.join(CONFIG_PATH, global_data.fullname + ".cfg"))
+    #for i in xrange(9):
+    #    radar_product='radar-{0:1d}'.format(i+1)
+    #    prod_name = conf.get(radar_product, "name")
+    #    if prod_name.replace("'", "").replace('"', '') == prop_str.replace("'", "").replace('"', ''):
+    #        if verbose:
+    #            print "... radar product to read:", prop_str
+    #        scale = conf.get(radar_product, "scale")
+    #        print '... read color scale from ', scale
+    #        break
+    ##scale = conf.get(prop_str, "scale")
+    #colorscale = np.loadtxt(scale, skiprows=1)
+    #print colorscale
+    #print colorscale.shape, type(colorscale)
+    #print colorscale[1:,4], type(colorscale[0,:])
+    #print colorscale[1:,1:4]    
+    
 else:
     print "*** ERROR, unknown color mode"
 

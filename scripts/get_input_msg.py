@@ -1,4 +1,3 @@
-
 from datetime import datetime, timedelta
 from my_msg_module import check_near_real_time
 import sys
@@ -74,7 +73,8 @@ class input_msg_class:
                       'precip':0,'precip_ir':0,'qa':0,'reff':0,'satz':0,'sds':0,'sds_cs':0,'sds_diff':0,'sds_diff_cs':0,\
                       'vza':0,'vaa':0,'sunz':0,'sza':0,'lat':-80,'lon':-80,'time_offset':0,\
                       'ot_anvilmean_brightness_temperature_difference':0,\
-                      'SYNMSG_BT_CL_IR10.8': 205}
+                      'SYNMSG_BT_CL_IR10.8': 205,'IR_108-COSMO-minus-MSG':-40,\
+                      'POH':0,'MESHS':2,'VIL':0}
       self.rad_max = {'VIS006':  85, 'VIS008':  90, 'IR_016':  80, 'IR_039': 340, 'WV_062': 260, 'WV_073': 280,\
                       'IR_087': 320, 'IR_097': 285, 'IR_108': 320, 'IR_120': 320, 'IR_134': 290, 'HRV': 100,\
                       'VIS006c':  85, 'VIS008c':  90, 'IR_016c':  80, 'IR_039c': 340, 'WV_062c': 260, 'WV_073c': 280,\
@@ -89,7 +89,8 @@ class input_msg_class:
                       'precip':256,'precip_ir':256,'qa':50,'reff':50,'satz':90,'sds':1200,'sds_cs':1200,'sds_diff':800,'sds_diff_cs':800,\
                       'vza':90,'vaa':360,'sunz':90,'sza':90,'lat':80,'lon':80,'time_offset':750,
                       'ot_anvilmean_brightness_temperature_difference':6,\
-                      'SYNMSG_BT_CL_IR10.8': 320}
+                      'SYNMSG_BT_CL_IR10.8': 320,'IR_108-COSMO-minus-MSG':40,\
+                      'POH':100,'MESHS':6,'VIL':75}
       self.tick_marks= {'VIS006': 20, 'VIS008': 20, 'IR_016': 20, 'IR_039': 20, 'WV_062': 20, 'WV_073': 20,\
                         'IR_087': 20, 'IR_097': 20, 'IR_108': 20, 'IR_120': 20, 'IR_134': 20, 'HRV': 20,\
                         'vza': 5, 'vaa': 5, 'lat': 5, 'lon': 5,\
@@ -102,7 +103,7 @@ class input_msg_class:
                         'precip':10,'precip_ir':10,'qa':10,'reff':10,'satz':10,'sds':100,'sds_cs':100,'sds_diff':100,'sds_diff_cs':100,\
                         'sunz':10,'sza':10,'lat':10,'lon':10,'time_offset':100,
                         'ot_anvilmean_brightness_temperature_difference':1,\
-                        'SYNMSG_BT_CL_IR10.8': 20}
+                        'SYNMSG_BT_CL_IR10.8': 20,'MESHS':1}
       self.minor_tick_marks = {'VIS006': 5, 'VIS008': 5, 'IR_016': 5, 'IR_039': 5, 'WV_062': 5, 'WV_073': 5,\
                         'IR_087': 5, 'IR_097': 5, 'IR_108': 5, 'IR_120': 5, 'IR_134': 5, 'HRV': 5,\
                         'vza': 1, 'vaa': 1, 'lat': 1, 'lon': 1,\
@@ -115,7 +116,7 @@ class input_msg_class:
                         'precip':5,'precip_ir':5,'qa':2,'reff':2,'satz':2,'sds':10,'sds_cs':10,'sds_diff':10,'sds_diff_cs':10,\
                         'sunz':2,'sza':2,'lat':2,'lon':2,'time_offset':10,
                         'ot_anvilmean_brightness_temperature_difference':0.5,\
-                        'SYNMSG_BT_CL_IR10.8': 5}
+                        'SYNMSG_BT_CL_IR10.8': 5,'MESHS':0.5}
 
       self.postprocessing_areas     = []
       self.postprocessing_composite = []
@@ -151,7 +152,7 @@ class input_msg_class:
          quit()
 
    def update_datetime(self, year, month, day, hour, minute):
-      if year != None and month != None and day != None and hour != None and minute != None: 
+      if (year is not None) and (month is not None) and (day is not None) and (hour is not None) and (minute is not None): 
          self.datetime = datetime(year, month, day, hour, minute, 0)
       else:
          print "*** WARNING: cannot update time!"
@@ -232,6 +233,8 @@ class input_msg_class:
            return ""
       elif self.sat[0:5].lower() == "cosmo":
          return "cosmo"
+      elif self.sat == "swissradar":
+         return "swissradar"
       else:
          if self.sat_nr != "":
            d={'sat':self.sat, 'sat_nr':str(int(self.sat_nr)), '0sat_nr':str(self.sat_nr).zfill(2)}
@@ -340,7 +343,7 @@ class input_msg_class:
             default_settings = global_settings
 
          for key, value in chosen_settings.iteritems():
-            if value == None:
+            if value is None:
                chosen_settings[key] = deepcopy(default_settings[key])
 
       if scale == "broad":
@@ -375,7 +378,7 @@ class input_msg_class:
 # =====================================================================================================================
 
 
-def get_input_msg(input_file, timeslot=None, delay=None):
+def get_input_msg(input_file):
 
    from os import getcwd
    from os import path
@@ -392,9 +395,6 @@ def get_input_msg(input_file, timeslot=None, delay=None):
          # get input from (user specified) file 
          input_module = __import__(input_file)
          input_module.input(in_msg)
-         
-         if timeslot != None:
-            in_msg.datetime = timeslot
             
          return in_msg
       else:
@@ -433,7 +433,7 @@ def get_date_and_inputfile_from_commandline(print_usage=None):
       # check for more arguments 
       if len(sys.argv) > 2:
          if len(sys.argv) < 7:
-            if print_usage==None:
+            if print_usage is None:
                   print "*** Error, not enough command line arguments"
             else:
                print_usage()
@@ -448,8 +448,17 @@ def get_date_and_inputfile_from_commandline(print_usage=None):
             timeslot = datetime(year, month, day, hour, minute)
 
    # read input file and initialize in_msg
-   in_msg = get_input_msg(input_file, timeslot=timeslot)
+   in_msg = get_input_msg(input_file)
 
+   # initialize datetime, if not yet done in the input file 
+   if in_msg.datetime is None:
+      # choose timeslot of the satellite picture to process
+      # datetime according to command line arguments (if given)
+      # otherwise the latest possible time of SEVIRI observation (depends on RSS mode and chosen delay)
+      # also sets the near real time marker: in_msg.nrt
+      # input: in_msg.rss and in_msg.delay 
+      in_msg.init_datetime(timeslot=timeslot)
+   
    return in_msg
 
 # =====================================================================================================================
@@ -533,50 +542,51 @@ def parse_commandline():
 
 #########################################################################################
 
-def parse_commandline_and_read_inputfile():
+def parse_commandline_and_read_inputfile(input_file=None):
 
    #from get_input_msg import parse_commandline_and_read_inputfile
    #from get_input_msg import parse_commandline
    #from get_input_msg import get_input_msg
-      
-   # skip the py at the end of the input filename
-   input_file = args[0]
-   if input_file[-3:] == '.py': 
-       input_file=input_file[:-3]
-   # read input file and initialize 'in_msg'
-   in_msg = get_input_msg(input_file)
 
    # interpret command line arguments 
    (options, args) = parse_commandline()
-   
-   # convert date information into a datetime object
-   if options.date == None:
-      timeslot=None
-   else:
-      print options.date
-      from datetime import datetime
-      in_msg.timeslot=datetime(options.date[0],options.date[1],options.date[2],options.date[3],options.date[4])
-      #options['datetime']=datetime(options.date[0],options.date[1],options.date[2],options.date[3],options.date[4])
-   print "AAAAAAA timeslot: ", in_msg.timeslot
+
+   # first obligatory argument is the input file (or as optional argument)
+   if input_file is None:
+      input_file = args[0]
+
+   # skip the '.py' at the end of the input filename
+   if input_file[-3:] == '.py': 
+      input_file=input_file[:-3]
+   # read input file and initialize 'in_msg'
+   in_msg = get_input_msg(input_file)
    
    print '*** overwrite options of the input_file with command line arguments'
    for opt, value in options.__dict__.items():
-       if value != None:
-           print '   ', opt, ' = ', value
-           setattr(in_msg, opt, value)
-
+      if value is not None:
+         if opt!='date':
+            print '...', opt, ' = ', value
+            setattr(in_msg, opt, value)
+         else:
+            in_msg.update_datetime(options.date[0],options.date[1],options.date[2],options.date[3],options.date[4])
+            
    # initialize datetime, if not yet done per command line comment or in the input file 
-   if in_msg.datetime==None:
-      # choose timeslot of the satellite picture to process
-      # datetime according to command line arguments (if given)
-      # otherwise the last possible time of SEVIRI observation (depends on RSS mode and chosen delay)
+   if in_msg.datetime is None:
+      # choose timeslot of the latest possible satellite picture 
+      # depends on RSS mode and chosen delay == input: in_msg.rss and in_msg.delay
       # also sets the near real time marker: in_msg.nrt
-      # input: in_msg.rss and in_msg.delay 
       in_msg.init_datetime()
-           
-   print "CCCCCCCCC", in_msg.delay, in_msg.rss
-   print "DDDDDDD", in_msg.datetime
-   print ""
+
+   from datetime import datetime
+   if datetime.now() < in_msg.datetime:
+      print "*** ERROR in parse_commandline_and_read_inputfile ("+inspect.getfile(inspect.currentframe())+")"
+      print '    in_msg.datetime is in the future ', in_msg.datetime
+      raise TypeError('*** ERROR: in_msg.datetime is in the future '+str(in_msg.datetime))
+      quit()
+      
+   print "  date:", in_msg.datetime
+   print "  NRT: ", in_msg.nrt
+   #print in_msg.__dict__
    
    return in_msg
 

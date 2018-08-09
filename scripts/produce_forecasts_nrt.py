@@ -268,8 +268,6 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
         u_d[g,:,:] = previous*u1 + (1-previous)*u2
         v_d[g,:,:] = previous*v1 + (1-previous)*v2      
 
-    print "*** u_d[0].shape", u_d.shape[1], u_d.shape[2]
-
     return u_d, v_d
     
 
@@ -403,9 +401,6 @@ def compute_new_xy(xy1, dx_ds, dy_ds,  max_x_m, max_y_m):
 
 
     ind_inside = np.where( np.logical_and( np.logical_and(0<=xy2[:,0],xy2[:,0]<max_x_m), np.logical_and(0<=xy2[:,1],xy2[:,1]<max_y_m) ) )
-    print type(ind_inside)
-    print np.array(ind_inside).max(), np.array(ind_inside).min()
-    print np.array(ind_inside).shape
 
     xy2    = np.squeeze(xy2[ind_inside,:])
     xy1_px = np.squeeze(xy1_px[ind_inside,:])
@@ -472,7 +467,6 @@ if __name__ == '__main__':
     in_msg.resolution = 'i'
     in_msg.sat="Meteosat-"
     #in_msg.sat_nr = 9
-    print ('in_msg.sat_nr', in_msg.sat_nr)
     in_msg.add_title=False
     in_msg.outputDir='./pics/'
     in_msg.outputFile='WS_%(rgb)s-%(area)s_%y%m%d%H%M'
@@ -580,7 +574,7 @@ if __name__ == '__main__':
         if True:  # automatic choise of last 5min 
             in_msg.get_last_SEVIRI_date()
             time_slotSTOP = in_msg.datetime 
-            print "... chose time (automatically): ", str(time_slotSTOP)
+            print "... choose time (automatically): ", str(time_slotSTOP)
         else: # fixed date for text reasons
             year=2014          # 2014 09 15 21 35
             month= 7           # 2014 07 23 18 30
@@ -746,8 +740,6 @@ if __name__ == '__main__':
           p_min = 1001
           no_data = -1000000000
           #xy_levels = np.zeros((n_levels,nx*ny,2))
-          print "nx ",nx
-          print "ny "
           forecasts_out = np.zeros((len(channel_nr),2,nx,ny))
           forecasts_NextStep = np.zeros((len(channel_nr),n_levels,nx,ny))
           
@@ -807,13 +799,10 @@ if __name__ == '__main__':
                               
                           else:
                               ind_time = 1
-                          print "forecast 2: ",forecast2.shape
-                          print "forecast out: ",forecasts_out.shape
                           
                           #forecasts_out[channel_nr[rgb],ind_time,np.where(forecast2!=no_data)] = forecast2[np.where(forecast2!=no_data)]
                           temp = deepcopy(forecasts_out[channel_nr[rgb],ind_time,:,:])
                           temp [forecast2!=no_data] = forecast2[forecast2!=no_data]
-                          print "temp ",temp.shape
                           forecasts_out[channel_nr[rgb],ind_time,:,:] = deepcopy(temp) #np.where(forecast2!=no_data,forecast2,forecasts_out)
                           if level == (n_levels-1):
                             

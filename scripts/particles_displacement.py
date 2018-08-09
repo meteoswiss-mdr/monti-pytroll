@@ -1,7 +1,8 @@
 #https://tonysyu.github.io/animating-particles-in-a-flow.html
-def particles_displacement(u_func, v_func,method,dt,pts,size_x,size_y,wind_source):
-    import sympy
-    from sympy.abc import x, y
+def particles_displacement( u_func, v_func, method, dt, pts, size_x, size_y, wind_source ):
+    
+    import sympy   # does include e.g. integrate
+    #from sympy.abc import x, y
     import numpy as np
     from matplotlib import mlab
     from scipy import integrate

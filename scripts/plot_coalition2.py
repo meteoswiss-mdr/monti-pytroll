@@ -1086,8 +1086,8 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     if in_msg.show_clouds != 'all':
                         from skimage import morphology
                         mask = morphology.remove_small_objects(mask, min_cloud) #,connectivity=2)
-                        mask = morphology.remove_small_objects(-mask, max_holes)
-                        mask = deepcopy(-mask)
+                        mask = morphology.remove_small_objects(~mask, max_holes)
+                        mask = deepcopy(~mask)
                 elif chosen_settings['clean_mask'] == 'scipy':        
                     if in_msg.show_clouds != 'all':
                         # Remove small white regions
@@ -1098,9 +1098,9 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     if in_msg.show_clouds != 'all':
                         from skimage import morphology
                         mask = morphology.remove_small_objects(mask, min_cloud) #,connectivity=2)
-                        mask = morphology.remove_small_objects(-mask, max_holes)                            
+                        mask = morphology.remove_small_objects(~mask, max_holes)                            
                         # Remove small white regions
-                        mask = ndimage.binary_opening(-mask)
+                        mask = ndimage.binary_opening(~mask)
                         # Remove small black hole
                         mask = ndimage.binary_closing(mask) 
                 elif chosen_settings['clean_mask'] != 'no_cleaning':

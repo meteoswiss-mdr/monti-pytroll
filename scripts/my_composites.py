@@ -310,8 +310,8 @@ def DayNightFog(self, downscale=False, sza_max=88):
 DayNightFog.prerequisites = set(["HRV","IR_016",'IR_039','IR_108','IR_120'])
 
 
-#def daynight_blackground(self, cos_scaled=True, use_HRV=False, smooth=False, stretch=(0.005, 0.005), colorscale='greys'):
-def daynight_blackground(self, cos_scaled=True, use_HRV=False, smooth=False, stretch=False, colorscale='greys', fixed_minmax=False, white_clouds=True):
+#def daynight_background(self, cos_scaled=True, use_HRV=False, smooth=False, stretch=(0.005, 0.005), colorscale='greys'):
+def daynight_background(self, cos_scaled=True, use_HRV=False, smooth=False, stretch=False, colorscale='greys', fixed_minmax=False, white_clouds=True):
 
     import numpy as np
 
@@ -332,6 +332,8 @@ def daynight_blackground(self, cos_scaled=True, use_HRV=False, smooth=False, str
     # select, if you want HRV or VIS006
     if use_HRV:
         vis   = self["HRV"].data
+        # fill remaining area with VIS006
+        vis[vis.mask==True] = self["VIS006"].data[vis.mask==True]
     else:
         vis   = self["VIS006"].data
 
@@ -414,44 +416,46 @@ def daynight_blackground(self, cos_scaled=True, use_HRV=False, smooth=False, str
     cm.set_range(0, 1)
     img.colorize(cm)
 
-    #if stretch:
-    #    img.enhance(stretch=stretch)
-
+    if stretch:
+        print "... use streching ", stretch
+        img.enhance(stretch=stretch)
+        
     return img
 
 def HRVir108c(self, smooth=False):
     self.check_channels("HRV", "IR_108")
-    return daynight_blackground(self, cos_scaled=True, use_HRV=True, smooth=smooth, colorscale='rainbow')
+    return daynight_background(self, cos_scaled=True, use_HRV=True, smooth=smooth, colorscale='rainbow')
 
-HRVir108c.prerequisites = set(["HRV", 10.8])
+HRVir108c.prerequisites = set(["VIS006", "HRV", 10.8])
 
 def HRVir108(self, smooth=False):
     self.check_channels("HRV", "IR_108")
-    return daynight_blackground(self, cos_scaled=True, use_HRV=True, smooth=smooth, colorscale='greys')
+    return daynight_background(self, cos_scaled=True, use_HRV=True, smooth=smooth, colorscale='greys')
 
-HRVir108.prerequisites = set(["HRV", 10.8])
+HRVir108.prerequisites = set(["VIS006", "HRV", 10.8])
 
 def hrvIR108(self, smooth=False):
     self.check_channels("HRV", "IR_108")
-    return daynight_blackground(self, cos_scaled=True, use_HRV=True, smooth=smooth, colorscale='greys', white_clouds=False)
+    return daynight_background(self, cos_scaled=True, use_HRV=True, smooth=smooth, colorscale='greys', white_clouds=False)
 
-hrvIR108.prerequisites = set(["HRV", 10.8])
+hrvIR108.prerequisites = set(["VIS006", "HRV", 10.8])
 
 def VIS006ir108c(self, smooth=False):
     self.check_channels("VIS006", "IR_108")
-    return daynight_blackground(self, cos_scaled=True, use_HRV=False, smooth=smooth, colorscale='rainbow')
+    return daynight_background(self, cos_scaled=True, use_HRV=False, smooth=smooth, colorscale='rainbow')
 
 VIS006ir108c.prerequisites = set(["VIS006", 10.8])
 
 def VIS006ir108(self, smooth=False):
     self.check_channels("VIS006", "IR_108")
-    return daynight_blackground(self, cos_scaled=True, use_HRV=False, smooth=smooth, colorscale='greys')
+    #return daynight_background(self, cos_scaled=True, use_HRV=False, smooth=smooth, stretch=(0.005, 0.005), colorscale='greys')
+    return daynight_background(self, cos_scaled=True, use_HRV=False, smooth=smooth, colorscale='greys')
 
 VIS006ir108.prerequisites = set(["VIS006", 10.8])
 
 def vis006IR108(self, smooth=False):
     self.check_channels("VIS006", "IR_108")
-    return daynight_blackground(self, cos_scaled=True, use_HRV=False, smooth=smooth, colorscale='greys', white_clouds=False)
+    return daynight_background(self, cos_scaled=True, use_HRV=False, smooth=smooth, colorscale='greys', white_clouds=False)
 
 vis006IR108.prerequisites = set(["VIS006", 10.8])
 
@@ -551,8 +555,8 @@ def VIS006_minus_IR_016(self):
 
     min_data = ch_diff.data.min()
     max_data = ch_diff.data.max()
-    print "    min/max", min_data, max_data
-
+    #print "    min/max", min_data, max_data
+    
     img = trollimage(ch_diff.data, mode="L", fill_value=(0,0,0))
 
     cm = deepcopy(rainbow)
@@ -928,6 +932,97 @@ def clouddepth(self):
 #clouddepth.prerequisites = set(['WV_062','WV_073','IR_087','IR_097','IR_108','IR_120','IR_134'])
 clouddepth.prerequisites = set(['WV_062','WV_073','IR_087','IR_108','IR_120','IR_134'])
 
+def streamplot(self):
+    """Create streamplot images with U and V wind components 
+    """
+
+    from mpop.imageo.HRWimage import HRWstreamplot
+    PIL_image = HRWstreamplot( self['U'].data, self['V'].data, self['U'].area, '', color_mode='speed', vmax=20) # , legend=True, legend_loc=3
+    
+    return PIL_image
+
+streamplot.prerequisites = set(['U','V'])
+
+
+def streamplot_100hPa(self):
+    """Create streamplot images with U and V wind components 
+    """
+    from mpop.imageo.HRWimage import HRWstreamplot
+    PIL_image = HRWstreamplot( self['U-100hPa'].data, self['V-100hPa'].data, self['U-100hPa'].area, '', color_mode='speed', vmax=20) # , legend=True, legend_loc=3
+    return PIL_image
+streamplot_100hPa.prerequisites = set(['U-100hPa','V-100hPa'])
+
+def streamplot_200hPa(self):
+    """Create streamplot images with U and V wind components 
+    """
+    from mpop.imageo.HRWimage import HRWstreamplot
+    PIL_image = HRWstreamplot( self['U-200hPa'].data, self['V-200hPa'].data, self['U-200hPa'].area, '', color_mode='speed', vmax=20) # , legend=True, legend_loc=3
+    return PIL_image
+streamplot_200hPa.prerequisites = set(['U-200hPa','V-200hPa'])
+def streamplot_300hPa(self):
+    """Create streamplot images with U and V wind components 
+    """
+    from mpop.imageo.HRWimage import HRWstreamplot
+    PIL_image = HRWstreamplot( self['U-300hPa'].data, self['V-300hPa'].data, self['U-300hPa'].area, '', color_mode='speed', vmax=20) # , legend=True, legend_loc=3
+    return PIL_image
+streamplot_300hPa.prerequisites = set(['U-300hPa','V-300hPa'])
+
+def streamplot_400hPa(self):
+    """Create streamplot images with U and V wind components 
+    """
+    from mpop.imageo.HRWimage import HRWstreamplot
+    PIL_image = HRWstreamplot( self['U-400hPa'].data, self['V-400hPa'].data, self['U-400hPa'].area, '', color_mode='speed', vmax=20) # , legend=True, legend_loc=3
+    return PIL_image
+streamplot_400hPa.prerequisites = set(['U-400hPa','V-400hPa'])
+def streamplot_500hPa(self):
+    """Create streamplot images with U and V wind components 
+    """
+    from mpop.imageo.HRWimage import HRWstreamplot
+    PIL_image = HRWstreamplot( self['U-500hPa'].data, self['V-500hPa'].data, self['U-500hPa'].area, '', color_mode='speed', vmax=20) # , legend=True, legend_loc=3
+    return PIL_image
+streamplot_500hPa.prerequisites = set(['U-500hPa','V-500hPa'])
+
+def streamplot_600hPa(self):
+    """Create streamplot images with U and V wind components 
+    """
+    from mpop.imageo.HRWimage import HRWstreamplot
+    PIL_image = HRWstreamplot( self['U-600hPa'].data, self['V-600hPa'].data, self['U-600hPa'].area, '', color_mode='speed', vmax=20) # , legend=True, legend_loc=3
+    return PIL_image
+streamplot_600hPa.prerequisites = set(['U-600hPa','V-600hPa'])
+
+def streamplot_700hPa(self):
+    """Create streamplot images with U and V wind components 
+    """
+    from mpop.imageo.HRWimage import HRWstreamplot
+    PIL_image = HRWstreamplot( self['U-700hPa'].data, self['V-700hPa'].data, self['U-700hPa'].area, '', color_mode='speed', vmax=20) # , legend=True, legend_loc=3
+    return PIL_image
+streamplot_700hPa.prerequisites = set(['U-700hPa','V-700hPa'])
+
+def streamplot_800hPa(self):
+    """Create streamplot images with U and V wind components 
+    """
+    from mpop.imageo.HRWimage import HRWstreamplot
+    PIL_image = HRWstreamplot( self['U-800hPa'].data, self['V-800hPa'].data, self['U-800hPa'].area, '', color_mode='speed', vmax=20) # , legend=True, legend_loc=3
+    return PIL_image
+streamplot_800hPa.prerequisites = set(['U-800hPa','V-800hPa'])
+
+def streamplot_900hPa(self):
+    """Create streamplot images with U and V wind components 
+    """
+    from mpop.imageo.HRWimage import HRWstreamplot
+    PIL_image = HRWstreamplot( self['U-900hPa'].data, self['V-900hPa'].data, self['U-900hPa'].area, '', color_mode='speed', vmax=20) # , legend=True, legend_loc=3
+    return PIL_image
+streamplot_900hPa.prerequisites = set(['U-900hPa','V-900hPa'])
+
+def streamplot_1000hPa(self):
+    """Create streamplot images with U and V wind components 
+    """
+    from mpop.imageo.HRWimage import HRWstreamplot
+    PIL_image = HRWstreamplot( self['U-1000hPa'].data, self['V-1000hPa'].data, self['U-1000hPa'].area, '', color_mode='speed', vmax=20) # , legend=True, legend_loc=3
+    return PIL_image
+streamplot_1000hPa.prerequisites = set(['U-1000hPa','V-1000hPa'])
+
+
 
 #def channel_difference(self, rgb):
 #    """Make a colored image of the difference of two Seviri channels.
@@ -961,6 +1056,8 @@ seviri = [hr_visual, hr_overview, hr_natural, hr_airmass, sandwich, HRVFog, DayN
           WV_073_minus_IR_134, IR_120_minus_IR_108, IR_087_minus_IR_108, IR_087_minus_IR_120, \
           trichannel, clouddepth, mask_clouddepth]
 
+cosmo = [streamplot, streamplot_100hPa, streamplot_200hPa, streamplot_300hPa, streamplot_400hPa, streamplot_500hPa, \
+                     streamplot_600hPa, streamplot_700hPa, streamplot_800hPa, streamplot_900hPa, streamplot_1000hPa]
 
 def get_image(data, rgb): 
 
@@ -1058,6 +1155,28 @@ def get_image(data, rgb):
         obj_image = data.image.trichannel
     elif rgb=='clouddepth':
         obj_image = data.image.clouddepth
+    elif rgb=='streamplot':
+        obj_image = data.image.streamplot
+    elif rgb=='streamplot-100hPa':
+        obj_image = data.image.streamplot_100hPa
+    elif rgb=='streamplot-200hPa':
+        obj_image = data.image.streamplot_200hPa
+    elif rgb=='streamplot-300hPa':
+        obj_image = data.image.streamplot_300hPa
+    elif rgb=='streamplot-400hPa':
+        obj_image = data.image.streamplot_400hPa
+    elif rgb=='streamplot-500hPa':        
+        obj_image = data.image.streamplot_500hPa
+    elif rgb=='streamplot-600hPa':
+        obj_image = data.image.streamplot_600hPa
+    elif rgb=='streamplot-700hPa':
+        obj_image = data.image.streamplot_700hPa
+    elif rgb=='streamplot-800hPa':
+        obj_image = data.image.streamplot_800hPa
+    elif rgb=='streamplot-900hPa':
+        obj_image = data.image.streamplot_900hPa
+    elif rgb=='streamplot-1000hPa':
+        obj_image = data.image.streamplot_1000hPa
     elif rgb == 'VIS006' or rgb == 'VIS008' or rgb == 'IR_016' or rgb == 'IR_039' or rgb == 'WV_062' or rgb == 'WV_073' or \
             rgb == 'IR_087' or rgb == 'IR_097' or rgb == 'IR_108' or rgb == 'IR_120' or rgb == 'IR_134' or rgb == 'HRV':
         obj_image = data.image.channel_image

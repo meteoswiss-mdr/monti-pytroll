@@ -104,6 +104,11 @@ def plot_msg(in_msg):
    RGBs = check_input(in_msg, in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str(), in_msg.datetime)  
    # in_msg.sat_nr might be changed to backup satellite
 
+   ### ??? maybe we would like some postprocessing ???
+   ## if no RGB product can be produced, return immediately
+   ##if len(RGBs) == 0:
+   ##  return []
+   
    if len(RGBs) != len(in_msg.RGBs):
       print "*** Warning, input not complete."
       print "*** Warning, process only: ", RGBs
@@ -117,6 +122,7 @@ def plot_msg(in_msg):
       print '    Satellite instrument: ' + in_msg.instrument
       print '    Date/Time:        '+ str(in_msg.datetime)
       print '    RGBs:            ', in_msg.RGBs
+      print '    parallax_correction: ', in_msg.parallax_correction
       print '    Area:            ', in_msg.areas
       print '    reader level:    ', in_msg.reader_level
 
@@ -190,14 +196,12 @@ def plot_msg(in_msg):
                print "*** Use data for the area loaded: ", area
             #obj_area = area_loaded
             data = global_data
-            resolution='l'
          else:
             if in_msg.verbose:    
                print "*** Reproject data to area: ", area, "(org projection: ",  area_loaded.name, ")"     
             obj_area = get_area_def(area)
             # PROJECT data to new area 
             data = global_data.project(area, precompute=True)
-            resolution='i'
 
 
          if in_msg.parallax_correction:
@@ -303,6 +307,7 @@ def plot_msg(in_msg):
 
                # add title to image
                if in_msg.add_title:
+                  print "in_msg.title_y_line_nr", in_msg.title_y_line_nr
                   add_title(PIL_image, in_msg.title, HRV_enhance_str+rgb, in_msg.sat_str(), data.sat_nr(), in_msg.datetime, area, dc, in_msg.verbose,
                             title_color=in_msg.title_color, title_y_line_nr=in_msg.title_y_line_nr ) # !!! needs change
 
@@ -386,25 +391,29 @@ def plot_msg(in_msg):
                   if (rgb in in_msg.scpProducts) or ('all' in [x.lower() for x in in_msg.scpProducts if type(x)==str]):
                      scpOutputDir = format_name (in_msg.scpOutputDir, data.time_slot, area=area, rgb=rgb+parallax_correction_str, sat=data.satname, sat_nr=data.sat_nr() )
                      if in_msg.compress_to_8bit:
+                        command_line_command="scp "+in_msg.scpID+" "+outputFile.replace(".png","-fs8.png")+" "+scpOutputDir+" 2>&1 &"
                         if in_msg.verbose:
-                           print "... secure copy "+outputFile.replace(".png","-fs8.png")+ " to "+scpOutputDir
-                        subprocess.call("scp "+in_msg.scpID+" "+outputFile.replace(".png","-fs8.png")+" "+scpOutputDir+" 2>&1 &", shell=True)
+                           print "... secure copy: "+command_line_command
+                        subprocess.call(command_line_command, shell=True)
                      else:
+                        command_line_command="scp "+in_msg.scpID+" "+outputFile+" "+scpOutputDir+" 2>&1 &"
                         if in_msg.verbose:
-                           print "... secure copy "+outputFile+ " to "+scpOutputDir
-                        subprocess.call("scp "+in_msg.scpID+" "+outputFile+" "+scpOutputDir+" 2>&1 &", shell=True)
+                           print "... secure copy: "+command_line_command
+                        subprocess.call(command_line_command, shell=True)
 
                if in_msg.scpOutput and (in_msg.scpID2 is not None) and (in_msg.scpOutputDir2 is not None):
                   if (rgb in in_msg.scpProducts2) or ('all' in [x.lower() for x in in_msg.scpProducts2 if type(x)==str]):
                      scpOutputDir2 = format_name (in_msg.scpOutputDir2, data.time_slot, area=area, rgb=rgb+parallax_correction_str, sat=data.satname, sat_nr=data.sat_nr() )
                      if in_msg.compress_to_8bit:
+                        command_line_command="scp "+in_msg.scpID2+" "+outputFile.replace(".png","-fs8.png")+" "+scpOutputDir2+" 2>&1 &"
                         if in_msg.verbose:
-                           print "... secure copy "+outputFile.replace(".png","-fs8.png")+ " to "+scpOutputDir2
-                        subprocess.call("scp "+in_msg.scpID2+" "+outputFile.replace(".png","-fs8.png")+" "+scpOutputDir2+" 2>&1 &", shell=True)
+                           print "... secure copy: "+command_line_command
+                        subprocess.call(command_line_command, shell=True)
                      else:
+                        command_line_command="scp "+in_msg.scpID2+" "+outputFile+" "+scpOutputDir2+" 2>&1 &"
                         if in_msg.verbose:
-                           print "... secure copy "+outputFile+ " to "+scpOutputDir2
-                        subprocess.call("scp "+in_msg.scpID2+" "+outputFile+" "+scpOutputDir2+" 2>&1 &", shell=True)
+                           print "... secure copy: "+command_line_command
+                        subprocess.call(command_line_command, shell=True)
 
                            
                if 'ninjotif' in in_msg.outputFormats:
@@ -507,6 +516,12 @@ def load_products(data_object, RGBs, in_options, area_loaded, load_CTH=True):
          #print data_object[rgb].data.shape, data_object[rgb].data.min(), data_object[rgb].data.max()
          area_loaded = data_object[rgb].area
 
+      elif rgb in products.cosmo_vars_3d:
+        
+        # use optional argument to specify the pressure in hPa
+        data_object.load( [rgb], pressure_levels=in_options.pressure_levels[rgb] )
+        area_loaded = data_object[rgb].area
+         
       else: 
          if in_options.verbose:
             print "    load " + str(in_options.sat_str()) +" product by name: ", rgb
@@ -809,20 +824,25 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
    #   if in_msg.verbose:
    #      print "    add coastlines to image by add_averlay"
    #   img.add_overlay(color=(0, 0, 0), width=0.5, resolution=None)
-   
-   # convert image to PIL image 
-   if hasattr(img, 'pil_image'):
-      if in_msg.verbose:
-         print "    convert to PIL_image by pil_image function"
-      PIL_image=img.pil_image()  
+
+   if isinstance(img, Image.Image):
+     print "    already PIL image, no conversion needed"
+     PIL_image=img
    else:
-      if in_msg.verbose:
-         print "    convert to PIL_image by saving and reading"
-      
-      tmp_file = format_name ("/tmp/%Y-%m-%d_%m-%d_%(rgb)s_%(area)s_tmp.png", in_msg.datetime, rgb=rgb, area=obj_area)
-      img.save(tmp_file)
-      PIL_image = Image.open(tmp_file)
-      subprocess.call("rm "+tmp_file, shell=True)
+     # convert image to PIL image 
+     if hasattr(img, 'pil_image'):
+        if in_msg.verbose:
+           print "    convert to PIL_image by pil_image function"
+        PIL_image=img.pil_image()
+
+     else:
+        if in_msg.verbose:
+           print "    convert to PIL_image by saving and reading"
+
+        tmp_file = format_name ("/tmp/%Y-%m-%d_%m-%d_%(rgb)s_tmp.png", in_msg.datetime, rgb=rgb)
+        img.save(tmp_file)
+        PIL_image = Image.open(tmp_file)
+        subprocess.call("rm "+tmp_file, shell=True)
 
    return PIL_image
 
@@ -965,7 +985,7 @@ def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, verbose, 
       # backward compartibility: convert title to a list, if given as a string
       if isinstance(title, basestring):
          title=[title]
-
+         
    # if area does not contain Europe 
    if area.find("EuropeCanary") == -1:
       x_pos_title = 10

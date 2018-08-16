@@ -251,5 +251,5 @@ if True:
     in_msg.scpOutput = False
     in_msg.datetime = global_data.time_slot
     in_msg.outputDir = outputDir
-    in_msg.postprocessing_composite=["RATE-HRV", "RATE-ir108", "RATE-VIS006ir108"]   
+    in_msg.postprocessing_composite=["RATE-HRVir108"]   
     postprocessing(in_msg, global_data.time_slot, global_data.number, area)

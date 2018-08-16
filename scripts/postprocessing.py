@@ -199,28 +199,23 @@ def n_file_composite(composite, satellite, sat_nr, time_slot, area, outDir, outF
 
 def postprocessing (in_msg, time_slot, sat_nr, area):
 
-    if in_msg.verbose:
-        print ""
-        print "*** start post processing for area: ", area, ', time: ', str(time_slot)
-        print "... desired composites: ", in_msg.postprocessing_composite
-        print "... desired montages: ", in_msg.postprocessing_montage
-        print ""
-
-    ## search for lightning file 
-    #yearS  = str(in_msg.datetime.year)
-    #monthS = "%02d" % in_msg.datetime.month
-    #dayS   = "%02d" % in_msg.datetime.day
-    #hourS  = "%02d" % in_msg.datetime.hour 
-    #minS   = "%02d" % in_msg.datetime.minute
-
-    #products_needed=set()
-    #for comp in in_msg.postprocessing_composite:
-    #    products_needed = products_needed |  set(comp.split("-"))  # | == union of two sets
-    ##print products_needed
-
-    composites_done = []
     if hasattr(in_msg, 'postprocessing_composite'):
-        for composite in in_msg.postprocessing_composite:
+        if isinstance(in_msg.postprocessing_composite, dict):
+            if area in in_msg.postprocessing_composite:
+                postprocessing_composite=in_msg.postprocessing_composite[area]
+            else:
+                postprocessing_composite=[]
+        else:
+            postprocessing_composite=in_msg.postprocessing_composite
+    
+        if in_msg.verbose:
+            print "=================================="
+            print "*** start post processing for area: ", area, ', time: ', str(time_slot)
+            print "... desired composites: ", postprocessing_composite
+
+        composites_done = []
+
+        for composite in postprocessing_composite:
 
             print "... creating composite: ", composite
             composites_done = n_file_composite(composite, in_msg.sat, sat_nr, time_slot, area, in_msg.outputDir, in_msg.outputFile,
@@ -238,13 +233,25 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
 
     # ----------------------------------------------
     if in_msg.verbose:
-        print ""
         print "*** start montage_pictures for area: ", area
     
     montage_done = []
     if hasattr(in_msg, 'postprocessing_montage'):
 
-        for montage in in_msg.postprocessing_montage:
+        if isinstance(in_msg.postprocessing_montage, dict):
+            if area in in_msg.postprocessing_montage:
+                postprocessing_montage=in_msg.postprocessing_montage[area]
+            else:
+                postprocessing_montage=[]
+        else:
+            postprocessing_montage=in_msg.postprocessing_montage
+    
+        if in_msg.verbose:
+            print ""
+            print "*** start post processing for area: ", area, ', time: ', str(time_slot)
+            print "... desired montages: ", postprocessing_montage
+            
+        for montage in postprocessing_montage:
             if len(montage) == 0:
                 continue
 
@@ -279,7 +286,8 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
             files_complete=True
             
             for mfile in montage:
-            
+
+                print '    analyse first filename', mfile
                 rgb = mfile.split("_")[1]
                 outputDir = format_name(in_msg.outputDir,  time_slot, rgb=rgb, area=area)
                 
@@ -287,7 +295,7 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
                 if not isfile(next_file):
                     files_complete=False
                     print "*** Warning, can not find "+mfile+" file: "+next_file
-                    if area == "ccs4" or area == 'EuropeCanaryS95':
+                    if area in ["ccs4","EuropeCanaryS95","odysseyS25","euroHDready","SeviriDiskFull00S4"]:
                         # produce image with placeholder for missing product
                         files += " "+"/opt/users/common/logos/missing_product_textbox_"+area+".png"
                         outfile += mfile[mfile.index("_")+1:]+"-"
@@ -358,9 +366,9 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
                 for montage in montage_done:
                     print "   ", montage
             else:
-                if len(in_msg.postprocessing_montage) > 0:
-                    if len(in_msg.postprocessing_montage[0]) > 0:
-                        print "*** Warning, no montages produced (requested ",in_msg.postprocessing_montage,")"
+                if len(postprocessing_montage) > 0:
+                    if len(postprocessing_montage[0]) > 0:
+                        print "*** Warning, no montages produced (requested ",postprocessing_montage,")"
 
     return composites_done, montage_done
 

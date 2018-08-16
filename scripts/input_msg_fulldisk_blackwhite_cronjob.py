@@ -40,7 +40,7 @@ def input(in_msg):
     # chose RGB mode
     #-------------------
     ## satellite channels
-    in_msg.RGBs.append('VIS006')       # black and white
+    #in_msg.RGBs.append('VIS006')       # black and white
     ##in_msg.RGBs.append('VIS008')       # black and white
     ##in_msg.RGBs.append('IR_016')       # black and white
     ##in_msg.RGBs.append('IR_039')       # black and white
@@ -48,7 +48,7 @@ def input(in_msg):
     ##in_msg.RGBs.append('WV_073')       # black and white
     ##in_msg.RGBs.append('IR_087')       # black and white
     ##in_msg.RGBs.append('IR_097')       # black and white
-    in_msg.RGBs.append('IR_108')       # black and white
+    #in_msg.RGBs.append('IR_108')       # black and white
     ##in_msg.RGBs.append('IR_120')       # black and white
     ##in_msg.RGBs.append('IR_134')       # black and white
     #in_msg.RGBs.append('HRV')          # black and white
@@ -253,11 +253,12 @@ def input(in_msg):
     #in_msg.areas.append('met09globe')      # Cropped globe MSG image 3620x3620     # does not yet work
     #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
     #in_msg.areas.append('odysseyS25')      # Area of Odyssey composite (factor 2.5 smaller)
-    in_msg.areas.append('SeviriDiskFull00S4')    
+    #in_msg.areas.append('SeviriDiskFull00S4')    
     in_msg.check_RSS_coverage()
     
     # please download the shape file 
-    in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
+    #in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
+    in_msg.mapDir='/opt/users/common/shapes/'
     in_msg.mapResolution=None      ## f  full resolution: Original (full) data resolution.          
                                    ## h  high resolution: About 80 % reduction in size and quality. 
                                    ## i  intermediate resolution: Another ~80 % reduction.          
@@ -310,7 +311,7 @@ def input(in_msg):
     in_msg.postprocessing_areas=['EuropeCanaryS95']
     #in_msg.postprocessing_composite=["THX-IR_108","radar-convection","THX-radar-convection"]    
     #in_msg.postprocessing_composite=["RATE-HRV", "RATE-ir108","h03-HRV", "h03-ir108"]
-    in_msg.postprocessing_composite=["h03-VIS006", "h03-ir108", "h03-VIS006ir108"]
+    in_msg.postprocessing_composite=["h03-HRVir108"]
     #in_msg.postprocessing_montage=[["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]]
         
     in_msg.scpOutput = True
@@ -319,4 +320,4 @@ def input(in_msg):
     #default: in_msg.scpProducts = ['all']
     #in_msg.scpProducts = ['IR_108c', "radar-convection"] # list of rgb, composite and montage strings
     #in_msg.scpProducts = ["C2rgb-IR_108"]
-    in_msg.scpProducts = ["h03-VIS006", "h03-ir108"]
+    in_msg.scpProducts = ["h03-HRVir108"]

@@ -229,6 +229,7 @@ def input(in_msg):
     in_msg.sat = "cosmo"
     in_msg.instrument = "cosmo"
     in_msg.sat_nr="1"
+    in_msg.pressure_levels={}
     #in_msg.RGBs.append('lon_1')
     #in_msg.RGBs.append('lat_1')
     #in_msg.RGBs.append('POT_VORTIC')
@@ -259,7 +260,17 @@ def input(in_msg):
     #in_msg.RGBs.append('HZEROCL')
     #in_msg.RGBs.append('WSHEAR_0-3km')
     #in_msg.RGBs.append('WSHEAR_0-6km')
-    in_msg.RGBs.append('SYNMSG_BT_CL_IR10.8')
+    #in_msg.RGBs.append('SYNMSG_BT_CL_IR10.8')
+    #in_msg.RGBs.append('U')
+    #in_msg.RGBs.append('U-100hPa')
+    #in_msg.pressure_levels["U"]=[800,500,300]
+    #in_msg.RGBs.append('V')
+    #in_msg.pressure_levels["V"]=[800,500,300]
+    #in_msg.RGBs.append('streamplot')
+    in_msg.RGBs.append('streamplot-300hPa')
+    in_msg.RGBs.append('streamplot-500hPa')
+    in_msg.RGBs.append('streamplot-800hPa')
+
     
     # experimental
     #in_msg.RGBs.append('clouddepth')     # test according to Mecikalski, 2010
@@ -337,7 +348,7 @@ def input(in_msg):
     in_msg.ninjotifFilename = 'MET%(sat_nr)s_%(RSS)s_%(rgb)s_%(area)s_%Y%m%d%H%M.tif' 
     in_msg.upload_ninjotif = False
 
-    in_msg.postprocessing_areas=['ccs4']
+    #in_msg.postprocessing_areas=['ccs4']
     #in_msg.postprocessing_areas=['EuropeCanaryS95']
     #in_msg.postprocessing_areas=["EuroMercator"]
 
@@ -352,5 +363,5 @@ def input(in_msg):
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
     #default: in_msg.scpProducts = ['all']
     #in_msg.scpProducts = [["MSG_IR-108cpc","COSMO_SYNMSG-BT-CL-IR10.8"]]
-    in_msg.scpProducts = ["IR-108cpc-SYNMSG-BT-CL-IR10.8"]
+    #in_msg.scpProducts = ["IR-108cpc-SYNMSG-BT-CL-IR10.8"]
     #in_msg.scpProducts = ['IR_108c', "radar-convection"] # list of rgb, composite and montage strings

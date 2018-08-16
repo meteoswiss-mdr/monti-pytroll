@@ -287,7 +287,7 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
             
             for mfile in montage:
 
-                print mfile
+                print '    analyse first filename', mfile
                 rgb = mfile.split("_")[1]
                 outputDir = format_name(in_msg.outputDir,  time_slot, rgb=rgb, area=area)
                 
@@ -295,7 +295,7 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
                 if not isfile(next_file):
                     files_complete=False
                     print "*** Warning, can not find "+mfile+" file: "+next_file
-                    if area == "ccs4" or area == 'EuropeCanaryS95':
+                    if area in ["ccs4","EuropeCanaryS95","odysseyS25","euroHDready","SeviriDiskFull00S4"]:
                         # produce image with placeholder for missing product
                         files += " "+"/opt/users/common/logos/missing_product_textbox_"+area+".png"
                         outfile += mfile[mfile.index("_")+1:]+"-"

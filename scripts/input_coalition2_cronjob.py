@@ -1,4 +1,4 @@
-def input(in_msg):
+indef input(in_msg):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -193,7 +193,7 @@ def input(in_msg):
     #in_msg.outputDirForecasts = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_forecasts_%(area)s/'
    
     in_msg.scpOutput = True
-    #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
+    #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages/"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
     #in_msg.scpID="-i /opt/users/$LOGNAME/monti-pytroll/scripts/id_rsa_las"
     #in_msg.scpOutputDir="las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s_%(area)s_"

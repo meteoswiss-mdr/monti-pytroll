@@ -1,4 +1,4 @@
-indef input(in_msg):
+def input(in_msg):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 

@@ -50,9 +50,11 @@ read junk
 
 echo "*** Create virtual environement PyTroll_${LOGNAME} and install python packages according to PyTroll-conda-package-list.txt"
 echo "=========================================================================================================================="
-##conda create -n PyTroll_${LOGNAME} python=2.7 --copy --file PyTroll-conda-package-list_no_version_nr.txt  # _${LOGNAME}
+conda create -n PyTroll_${LOGNAME} python=2.7 --copy --file PyTroll-conda-package-list_no_version_nr.txt  # _${LOGNAME}
 ### !!! without copy conda does not create shaired library files !!!
-conda create -n PyTroll_${LOGNAME} --copy python=2.7 numpy ephem
+#conda create -n PyTroll_${LOGNAME} --copy python=2.7 numpy ephem
+#echo conda env create -f jmz.yml   ### does not work due to SSL: CERTIFICATE_VERIFY_FAILED error
+#conda env create -f jmz.yml        ### does not work due to SSL: CERTIFICATE_VERIFY_FAILED error
 echo "Could you create the virtual environment? (press enter to continue or CTRL+c to abort)"
 read junk
 
@@ -79,7 +81,6 @@ source set_paths.sh  # load functions from this script
 set_utils_path
 export INSTALL_DIR=$UTILS_PATH/packages/
 
-# INSTALLATION OF BASEMAP REQUIRES A LOT OF DOWNGRADES OF OTHER PACKAGES, WE SKIP IT
 ##echo ""
 ##echo "*** Install basemap (inside the virtual env)"
 ##echo "============================================"
@@ -90,8 +91,11 @@ export INSTALL_DIR=$UTILS_PATH/packages/
 #python setup.py install
 #echo "did the installation of basemap work fine? (press enter to continue or CTRL+c to abort)"
 #read junk
- 
+# BASEMAP CAN NOW BE INSTALLED BY ANACONDA INCLUDING precompiled GOES LIBRARY
+# REQUIRES SOME DOWNGRADES (IS BASEMAP STILL NECESSARY?)
+conda install basemap 
 
+# should be already installed when using yml file
 echo ""
 echo "*** Install pygrib (inside the virtual env)"
 echo "============================================"

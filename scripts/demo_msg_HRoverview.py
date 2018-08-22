@@ -24,7 +24,7 @@ else:
         day    = int(sys.argv[3])
         hour   = int(sys.argv[4])
         minute = int(sys.argv[5])
-        timeslot = datetime.datetime(year, month, day, hour, minute)
+        time_slot = datetime.datetime(year, month, day, hour, minute)
 
 print ("         ")    
 print ('*** load data for time:', str(time_slot))
@@ -95,11 +95,11 @@ if True:
                            add_rivers=False, river_color='blue', 
                            resolution='i', verbose=False)
 
-if True:
+if False: #True:
     PIL_image.show()
     print ("*** show image in x-Window ")
 else:
-    filename=time_slot.strftime('MSG_'+chn+'-'+area+'_%y%m%d%H%M.png')
+    filename=time_slot.strftime('MSG_'+area+'_%y%m%d%H%M.png')
     PIL_image.save(filename)
     print ("*** display "+filename)
 

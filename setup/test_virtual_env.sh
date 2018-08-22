@@ -10,7 +10,7 @@ function test_virtual_env {
     echo "import h5py"
     echo "import netCDF4"
     echo "from mpl_toolkits.basemap import Basemap"
-    echo "import aggdraw"
+    echo "# import aggdraw (installed as submodule later)"
     echo "import pygrib"
     echo "import scipy"
     echo "import numpy"

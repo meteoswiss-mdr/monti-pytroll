@@ -23,20 +23,22 @@
 #            SO CHECK THE EASY-INSTALL file after installation   
 #export packages="aggdraw pygrib pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate"
 #export packages="pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate satpy"
-export packages='pykdtree pyresample pycoast pyorbital posttroll trollsift pytroll-schedule trollimage mipp mpop trollduction pyspectral pydecorate satpy pytroll-collectors trollflow-sat trollflow trollbufr trollmoves pytroll-examples pytroll-cspp-runner pytroll-pps-runner pytroll-aapp-runner pygac pyninjotiff pytroll-product-filter pytroll-modis-runner pytroll-osisaf-runner python-bufr pygranule'
-#pytroll-db is not recommended by Martin R.
+# PYGRIB IS ALREADY INSTALLED BY ANACONDA
+# PYTROLL-DB is not recommended by Martin R.
+export packages='aggdraw trollimage pykdtree pyresample pycoast pyorbital posttroll trollsift pytroll-schedule mipp mpop trollduction pyspectral pydecorate satpy pytroll-collectors trollflow-sat trollflow trollbufr trollmoves pytroll-examples pytroll-cspp-runner pytroll-pps-runner pytroll-aapp-runner pygac pyninjotiff pytroll-product-filter pytroll-modis-runner pytroll-osisaf-runner python-bufr pygranule'
 
-declare -A branches
-branches=( ["aggdraw"]="master" ["pygrib"]="master" ["pykdtree"]="master" ["pyresample"]="master" ["pycoast"]="master"  \
-           ["pyorbital"]="master" ["posttroll"]="develop" ["trollsift"]="master" \
-           ["pytroll-schedule"]="master" ["trollimage"]="develop" ["mipp"]="master" \
-           ["mpop"]="master" ["trollduction"]="develop" ["pyspectral"]="master" ["pydecorate"]="master" \
-	   ["satpy"]="develop" ["pytroll-collectors"]="develop" ["trollflow-sat"]="develop" \
-	   ["trollflow"]="develop" ["trollbufr"]="develop" ["trollmoves"]="develop" ["pytroll-examples"]="master" \
-	   ["pytroll-cspp-runner"]="master" ["pytroll-pps-runner"]="master" ["pytroll-aapp-runner"]="master" ["pygac"]="master" \
-	   ["pyninjotiff"]="master" ["pytroll-product-filter"]="master" ["pytroll-modis-runner"]="master" \
-	   ["pytroll-osisaf-runner"]="master" ["python-bufr"]="master" ["pytroll-db"]="master" ["pygranule"]="master" \
-	 )
+## !!!USE BRANCHES FROM THE .gitmodule FILE INSTEAD OF HARD CODED BRANCHES!!!
+#declare -A branches
+#branches=( ["aggdraw"]="master" ["pygrib"]="master" ["pykdtree"]="master" ["pyresample"]="master" ["pycoast"]="master"  \
+#           ["pyorbital"]="master" ["posttroll"]="develop" ["trollsift"]="master" \
+#           ["pytroll-schedule"]="master" ["trollimage"]="develop" ["mipp"]="master" \
+#           ["mpop"]="master" ["trollduction"]="develop" ["pyspectral"]="master" ["pydecorate"]="master" \
+#	   ["satpy"]="develop" ["pytroll-collectors"]="develop" ["trollflow-sat"]="develop" \
+#	   ["trollflow"]="develop" ["trollbufr"]="develop" ["trollmoves"]="develop" ["pytroll-examples"]="master" \
+#	   ["pytroll-cspp-runner"]="master" ["pytroll-pps-runner"]="master" ["pytroll-aapp-runner"]="master" ["pygac"]="master" \
+#	   ["pyninjotiff"]="master" ["pytroll-product-filter"]="master" ["pytroll-modis-runner"]="master" \
+#	   ["pytroll-osisaf-runner"]="master" ["python-bufr"]="master" ["pytroll-db"]="master" ["pygranule"]="master" \
+#	 )
 
 source set_paths.sh  # load functions from this script
 set_pytroll_paths
@@ -98,7 +100,7 @@ do
     echo ""
     echo ""
     echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-    echo "*** install"  $pack " with branch " ${branches[$pack]} " from repository " ${repositories[$pack]}
+    echo "*** install PyTroll package:"  $pack 
     echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     cd $PYTROLLHOME
     
@@ -119,18 +121,31 @@ do
 	sed -i -- 's/\#grib\_api\_dir\ \=\ \/usr\/local/grib\_api\_dir\ \=\ \/opt\/users\/common\/lib\/grib\_api/g' setup.cfg
     fi
 
-    # Install python and PyTroll packages
-    if ( [ "$pack" == "aggdraw" ] || [ "$pack" == "aggdraw" ] ) ; then
-	# normal installation in the site-package directory
-	echo python setup.py install 
-	python setup.py install 
-    else
+    # ALSO AGGDRAW IS INSTALLED AS SUBMODULE
+    ## Install python and PyTroll packages
+    #if ( [ "$pack" == "aggdraw" ] || [ "$pack" == "aggdraw" ] ) ; then
+    #	# normal installation in the site-package directory
+    #	echo python setup.py install 
+    #	python setup.py install 
+    #else
 	# development installation using the easy-install.pth file
-	echo python setup.py develop 
-	python setup.py develop 
-    fi
+    echo python setup.py develop 
+    python setup.py develop 
+    #fi
 
 done 
+
+echo "*** check your easy-install file, if all packages are installed with develop option"
+echo "    all PyTroll packages shoud look like this:"
+echo "trollimage (1.5.0, /opt/users/"$LOGNAME"/PyTroll/packages/trollimage)"
+echo "    if this is not the case, deinstall and reinstall as develop version"
+echo "pip uninstall package_name"
+echo "cd packages/package_name"
+echo "python setup.py develop"
+echo "==============================================="
+echo "more $CONDA_PATH/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth"
+more $CONDA_PATH/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth
+
 
 echo "*** Deactivate virtual environment"
 source deactivate

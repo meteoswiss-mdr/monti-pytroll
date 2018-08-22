@@ -8,13 +8,14 @@ rgbs="[VIS006 VIS008 IR_016 IR_039 WV_062 WV_073 IR_087 IR_097 IR_108 IR_120 IR_
 echo ""
 
 echo "*** create dates"
-if [ 1 -eq 0 ]; then
+if [ 1 -eq 1 ]; then
     # check old dates from archive (offline modus)
-    date_start="2015-06-30 23:52"
+    date_start="2015-07-07 00:00"
     date_start_s=$(/bin/date --date "$date_start" +"%s")
-    date_end="2015-07-01 01:04"
+    date_end="2015-07-07 23:55"
     date_end_s=$(/bin/date --date "$date_end" +"%s")
     . /opt/users/cinesat/monti-pytroll/setup/bashrc_offline no_virtual_environment
+    # check satellite in the input file (MSG2 or MSG3) depending on start/end time in line 105/106 and 109/110 
 else
     # check near real time dates for the last "check_time" seconds (nrt modus)
     date_end=$(/bin/date  +$"%Y-%m-%d %H:%M")  # now (current date)
@@ -24,6 +25,7 @@ else
     date_start_s=$(expr $date_end_s - $check_time )
     date_start=$(/bin/date -d @$date_start_s +"%Y-%m-%d %H:%M")
     . /opt/users/cinesat/monti-pytroll/setup/bashrc_offline no_virtual_environment
+    # check satellite in the input file (MSG2 or MSG3) depending on start/end time in line 105/106 and 109/110 
 fi
 #export python=/usr/bin/python
 #export python=/opt/users/common/packages/anaconda3/envs/PyTroll_$LOGNAME/bin/python
@@ -100,17 +102,19 @@ do
 	cd $PYTROLLHOME/scripts # necessary to specify input file without path
 	if [ $# -eq 0 ]; then
 	    echo "    "python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles.py $year $month $day $hour $minute 
- 	    python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles.py $year $month $day $hour $minute
+ 	    #python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles.py $year $month $day $hour $minute
+ 	    python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles_MSG2.py $year $month $day $hour $minute
 	elif [[ "$1" = "PLAX" ]]; then
 	    echo "    "python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles_PLAX.py $year $month $day $hour $minute 
  	    python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles_PLAX.py $year $month $day $hour $minute
+ 	    python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles_PLAX_MSG2.py $year $month $day $hour $minute
 	else
 	    echo "unknown command line arguemnt" $1
 	fi		    
     fi
 
     # clean temporary files
-    find /tmp/SEVIRI_DECOMPRESSED/H-000-MSG* -type f -mmin +5 -delete
+    find /tmp/SEVIRI_DECOMPRESSED/H-000-MSG* -type f -mmin +5 -delete 2>&1
     
     # add 5min (dtime) to current date 
     currentdate_s=$(/bin/date --date "$currentdate $dtime" +"%s") 

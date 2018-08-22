@@ -1,6 +1,10 @@
+from __future__ import division
+from __future__ import print_function
+
 from mpop.satellites import GeostationaryFactory
 from mpop.projector import get_area_def
 import datetime
+
 
 ## uncomment these two lines for more debugging information
 from mpop.utils import debug_on
@@ -12,7 +16,7 @@ if False:
 else:
     import sys
     if len(sys.argv) <= 2:
-        time_slot = datetime.datetime(2016, 9, 1, 12, 00)
+        time_slot = datetime.datetime(2015, 7, 7, 12, 00)
     else:
         # python 
         year   = int(sys.argv[1])
@@ -22,19 +26,40 @@ else:
         minute = int(sys.argv[5])
         timeslot = datetime.datetime(year, month, day, hour, minute)
 
-print str(time_slot)
+print ("         ")    
+print ('*** load data for time:', str(time_slot))
 
-global_data = GeostationaryFactory.create_scene("Meteosat-10", "", "seviri", time_slot)
+#global_data = GeostationaryFactory.create_scene("Meteosat-10", "", "seviri", time_slot)
+global_data = GeostationaryFactory.create_scene("Meteosat-9", "", "seviri", time_slot)
 #global_data = GeostationaryFactory.create_scene("Meteosat-8", "", "seviri", time_slot)
 from my_composites import get_image
 obj_image = get_image(global_data, 'HRoverview')
-global_data.load(obj_image.prerequisites, reader_level="seviri-level9")
-print global_data
+print (obj_image.prerequisites)
 
-#area="EuropeCanaryS95"
+parallax_correction=True
+if parallax_correction:
+    global_data.load(obj_image.prerequisites, reader_level="seviri-level9")
+else:
+    global_data.load(obj_image.prerequisites, reader_level="seviri-level8")   
+print ("         ")    
+print ('*** some info about the loaded data')
+print (global_data)
+
+# data is already in ccs4 projection, so we can skip this step
 area="ccs4"
-data = global_data.project(area, precompute=True)
+#data = global_data.project(area, precompute=True)
+data = global_data
 
+print ("         ")    
+print ('*** some info about the projection')
+print (global_data['HRV'].area)
+#print (dir(global_data['HRV'].area))
+print (global_data['HRV'].area.name)
+print ("x_size area (south to north!): ", global_data['HRV'].area.x_size)
+print ("y_size area (west to east!):   ", global_data['HRV'].area.y_size)
+
+print ("         ")    
+print ('*** create the image')
 img = data.image.hr_overview()
 
 #if True:
@@ -46,6 +71,8 @@ img = data.image.hr_overview()
 PIL_image=img.pil_image()
 
 if True:
+    print ("         ")    
+    print ('*** add the map overlap')
     from pycoast import ContourWriterAGG
     cw = ContourWriterAGG('/opt/users/common/shapes/')
     from mpop.projector import get_area_def
@@ -70,7 +97,9 @@ if True:
 
 if True:
     PIL_image.show()
+    print ("*** show image in x-Window ")
 else:
     filename=time_slot.strftime('MSG_'+chn+'-'+area+'_%y%m%d%H%M.png')
     PIL_image.save(filename)
+    print ("*** display "+filename)
 

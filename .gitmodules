@@ -114,10 +114,6 @@
 	path = packages/python-bufr
 	url = https://github.com/pytroll/python-bufr.git
 	branch = master
-[submodule "packages/pytroll-db"]
-	path = packages/pytroll-db
-	url = https://github.com/pytroll/pytroll-db.git
-	branch = master
 [submodule "packages/pygranule"]
 	path = packages/pygranule
 	url = https://github.com/pytroll/pygranule.git

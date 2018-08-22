@@ -43,7 +43,7 @@ global_data = GeostationaryFactory.create_scene("Meteosat-9", "", "seviri", time
 
 from my_composites import get_image
 obj_image = get_image(global_data, 'HRoverview')
-print (obj_image.prerequisites)
+print ("... read following channels: ", obj_image.prerequisites)
 
 # read parallax corrected data from netCDF
 global_data.load(obj_image.prerequisites, reader_level="seviri-level9")
@@ -72,6 +72,37 @@ from mpop.projector import get_area_def
 area = 'ccs4'
 area_def = get_area_def(area)
 
+print ("         ")    
+print ('*** some info about the area definition')
+print (area_def)
+# print (area_def.proj_id)   # 'somerc'
+# print (area_def.proj_dict) # {'ellps': 'bessel', 'k_0': '1', 'lat_0': '46.9524055555556', 'lon_0': '7.43958333333333', 'proj': 'somerc', 'x_0': '600000', 'y_0': '200000'}
+# print (area_def.aex)       #      (255000.0, -21000.0, 965000.0, 330000.0)
+# print (area_def.x_size)    # 710
+# print (area_def.y_size)    # 640 -> this is changed later! 
+
+create_subregion=False
+if create_subregion:
+    y1=150
+    y2=500
+    HRV    = HRV[y1:y2,:]
+    VIS006 = VIS006[y1:y2,:]
+    VIS008 = VIS008[y1:y2,:]
+    IR_108 = IR_108[y1:y2,:]
+    # print (HRV.shape) # (350, 710)
+
+    # get_area_extent_for_subset(self, row_LR, col_LR, row_UL, col_UL):
+    aex = area_def.get_area_extent_for_subset(y2,0,y1,area_def.x_size-1)
+
+    from pyresample.geometry import AreaDefinition
+    area = "on_the_fly"
+    # redefine area_def (using still the original area_def on the right side)
+    area_def = AreaDefinition(area, area, area_def.proj_id, area_def.proj_dict, area_def.x_size, y2-y1, aex)
+    print ("         ")    
+    print ('*** some info about the NEW area definition')
+    print (area_def)
+    
+    
 # defining a new channels named 'var', the wavenlegth range is not that critial (for radar data I usually use [0.,0.,0.])
 data.channels.append(Channel(name='var', wavelength_range=[0.0,0.0,0.0], data=HRV ))
 data['var'].area     = area
@@ -90,6 +121,7 @@ data['VIS008'].area_def = area_def
 data['IR_108'].data     = IR_108
 data['IR_108'].area     = area
 data['IR_108'].area_def = area_def
+
 print ("         ")    
 print ('*** some info about the manipulated data')
 print (data)
@@ -106,17 +138,16 @@ img = data.image.hr_overview()
 
 PIL_image=img.pil_image()
 
-if True:
+add_map_overlay=True
+if add_map_overlay:
     print ("         ")    
     print ('*** add the map overlap')
     from pycoast import ContourWriterAGG
     cw = ContourWriterAGG('/opt/users/common/shapes/')
-    from mpop.projector import get_area_def
-    obj_area = get_area_def(area)
     # define area
-    proj4_string = obj_area.proj4_string            
+    proj4_string = area_def.proj4_string            
     # e.g. proj4_string = '+proj=geos +lon_0=0.0 +a=6378169.00 +b=6356583.80 +h=35785831.0'
-    area_extent = obj_area.area_extent              
+    area_extent = area_def.area_extent              
     # e.g. area_extent = (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
     area_tuple = (proj4_string, area_extent)
     from plot_msg import add_borders_and_rivers

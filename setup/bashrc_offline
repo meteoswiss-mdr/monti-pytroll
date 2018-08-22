@@ -118,6 +118,9 @@ if [ "$1" == "no_virtual_environment" ] || [ "$1" = "nve" ] ; then
     unset PYTHON_HOME
 
 else
+    # deactivate any running virtual environment (activated before)
+    source deactivate
+    # activate new environment
     echo "*** activate virtual environment: source activate PyTroll_"$LOGNAME
     source activate PyTroll_$LOGNAME
 fi

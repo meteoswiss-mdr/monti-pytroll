@@ -1,3 +1,5 @@
+#from __future__ import print_function
+
 from datetime import datetime, timedelta
 from my_msg_module import check_near_real_time
 import sys
@@ -128,7 +130,7 @@ class input_msg_class:
 
       import getpass
       self.user = getpass.getuser()
-      print "*** working with username \'"+self.user+"\'"
+      print ("*** working with username \'"+self.user+"\'")
 
 
    def add_rgb(self, rgb):
@@ -146,8 +148,8 @@ class input_msg_class:
          # overwrite the input file by optional argument timeslot
          self.update_datetime(timeslot.year, timeslot.month, timeslot.day, timeslot.hour, timeslot.minute)
       else:
-         print "*** ERROR in input_msg_class.init_datetime ("+inspect.getfile(inspect.currentframe())+")"
-         print '    timeslot must be a datetime.date, not a %s' % type(timeslot)
+         print ("*** ERROR in input_msg_class.init_datetime ("+inspect.getfile(inspect.currentframe())+")")
+         print ('    timeslot must be a datetime.date, not a %s' % type(timeslot))
          raise TypeError('*** ERROR timeslot must be a datetime.date, not a %s' % type(timeslot))
          quit()
 
@@ -155,14 +157,14 @@ class input_msg_class:
       if (year is not None) and (month is not None) and (day is not None) and (hour is not None) and (minute is not None): 
          self.datetime = datetime(year, month, day, hour, minute, 0)
       else:
-         print "*** WARNING: cannot update time!"
+         print ("*** WARNING: cannot update time!")
       # first 120min are saved in the near real time archive
       self.nrt = check_near_real_time(self.datetime, 120)
       return self.datetime
 
    def get_last_SEVIRI_date(self):
       from my_msg_module import get_last_SEVIRI_date
-      print "... initialize date: RSS mode = ", self.RSS, ", delay = ", self.delay
+      print ("... initialize date: RSS mode = ", self.RSS, ", delay = ", self.delay)
       self.datetime = get_last_SEVIRI_date(self.RSS, delay=self.delay)
       # first 120min are saved in the near real time archive
       self.nrt = check_near_real_time(self.datetime, 120)
@@ -171,9 +173,9 @@ class input_msg_class:
    def check_RSS_coverage(self):
       # Warning, if large areas are wanted and RSS is specified
       if self.RSS and (('fullearth' in self.areas) or ('met09globe' in self.areas) or ('met09globeFull' in self.areas)): 
-         print        "*** WARNING, large areas are requested: ", self.areas
-         print        "    as well as rapid scan service is selected, which covers only the uppermost 1/3 of the disk"
-         print        "    (1) continue with enter"
+         print  ("*** WARNING, large areas are requested: ", self.areas)
+         print  ("    as well as rapid scan service is selected, which covers only the uppermost 1/3 of the disk")
+         print  ("    (1) continue with enter")
          junk = input("    (2) abort with Ctrl+c")
 
    def sat_nr_str(self):
@@ -198,8 +200,8 @@ class input_msg_class:
          else:
             sat_nr_str = self.sat_nr          # for unknown satellite names just copy the string
       else:
-         print "*** Error in sat_nr_str ("+inspect.getfile(inspect.currentframe())+")"
-         print "    unknown type of sat_nr", type(self.sat_nr)
+         print ("*** Error in sat_nr_str ("+inspect.getfile(inspect.currentframe())+")")
+         print ("    unknown type of sat_nr", type(self.sat_nr))
          quit()
 
       if self.sat[0:8] == "Meteosat" or self.sat[0:4] == "Hsaf":
@@ -217,16 +219,16 @@ class input_msg_class:
       """
 
       if self.sat[0:8] == "meteosat":
-         #print "sat_str meteosat"
+         #print ("sat_str meteosat")
          return "meteosat"
       elif self.sat[0:8].lower() == "meteosat":
-         #print "sat_str "+"Meteosat-"+str(int(self.sat_nr))
+         #print ("sat_str "+"Meteosat-"+str(int(self.sat_nr)))
          return "Meteosat-"+str(int(self.sat_nr))
       elif self.sat[0:4].lower() == "hsaf":
-         #print "sat_str "+"Meteosat-"+str(int(self.sat_nr))
+         #print ("sat_str "+"Meteosat-"+str(int(self.sat_nr)))
          return "Hsaf-"+str(int(self.sat_nr))
       elif self.sat[0:6].lower() == "msg-ot":
-         #print "sat_str "+"Meteosat-"+str(int(self.sat_nr))
+         #print ("sat_str "+"Meteosat-"+str(int(self.sat_nr)))
          if layout=="%(sat)s-%(sat_nr)s":
            return "msg-ot"
          else:
@@ -240,7 +242,7 @@ class input_msg_class:
            d={'sat':self.sat, 'sat_nr':str(int(self.sat_nr)), '0sat_nr':str(self.sat_nr).zfill(2)}
          else:
            d={'sat':self.sat, 'sat_nr':"", '0sat_nr':""}
-         #print "sat_str "+self.sat+str(int(self.sat_nr))
+         #print ("sat_str "+self.sat+str(int(self.sat_nr)))
          return layout % d
 
    def msg_str(self, layout="%(msg)s-%(msg_nr)s"):
@@ -259,13 +261,13 @@ class input_msg_class:
             d={'msg':'MSG', 'msg_nr':str(int(self.sat_nr)-7), 'sat':self.sat, 'sat_nr':str(self.sat_nr),'0sat_nr':str(self.sat_nr).zfill(2)}
             msg_str = layout % d
          else:
-            print "*** Error in msg_str ("+inspect.getfile(inspect.currentframe())+")"
-            print "    try to get msg_string for sat number", self.sat_nr, " which is not meteosat SECOND generation "
+            print ("*** Error in msg_str ("+inspect.getfile(inspect.currentframe())+")")
+            print ("    try to get msg_string for sat number", self.sat_nr, " which is not meteosat SECOND generation ")
             quit()
 
       else:
-         print "*** Error in msg_str ("+inspect.getfile(inspect.currentframe())+")"
-         print "    try to get msg_string for sat ", self.sat, " which is not Meteosat/meteosat"
+         print ("*** Error in msg_str ("+inspect.getfile(inspect.currentframe())+")")
+         print ("    try to get msg_string for sat ", self.sat, " which is not Meteosat/meteosat")
          quit()
       return msg_str
 
@@ -348,16 +350,16 @@ class input_msg_class:
 
       if scale == "broad":
          if chosen_settings['use_TB_forecast'] == True:
-            print "The area you chose ", area," is larger than the available forecast (ccs4).\n Suggestion: use only observation (set use_TB_forecast to False or None)"
+            print ("The area you chose ", area," is larger than the available forecast (ccs4).\n Suggestion: use only observation (set use_TB_forecast to False or None)")
             quit()
 
       for key, value in chosen_settings.iteritems():
          if value != default_settings[key]:
-            print "    WARNING: not reccomended choice: ", key, " set to ", value,". Reccomended: ", default_settings[key]
+            print ("    WARNING: not reccomended choice: ", key, " set to ", value,". Reccomended: ", default_settings[key])
 
       # switch off Rapid scan, if large areas are wanted ess' in self.aux_results
       if area in self.areasNoRapidScan and self.rapid_scan_mode==True: 
-         print "Over the area you chose ", area," there is no Rapid Scan available.\n Suggestion: set rapid_scan_mode to False"
+         print ("Over the area you chose ", area," there is no Rapid Scan available.\n Suggestion: set rapid_scan_mode to False")
          quit()
 
       if chosen_settings['rapid_scan_mode']==True:
@@ -383,7 +385,7 @@ def get_input_msg(input_file):
    from os import getcwd
    from os import path
 
-   print "... read input file from directory:", getcwd()
+   print ("... read input file from directory:", getcwd())
 
    # define input class
    in_msg = input_msg_class()
@@ -399,13 +401,13 @@ def get_input_msg(input_file):
          return in_msg
       else:
          # Empty file exists
-         print "*** ERROR in get_input_msg ("+inspect.getfile(inspect.currentframe())+")"
-         print '    input file %s.py is empty' % input_file
+         print ("*** ERROR in get_input_msg ("+inspect.getfile(inspect.currentframe())+")")
+         print ('    input file %s.py is empty' % input_file)
          quit()
    except OSError as e:
       # File does not exists or is non accessible
-      print "*** ERROR in get_input_msg ("+inspect.getfile(inspect.currentframe())+")"
-      print '    input file %s.py does not exist' % input_file
+      print ("*** ERROR in get_input_msg ("+inspect.getfile(inspect.currentframe())+")")
+      print ('    input file %s.py does not exist' % input_file)
       quit()
       
    
@@ -434,7 +436,7 @@ def get_date_and_inputfile_from_commandline(print_usage=None):
       if len(sys.argv) > 2:
          if len(sys.argv) < 7:
             if print_usage is None:
-                  print "*** Error, not enough command line arguments"
+                  print ("*** Error, not enough command line arguments")
             else:
                print_usage()
          else:
@@ -528,15 +530,15 @@ def parse_commandline():
                      help="creates a montage (two images side by side), such as [\"MSG_h03-ir108\",\"MSG_HRV\"], argument repetition  '-m mont1 -m mont2' possible, list of montages possible [[im1,im2],[im3,im4]]")
 
    (options, args) = parser.parse_args()
-   #print options
-   #print args
+   #print (options)
+   #print (args)
 
    if len(args) < 1:
-      print parser.print_help()
+      print (parser.print_help())
       # error also cause program to exit
       parser.error("\n*** Error, at least the input file is necessary, e.g. input_msg.py\n")
    else:
-      print ""
+      print ("")
 
    return (options, args)
 
@@ -561,11 +563,11 @@ def parse_commandline_and_read_inputfile(input_file=None):
    # read input file and initialize 'in_msg'
    in_msg = get_input_msg(input_file)
    
-   print '*** overwrite options of the input_file with command line arguments'
+   print ('*** overwrite options of the input_file with command line arguments')
    for opt, value in options.__dict__.items():
       if value is not None:
          if opt!='date':
-            print '...', opt, ' = ', value
+            print ('...', opt, ' = ', value)
             setattr(in_msg, opt, value)
          else:
             in_msg.update_datetime(options.date[0],options.date[1],options.date[2],options.date[3],options.date[4])
@@ -579,13 +581,13 @@ def parse_commandline_and_read_inputfile(input_file=None):
 
    from datetime import datetime
    if datetime.now() < in_msg.datetime:
-      print "*** ERROR in parse_commandline_and_read_inputfile ("+inspect.getfile(inspect.currentframe())+")"
-      print '    in_msg.datetime is in the future ', in_msg.datetime
+      print ("*** ERROR in parse_commandline_and_read_inputfile ("+inspect.getfile(inspect.currentframe())+")")
+      print ('    in_msg.datetime is in the future ', in_msg.datetime)
       raise TypeError('*** ERROR: in_msg.datetime is in the future '+str(in_msg.datetime))
       quit()
       
-   print "  date:", in_msg.datetime
-   print "  NRT: ", in_msg.nrt
+   print ("  date:", in_msg.datetime)
+   print ("  NRT: ", in_msg.nrt)
    #print in_msg.__dict__
    
    return in_msg

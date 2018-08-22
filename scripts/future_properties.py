@@ -38,7 +38,7 @@ def future_properties(time, property_values, property_name,model):
          
         if model not in possible_models:
             print ('*** Error in future_properties ('+current_file+")")
-	    print ('    The chosen fitting model is not implemented: '+model)
+            print ('    The chosen fitting model is not implemented: '+model)
             quit()
         
         # Getting back the objects:
@@ -155,7 +155,7 @@ def future_properties(time, property_values, property_name,model):
                 print ("n sample", nsample)
             t1n[i] = time[nsample-1]+(i+1)*timedelta(minutes = 5)
             if verbose:
-                print t1n[i]
+                print (t1n[i])
         
         if model=="example":
             Xnew = np.column_stack((x1n, np.sin(x1n), (x1n-5)**2))
@@ -252,16 +252,16 @@ if __name__ == "__main__":
         #
         #in_msg = get_input_msg(input_file, timeslot=time_start)
 
-	from get_input_msg import get_date_and_inputfile_from_commandline
-	in_msg = get_date_and_inputfile_from_commandline()
+        from get_input_msg import get_date_and_inputfile_from_commandline
+        in_msg = get_date_and_inputfile_from_commandline()
 
-	time_start = deepcopy(in_msg.datetime)
-	time_start_save = deepcopy(time_start)
+        time_start = deepcopy(in_msg.datetime)
+        time_start_save = deepcopy(time_start)
 
-	if len(sys.argv)>7:
+        if len(sys.argv)>7:
             id_interesting_cell = int(sys.argv[7])
 
-	    if len(sys.argv)>8:
+            if len(sys.argv)>8:
                 year = int(sys.argv[8])
                 month = int(sys.argv[9])
                 day = int(sys.argv[10])
@@ -290,12 +290,12 @@ if __name__ == "__main__":
                 t_forecast, y_forecast = future_properties(time, area, 'area', "linear_exp_exp") 
                 t_forecast, forecast108 = future_properties(time,history108,'IR_108', "linear_exp_exp")
             
-            print "starting history forward, ", time_start    
+            print ("starting history forward, ", time_start)
             t_temp_stop = time_start+timedelta(hours = 1)+timedelta(minutes = 5) 
             
             backward = False
             ind1, area1, displacement1, time1, center1 = history_backward(time_start, id_interesting_cell, backward, in_msg, t_temp_stop, labels_dir= '/opt/users/'+getpass.getuser()+'/PyTroll/scripts/labels/',history_correction = history_correction)
-            print "history forward Done"        
+            print ("history forward Done")
             
             future108 = ind1[:,2]
 

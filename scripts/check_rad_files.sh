@@ -19,8 +19,7 @@ else
     # check near real time dates for the last "check_time" seconds (nrt modus)
     date_end=$(/bin/date  +$"%Y-%m-%d %H:%M")  # now (current date)
     date_end_s=$(/bin/date --date "$date_end" +"%s") 
-    #check_time=$(expr 6 \* 60 \* 60 \-50 )          # check for the last 6 hours 
-    check_time=21550         # check for the last 6 hours 
+    check_time=$(expr 6 \* 60 \* 60 )          # check for the last 6 hours 
     #date_start_s=$(echo "$date_end_s - $check_time" | bc)
     date_start_s=$(expr $date_end_s - $check_time )
     date_start=$(/bin/date -d @$date_start_s +"%Y-%m-%d %H:%M")

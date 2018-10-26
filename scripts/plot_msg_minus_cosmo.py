@@ -261,7 +261,7 @@ def plot_msg_minus_cosmo(in_msg):
 
                # add title to image
                if in_msg.add_title:
-                  add_title(PIL_image, in_msg.title, HRV_enhance_str+rgb, in_msg.sat_str(), data.sat_nr(), in_msg.datetime, area, dc, in_msg.verbose,
+                  add_title(PIL_image, in_msg.title, HRV_enhance_str+rgb, in_msg.sat_str(), data.sat_nr(), in_msg.datetime, area, dc, in_msg.font_file, in_msg.verbose,
                             title_color=in_msg.title_color, title_y_line_nr=in_msg.title_y_line_nr ) # !!! needs change
 
                # add MeteoSwiss and Pytroll logo

@@ -368,7 +368,7 @@ if __name__ == '__main__':
 
         # add title to image
         if in_msg.add_title:
-            add_title(PIL_image, rgb, int(data.number), dateS, hourS, minS, area, dc, in_msg.verbose )
+            add_title(PIL_image, rgb, int(data.number), dateS, hourS, minS, area, dc, in_msg.font_file, in_msg.verbose )
 
         # create output filename
         outputDir =              format_name(in_msg.outputDir,  data.time_slot, area=area, rgb=rgb, sat_nr=data.number)

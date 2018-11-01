@@ -61,7 +61,7 @@
 [submodule "packages/trollflow"]
 	path = packages/trollflow
 	url = https://github.com/pytroll/trollflow.git
-	branch = develop
+	branch = master
 [submodule "packages/trollbufr"]
 	path = packages/trollbufr
 	url = https://github.com/pytroll/trollbufr

@@ -69,9 +69,18 @@ if True:
 if False:
     from plot_msg import add_title
     from pydecorate import DecoratorAGG
+
+    if socket.gethostname()[0:5] == 'zueub':
+        font_file = "/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf"
+    elif socket.gethostname()[0:7] == 'keschln' or socket.gethostname()[0:7]=="eschaln":
+        font_file = "/usr/share/fonts/dejavu/DejaVuSansMono.ttf"
+    else:
+        print "*** ERROR, unknown computer, unknown location of the ttf-file"
+        quit()
+
     dc = DecoratorAGG(PIL_image)
     title="Cloud Physical Properties (Roebeling, 2009), %Y-%m-%d %H:%MUTC, %(area)s\n%(rgb)s"
-    add_title(PIL_image, title, chn, "cpp", "10", time_slot, area, dc, True, title_color='red' )
+    add_title(PIL_image, title, chn, "cpp", "10", time_slot, area, dc, font_file, True, title_color='red' )
 
 #img.show()
 PIL_image.show()

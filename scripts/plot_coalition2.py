@@ -1281,7 +1281,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                         print ("... in_msg.title_y_line_nr ", in_msg.title_y_line_nr)
 
                         add_title(PIL_image, in_msg.title, "COALITION-2", 
-                                  in_msg.sat_str(), in_msg.sat_nr_str(), in_msg.datetime, area, dc, in_msg.verbose, title_y_line_nr=title_y_line_nr )
+                                  in_msg.sat_str(), in_msg.sat_nr_str(), in_msg.datetime, area, dc, in_msg.font_file, in_msg.verbose, title_y_line_nr=title_y_line_nr )
 
                     print ("... save image: display ", c2File, " &")
                     PIL_image.save( create_dir(c2File) )

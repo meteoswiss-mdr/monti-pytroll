@@ -92,15 +92,6 @@ REGION: ticino {
         AREA_EXTENT:    (-42758.508094068224, -38755.028853807205, 42758.5080940681, 39051.562898605094)
 };
 
-REGION: nrEURO1km {
-        NAME:          nrEURO1km ninjo stereographic projection NPOL close to COALITION1 projection resolution 1056m
-        PCS_ID:        nrEURO1km_NPOL_stere_10_90_0_60
-        PCS_DEF:       proj=stere, lat_0=90.0, lat_1=60.0, lat_2=0.0, lon_0=10.0, lon_1=0.0, lon_2=0.0, a=6370000.0, b=6370000.0, ellps=WGS84
-        XSIZE:         972
-        YSIZE:         933
-        AREA_EXTENT:   (-783252.336773,-5544157.984519,319810.747325,-4488637.312331)
-};
-
 # see /data/COALITION2/database/projections/ninjotif_coalition/coord2area_def_COALITION1.py
 REGION: nrCOALtwo1km {
         NAME:   nrCOALtwo1km ninjo stereographic projection NPOL for COALITION2 resolution 1000m ccs4 corners
@@ -144,6 +135,74 @@ REGION: SwitzerlandStereo500m {
 #################
 # Europe Europa
 #################
+
+#####################
+# Ninjo compartible #
+#####################
+REGION: nrEURO1km {
+        NAME:          nrEURO1km ninjo stereographic projection NPOL close to COALITION1 projection resolution 1056m
+        PCS_ID:        nrEURO1km_NPOL_stere_10_90_0_60
+        PCS_DEF:       proj=stere, lat_0=90.0, lat_1=60.0, lat_2=0.0, lon_0=10.0, lon_1=0.0, lon_2=0.0, a=6370000.0, b=6370000.0, ellps=WGS84
+        XSIZE:         972
+        YSIZE:         933
+        AREA_EXTENT:   (-783252.336773,-5544157.984519,319810.747325,-4488637.312331)
+};
+
+# from Katia, seems to be wrong, does not show any data!!!
+#REGION: nrEURO1km{
+#        NAME:   ninjo stereographic projection nrEURO1km NPOL for COALITION
+#        PCS_ID: NPOL_0.000000_1056.0
+#        PCS_DEF:        proj=stere,lon_0=0.000000,ellps=WGS84
+#        XSIZE:  854
+#        YSIZE:  1164
+#        AREA_EXTENT:    (191186.4513570518, -5594827.132697373, 1093278.016412308, -4365108.274999464)
+#};
+
+#####################
+# Ninjo compartible #
+#####################
+REGION: nrEURO3km {
+        NAME:           nrEURO3km
+        PCS_ID:         eqc_-1.02539_42.06787
+        PCS_DEF:        proj=eqc,lat_0=42.06787,lon_0=-1.02539,ellps=WGS84
+        XSIZE:          3000
+        YSIZE:          1500
+        AREA_EXTENT:    (-4504247.085104304, -2251372.135989299, 4504247.085104305, 2251372.1359892967)
+};
+
+REGION: nrEuro4km {
+        NAME:          nrEuro4km
+        PCS_ID:        nrEuro4km
+        PCS_DEF:       proj=stere, lat_0=90, lon_0=,lat_ts=, ellps=WGS84
+        XSIZE:         1280
+        YSIZE:         1024
+        AREA_EXTENT:   (-1162298.313205,-3754578.052310,1148655.678415,-1134810.942758)
+};
+
+#####################
+# Ninjo compartible #
+#####################
+REGION: nrMET3km {
+        NAME:          nrMET3km
+        PCS_ID:        nrMET3km
+        PCS_DEF:       proj=eqc, lon_0=0.0, a=6378137.00
+        XSIZE:         6666
+        YSIZE:         6666
+        AREA_EXTENT:   (-10010271.403557,-10013274.469460,10013274.469460,10010271.403557)
+};
+
+#####################
+# Ninjo compartible #
+#####################
+REGION: nrIODC8km {
+        NAME:          nrIODC8km
+        PCS_ID:        nrIODC8km
+        PCS_DEF:       proj=eqc, lon_0=65.0, a=6378137.00
+        XSIZE:         2500
+        YSIZE:         2500
+        AREA_EXTENT:   (-10008769.814946,-10016778.695711,10016777.025919,10008768.924390)
+};
+
 
 REGION: baltrad_lambert {
         NAME:           Baltrad Lambert
@@ -649,33 +708,6 @@ REGION: nqeuro1km{
         AREA_EXTENT:    (-6011097.7687445702, 2560675.5675482242, 6011097.7687445702, 8571273.5117791332)
 };
 
-# from Katia, seems to be wrong, does not show any data!!!
-#REGION: nrEURO1km{
-#        NAME:   ninjo stereographic projection nrEURO1km NPOL for COALITION
-#        PCS_ID: NPOL_0.000000_1056.0
-#        PCS_DEF:        proj=stere,lon_0=0.000000,ellps=WGS84
-#        XSIZE:  854
-#        YSIZE:  1164
-#        AREA_EXTENT:    (191186.4513570518, -5594827.132697373, 1093278.016412308, -4365108.274999464)
-#};
-
-REGION: nrEURO3km {
-        NAME:           nrEURO3km
-        PCS_ID:         eqc_-1.02539_42.06787
-        PCS_DEF:        proj=eqc,lat_0=42.06787,lon_0=-1.02539,ellps=WGS84
-        XSIZE:          3000
-        YSIZE:          1500
-        AREA_EXTENT:    (-4504247.085104304, -2251372.135989299, 4504247.085104305, 2251372.1359892967)
-};
-
-REGION: nrEuro4km {
-        NAME:          nrEuro4km
-        PCS_ID:        nrEuro4km
-        PCS_DEF:       proj=stere, lat_0=90, lon_0=,lat_ts=, ellps=WGS84
-        XSIZE:         1280
-        YSIZE:         1024
-        AREA_EXTENT:   (-1162298.313205,-3754578.052310,1148655.678415,-1134810.942758)
-};
 REGION: nrEuro4kmEqc {
         NAME:          nrEuro4kmEqc
         PCS_ID:        nrEuro4kmEqc

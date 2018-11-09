@@ -308,7 +308,7 @@ def plot_msg(in_msg):
                # add title to image
                if in_msg.add_title:
                   print "in_msg.title_y_line_nr", in_msg.title_y_line_nr
-                  add_title(PIL_image, in_msg.title, HRV_enhance_str+rgb, in_msg.sat_str(), data.sat_nr(), in_msg.datetime, area, dc, in_msg.verbose,
+                  add_title(PIL_image, in_msg.title, HRV_enhance_str+rgb, in_msg.sat_str(), data.sat_nr(), in_msg.datetime, area, dc, in_msg.font_file, in_msg.verbose,
                             title_color=in_msg.title_color, title_y_line_nr=in_msg.title_y_line_nr ) # !!! needs change
 
                # add MeteoSwiss and Pytroll logo
@@ -919,7 +919,7 @@ def indicate_mask(rgb, PIL_image, data, verbose):
 #----------------------------------------------------------------------------------------------------------------
 
 
-def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, verbose, title_color=None, title_y_line_nr=1 ):
+def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, font_file, verbose, title_color=None, title_y_line_nr=1 ):
 
    if verbose:
       print "*** add title to image "
@@ -933,15 +933,15 @@ def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, verbose, 
 
    # determine font size
    if "EuropeCanary" in area:
-      fontsize=18
+      font_size=18
    elif "eurotv" in area:
-      fontsize=24
+      font_size=24
    elif area.find("ticino") != -1:
-      fontsize=12
+      font_size=12
    else:
-      fontsize=18
-
-   font = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf", fontsize)
+      font_size=18
+    
+   font = ImageFont.truetype(font_file, font_size)
 
    # define draw object
    draw = ImageDraw.Draw(PIL_image)

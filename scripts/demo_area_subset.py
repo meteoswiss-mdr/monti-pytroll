@@ -11,7 +11,8 @@
 #                                      x_size, y_size, area_extent)
 
 from mpop.projector import get_area_def
-area_def = get_area_def("SeviriDiskFull")
+#area_def = get_area_def("SeviriDiskFull")
+area_def = get_area_def("SeviriDiskFull00")
 import numpy as np
 
 print "dir(area_def)", dir(area_def)
@@ -76,6 +77,12 @@ print "area_def.get_proj_coords(data_slice=(3711,3711))",area_def.get_proj_coord
 #                                              array([ 5315214.20824482,  3418959.40744847])
 #AREA_EXTENT:    (-2284807.01076965, 2611850.9558437,  3418959.40744847,  5315214.20824482)
 
+
+# in get_area_extent_for_subset in pyresample/pyresample/geometry.py
+# e.g. used in
+# mpop/mpop/satin/hsaf_h03.py:        # aex = full_disk.get_area_extent_for_subsets(985,1095,85,2995)
+# mpop/mpop/satin/msg_seviri_hdf.py:  aex = full_disk_def.get_area_extent_for_subset(3712-VIS_IRSouthLine,3712-VIS_IRWestColumn,3712-VIS_IRNorthLine,3712-VIS_IREastColumn)
+# def get_area_extent_for_subset(self, row_LR, col_LR, row_UL, col_UL):
 print area_def.get_area_extent_for_subset(985,1095,85,2995)  # (-2284807.0107696461, 2611850.9558436987, 3418959.4074484715, 5315214.2082448164)
 
 

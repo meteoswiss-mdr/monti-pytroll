@@ -14,17 +14,23 @@ if False:
     from my_msg_module import get_last_SEVIRI_date
     time_slot = get_last_SEVIRI_date(True, delay=10)
 else:
+    out_path = None
     import sys
     if len(sys.argv) <= 2:
         time_slot = datetime.datetime(2015, 7, 7, 12, 00)
-    else:
+    elif len(sys.argv) <= 7:
         # python 
         year   = int(sys.argv[1])
         month  = int(sys.argv[2])
         day    = int(sys.argv[3])
         hour   = int(sys.argv[4])
         minute = int(sys.argv[5])
-        timeslot = datetime.datetime(year, month, day, hour, minute)
+        time_slot = datetime.datetime(year, month, day, hour, minute)
+    if len(sys.argv) == 7:
+        out_path  = sys.argv[6]
+    elif len(sys.argv) >= 7:
+        print ("*** Error: Incorrect number of arguments ***")
+        sys.exit()
 
 print ("         ")    
 print ('*** load data for time:', str(time_slot))
@@ -95,11 +101,11 @@ if True:
                            add_rivers=False, river_color='blue', 
                            resolution='i', verbose=False)
 
-if True:
+if out_path is None: #True:
     PIL_image.show()
     print ("*** show image in x-Window ")
 else:
-    filename=time_slot.strftime('MSG_'+chn+'-'+area+'_%y%m%d%H%M.png')
-    PIL_image.save(filename)
+    filename=time_slot.strftime('MSG_'+area+'_%y%m%d%H%M.png')
+    PIL_image.save(out_path+filename)
     print ("*** display "+filename)
 

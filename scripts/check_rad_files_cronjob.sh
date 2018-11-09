@@ -69,10 +69,18 @@ do
 
     echo " "
     calculate_radfile=0
-    rad_dir=/data/COALITION2/database/meteosat/ccs4/$year/$month/$day/
-    radfile_wildcard=MSG?_ccs4_$year$month$day$hour${minute}_rad.nc
-    radfile=$(find $rad_dir -name $radfile_wildcard -print)
-
+    if [ $# -eq 0 ]; then
+	rad_dir=/data/COALITION2/database/meteosat/ccs4/$year/$month/$day/
+	radfile_wildcard=MSG?_ccs4_$year$month$day$hour${minute}_rad.nc
+	radfile=$(find $rad_dir -name $radfile_wildcard -print)
+    elif [[ "$1" = "PLAX" ]]; then
+	rad_dir=/data/COALITION2/database/meteosat/ccs4_PLAX/$year/$month/$day/
+	radfile_wildcard=MSG?_ccs4_$year$month$day$hour${minute}_rad_PLAX.nc
+	radfile=$(find $rad_dir -name $radfile_wildcard -print)
+    else
+	echo "unknown command line arguemnt" $1
+    fi	
+    
     if test -n "$radfile" 
     then
 	echo "*** MSG SEVIRI radiance file exits for date: " $year $month $day $hour $minute # $rgb $area
@@ -91,10 +99,20 @@ do
     if [ $calculate_radfile -eq 1 ]; then 
 	echo '    calculate MSG SEVIRI radiance file'
 	cd $PYTROLLHOME/scripts # necessary to specify input file without path
-	echo "    "python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles.py $year $month $day $hour $minute 
- 	python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles.py $year $month $day $hour $minute 
+	if [ $# -eq 0 ]; then
+	    echo "    "python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles.py $year $month $day $hour $minute 
+ 	    python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles.py $year $month $day $hour $minute
+	elif [[ "$1" = "PLAX" ]]; then
+	    echo "    "python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles_PLAX.py $year $month $day $hour $minute 
+ 	    python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles_PLAX.py $year $month $day $hour $minute
+	else
+	    echo "unknown command line arguemnt" $1
+	fi		    
     fi
 
+    # clean temporary files
+    find /tmp/SEVIRI_DECOMPRESSED/H-000-MSG* -type f -mmin +5 -delete
+    
     # add 5min (dtime) to current date 
     currentdate_s=$(/bin/date --date "$currentdate $dtime" +"%s") 
 

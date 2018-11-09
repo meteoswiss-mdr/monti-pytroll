@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from my_msg_module import check_near_real_time
 import sys
 import inspect
+import socket
 
 class input_msg_class:
 
@@ -50,6 +51,13 @@ class input_msg_class:
       self.add_title = True
       #self.title = None
       self.title = None               # ' %(sat)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s'
+      if socket.gethostname()[0:5] == 'zueub':
+         self.font_file = "/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf"
+      elif socket.gethostname()[0:7] == 'keschln' or socket.gethostname()[0:7]=="eschaln":
+         self.font_file = "/usr/share/fonts/dejavu/DejaVuSansMono.ttf"
+      else:
+         print "*** ERROR, unknown computer "+socket.gethostname()+", unknown location of the ttf-file"
+         quit()
       self.title_color = None
       self.title_y_line_nr = 1        # at which line should the title be written
       self.title_color='white'

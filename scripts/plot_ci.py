@@ -283,7 +283,7 @@ def plot_msg(in_msg):
    
             # add title to image
             if in_msg.add_title:
-               add_title(PIL_image, rgb, int(data.number), dateS, hourS, minS, area, dc, in_msg.verbose )
+               add_title(PIL_image, rgb, int(data.number), dateS, hourS, minS, area, dc, in_msg.font_file, in_msg.verbose )
 
             # add MeteoSwiss and Pytroll logo
             if in_msg.add_logos:
@@ -662,7 +662,7 @@ def create_PIL_image(rgb, data, in_msg):
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
 
-def add_title(PIL_image, rgb, sat_nr, dateS, hourS, minS, area, dc, verbose ):
+def add_title(PIL_image, rgb, sat_nr, dateS, hourS, minS, area, dc, font_file, verbose ):
 
    if verbose:
       print "    add title to image "
@@ -678,12 +678,12 @@ def add_title(PIL_image, rgb, sat_nr, dateS, hourS, minS, area, dc, verbose ):
 
       # determine font size
       if area == "EuropeCanary":
-         fontsize=36
+         font_size=36
       elif area.find("ticino") != -1:
-         fontsize=12
+         font_size=12
       else:
-         fontsize=18
-      font = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf", fontsize)
+         font_size=18
+      font = ImageFont.truetype(font_file, font_size)
 
       title = ' '+ "MSG-"+str(sat_nr-7) +', '+ dateS+' '+hourS+':'+minS+'UTC, '+area+', '+rgb
       draw = ImageDraw.Draw(PIL_image)

@@ -49,6 +49,7 @@ from my_msg_module import check_input
 #from astropy.convolution import MexicanHat2DKernel
 
 from postprocessing import postprocessing
+from socket import gethostname
 
 import inspect 
 
@@ -1368,8 +1369,12 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                                            nbits=8)   
                         os.chmod(c2ninjotif_file, 0777)
                         if in_msg.upload_ninjotif:
-                            print ("... upload ninjotif: /tools/mch/datadisp/bin/jwscp_upload.zueub227.tcoalition2 &")
-                            subprocess.call("/tools/mch/datadisp/bin/jwscp_upload.zueub227.tcoalition2 &", shell=True)
+                            print ("... upload ninjotif: /tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition2 &")
+                            subprocess.call("/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition2 &", shell=True)
+                            subprocess.call("/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition3 &", shell=True)
+                            subprocess.call("/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition4 &", shell=True)
+                            subprocess.call("/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition5 &", shell=True)
+                            
 
                     #pickle.dump( PIL_image, open("RGB"+yearS+monthS+dayS+hourS+minS+".p", "wb" ) )
                 

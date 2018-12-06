@@ -1,7 +1,7 @@
 [submodule "packages/pyresample"]
 	path = packages/pyresample
 	url = https://github.com/meteoswiss-mdr/pyresample.git
-	branch = develop
+	branch = master
 [submodule "packages/pycoast"]
 	path = packages/pycoast
 	url = https://github.com/pytroll/pycoast.git
@@ -9,11 +9,11 @@
 [submodule "packages/pyorbital"]
 	path = packages/pyorbital
 	url = https://github.com/meteoswiss-mdr/pyorbital.git
-	branch = develop
+	branch = master
 [submodule "packages/posttroll"]
 	path = packages/posttroll
 	url = https://github.com/pytroll/posttroll.git
-	branch = develop
+	branch = master
 [submodule "packages/trollsift"]
 	path = packages/trollsift
 	url = https://github.com/pytroll/trollsift.git
@@ -25,7 +25,7 @@
 [submodule "packages/trollimage"]
 	path = packages/trollimage
 	url = https://github.com/meteoswiss-mdr/trollimage.git
-	branch = develop
+	branch = master
 [submodule "packages/mipp"]
 	path = packages/mipp
 	url = https://github.com/meteoswiss-mdr/mipp.git
@@ -53,11 +53,11 @@
 [submodule "packages/pytroll-collectors"]
 	path = packages/pytroll-collectors
 	url = https://github.com/pytroll/pytroll-collectors.git
-	branch = develop
+	branch = master
 [submodule "packages/trollflow-sat"]
 	path = packages/trollflow-sat
 	url = https://github.com/pytroll/trollflow-sat.git
-	branch = develop
+	branch = master
 [submodule "packages/trollflow"]
 	path = packages/trollflow
 	url = https://github.com/pytroll/trollflow.git
@@ -96,7 +96,7 @@
 	branch = master
 [submodule "packages/pykdtree"]
 	path = packages/pykdtree
-	url = https://github.com/pytroll/pykdtree.git
+	url = https://github.com/storpipfugl/pykdtree.git
 	branch = master
 [submodule "packages/pytroll-product-filter"]
 	path = packages/pytroll-product-filter

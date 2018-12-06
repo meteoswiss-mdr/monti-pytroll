@@ -9,8 +9,8 @@ import logging
 LOG = logging.getLogger(__name__)
 
 #
-#time_slot = get_last_SEVIRI_date(False, delay=10)
-time_slot = datetime.datetime(2013, 6, 20, 10, 45) # every 15 min
+time_slot = get_last_SEVIRI_date(False, delay=10)
+#time_slot = datetime.datetime(2013, 6, 20, 10, 45) # every 15 min
 LOG.debug("*** read radar data for "+str(time_slot))
 
 global_radar = GeostationaryFactory.create_scene("odyssey", "", "radar", time_slot)

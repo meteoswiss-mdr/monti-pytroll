@@ -45,6 +45,15 @@ class input_msg_class:
       self.scpOutputDir2 = None
       self.scpID2 = None
       self.scpProducts2 = []
+      self.upload_ninjotif = False  
+      self.socupload = False  
+      self.socuploadFilename = 'r0305n.%Y%m%d%H%M.png' 
+      self.socuploadCommand = '/tools/ext/wman/custom/bin/socupload -s zuegts3,zuegts4 -f '+self.socuploadFilename+' -c LSSX'
+      self.ftpUpload=False
+      self.ftpProducts=[]
+      self.ftpServer=None
+      self.ftpUser=None
+      self.ftpPassword=None
       self.mapDir = ""
       self.mapResolution = None
       self.indicate_mask = True

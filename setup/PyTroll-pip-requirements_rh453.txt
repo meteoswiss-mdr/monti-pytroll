@@ -1,0 +1,71 @@
+-e git+https://github.com/pytroll/pytroll-aapp-runner.git@a7c7fc927dbe8208c41e26bd7f9056c779b09816#egg=aapp_runner&subdirectory=../../../packages/pytroll-aapp-runner
+-e git+https://github.com/pytroll/aggdraw.git@525ddaafc05a934587beb387bd9f293192207250#egg=aggdraw&subdirectory=../../../packages/aggdraw
+appdirs==1.4.3
+asn1crypto==0.24.0
+bcrypt==3.1.6
+bitstring==3.1.5
+certifi==2019.3.9
+cffi==1.12.2
+cftime==1.0.3.4
+chardet==3.0.4
+configobj==5.0.6
+cryptography==2.6.1
+-e git+https://github.com/pytroll/pytroll-cspp-runner.git@15913bf695ec4a77326493d4e9214f6f0e98cfa2#egg=cspp_runner&subdirectory=../../../packages/pytroll-cspp-runner
+dask==1.1.5
+docutils==0.14
+dpath==1.4.2
+enum34==1.1.6
+h5py==2.9.0
+idna==2.8
+ipaddress==1.0.22
+-e git+https://github.com/meteoswiss-mdr/mipp.git@031f620aaff5e75566f62f6f5f84452bd3979781#egg=mipp&subdirectory=../../../packages/mipp
+-e git+https://github.com/pytroll/pytroll-modis-runner.git@d3a7e3f7eeda2f47f7eda424ff1fe225729b893b#egg=modis_runner&subdirectory=../../../packages/pytroll-modis-runner
+-e git+https://github.com/meteoswiss-mdr/mpop.git@f2c12a1291f06dee1794d84ff6abe425c110eaea#egg=mpop&subdirectory=../../../packages/mpop
+netCDF4==1.5.0.1
+netifaces==0.10.9
+numpy==1.16.2
+-e git+https://github.com/pytroll/pytroll-osisaf-runner.git@a893d64a8fb008741f43596a936b6e986b1f03ba#egg=osisaf_runner&subdirectory=../../../packages/pytroll-osisaf-runner
+pandas==0.24.2
+paramiko==2.4.2
+Pillow==6.0.0
+-e git+https://github.com/pytroll/posttroll.git@47e25cec2dea419e299893654814831bdf21d41f#egg=posttroll&subdirectory=../../../packages/posttroll
+-e git+https://github.com/pytroll/pytroll-pps-runner.git@b3973035aa77fbdef469e7bfcee7c1f7f615fdc8#egg=pps_runner&subdirectory=../../../packages/pytroll-pps-runner
+-e git+https://github.com/pytroll/pytroll-product-filter.git@a99021b494a88f69b5a9709f7ede27fc92e038ae#egg=product_filter&subdirectory=../../../packages/pytroll-product-filter
+pyasn1==0.4.5
+-e git+https://github.com/pytroll/pycoast.git@eb186a0495fe0578f35c30c625ce77d337efd236#egg=pycoast&subdirectory=../../../packages/pycoast
+pycparser==2.19
+-e git+https://github.com/pytroll/pydecorate.git@c0eaf59ebf226415d335843dcc27b86b0668920f#egg=pydecorate&subdirectory=../../../packages/pydecorate
+-e git+https://github.com/pytroll/pygac.git@9c2e5233b4e5720bcd18f3d3332665e1387511f0#egg=pygac&subdirectory=../../../packages/pygac
+-e git+https://github.com/pytroll/pygranule.git@e73cbda49aa2073d249f5a88e0273328acf8836c#egg=pygranule&subdirectory=../../../packages/pygranule
+pyinotify==0.9.6
+-e git+https://github.com/storpipfugl/pykdtree.git@18ed42347f6e2ce11beacacb47bfdde9dcdaa300#egg=pykdtree&subdirectory=../../../packages/pykdtree
+PyNaCl==1.3.0
+-e git+https://github.com/pytroll/pyninjotiff.git@a77f5ad384a17c309b6cc4ab7f7173773fd1b2e2#egg=pyninjotiff&subdirectory=../../../packages/pyninjotiff
+-e git+https://github.com/meteoswiss-mdr/pyorbital.git@bee15f028544303e81cc0ee48aaab9158579fddc#egg=pyorbital&subdirectory=../../../packages/pyorbital
+pyproj==2.1.2
+# Editable install with no version control (pyresample==1.11.2)
+-e /opt/users/hau/C2python2_env/lib/python2.7/site-packages/pyresample-1.11.2-py2.7-linux-x86_64.egg
+pyshp==2.1.0
+-e git+https://github.com/meteoswiss-mdr/pyspectral.git@29f3e96d1ac3019d4d8836315cc6de672ddd293e#egg=pyspectral&subdirectory=../../../packages/pyspectral
+python-dateutil==2.8.0
+python-geotiepoints==1.1.7
+-e git+https://github.com/pytroll/pytroll-collectors.git@eddd2651a235cab8c97a84b2a365baf4953f0c0d#egg=pytroll_collectors&subdirectory=../../../packages/pytroll-collectors
+-e git+https://github.com/pytroll/pytroll-schedule.git@d08389e009996085e8eae35cc6c0f234a2707782#egg=pytroll_schedule&subdirectory=../../../packages/pytroll-schedule
+pytz==2018.9
+PyYAML==5.1
+pyzmq==18.0.1
+requests==2.21.0
+-e git+https://github.com/pytroll/satpy.git@17b88e4916435cd9e68dd689b7a3e5147c8cb566#egg=satpy&subdirectory=../../../packages/satpy
+scipy==1.2.1
+scp==0.13.2
+six==1.12.0
+toolz==0.9.0
+-e git+https://github.com/pytroll/trollbufr@9c2f9feaafcd1aa240d41dedf5400b1a18468efb#egg=trollbufr&subdirectory=../../../packages/trollbufr
+-e git+https://github.com/pytroll/trollduction.git@9cd84934c3473c8f0d5a07449635a3056aa19a0e#egg=trollduction&subdirectory=../../../packages/trollduction
+-e git+https://github.com/pytroll/trollflow.git@a1854d2a05bc974039af42dfa49e589a1811d032#egg=trollflow&subdirectory=../../../packages/trollflow
+-e git+https://github.com/pytroll/trollflow-sat.git@dd399f2e48e32c0349aa4ad13541b39eeee84a82#egg=trollflow_sat&subdirectory=../../../packages/trollflow-sat
+-e git+https://github.com/meteoswiss-mdr/trollimage.git@a4704d7c49ae92831a04c07643a38df8d629c869#egg=trollimage&subdirectory=../../../packages/trollimage
+-e git+https://github.com/pytroll/trollmoves.git@075b93f80caffe2816bad03dab9bd3245503a4ea#egg=trollmoves&subdirectory=../../../packages/trollmoves
+-e git+https://github.com/pytroll/trollsift.git@714363d1f13a408500bbbaf3e072fbda9683ecda#egg=trollsift&subdirectory=../../../packages/trollsift
+urllib3==1.24.1
+xarray==0.12.0

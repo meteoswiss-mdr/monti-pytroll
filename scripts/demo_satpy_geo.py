@@ -51,7 +51,7 @@ We take the case of HRIT data from meteosat 9, as send through eumetcast.
 
 from satpy.utils import debug_on
 debug_on()
-from satpy.satellites import GeostationaryFactory
+from satpy import Scene, find_files_and_readers
 
 import sys
 from datetime import datetime
@@ -71,24 +71,25 @@ else:
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print "Usage: " + sys.argv[0] + " time_string"
+        print "Usage: " + sys.argv[0] + " time_string(%Y%m%d%H%M)"
         sys.exit()
 
     time_string = sys.argv[1]
     time_slot = strptime(time_string, "%Y%m%d%H%M")
-    global_data = GeostationaryFactory.create_scene("meteosat", "09",
-                                                    "seviri", time_slot)
+    global_scene = Scene(reader="hrit_msg", start_time=time_slot)
+    #global_scene = Scene(platform_name="Meteosat-9", sensor="seviri", reader="hrit_msg", start_time=time_slot)
+    #global_data = Scene.create_scene("meteosat", "09", "seviri", time_slot)
 
-    global_data.load()
+    global_scene.load()
 
     areas = ["euro4", "scan2"]
 
     for area in areas:
 
-        local_data = global_data.project(area)
+        local_scene = global_scene.project(area)
 
-        img = local_data.image.overview()
+        img = local_scene.image.overview()
         img.save("overview_" + area + "_" + time_string + ".png")
 
-        img = local_data.image.fog()
+        img = local_scene.image.fog()
         img.save("fog_" + area + "_" + time_string + ".png")

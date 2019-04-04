@@ -1,0 +1,1 @@
+../packages/pyorbital/pyorbital/etc/platforms.txt

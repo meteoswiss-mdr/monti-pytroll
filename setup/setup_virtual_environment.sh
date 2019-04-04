@@ -29,11 +29,27 @@ export https_proxy=https://proxy.meteoswiss.ch:8080
 # This is done only once for all users at the zueub427, zueub428, and CSCS
 #. ./install_anaconda.sh
 
+# check if gcc compiler is installed
+gcc -v
+echo "Is the gcc compiler installed? (press enter to continue or CTRL+c to abort)"
+read junk
+
+
+echo "*** Create virtual environement PyTroll_${LOGNAME} and install python packages according to PyTroll-conda-package-list.txt"
+echo "=========================================================================================================================="
+
 # add Anaconda directory to the path and check, if it is installed
 source set_paths.sh  # load functions from this script
-#set_conda_path
-echo "rechange conda"
-export CONDA_PATH="/opt/users/common/packages/anaconda2_$LOGNAME/"
+if [[ $# -eq 0 ]]; then 
+    set_conda_path
+else
+    if [ "$1" == "python3" ] || [ "$1" == "py3" ] || [ "$1" == "3" ] ; then
+	set_conda_path python3
+    else
+	echo "unknown command line option: setup_virtual_environment" $1
+	return
+    fi
+fi
 conda -V
 which conda
 which python
@@ -43,14 +59,21 @@ read junk
 #echo "*** Update anaconda itself"
 #conda update conda
 
-# check if gcc compiler is installed
-gcc -v
-echo "Is the gcc compiler installed? (press enter to continue or CTRL+c to abort)"
-read junk
+if [[ $# -eq 0 ]]; then 
+    echo "Creating virtual environment with python2.7? (press enter to continue or CTRL+c to abort)"
+    read junk
+    conda create -n PyTroll_${LOGNAME} python=2.7 --copy --file PyTroll-conda-package-list_no_version_nr.txt  # _${LOGNAME}
+else
+    if [ "$1" == "python3" ] || [ "$1" == "py3" ] || [ "$1" == "3" ] ; then
+	echo "Creating virtual environment with python3.7.1? (press enter to continue or CTRL+c to abort)"
+	read junk
+	conda create -n PyTroll_${LOGNAME} python=3.7.1 --copy --file PyTroll-conda-package-list_no_version_nr.txt  # _${LOGNAME}	
+    else
+	echo "unknown command line option: setup_virtual_environment" $1
+	return
+    fi
+fi
 
-echo "*** Create virtual environement PyTroll_${LOGNAME} and install python packages according to PyTroll-conda-package-list.txt"
-echo "=========================================================================================================================="
-conda create -n PyTroll_${LOGNAME} python=2.7 --copy --file PyTroll-conda-package-list_no_version_nr.txt  # _${LOGNAME}
 ### !!! without copy conda does not create shaired library files !!!
 #conda create -n PyTroll_${LOGNAME} --copy python=2.7 numpy ephem
 #echo conda env create -f jmz.yml   ### does not work due to SSL: CERTIFICATE_VERIFY_FAILED error
@@ -96,19 +119,19 @@ export INSTALL_DIR=$UTILS_PATH/packages/
 conda install basemap 
 
 # should be already installed when using yml file
-echo ""
-echo "*** Install pygrib (inside the virtual env)"
-echo "============================================"
-cd $INSTALL_DIR/pygrib
-# install pygrib
-# Note: jasper and grib_api libraries have to be already installed
-#       and setup.cfg has to be modified accordingly
-# Note: pygrib has to be build before virtual env is activated
-python setup.py install
-###### works now automatically and also installs the package: ecmwf_grib
-#####conda install -c conda-forge pygrib   ## very unfortunately in conflict with PIL
-echo "Did the installation of pygrib work fine? (press enter to continue or CTRL+c to abort)"
-read junk
+#echo ""
+#echo "*** Install pygrib (inside the virtual env)"
+#echo "============================================"
+#cd $INSTALL_DIR/pygrib
+## install pygrib
+## Note: jasper and grib_api libraries have to be already installed
+##       and setup.cfg has to be modified accordingly
+## Note: pygrib has to be build before virtual env is activated
+#python setup.py install
+####### works now automatically and also installs the package: ecmwf_grib
+######conda install -c conda-forge pygrib   ## very unfortunately in conflict with PIL
+#echo "Did the installation of pygrib work fine? (press enter to continue or CTRL+c to abort)"
+#read junk
 
 # !!! THIS IS NOW A PYTROLL PACKAGE. Hence, it is installed as submodule!
 #echo ""

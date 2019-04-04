@@ -16,6 +16,8 @@ from PIL import ImageFont, ImageDraw
 from pycoast import ContourWriterAGG
 from datetime import timedelta
 import sys
+from os.path import dirname, exists
+from os import makedirs
 
 LOG = logging.getLogger(__name__)
 
@@ -53,8 +55,8 @@ else:
         minute = 30
 
 
-#prop_str='DBZH'
-prop_str='RATE'
+prop_str='DBZH'
+#prop_str='RATE'
 
 #if len(sys.argv) > 1:
 #   prop_str = sys.argv[1]
@@ -87,7 +89,7 @@ color_mode='RainRate'
 
 #area='odyssey'
 #area='odysseyS25'
-area='EuroMercator'
+area='EuroMercator' # should be the same as blitzortung
 
 reproject=True
 if reproject:
@@ -101,6 +103,8 @@ if reproject:
 
 #outputDir = "/data/cinesat/out/"
 outputDir = time_slot.strftime('/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_ODY_RATE_'+area+'/')
+if not exists(outputDir):
+    makedirs(outputDir)
 outputFile = outputDir+'ODY_'+prop_str+'-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS +'.png'
 
 # define area
@@ -125,6 +129,7 @@ min_data = 0.0
 max_data = 150
 colormap = RainRate
 
+# instantaneous rain rate in mm/h
 if prop_str == 'RATE':
 #   prop = np.log10(prop)
 #   min_data = prop.min()
@@ -138,6 +143,7 @@ if prop_str == 'RATE':
 #   minor_tick_marks = 0.1   # default
    lower_value=0.15
 
+# instantaneous rain rate in mm/h
 if prop_str == 'DBZH':
    min_data = -20
    max_data = 70
@@ -155,27 +161,34 @@ if lower_value > -1000:
 LOG.debug("min_data/max_data: "+str(min_data)+" / "+str(max_data))
 colormap.set_range(min_data, max_data)
 
+# prop.mask[:,:]=True
+
 img = trollimage(prop, mode="L", fill_value=fill_value)
 img.colorize(colormap)
 PIL_image=img.pil_image()
 dc = DecoratorAGG(PIL_image)
 
+
+add_logos=True
+add_colorscale=True
+add_title=True
+add_map=True
+find_maxima=True
+verbose=True
+layer=' 2nd layer'
+add_borders=True
+
 resolution='l'
 
-if False:
+if add_borders:
    cw = ContourWriterAGG('/data/OWARNA/hau/pytroll/shapes/')
    cw.add_coastlines(PIL_image, area_def, outline='white', resolution=resolution, outline_opacity=127, width=1, level=2)  #, outline_opacity=0
-
-   outline = (255, 0, 0)
+   #outline = (255, 0, 0)
    outline = 'red'
+   #outline = 'white'
    cw.add_coastlines(PIL_image, area_def, outline=outline, resolution=resolution, width=2)  #, outline_opacity=0
    cw.add_borders(PIL_image, area_def, outline=outline, resolution=resolution, width=2)       #, outline_opacity=0 
 
-add_logos=1
-add_colorscale=0
-add_title=1
-verbose=1
-layer=' 2nd layer'
 
 ticks=20
 tick_marks=20        # default
@@ -196,7 +209,8 @@ if add_logos:
 
 #font_scale = aggdraw.Font("black","/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerif-Bold.ttf",size=16)
 fontsize=18
-font = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf", fontsize)
+#font = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf", fontsize)
+font = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaSansRegular.ttf", fontsize)
 
 if add_colorscale:
    print '... add colorscale ranging from min_data (',min_data,') to max_data (',max_data,')'
@@ -205,7 +219,7 @@ if add_colorscale:
    #font_scale = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf", fontsize)
    colormap_r = colormap.reverse()
    #rainbow_r.set_range(min_data, max_data)
-   dc.add_scale(colormap_r, extend=True, ticks=ticks, tick_marks=tick_marks, minor_tick_marks=minor_tick_marks, font=font, line_opacity=100, unit=units) #
+   dc.add_scale(colormap_r, extend=True, ticks=ticks, tick_marks=tick_marks, minor_tick_marks=minor_tick_marks, line_opacity=100, unit=units) #, font=font
 
 indicate_range=True
 if indicate_range:
@@ -235,5 +249,77 @@ if add_title:
    title = layer+' ODYSSEY, '+'precipitation rate'+' ['+global_data[prop_str].info["units"]+']'
    draw.text((0, y_pos_title),title, title_color, font=font)
 
+   
 PIL_image.save(outputFile)
 print '... save image as ', outputFile
+
+# Austria works with
+# https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_watershed/py_watershed.html
+
+if find_maxima:
+    import numpy as np
+    import scipy
+    import scipy.ndimage as ndimage
+    import scipy.ndimage.filters as filters
+    
+    import matplotlib.pyplot as plt
+    
+    data = global_data[prop_str].data.data
+    #data = filters.gaussian_filter(global_data[prop_str].data,1) ### filter eliminates too many data points...
+
+    noise_removal = False
+    if noise_removal:
+        # ... need to install openCV2 
+        import cv2
+        kernel = np.ones((3,3),np.uint8)
+        ret, thresh = cv2.threshold(data, 0, 75, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+        opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations = 1)
+        sure_bg = cv2.dilate(opening,kernel,iterations=3)
+
+    # arbitrary settings
+    neighborhood_size = 6
+    threshold = 6
+    ref_min=43
+    
+    data_max = filters.maximum_filter(data, neighborhood_size)
+    print data_max.max()
+    maxima = (data == data_max)
+    data_min = filters.minimum_filter(data, neighborhood_size)
+    print data_min.max()
+    diff = ((data_max - data_min) > threshold)
+    #print "diff: ", diff
+    maxima[diff == False] = 0
+    maxima[data_max < ref_min] = 0
+    
+    labeled, num_objects = ndimage.label(maxima)
+    slices = ndimage.find_objects(labeled)
+    x, y = [], []
+    for dy,dx in slices:
+        x_center = (dx.start + dx.stop - 1)/2
+        x.append(x_center)
+        y_center = (dy.start + dy.stop - 1)/2    
+        y.append(y_center)
+
+    plot_plt=True
+    if plot_plt:
+        plt.imshow(data, vmin=0, vmax=0.9*data_max.max())
+        #plt.imshow(data, vmin=0, vmax=50)
+        #plt.imshow(data)
+        plt.autoscale(False)
+        outputFile = outputDir+'odd_'+prop_str+'-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS +'.png'
+        plt.savefig(outputFile, bbox_inches = 'tight')
+        print "display "+outputFile+" &"
+        
+        plt.autoscale(False)
+        plt.plot(x,y, 'ro', markersize=2.5)
+        outputFile = outputDir+'odm_'+prop_str+'-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS +'.png'
+        plt.savefig(outputFile, bbox_inches = 'tight')
+        print "display "+outputFile+" &"
+    else:
+        prop = np.full(data.shape, False, dtype=bool)
+        for i,j in zip(x,y):
+            prop[i,j]=True
+        from mpop.satin.swisslightning import unfold_lightning
+        
+        img = trollimage(prop, mode="L", fill_value=fill_value)
+        # ... not yet finished ...

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set_utils_path() {
-#function set_utils_path {  # function syntax is not supported crontab
+#function set_utils_path {  # function syntax is not supported by crontab
     case $HOSTNAME in
     "zueub"[2-4][0-9][0-9])
 	export UTILS_PATH=/opt/users/common/
@@ -19,11 +19,22 @@ set_utils_path() {
 }
 
 set_conda_path() {
-#function set_conda_path {  # function syntax is not supported crontab
+#function set_conda_path {  # function syntax is not supported by crontab
+    echo "set_conda_path" $1
     case $HOSTNAME in
     "zueub"[2-4][0-9][0-9])
-	#export CONDA_PATH="/opt/users/common/packages/anaconda3/" ;;
-        export CONDA_PATH="/opt/users/common/packages/anaconda2_$LOGNAME/" ;;
+	if [[ $# -eq 0 ]]; then 
+	    export CONDA_PATH="/opt/users/common/packages/anaconda2_$LOGNAME/"
+	else
+	    if [ "$1" == "python3" ] || [ "$1" == "py3" ] || [ "$1" == "3" ] ; then
+		echo "set_conda_path python3"
+		export CONDA_PATH="/opt/users/common/packages/anaconda37_$LOGNAME/"
+	    else
+		echo "unknown command line option: set_conda_path" $1
+		export CONDA_PATH=""
+		return
+	    fi
+	fi ;;
     "keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
         export CONDA_PATH="/store/msrad/utils/anaconda3/" ;;
     *)
@@ -40,6 +51,7 @@ set_conda_path() {
 
     # easy access to the easy-install file
     alias easy-install.pth='emacs '$CONDA_PATH'/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth &'
+    alias easy-install='emacs '$CONDA_PATH'/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth &'
     alias site-packages='cd '$CONDA_PATH'/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/ '
 
     # easier activation and deactivation of the virtual environment PyTroll
@@ -55,8 +67,11 @@ set_conda_path() {
     #conda info --envs
 }
 
+
+
+
 set_pytroll_paths() {
-# function set_pytroll_paths {   # function syntax is not supported crontab
+# function set_pytroll_paths {   # function syntax is not supported by crontab
 case $HOSTNAME in
     "zueub"[2-4][0-9][0-9])
         if [ -d /opt/users/$LOGNAME/monti-pytroll/ ]
@@ -68,6 +83,7 @@ case $HOSTNAME in
         export XRIT_DECOMPRESS_PATH=/opt/users/common/bin/xRITDecompress
         #export XRIT_DECOMPRESS_OUTDIR=/tmp/SEVIRI_DECOMPRESSED_$LOGNAME ;;
         export XRIT_DECOMPRESS_OUTDIR=/tmp/SEVIRI_DECOMPRESSED ;;
+        #export XRIT_DECOMPRESS_OUTDIR=/data/COALITION2/tmp/SEVIRI_DECOMPRESSED ;;
     "keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
         export PYTROLLHOME=$HOME/monti-pytroll/
         export XRIT_DECOMPRESS_PATH=/store/mch/msrad/sat/pytroll/xRITDecompress
@@ -77,10 +93,13 @@ case $HOSTNAME in
 	return ;;
 	#exit 1 ;;
     esac
-    export PSP_CONFIG_FILE=${UTILS_PATH}/packages/pyspectral_aux_files/pyspectral.cfg
-    #unset PSP_CONFIG_FILE   # should not be needed any more ... 
+    #export PSP_CONFIG_FILE=${UTILS_PATH}/packages/pyspectral_aux_files/pyspectral.cfg
+    export PSP_CONFIG_FILE=${UTILS_PATH}/packages/pyspectral_aux_files/pyspectral.yaml
+    #unset PSP_CONFIG_FILE   # should not be needed any more ...
+    export PYGAC_CONFIG_FILE=$PYTROLLHOME/packages/pygac/etc/pygac.cfg
     echo "... set PYTROLLHOME to: "$PYTROLLHOME
     echo "... set PSP_CONFIG_FILE to: "$PSP_CONFIG_FILE
     echo "... set XRIT_DECOMPRESS_PATH to: "$XRIT_DECOMPRESS_PATH
     echo "... set XRIT_DECOMPRESS_OUTDIR to: "$XRIT_DECOMPRESS_OUTDIR
+    echo "... set PYGAC_CONFIG_FILE to: "$PYGAC_CONFIG_FILE
 }

@@ -76,7 +76,8 @@ if 'cell' in locals():
 else:
     cell_ID=''
     cell_dir=''
-    global_data.load(['TRTcells']) # ,min_rank=8
+    global_data.load(['TRTcells']) # ,min_rank=8, cell="2018080710450054"
+    #global_data.load(['TRTcells'],min_rank=28) # ,min_rank=8, cell="2018080710450054"
 
 #if hasattr(global_data, 'traj_IDs'):
 #    print ""
@@ -165,6 +166,23 @@ minor_tick_marks=1   # default
 
 old_style=False
 
+read_COALITION3=True
+if read_COALITION3:
+    import pickle
+    import pandas as pd
+    #C3_file="/opt/users/hau/PyTroll/scripts/C3/TRT_Rank_Pred_2018080710200036.pkl"
+    C3_file="/opt/users/hau/PyTroll/scripts/C3/TRT_Rank_Pred_PM_2018080710200036.pkl"
+    #with open("TRT_Rank_Pred"+prob_match+"_"+cellID+".pkl", "rb") as file: TRT_Rank_Pred = pickle.load(file)
+    with open(C3_file, "rb") as file: TRT_Rank_Pred = pickle.load(file)
+    t_0_str = time_slot.strftime("%H:%M")
+    if time_slot in TRT_Rank_Pred.index:
+        TRT_tmp=TRT_Rank_Pred.at_time(time_slot)[['TRT_Rank_pred|5','TRT_Rank_pred|10','TRT_Rank_pred|15','TRT_Rank_pred|20','TRT_Rank_pred|25','TRT_Rank_pred|30','TRT_Rank_pred|35','TRT_Rank_pred|40','TRT_Rank_pred|45']]
+        RANKr_0 = TRT_Rank_Pred.at_time(t_0_str)['RANKr']
+        Rank_predicted = [RANKr_0.iloc[0]/10.,TRT_tmp.iloc[0]['TRT_Rank_pred|5'],TRT_tmp.iloc[0]['TRT_Rank_pred|10'],TRT_tmp.iloc[0]['TRT_Rank_pred|15'],TRT_tmp.iloc[0]['TRT_Rank_pred|20'],TRT_tmp.iloc[0]['TRT_Rank_pred|25'],TRT_tmp.iloc[0]['TRT_Rank_pred|30'],TRT_tmp.iloc[0]['TRT_Rank_pred|35'],TRT_tmp.iloc[0]['TRT_Rank_pred|40'],TRT_tmp.iloc[0]['TRT_Rank_pred|45']]
+        print Rank_predicted
+    else:
+        Rank_predicted=None
+
 if old_style: 
     print '... use trollimage to ', method,' plot data (min,max)=',min_data, max_data
     img = trollimage(prop, mode="L") # , fill_value=(0,0,0)  add black background color 
@@ -190,8 +208,15 @@ else:
     colorscale=False
     black_vel=True
 
-    PIL_image = TRTimage( global_data.traj_IDs, global_data.TRTcells, obj_area) # minRank=8, alpha_max=1.0, plot_vel=True
+    #PIL_image = TRTimage( global_data.traj_IDs, global_data.TRTcells, obj_area) # , fill=False, minRank=8, alpha_max=1.0, plot_vel=True
+    #PIL_image = TRTimage( global_data.traj_IDs, global_data.TRTcells, obj_area, minRank=15.01) # minRank=8, alpha_max=1.0, plot_vel=True
+    #PIL_image = TRTimage( global_data.traj_IDs, global_data.TRTcells, obj_area, TRTcell_ID="2018080113300129", minRank=3) # minRank=8, alpha_max=1.0, plot_vel=True
+    #PIL_image = TRTimage( global_data.traj_IDs, global_data.TRTcells, obj_area, TRTcell_ID="2018080721300099", minRank=3) # minRank=8, alpha_max=1.0, plot_vel=True
+    PIL_image = TRTimage( global_data.traj_IDs, global_data.TRTcells, obj_area, TRTcell_ID="2018080710200036", minRank=-1, plot_nowcast=True, fill=True, Rank_predicted=Rank_predicted) # minRank=3, minRank=8, alpha_max=1.0, plot_vel=True
+    #PIL_image = TRTimage( global_data.traj_IDs, global_data.TRTcells, obj_area, fill=False) # minRank=8, alpha_max=1.0, plot_vel=True
+    #PIL_image = TRTimage( global_data.traj_IDs, global_data.TRTcells, obj_area, plot_nowcast=True) # minRank=8, alpha_max=1.0, plot_vel=True
 
+    
 # create decorator 
 dc = DecoratorAGG(PIL_image)
 draw = ImageDraw.Draw(PIL_image)

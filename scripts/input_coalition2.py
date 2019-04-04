@@ -211,6 +211,13 @@ def input(in_msg):
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
 
+    #import ftp_DACH_MWO
+    #in_msg.ftpUpload   = ftp_DACH_MWO.ftpUpload
+    #in_msg.ftpProducts = ftp_DACH_MWO.ftpProducts
+    #in_msg.ftpServer   = ftp_DACH_MWO.ftpServer
+    #in_msg.ftpUser     = ftp_DACH_MWO.ftpUser
+    #in_msg.ftpPassword = ftp_DACH_MWO.ftpPassword
+    
     in_msg.chosen_settings={}
     #settings: set to None for automatic choice
     if in_msg.settings == "manual":

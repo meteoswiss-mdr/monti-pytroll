@@ -104,6 +104,7 @@ def get_file_list(composite, sat, sat_nr, time_slot, area, outDir, outFile, n=No
 def n_file_composite(composite, satellite, sat_nr, time_slot, area, outDir, outFile,
                      scpOutput=False, scpOutDir="/tmp/", scpID=None, scpProducts=[],
                      scpOutDir2="/tmp/", scpID2=None, scpProducts2=[], 
+                     ftpUpload=False, ftpProducts=[], ftpServer=None, ftpUser=None, ftpPassword=None, 
                      bits_per_pixel=8, compress_to_8bit=False, composites_done=[], verbose=True):
     
     n_rgb = composite.count('-') + 1
@@ -162,7 +163,20 @@ def n_file_composite(composite, satellite, sat_nr, time_slot, area, outDir, outF
                 if verbose:
                     print "... secure copy "+comp_file+ " to "+scpOutputDir2
                 subprocess.call("scp "+scpID2+" "+comp_file+" "+scpOutputDir2+" 2>&1 &", shell=True)
-    
+
+    if ftpUpload:
+        print "... ftpUpload requested"
+        if ftpServer==None or ftpUser==None or ftpPassword==None:
+            print "*** ERROR, ftp input is not complete"
+            print "ftp_server=", ftpServer
+            print "ftp_user=", ftpUser
+            print "ftp_password=", ftpPassword
+        else:
+            if (composite in ftpProducts):
+                command_line = "curl -T "+comp_file+" "+ftpServer+" --user "+ftpUser+":"+ftpPassword
+                print (command_line)
+                subprocess.call(command_line, shell=True)
+            
     return composites_done
 
 #-----------------------------------------------------------------------------------------
@@ -221,6 +235,7 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
             composites_done = n_file_composite(composite, in_msg.sat, sat_nr, time_slot, area, in_msg.outputDir, in_msg.outputFile,
                                                scpOutput=in_msg.scpOutput, scpOutDir=in_msg.scpOutputDir, scpID=in_msg.scpID, scpProducts=in_msg.scpProducts,
                                                scpOutDir2=in_msg.scpOutputDir2, scpID2=in_msg.scpID2, scpProducts2=in_msg.scpProducts2,
+                                               ftpUpload=in_msg.ftpUpload, ftpProducts=in_msg.ftpProducts, ftpServer=in_msg.ftpServer, ftpUser=in_msg.ftpUser, ftpPassword=in_msg.ftpPassword,
                                                composites_done=composites_done, verbose=in_msg.verbose)
 
         if in_msg.verbose:

@@ -415,6 +415,14 @@ def plot_msg(in_msg):
                            print "... secure copy: "+command_line_command
                         subprocess.call(command_line_command, shell=True)
 
+               if in_msg.socupload:
+                 socuploadFilename = format_name (in_msg.socuploadFilename, data.time_slot, area=area)
+                 command_line_command1 = "cp "+outputFile+" "+outputDir+"/"+socuploadFilename+" 2>&1; "
+                 socuploadCommand  = format_name (in_msg.socuploadCommand,  data.time_slot, area=area)
+                 if in_msg.verbose:
+                   print command_line_command1
+                   print socuploadCommand
+                 subprocess.call(command_line_command1+socuploadCommand, shell=True) 
                            
                if 'ninjotif' in in_msg.outputFormats:
                   ninjotif_file = format_name (outputDir+'/'+in_msg.ninjotifFilename, data.time_slot, sat_nr=data.sat_nr(), RSS=in_msg.RSS, area=area, rgb=rgb+parallax_correction_str )
@@ -995,8 +1003,8 @@ def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, font_file
    else:
       x_pos_title = 10  # x1 = 10
       y_pos_title =  5  # y1 = 10
-      dy = 1.11111 * fontsize # dy = 20 dy = 50
-      print "fontsize", fontsize, ", dy=", dy
+      dy = 1.11111 * font_size # dy = 20 dy = 50
+      print "font_size", font_size, ", dy=", dy
 
    # replace wildcards such as %Y-%m-%d with values
    for idx, title_line in enumerate(title):

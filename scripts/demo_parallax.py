@@ -91,6 +91,7 @@ if __name__ == '__main__':
 
         # do parallax correction for all channels
         data = data.parallax_corr(fill="bilinear")
+        #data = data.parallax_corr()
         cth = data["CTTH"].height
 
     else:

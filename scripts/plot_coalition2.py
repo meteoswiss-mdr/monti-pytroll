@@ -2,7 +2,7 @@ from __future__ import print_function
 from datetime import datetime
 import sys, string, os
 import logging
-sys.path.insert(0, "/home/lom/users/cll/pytroll/install/lib/python2.6/site-packages")
+#sys.path.insert(0, "/home/lom/users/cll/pytroll/install/lib/python2.6/site-packages")
 from mpop.satellites import GeostationaryFactory
 from mpop.projector import get_area_def
 from mpop.utils import debug_on
@@ -1285,6 +1285,12 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
 
                     print ("... save image: display ", c2File, " &")
                     PIL_image.save( create_dir(c2File) )
+
+                    #ftp_upload=True
+                    #if ftp_upload:
+                    #    command_line = "/opt/users/common/packages/anaconda2_cinesat//envs/PyTroll_cinesat//bin/curl -T "+c2File+" ftp://web2acg.austrocontrol.at/mch/ --user dach_mwo:oVV9--1Mq"
+                    #    print (command_line)
+                    #    subprocess.call(command_line, shell=True)
                     
                     if 'ninjotif' in in_msg.outputFormats:
                         
@@ -1369,12 +1375,22 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                                            nbits=8)   
                         os.chmod(c2ninjotif_file, 0777)
                         if in_msg.upload_ninjotif:
-                            print ("... upload ninjotif: /tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition2 &")
-                            subprocess.call("/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition2 &", shell=True)
-                            subprocess.call("/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition3 &", shell=True)
-                            subprocess.call("/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition4 &", shell=True)
-                            subprocess.call("/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition5 &", shell=True)
-                            
+                            if len(c2ninjotif_file) > 0:
+                                print ("... upload ninjotif: /tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition2 &")
+                                subprocess.call("/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition2; "+
+                                                #"/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition3; "+
+                                                #"/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition4; "+
+                                                #"/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition5; "+
+                                                "sleep 4; "+
+                                                "rm  "+c2ninjotif_file+" &", shell=True)
+                                
+                                print ("rm "+c2ninjotif_file+" &")
+                                #subprocess.call("/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition3 &", shell=True)
+                                #subprocess.call("/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition3 &", shell=True)
+                                #subprocess.call("/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition4 &", shell=True)
+                                #subprocess.call("/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition5 &", shell=True)
+                                #if len(c2ninjotif_file) > 0:   
+                                #    subprocess.call("rm "+c2ninjotif_file+" &", shell=True)                            
 
                     #pickle.dump( PIL_image, open("RGB"+yearS+monthS+dayS+hourS+minS+".p", "wb" ) )
                 

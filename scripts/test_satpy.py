@@ -12,6 +12,10 @@ RSS=False
 from satpy.utils import debug_on
 debug_on()
 
+#### https://satpy.readthedocs.io/en/latest/quickstart.html
+#### https://satpy.readthedocs.io/en/latest/quickstart.html
+
+
 #time_slot = datetime(lastdate.year, lastdate.month, lastdate.day, lastdate.hour, lastdate.minute)
 #global_scene = Scene(platform_name="Meteosat-10", sensor="seviri", start_time=datetime(2015, 4, 20, 10, 0))
 #global_scene = Scene(platform_name="Meteosat-10", sensor="seviri", start_time=datetime(2015, 4, 20, 10, 0), base_dir="/home/a001673/data/satellite/Meteosat-10/seviri/lvl1.5/2015/04/20/HRIT") 
@@ -20,6 +24,8 @@ debug_on()
 #global_scene = Scene(platform_name="Meteosat-10", sensor="seviri", start_time=datetime(2017, 1, 27, 13, 45))
 #print "hallo world", dir(global_scene), global_scene.info
 #print global_scene.available_composites()
+print global_scene.available_dataset_names()
+print global_scene.available_composite_names()
 
 from satpy import Scene
 

@@ -60,7 +60,7 @@ case $HOSTNAME in
 esac
 
 set_utils_path
-set_conda_path
+set_conda_path python3
 set_pytroll_paths
 
 export PPP_CONFIG_DIR=$PYTROLLHOME/etc/

@@ -128,8 +128,8 @@ def input(in_msg):
     in_msg.results = ['C2rgb']
     #in_msg.outputFormats = ['png']  # only for 'C2rgb'
     in_msg.outputFormats = ['png','ninjotif']  # only for 'C2rgb'
-    in_msg.ninjotifFilename = 'MET%(sat_nr)s_%(RSS)s_COALITION2_%(area)s_%Y%m%d%H%M.tif'
-    in_msg.upload_ninjotif = False
+    in_msg.ninjotifFilename = 'MET-%(sat_nr)s_%(RSS)s_COALITION2_%(area)s_%Y%m%d%H%M.tif'
+    in_msg.upload_ninjotif = True
     #in_msg.results.append('C2rgbHRV')
 
     # look at metadata with: 
@@ -201,6 +201,13 @@ def input(in_msg):
     #in_msg.scpID2="-i /home/cinesat/.ssh/id_dsa_las"
     #in_msg.scpOutputDir2='las@lomux240:/www/proj/OTL/WOL/cll/satimages/'
     #in_msg.scpProducts2 = ['all']
+
+    import ftp_DACH_MWO
+    in_msg.ftpUpload   = ftp_DACH_MWO.ftpUpload
+    in_msg.ftpProducts = ftp_DACH_MWO.ftpProducts
+    in_msg.ftpServer   = ftp_DACH_MWO.ftpServer
+    in_msg.ftpUser     = ftp_DACH_MWO.ftpUser
+    in_msg.ftpPassword = ftp_DACH_MWO.ftpPassword
     
     in_msg.chosen_settings={}
     #settings: set to None for automatic choice

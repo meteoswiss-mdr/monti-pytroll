@@ -11,12 +11,13 @@ def input(in_msg):
     #in_msg.sat = "meteosat"
     #in_msg.sat_nr=8
     #in_msg.RSS=False 
-    #in_msg.sat_nr=9
+    in_msg.sat_nr=9
     #in_msg.RSS=True
+    in_msg.RSS=False
     #in_msg.sat_nr=10
     #in_msg.RSS=False
-    in_msg.sat_nr=11
-    in_msg.RSS=False
+    #in_msg.sat_nr=11
+    #in_msg.RSS=False
     
     # specify an delay (in minutes), when you like to process a time some minutes ago
     # e.g. current time               2015-05-31 12:33 UTC
@@ -47,26 +48,26 @@ def input(in_msg):
     ##in_msg.RGBs.append('VIS008')       # black and white
     ##in_msg.RGBs.append('IR_016')       # black and white
     ##in_msg.RGBs.append('IR_039')       # black and white
-    ##in_msg.RGBs.append('WV_062')       # black and white
+    in_msg.RGBs.append('WV_062')       # black and white
     ##in_msg.RGBs.append('WV_073')       # black and white
     ##in_msg.RGBs.append('IR_087')       # black and white
     ##in_msg.RGBs.append('IR_097')       # black and white
-    in_msg.RGBs.append('IR_108')       # black and white
+    #in_msg.RGBs.append('IR_108')       # black and white
     ##in_msg.RGBs.append('IR_120')       # black and white
     ##in_msg.RGBs.append('IR_134')       # black and white
     #in_msg.RGBs.append('HRV')          # black and white
-    in_msg.RGBs.append('VIS006c')      # colored version
-    in_msg.RGBs.append('VIS008c')      # colored version
-    in_msg.RGBs.append('IR_016c')      # colored version
-    in_msg.RGBs.append('IR_039c')      # colored version
-    in_msg.RGBs.append('WV_062c')      # colored version
-    in_msg.RGBs.append('WV_073c')      # colored version
-    in_msg.RGBs.append('IR_087c')      # colored version
-    in_msg.RGBs.append('IR_097c')      # colored version
-    in_msg.RGBs.append('IR_108c')      # colored version
-    in_msg.RGBs.append('IR_120c')      # colored version
-    in_msg.RGBs.append('IR_134c')      # colored version
-    in_msg.RGBs.append('HRVc')         # colored version
+    #in_msg.RGBs.append('VIS006c')      # colored version
+    #in_msg.RGBs.append('VIS008c')      # colored version
+    #in_msg.RGBs.append('IR_016c')      # colored version
+    #in_msg.RGBs.append('IR_039c')      # colored version
+    #in_msg.RGBs.append('WV_062c')      # colored version
+    #in_msg.RGBs.append('WV_073c')      # colored version
+    #in_msg.RGBs.append('IR_087c')      # colored version
+    #in_msg.RGBs.append('IR_097c')      # colored version
+    #in_msg.RGBs.append('IR_108c')      # colored version
+    #in_msg.RGBs.append('IR_120c')      # colored version
+    #in_msg.RGBs.append('IR_134c')      # colored version
+    #in_msg.RGBs.append('HRVc')         # colored version
     #-------------------
     # viewing geometry
     #-------------------
@@ -74,12 +75,12 @@ def input(in_msg):
     #in_msg.sat = "vaa"
 
     # satellite channel differences
-    in_msg.RGBs.append('WV_062-WV_073')    # need to be activated 
+    #in_msg.RGBs.append('WV_062-WV_073')    # need to be activated 
     #in_msg.RGBs.append('WV_062-IR_108')
     #in_msg.RGBs.append('WV_073-IR_134')
     #in_msg.RGBs.append('IR_087-IR_108')      
-    in_msg.RGBs.append('IR_039-IR_108')    # need to be activated       
-    in_msg.RGBs.append('IR_120-IR_108')    # need to be activated       
+    #in_msg.RGBs.append('IR_039-IR_108')    # need to be activated       
+    #in_msg.RGBs.append('IR_120-IR_108')    # need to be activated       
     #in_msg.RGBs.append('IR_087-IR_120')      
     #in_msg.RGBs.append('IR_120-IR_108')
     #in_msg.RGBs.append('trichannel')    
@@ -103,7 +104,7 @@ def input(in_msg):
     in_msg.RGBs.append('dust')               # IR_120-IR_108  IR_108-IR_087  IR_108
     in_msg.RGBs.append('fog')
     in_msg.RGBs.append('green_snow')
-    #in_msg.RGBs.append('ir108')
+    in_msg.RGBs.append('ir108')
     in_msg.RGBs.append('natural')            # IR_016         VIS008         VIS006
     in_msg.RGBs.append('night_fog')          
     in_msg.RGBs.append('night_microphysics') # IR_120-IR_108  IR_108-IR_039  IR_108
@@ -120,9 +121,14 @@ def input(in_msg):
     # user defined RGBs
     in_msg.RGBs.append('HRoverview')
     ##in_msg.RGBs.append('sandwich')
-    #########in_msg.RGBs.append('ndvi')
+    #####in_msg.RGBs.append('ndvi')
+    #in_msg.RGBs.append('HRVir108c')
+    #in_msg.RGBs.append('HRVir108')
+    #in_msg.RGBs.append('VIS006ir108c')
+    in_msg.RGBs.append('VIS006ir108')
     #in_msg.RGBs.append('HRVFog')
     in_msg.RGBs.append('DayNightFog')       
+
     ##-------------------
     ## NWC SAF
     ##-------------------
@@ -313,13 +319,13 @@ def input(in_msg):
 
     in_msg.scpOutput = True   
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
-    in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages/SeviriDiskFull00S4"
+    #in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages/SeviriDiskFull00S4"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
     #default: in_msg.scpProducts = ['all']
     #in_msg.scpProducts = ['airmass'] # list of rgb, composite and montage strings
     #in_msg.scpProducts = ["C2rgb-IR_108"]
-    in_msg.scpID2="-i /opt/users/cinesat/monti-pytroll/scripts/id_rsa_las"
-    in_msg.scpOutputDir2='las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s-%(area)s_'
-    in_msg.scpProducts2 = ['airmass','ash','cloudtop','convection','day_microphysics','dust','fog',\
-                           'DayNightFog','green_snow','natural','night_fog','night_microphysics','night_overview','overview','red_snow',\
-                           'HRoverview']
+    #in_msg.scpID2="-i /opt/users/cinesat/monti-pytroll/scripts/id_rsa_las"
+    #in_msg.scpOutputDir2='las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s-%(area)s_'
+    #in_msg.scpProducts2 = ['airmass','ash','cloudtop','convection','day_microphysics','dust','fog',\
+    #                       'DayNightFog','green_snow','natural','night_fog','night_microphysics','night_overview','overview','red_snow',\
+    #                       'HRoverview']

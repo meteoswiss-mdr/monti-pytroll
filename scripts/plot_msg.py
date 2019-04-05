@@ -48,6 +48,7 @@ from trollimage.image import Image as trollimage
 from PIL import ImageFont
 from PIL import ImageDraw 
 from trollimage.colormap import rdbu, greys, rainbow, spectral
+# 'accent', 'blues', 'brbg', 'bugn', 'bupu', 'colorbar', 'colorize', 'dark2', 'diverging_colormaps', 'gnbu', 'greens', 'greys', 'hcl2rgb', 'np', 'oranges', 'orrd', 'paired', 'palettebar', 'palettize', 'pastel1', 'pastel2', 'piyg', 'prgn', 'pubu', 'pubugn', 'puor', 'purd', 'purples', 'qualitative_colormaps', 'rainbow', 'rdbu', 'rdgy', 'rdpu', 'rdylbu', 'rdylgn', 'reds', 'rgb2hcl', 'sequential_colormaps', 'set1', 'set2', 'set3', 'spectral', 'ylgn', 'ylgnbu', 'ylorbr', 'ylorrd'
 
 from my_composites import mask_clouddepth, get_image, get_sza_mask, get_box_mask
 
@@ -226,6 +227,7 @@ def plot_msg(in_msg):
  
          # save reprojected data
          if area in in_msg.save_reprojected_data:
+            print data.area
             save_reprojected_data(data, area, in_msg)
 
          # apply a mask to the data (switched off at the moment)
@@ -430,9 +432,9 @@ def plot_msg(in_msg):
                if rgb not in RGBs_done:
                   RGBs_done.append(rgb)
    
-      ## start postprocessing
-      for area in in_msg.postprocessing_areas:
-         postprocessing(in_msg, global_data.time_slot, int(data.sat_nr()), area)
+   ## start postprocessing
+   for area in in_msg.postprocessing_areas:
+      postprocessing(in_msg, global_data.time_slot, int(global_data.sat_nr()), area)
 
    if in_msg.verbose:
       print " "

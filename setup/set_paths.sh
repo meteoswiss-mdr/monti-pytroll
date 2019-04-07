@@ -3,7 +3,7 @@
 set_utils_path() {
 #function set_utils_path {  # function syntax is not supported by crontab
     case $HOSTNAME in
-    "zueub"[2-4][0-9][0-9])
+    "zue"[ur][bh][2-4][0-9][0-9])
 	export UTILS_PATH=/opt/users/common/
 	export SAT_UTILS_PATH=/opt/users/common/ ;;
     "keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
@@ -22,7 +22,7 @@ set_conda_path() {
 #function set_conda_path {  # function syntax is not supported by crontab
     echo "set_conda_path" $1
     case $HOSTNAME in
-    "zueub"[2-4][0-9][0-9])
+    "zue"[ur][bh][2-4][0-9][0-9])
 	if [[ $# -eq 0 ]]; then 
 	    export CONDA_PATH="/opt/users/common/packages/anaconda2_$LOGNAME/"
 	else
@@ -73,7 +73,7 @@ set_conda_path() {
 set_pytroll_paths() {
 # function set_pytroll_paths {   # function syntax is not supported by crontab
 case $HOSTNAME in
-    "zueub"[2-4][0-9][0-9])
+    "zue"[ur][bh][2-4][0-9][0-9])
         if [ -d /opt/users/$LOGNAME/monti-pytroll/ ]
         then
             export PYTROLLHOME=/opt/users/$LOGNAME/monti-pytroll/

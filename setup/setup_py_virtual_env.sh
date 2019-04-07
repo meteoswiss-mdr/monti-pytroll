@@ -1,4 +1,5 @@
 pip install --user --trusted-host nexus.meteoswiss.ch --install-option="--prefix=/opt/users/hau/python-packets" virtualenv
+pip install --trusted-host nexus.meteoswiss.ch --install-option="--prefix=/opt/users/hau/python-packets" numexpr
 
 export ENV_PATH=/opt/users/hau/C2python2_env
 #echo $ENV_PATH

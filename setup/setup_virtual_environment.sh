@@ -63,11 +63,13 @@ if [[ $# -eq 0 ]]; then
     echo "Creating virtual environment with python2.7? (press enter to continue or CTRL+c to abort)"
     read junk
     conda create -n PyTroll_${LOGNAME} python=2.7 --copy --file PyTroll-conda-package-list_no_version_nr.txt  # _${LOGNAME}
+    #conda env create environment_py2.yml 
 else
     if [ "$1" == "python3" ] || [ "$1" == "py3" ] || [ "$1" == "3" ] ; then
 	echo "Creating virtual environment with python3.7.1? (press enter to continue or CTRL+c to abort)"
 	read junk
-	conda create -n PyTroll_${LOGNAME} python=3.7.1 --copy --file PyTroll-conda-package-list_no_version_nr.txt  # _${LOGNAME}	
+	conda create -n PyTroll_${LOGNAME} python=3.7.1 --copy --file PyTroll-conda-package-list_no_version_nr.txt  # _${LOGNAME}
+	#conda env create environment_py3.yml 
     else
 	echo "unknown command line option: setup_virtual_environment" $1
 	return

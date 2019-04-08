@@ -70,15 +70,27 @@ git submodule foreach -q --recursive 'branch="$(git config -f $toplevel/.gitmodu
 echo "Does this look good? (press enter to continue or CTRL+c to abort)"
 read junk
 
-which conda
-echo "Is the correct anaconda activated? (press enter to continue or CTRL+c to abort)"
-read junk
+case $HOSTNAME in
+    "zueub"[2-4][0-9][0-9]|"keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
+	# check conda installation 
+	which conda
+	echo "Is the correct anaconda activated? (press enter to continue or CTRL+c to abort)"
+	read junk
 
-echo ""
-echo "*** Activate virtual environment " PyTroll_$LOGNAME
-echo "============================================= "
-#source activate PyTroll_$(logname) -> logname points to hau, even when using cinesat
-source activate PyTroll_${LOGNAME}
+	echo ""
+	echo "*** Activate virtual environment " PyTroll_$LOGNAME
+	echo "============================================= "
+	#source activate PyTroll_$(logname) -> logname points to hau, even when using cinesat
+	source activate PyTroll_${LOGNAME}
+	;;
+    "zuerh"[2-4][0-9][0-9])
+	echo ""
+	echo "*** Activate python virtualenv "
+	echo "============================================= "
+	export ENV_PATH=/opt/users/hau/C2python2_env
+	source $ENV_PATH/bin/activate
+	;;
+esac
 echo "Is the virtual environement active? (press enter to continue or CTRL+c to abort)"
 read junk
 

@@ -149,15 +149,28 @@ done
 
 echo "*** check your easy-install file, if all packages are installed with develop option"
 echo "    all PyTroll packages shoud look like this:"
-echo "trollimage (1.5.0, /opt/users/"$LOGNAME"/PyTroll/packages/trollimage)"
-echo "    if this is not the case, deinstall and reinstall as develop version"
-echo "pip uninstall package_name"
-echo "cd packages/package_name"
-echo "python setup.py develop"
-echo "==============================================="
-echo "more $CONDA_PATH/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth"
-more $CONDA_PATH/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth
-
+case $HOSTNAME in
+    "zueub"[2-4][0-9][0-9]|"keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
+	echo "trollimage (1.5.0, /opt/users/"$LOGNAME"/PyTroll/packages/trollimage)"
+	echo "    if this is not the case, deinstall and reinstall as develop version"
+	echo "pip uninstall package_name"
+	echo "cd packages/package_name"
+	echo "python setup.py develop"
+	echo "==============================================="
+	echo "more $CONDA_PATH/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth"
+	more $CONDA_PATH/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth
+	;;
+    "zuerh"[2-4][0-9][0-9])
+	echo "/opt/users/hau/monti-pytroll/packages/mpop"
+	echo "    if this is not the case, deinstall and reinstall as develop version"
+	echo "pip uninstall package_name"
+	echo "cd packages/package_name"
+	echo "python setup.py develop"
+	echo "==============================================="
+	echo "more $ENV_PATH/lib/python2.7/site-packages/easy-install.pth"
+	more $ENV_PATH/lib/python2.7/site-packages/easy-install.pth
+	;;
+esac 
 
 echo "*** Deactivate virtual environment"
 source deactivate

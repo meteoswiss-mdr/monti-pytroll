@@ -32,8 +32,8 @@
 	branch = pre-master
 [submodule "packages/mpop"]
 	path = packages/mpop
-	url = https://github.com/pytroll/mpop.git
-	branch = master
+	url = https://github.com/meteoswiss-mdr/mpop.git
+	branch = meteoswiss
 [submodule "packages/trollduction"]
 	path = packages/trollduction
 	url = https://github.com/pytroll/trollduction.git

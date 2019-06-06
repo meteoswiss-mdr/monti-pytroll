@@ -417,7 +417,7 @@ def plot_msg(in_msg):
 
                if in_msg.socupload:
                  socuploadFilename = format_name (in_msg.socuploadFilename, data.time_slot, area=area)
-                 command_line_command1 = "cp "+outputFile+" "+outputDir+"/"+socuploadFilename+" 2>&1; "
+                 command_line_command1 = "cp "+outputFile+" "+outputDir+"/"+socuploadFilename+" 2>&1; cd "+outputDir+"; "
                  socuploadCommand  = format_name (in_msg.socuploadCommand,  data.time_slot, area=area)
                  if in_msg.verbose:
                    print command_line_command1

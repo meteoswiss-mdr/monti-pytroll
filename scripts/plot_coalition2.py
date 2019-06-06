@@ -1381,8 +1381,8 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                                                 #"/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition3; "+
                                                 #"/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition4; "+
                                                 #"/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition5; "+
-                                                "sleep 4; "+
-                                                "rm  "+c2ninjotif_file+" &", shell=True)
+                                                #"sleep 4; ", shell=True)
+                                                "sleep 4; "+"rm  "+c2ninjotif_file+" &", shell=True)
                                 
                                 print ("rm "+c2ninjotif_file+" &")
                                 #subprocess.call("/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition3 &", shell=True)

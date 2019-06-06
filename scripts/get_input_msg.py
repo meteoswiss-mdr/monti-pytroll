@@ -390,7 +390,8 @@ class input_msg_class:
 
       chosen_settings['scale'] = scale
 
-      self.upload_ninjotif = True  
+      #self.upload_ninjotif = True  
+      #print ("set upload_ninjotif = True")
       self.modify_day_color = True
       self.indicate_sza = True
 

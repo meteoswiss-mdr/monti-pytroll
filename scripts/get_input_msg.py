@@ -63,6 +63,8 @@ class input_msg_class:
       self.title = None               # ' %(sat)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s'
       if socket.gethostname()[0:5] == 'zueub':
          self.font_file = "/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf"
+      if socket.gethostname()[0:5] == 'zuerh':
+         self.font_file = "/usr/java/jdk1.8.0_121/jre/lib/fonts/LucidaTypewriterBold.ttf"
       elif socket.gethostname()[0:7] == 'keschln' or socket.gethostname()[0:7]=="eschaln":
          self.font_file = "/usr/share/fonts/dejavu/DejaVuSansMono.ttf"
       else:
@@ -389,7 +391,8 @@ class input_msg_class:
 
       chosen_settings['scale'] = scale
 
-      self.upload_ninjotif = True  
+      #self.upload_ninjotif = True  
+      #print ("set upload_ninjotif = True")
       self.modify_day_color = True
       self.indicate_sza = True
 

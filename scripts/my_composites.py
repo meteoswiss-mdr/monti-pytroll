@@ -404,6 +404,7 @@ def daynight_background(self, cos_scaled=True, use_HRV=False, smooth=False, stre
         
     img = GeoImage(vis + ir108, self.area, self.time_slot, fill_value=(0,0,0), mode="L")
 
+    print colorscale, white_clouds
     if colorscale=='rainbow':
         from trollimage.colormap import rainbow
         cm = deepcopy(rainbow)
@@ -411,6 +412,7 @@ def daynight_background(self, cos_scaled=True, use_HRV=False, smooth=False, stre
         from trollimage.colormap import greys
         cm = deepcopy(greys)
         if white_clouds:
+            #cm.reverse() # UH (my change in trollimage/colormap.py): color table is not any more changed, but changed one is returned.  
             cm = cm.reverse()
 
     cm.set_range(0, 1)

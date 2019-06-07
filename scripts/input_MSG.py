@@ -76,7 +76,7 @@ def input(in_msg):
     #in_msg.RGBs.append('IR_120-IR_108')
     #in_msg.RGBs.append('trichannel')
     #-------------------
-    # buil in RGBs, see http://mpop.readthedocs.org/en/latest/pp.html
+    # build in RGBs, see http://mpop.readthedocs.org/en/latest/pp.html
     #                or  http://oiswww.eumetsat.int/~idds/html/doc/best_practices.pdf
     #-------------------      # RED            GREEN          BLUE
     #in_msg.RGBs.append('airmass')           # WV_062-WV_073  IR_097-IR_108  -WV_062
@@ -110,7 +110,7 @@ def input(in_msg):
     #in_msg.RGBs.append('HRVFog')
     #in_msg.RGBs.append('DayNightFog')
     #in_msg.RGBs.append('HRVir108c')
-    in_msg.RGBs.append('HRVir108')
+    #in_msg.RGBs.append('HRVir108')
     #in_msg.RGBs.append('VIS006ir108c')
     #in_msg.RGBs.append('VIS006ir108')
     ##-------------------
@@ -175,7 +175,7 @@ def input(in_msg):
     #----------------
     #in_msg.areas.append('EuropeCanary')    # upper third of MSG disk, satellite at 0.0 deg East, full resolution 
     #in_msg.areas.append('EuropeCanary95')  # upper third of MSG disk, satellite at 9.5 deg East, full resolution 
-    # in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
+    #in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
     #in_msg.areas.append('EuroMercator')    # same projection as blitzortung.org
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
@@ -198,16 +198,22 @@ def input(in_msg):
     in_msg.check_RSS_coverage()
 
     in_msg.check_input = False
-    #in_msg.reader_level="seviri-level4"
-    #in_msg.reader_level="seviri-level8"
-    in_msg.parallax_correction = False
+    #in_msg.reader_level="seviri-level4"   # hdf5
+    #in_msg.reader_level="seviri-level5"   # NWC SAF HRW hdf5
+    #in_msg.reader_level="seviri-level6"   # viewing geometry nc
+    #in_msg.reader_level="seviri-level7"   # hsaf h03
+    #in_msg.reader_level="seviri-level8"   # msg radiance ccs4 nc
+    in_msg.reader_level="seviri-level9"    # msg radiance ccs4 nc parallax corrected
+    in_msg.parallax_correction = True     # when using "seviri-level9", set this to False (as data is already par corrected)
     in_msg.parallax_gapfilling = 'bilinear' # 'False' (default), 'nearest'
     #in_msg.save_reprojected_data=['ccs4']
     in_msg.reprojected_data_filename='%(msg)s_%(area)s_%Y%m%d%H%M_nwcsaf.nc'
     in_msg.reprojected_data_dir='/data/COALITION2/database/meteosat/ccs4/%Y/%m/%d/'
     in_msg.save_statistics=False
 
-    in_msg.make_plots = True
+    #in_msg.load_data = True
+    in_msg.load_data = False    
+    in_msg.make_plots = False
     in_msg.fill_value = (0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
     in_msg.add_title = True
     in_msg.add_borders = True
@@ -227,7 +233,8 @@ def input(in_msg):
     #    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%(rgb)s/%Y-%m-%d/'
     #    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/GPM/%Y-%m-%d/'
     in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
-        
+    #in_msg.outputDir = './pics/'
+       
     in_msg.compress_to_8bit=False
 
     #in_msg.scpOutput = True
@@ -251,6 +258,9 @@ def input(in_msg):
     #in_msg.postprocessing_composite=["hrwdpL-streamdL-HRV","hrwdpL-streamdL-ir108"] 
     #in_msg.postprocessing_composite=["hrwdpH-streamdH-HRV","hrwdpH-streamdH-ir108"] 
     #in_msg.postprocessing_composite=["hrwdp-streamd-ir108","TRT-streamd-ir108"] 
+    #in_msg.postprocessing_composite = ["VIL-HRVir108"]
+    in_msg.postprocessing_composite = ["VIL-HRVir108pc"]
+    #in_msg.postprocessing_composite = ["TRT-radar-HRVir108","THX-HRVir108"]
     #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03-ir108"],["MSG_radar-HRV","MSG_h03-HRV"],["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]]
     #in_msg.postprocessing_montage = [["MSG_h03-ir108","MSG_HRV"],["MSG_h03-ir108","MSG_test"]]
     #in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-radar-convection"]]

@@ -41,7 +41,7 @@ def input(in_msg):
     # chose RGB mode
     #-------------------
     ## satellite channels
-    ##in_msg.RGBs.append('VIS006')       # black and white
+    #in_msg.RGBs.append('VIS006')       # black and white
     ##in_msg.RGBs.append('VIS008')       # black and white
     ##in_msg.RGBs.append('IR_016')       # black and white
     ##in_msg.RGBs.append('IR_039')       # black and white
@@ -49,7 +49,7 @@ def input(in_msg):
     ##in_msg.RGBs.append('WV_073')       # black and white
     ##in_msg.RGBs.append('IR_087')       # black and white
     ##in_msg.RGBs.append('IR_097')       # black and white
-    #in_msg.RGBs.append('IR_108')       # black and white
+    in_msg.RGBs.append('IR_108')       # black and white
     ##in_msg.RGBs.append('IR_120')       # black and white
     ##in_msg.RGBs.append('IR_134')       # black and white
     #in_msg.RGBs.append('HRV')          # black and white
@@ -177,6 +177,8 @@ def input(in_msg):
     #in_msg.areas.append('EuropeCanary95')  # upper third of MSG disk, satellite at 9.5 deg East, full resolution 
     #in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
     #in_msg.areas.append('EuroMercator')    # same projection as blitzortung.org
+    #in_msg.areas.append('nrEURO1km')        # Ninjo Alps projection 
+    in_msg.areas.append('nrEURO3km')        # Ninjo Europe projection 
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     #in_msg.areas.append('eurotv4n')        # Europe TV4 -  4.1x4.1km 2048x1152
@@ -184,7 +186,7 @@ def input(in_msg):
     #in_msg.areas.append('euroHDready')      # Europe in HD resolution 1280 x 720
     #in_msg.areas.append('euroHDfull')      # Europe in full HD resolution 1920 x 1080
     #in_msg.areas.append('SwitzerlandStereo500m')
-    in_msg.areas.append('ccs4')            # CCS4 Swiss projection 710x640
+    #in_msg.areas.append('ccs4')            # CCS4 Swiss projection 710x640
     #in_msg.areas.append('alps95')          # area around Switzerland processed by NWCSAF software 349x151 
     #in_msg.areas.append('ticino')          # stereographic proj of Ticino 342x311
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
@@ -195,6 +197,7 @@ def input(in_msg):
     #in_msg.areas.append('SeviriDiskFull00S4')
     #in_msg.areas.append('SouthArabia')
     #in_msg.areas.append('opera_odyssey')
+    #in_msg.areas.append('odysseyS25')
     in_msg.check_RSS_coverage()
 
     in_msg.check_input = False
@@ -223,6 +226,8 @@ def input(in_msg):
     in_msg.add_colorscale = True
     in_msg.HRV_enhancement = False
 
+    #in_msg.outputFormats = ['png']
+    in_msg.outputFormats = ['ninjotif']
     in_msg.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
     #in_msg.outputDir='./pics/'
     #in_msg.outputDir = "./%Y-%m-%d/%Y-%m-%d_%(rgb)s-%(area)s/"
@@ -233,8 +238,8 @@ def input(in_msg):
     #    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%(rgb)s/%Y-%m-%d/'
     #    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/GPM/%Y-%m-%d/'
     in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
-    #in_msg.outputDir = './pics/'
-       
+    #in_msg.outputDir = '/data/cinesat/out/'
+        
     in_msg.compress_to_8bit=False
 
     #in_msg.scpOutput = True
@@ -244,7 +249,7 @@ def input(in_msg):
     # please download the shape file 
     in_msg.mapDir='/opt/users/common/shapes/'
 
-    in_msg.postprocessing_areas=["ccs4"]
+    #in_msg.postprocessing_areas=["ccs4"]
     #in_msg.postprocessing_areas=['EuropeCanaryS95']
 
     #in_msg.postprocessing_composite=["h03-ir108"] 

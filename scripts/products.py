@@ -108,7 +108,7 @@ ninjo_chan_id = {'THX-ic_nrEURO1km':     8300015,
                  'OT_nrEURO1km':         9500015,
                  'COALITION2_nrEURO3km': 9600015, 
                  'IR-108_nrEURO3km':     9700015,
-                 'CT_nrEURO1km':         9800015, 
+                 'IR-108_nrEURO1km':     9800015, 
                  'TRT_nrEURO1km':        9900015}
 
 #7900015=COALITION

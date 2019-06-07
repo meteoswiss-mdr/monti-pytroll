@@ -239,7 +239,7 @@ def DayNightFog(self, downscale=False, sza_max=88):
     during day:   HRVFog
     during night: night microphysics
     """
-    self.check_channels(1.6, 3.9, 10.8, 12.0, "HRV")
+    self.check_channels("IR_016", "IR_039", "IR_108", "IR_120", "HRV")
 
     # HRVFog recipe
     # --------------
@@ -249,7 +249,7 @@ def DayNightFog(self, downscale=False, sza_max=88):
     import numpy as np
     cos_sza = np.cos(np.radians(sza)) + 0.05
         
-    ch1a = self[1.6].data   / cos_sza
+    ch1a = self["IR_016"].data   / cos_sza
     ch2a = self["HRV"].data / cos_sza
     ch3a = self["HRV"].data / cos_sza
 
@@ -261,9 +261,9 @@ def DayNightFog(self, downscale=False, sza_max=88):
 
     # night microphysics recipe
     # --------------------------       
-    ch1b = self[12.0].data - self[10.8].data
-    ch2b = self[10.8].data - self[3.9].data
-    ch3b = self[10.8].data
+    ch1b = self["IR_120"].data - self["IR_108"].data
+    ch2b = self["IR_108"].data - self["IR_039"].data
+    ch3b = self["IR_108"].data
 
     # this area exception is not nice!
     if downscale or (self["HRV"].area.name=='ccs4' or self["HRV"].area.name=='Switzerland_stereographic_500m'):
@@ -404,6 +404,7 @@ def daynight_background(self, cos_scaled=True, use_HRV=False, smooth=False, stre
         
     img = GeoImage(vis + ir108, self.area, self.time_slot, fill_value=(0,0,0), mode="L")
 
+    print colorscale, white_clouds
     if colorscale=='rainbow':
         from trollimage.colormap import rainbow
         cm = deepcopy(rainbow)
@@ -411,6 +412,7 @@ def daynight_background(self, cos_scaled=True, use_HRV=False, smooth=False, stre
         from trollimage.colormap import greys
         cm = deepcopy(greys)
         if white_clouds:
+            #cm.reverse() # UH (my change in trollimage/colormap.py): color table is not any more changed, but changed one is returned.  
             cm = cm.reverse()
 
     cm.set_range(0, 1)

@@ -30,8 +30,12 @@ echo "When asked: Do you approve the license terms? [yes|no]"
 echo "answer with >>> yes"
 echo ""
 echo "When asked where to install anaconda, the answer should look like this:"
-echo "[/home/lom/users/"$LOGNAME"/anaconda2] >>> /opt/users/"$LOGNAME"/PyTroll/packages/anaconda2"
-#echo "[/home/lom/users/"$LOGNAME"/anaconda3] >>> /opt/users/"$LOGNAME"/PyTroll/packages/anaconda3"
+if [ $1 == "python3" ] || [ $1 == "py3" ] || [ $1 == "3" ]
+then
+    echo " >>> /opt/users/common/packages/anaconda3"_${LOGNAME}
+else
+    echo " >>> /opt/users/common/packages/anaconda2"_${LOGNAME}
+fi
 echo "you have to press enter to approve the installation location"
 echo "(this is the default for this installation)"
 echo ""
@@ -41,15 +45,16 @@ echo ""
 echo "Did you read the last lines? (Continue with enter)"
 echo ""
 read junk
-if [ $1 -eq python3 ] || [ $1 -eq py3 ] || [ $1 -eq 3 ]
+if [ $1 == python3 ] || [ $1 == py3 ] || [ $1 == 3 ]
 then
     echo "install anaconda with python3" 
     #/opt/users/common/packages/Anaconda3-4.0.0-Linux-x86_64.sh
     #/opt/users/common/packages/Anaconda3-4.3.1-Linux-x86_64.sh
-    /opt/users/common/packages/Anaconda3-2018.12-Linux-x86_64.sh
+    #/opt/users/common/packages/Anaconda3-2018.12-Linux-x86_64.sh
+    /opt/users/common/packages/Anaconda3-2019.03-Linux-x86_64.sh
     echo "the script changes your \$PATH and \$PYTHONPATH to avoid conflicts:"
     echo "\$PATH="$PATH
-    export PYTHONPATH=$HOME/packages/anaconda37_${LOGNAME}/bin:$PYTROLLHOME/scripts
+    export PYTHONPATH=$HOME/packages/anaconda3_${LOGNAME}/bin:$PYTROLLHOME/scripts
 else
     echo "install anaconda with python2" 
     #/opt/users/common/packages/Anaconda2-2.4.1-Linux-x86_64.sh

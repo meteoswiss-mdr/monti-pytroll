@@ -46,6 +46,7 @@ class input_msg_class:
       self.scpOutputDir2 = None
       self.scpID2 = None
       self.scpProducts2 = []
+      self.ninjotifFilename = 'MET%(sat_nr)s_%(RSS)s_%(rgb)s_%(area)s_%Y%m%d%H%M.tif'
       self.upload_ninjotif = False  
       self.socupload = False  
       self.socuploadFilename = 'r0305n.%Y%m%d%H%M.png' 
@@ -393,7 +394,8 @@ class input_msg_class:
 
       chosen_settings['scale'] = scale
 
-      self.upload_ninjotif = True  
+      #self.upload_ninjotif = True  
+      #print ("set upload_ninjotif = True")
       self.modify_day_color = True
       self.indicate_sza = True
 

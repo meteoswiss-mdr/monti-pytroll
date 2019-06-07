@@ -166,7 +166,7 @@ minor_tick_marks=1   # default
 
 old_style=False
 
-read_COALITION3=True
+read_COALITION3=False
 if read_COALITION3:
     import pickle
     import pandas as pd
@@ -179,9 +179,11 @@ if read_COALITION3:
         TRT_tmp=TRT_Rank_Pred.at_time(time_slot)[['TRT_Rank_pred|5','TRT_Rank_pred|10','TRT_Rank_pred|15','TRT_Rank_pred|20','TRT_Rank_pred|25','TRT_Rank_pred|30','TRT_Rank_pred|35','TRT_Rank_pred|40','TRT_Rank_pred|45']]
         RANKr_0 = TRT_Rank_Pred.at_time(t_0_str)['RANKr']
         Rank_predicted = [RANKr_0.iloc[0]/10.,TRT_tmp.iloc[0]['TRT_Rank_pred|5'],TRT_tmp.iloc[0]['TRT_Rank_pred|10'],TRT_tmp.iloc[0]['TRT_Rank_pred|15'],TRT_tmp.iloc[0]['TRT_Rank_pred|20'],TRT_tmp.iloc[0]['TRT_Rank_pred|25'],TRT_tmp.iloc[0]['TRT_Rank_pred|30'],TRT_tmp.iloc[0]['TRT_Rank_pred|35'],TRT_tmp.iloc[0]['TRT_Rank_pred|40'],TRT_tmp.iloc[0]['TRT_Rank_pred|45']]
-        print Rank_predicted
     else:
         Rank_predicted=None
+else:
+    Rank_predicted=None
+#print "Rank_predicted:", Rank_predicted
 
 if old_style: 
     print '... use trollimage to ', method,' plot data (min,max)=',min_data, max_data
@@ -208,11 +210,11 @@ else:
     colorscale=False
     black_vel=True
 
-    #PIL_image = TRTimage( global_data.traj_IDs, global_data.TRTcells, obj_area) # , fill=False, minRank=8, alpha_max=1.0, plot_vel=True
+    PIL_image = TRTimage( global_data.traj_IDs, global_data.TRTcells, obj_area) # , fill=False, minRank=8, alpha_max=1.0, plot_vel=True
     #PIL_image = TRTimage( global_data.traj_IDs, global_data.TRTcells, obj_area, minRank=15.01) # minRank=8, alpha_max=1.0, plot_vel=True
     #PIL_image = TRTimage( global_data.traj_IDs, global_data.TRTcells, obj_area, TRTcell_ID="2018080113300129", minRank=3) # minRank=8, alpha_max=1.0, plot_vel=True
     #PIL_image = TRTimage( global_data.traj_IDs, global_data.TRTcells, obj_area, TRTcell_ID="2018080721300099", minRank=3) # minRank=8, alpha_max=1.0, plot_vel=True
-    PIL_image = TRTimage( global_data.traj_IDs, global_data.TRTcells, obj_area, TRTcell_ID="2018080710200036", minRank=-1, plot_nowcast=True, fill=True, Rank_predicted=Rank_predicted) # minRank=3, minRank=8, alpha_max=1.0, plot_vel=True
+    #PIL_image = TRTimage( global_data.traj_IDs, global_data.TRTcells, obj_area, TRTcell_ID="2018080710200036", minRank=-1, plot_nowcast=True, fill=True, Rank_predicted=Rank_predicted) # minRank=3, minRank=8, alpha_max=1.0, plot_vel=True
     #PIL_image = TRTimage( global_data.traj_IDs, global_data.TRTcells, obj_area, fill=False) # minRank=8, alpha_max=1.0, plot_vel=True
     #PIL_image = TRTimage( global_data.traj_IDs, global_data.TRTcells, obj_area, plot_nowcast=True) # minRank=8, alpha_max=1.0, plot_vel=True
 

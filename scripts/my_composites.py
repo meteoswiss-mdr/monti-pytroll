@@ -1185,5 +1185,6 @@ def get_image(data, rgb):
     else:
         print "*** ERROR, undefined rgb mode"
         print "*** ERROR, undefined rgb mode"
+        #quit()
 
     return obj_image

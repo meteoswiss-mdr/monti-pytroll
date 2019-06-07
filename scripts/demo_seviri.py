@@ -13,7 +13,12 @@ print str(time_slot)
 
 global_data = GeostationaryFactory.create_scene("Meteosat-11", "", "seviri", time_slot)
 #europe = get_area_def("EuropeCanaryS95")
-global_data.load([0.6, 0.8, 10.8])  # , area_extent=europe.area_extent
+#global_data.load([0.6, 0.8, 10.8])  # , area_extent=europe.area_extent
+#global_data.load([10.8])  # , area_extent=europe.area_extent
+#channel_sat=['WV_062','WV_073','IR_087','IR_097','IR_108','IR_120','IR_134']
+channel_sat=['IR_108']
+global_data.load(channel_sat)
+
 print global_data
 
 area="EuropeCanaryS95"

@@ -220,7 +220,7 @@ def input(in_msg):
     in_msg.scpOutput = True 
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
-    in_msg.scpProducts = ["h03-VIS006ir108",["MSG_RATE-VIS006ir108","MSG_h03-VIS006ir108"],["MSG_radar-HRVir108","MSG_h03-HRVir108"]]
+    in_msg.scpProducts = ["h03-VIS006ir108",["MSG_RATE-VIS006ir108","MSG_h03-VIS006ir108"],["MSG_radar-HRVir108","MSG_h03-HRVir108"],"TRT-radar-convection","THX-radar-convection","radar-convection"]
 
     #in_msg.scpID2="-i /opt/users/cinesat/monti-pytroll/scripts/id_rsa_las"
     #in_msg.scpOutputDir2='las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s-%(area)s_'

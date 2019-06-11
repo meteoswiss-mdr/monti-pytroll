@@ -166,25 +166,38 @@ def channel_num2str(channels):
     i=0 
     channels=list(channels)
     for channel in channels:
+        #print "++++++++", channel
         if type(channel) is float:
             if channel == 0.635:
                 channels[i] = 'VIS006'
             elif channel == 0.8:         # sometimes this number is used
                 channels[i] = 'VIS008'
+            elif channel == 0.81:         # sometimes this number is used
+                channels[i] = 'VIS008'
             elif channel == 0.85:        # but most of the times this 
                 channels[i] = 'VIS008'
             elif channel == 1.63:
+                channels[i] = 'IR_016'
+            elif channel == 1.64:
                 channels[i] = 'IR_016'
             elif channel == 3.75:        # sometimes this number is used
                 channels[i] = 'IR_039'
             elif channel == 3.9:         # and sometimes this
                 channels[i] = 'IR_039'
+            elif channel == 3.92:         # and sometimes this
+                channels[i] = 'IR_039'
+            elif channel == 6.25:
+                channels[i] = 'WV_062'
             elif channel == 6.7:
                 channels[i] = 'WV_062'
             elif channel == 7.3:
                 channels[i] = 'WV_073'
+            elif channel == 7.35:
+                channels[i] = 'WV_073'
             elif channel == 8.7:
                 channels[i] = 'IR_087'
+            elif channel == 9.66:
+                channels[i] = 'IR_097'
             elif channel == 9.7:
                 channels[i] = 'IR_097'
             elif channel == 10.8:

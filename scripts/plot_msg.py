@@ -157,7 +157,8 @@ def plot_msg(in_msg):
    # -------------------------------------------------------------------
    # load reflectivities, brightness temperatures, NWC-SAF products ...
    # -------------------------------------------------------------------
-   area_loaded = load_products(global_data, RGBs, in_msg, area_loaded)
+   if in_msg.load_data:
+     area_loaded = load_products(global_data, RGBs, in_msg, area_loaded)
    # ----------------------------------------------------------------------
    # load reflectivities, brightness temperatures, NWC-SAF products for t-1
    # ----------------------------------------------------------------------
@@ -741,6 +742,10 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
       elif rgb == 'VIL':
         from trollimage.colormap import VIL
         colormap = VIL
+      elif 'EchoTOP' in rgb :
+        #from trollimage.colormap import EchoTop    ????? why not ????
+        #colormap = EchoTop                         ????? why not ????
+        colormap = deepcopy(rainbow)
    else:
       # includes products.RGBs_buildin
       prop = ma.asarray([-999.,-999.])

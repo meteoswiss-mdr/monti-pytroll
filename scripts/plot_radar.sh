@@ -12,6 +12,8 @@ echo "*** Start to radar iamges"
 ## execute plot_radar pytroll script 
 python plot_radar_cronjob.py           # > /tmp/plot_radar_cronjob.txt 2>&1
 
+python postprocessing.py --parea ccs4   -c ["TRT-radar-convection","THX-radar-convection"]   input_hsaf_cronjob.py
+
 ## remove result files older than 1 hour (done in plot_ms.sh)
 #echo "*** Remove all result files older than 1 hour"
 #find /data/cinesat/out/* -type f -mmin +60 -exec rm {} \;

@@ -20,11 +20,14 @@ from pydecorate import DecoratorAGG
 import aggdraw
 from PIL import ImageFont, ImageDraw 
 from os.path import exists
-from os import makedirs
+from os import makedirs, environ
 from pycoast import ContourWriterAGG
 from datetime import timedelta
 
 # debug_on()
+
+# set Metranet library path
+environ["METRANETLIB_PATH"] = "/opt/users/hau/PyTroll/packages/mpop/mpop/satin/metranet"
 
 save_statistics=False
 delay = 5
@@ -90,8 +93,8 @@ time_slot = datetime(year, month, day, hour, minute)
 print "*** "
 print "*** read radar data (plot_radar.py)"
 global_data = GeostationaryFactory.create_scene("swissradar", "", "radar", time_slot)
-prop_str='PRECIP'                     # RZC
-#prop_str='POH'    # does not work!!!  # BZC
+#prop_str='PRECIP'                     # RZC
+prop_str='POH'    # does not work!!!  # BZC
 #prop_str='MESHS' # does not work!!!  # MZC
 #prop_str='VIL'                       # LZC
 #prop_str='MaxEcho'                   # CZC
@@ -101,6 +104,17 @@ prop_str='PRECIP'                     # RZC
 #prop_str='EchoTOP50'                 # EZC
 #global_data = GeostationaryFactory.create_scene("dem", "", "dem", time_slot)
 #prop_str = 'dem'
+
+long_names={}
+long_names['PRECIP']='precipitation rate'
+long_names['POH']='probability of hail'
+long_names['MESHS']='max. expected severe hail size'
+long_names['VIL']='vertical integrated liquid'
+long_names['MaxEcho']='max reflectivity'
+long_names['EchoTOP15']='EchoTop 15dBZ'
+long_names['EchoTOP20']='EchoTop 20dBZ'
+long_names['EchoTOP45']='EchoTop 45dBZ'
+long_names['EchoTOP50']='EchoTop 50dBZ'
 
 #global_data.load(['precip', 'maxecho'])
 #print "global_data ", global_data
@@ -252,7 +266,7 @@ elif color_mode == 'RainRate':
     min_data = 0.08
     max_data = 250
     colormap = RainRate
-    units='mm/h'
+    #units='mm/h'
 elif color_mode == 'datalevels256':
 
     if prop_str == 'PRECIP':
@@ -382,8 +396,8 @@ if add_title:
     if len(layer) > 0:
         layer=layer+':'
 
-    #title = layer+' radar, '+prop_str+' ['+global_data[prop_str].units+']'
-    title = layer+' radar, '+'precipitation rate'+' ['+global_data[prop_str].units+']'
+    title = layer+' radar, '+long_names[prop_str]+' ['+global_data[prop_str].units+']'
+    #title = layer+' radar, '+'precipitation rate'+' ['+global_data[prop_str].units+']'
     draw.text((0, y_pos_title),title, title_color, font=font)
 
 print '... save image as ', outputFile

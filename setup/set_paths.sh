@@ -42,6 +42,12 @@ set_conda_path() {
 	return ;;
 	#exit 1 ;;
     esac
+    if [ ! -d "$CONDA_PATH" ]; then
+	echo "ERROR, CONDA PATH " $CONDA_PATH "does not exists"
+	echo "       probably conda is not installed on this server"
+	echo "       please contact Ulrich Hamann"
+	return
+    fi
     export PATH=$CONDA_PATH"/bin:$PATH"
     echo "... set CONDA_PATH to: "$CONDA_PATH
     # echo conda version and conda & python path

@@ -231,9 +231,10 @@ def input(in_msg):
         
     in_msg.compress_to_8bit=False
 
-    #in_msg.scpOutput = True
+    in_msg.scpOutput = True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
+    in_msg.scpProducts = [["MSG_IR-108cpc","COSMO_SYNMSG-BT-CL-IR10.8","MSG_IR-108-COSMO-minus-MSGpc"]]
 
     # please download the shape file 
     in_msg.mapDir='/opt/users/common/shapes/'
@@ -257,6 +258,8 @@ def input(in_msg):
     #in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-radar-convection"]]
     #in_msg.postprocessing_montage = [["MSG_C2rgb-Forecast-IR_108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-radar-convection"]]
     #in_msg.postprocessing_montage = [["MSG_SYNMSG-BT-CL-IR10.8","MSG_IR-108c"]]
+    #in_msg.postprocessing_montage = [["MSG_IR-108cpc","COSMO_SYNMSG-BT-CL-IR10.8"]]
+    in_msg.postprocessing_montage = [["MSG_IR-108cpc","COSMO_SYNMSG-BT-CL-IR10.8","MSG_IR-108-COSMO-minus-MSGpc"]]
     
     #in_msg.resize_composite = 100
     #in_msg.resize_montage = 70

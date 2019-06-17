@@ -342,8 +342,8 @@ def input(in_msg):
     #in_msg.postprocessing_areas=["EuroMercator"]
 
     #in_msg.postprocessing_montage = [["MSG_IR-108c","COSMO_SYNMSG-BT-CL-IR10.8"]]
-    in_msg.postprocessing_montage = [["MSG_IR-108cpc","COSMO_SYNMSG-BT-CL-IR10.8"]]
-
+    #in_msg.postprocessing_montage = [["MSG_IR-108cpc","COSMO_SYNMSG-BT-CL-IR10.8"]]
+    in_msg.postprocessing_montage = [["MSG_IR-108cpc","COSMO_SYNMSG-BT-CL-IR10.8","MSG_IR-108-COSMO-minus-MSGpc"]]
     
     #in_msg.resize_montage = 70
     #in_msg.resize_composite = 100
@@ -352,6 +352,7 @@ def input(in_msg):
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
     #default: in_msg.scpProducts = ['all']
-    in_msg.scpProducts = [["MSG_IR-108cpc","COSMO_SYNMSG-BT-CL-IR10.8"]]
+    #in_msg.scpProducts = [["MSG_IR-108cpc","COSMO_SYNMSG-BT-CL-IR10.8"]]
+    in_msg.scpProducts = [["MSG_IR-108cpc","COSMO_SYNMSG-BT-CL-IR10.8","MSG_IR-108-COSMO-minus-MSGpc"]]
     #in_msg.scpProducts = ["IR-108cpc-SYNMSG-BT-CL-IR10.8"]
     #in_msg.scpProducts = ['IR_108c', "radar-convection"] # list of rgb, composite and montage strings

@@ -61,6 +61,10 @@ esac
 
 set_utils_path
 set_conda_path python3
+if [ ! -d "$CONDA_PATH" ]; then
+    echo "ERROR, CONDA PATH " $CONDA_PATH "does not exists"
+    return
+fi
 set_pytroll_paths
 
 export PPP_CONFIG_DIR=$PYTROLLHOME/etc/

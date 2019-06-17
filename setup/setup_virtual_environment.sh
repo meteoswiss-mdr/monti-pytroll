@@ -56,6 +56,9 @@ which python
 conda config --set ssl_verify false
 read junk
 
+# enable the use of cython for speedup
+export USE_CYTHON=True
+
 #echo "*** Update anaconda itself"
 #conda update conda
 
@@ -66,9 +69,10 @@ if [[ $# -eq 0 ]]; then
     #conda env create environment_py2.yml 
 else
     if [ "$1" == "python3" ] || [ "$1" == "py3" ] || [ "$1" == "3" ] ; then
-	echo "Creating virtual environment with python3.7.1? (press enter to continue or CTRL+c to abort)"
+	python_version=3.7.3
+	echo "Creating virtual environment with python"$python_version"? (press enter to continue or CTRL+c to abort)"
 	read junk
-	conda create -n PyTroll_${LOGNAME} python=3.7.1 --copy --file PyTroll-conda-package-list_no_version_nr.txt  # _${LOGNAME}
+	conda create -n PyTroll_${LOGNAME} python=$python_version --copy --file PyTroll-conda-package-list_python3.txt  # _${LOGNAME}
 	#conda env create environment_py3.yml 
     else
 	echo "unknown command line option: setup_virtual_environment" $1

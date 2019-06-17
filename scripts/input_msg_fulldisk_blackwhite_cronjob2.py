@@ -12,6 +12,7 @@ def input(in_msg):
     #in_msg.RSS=False 
     #in_msg.sat_nr=9
     #in_msg.RSS=True
+    #in_msg.RSS=False
     #in_msg.sat_nr=10
     #in_msg.RSS=False
     in_msg.sat_nr=11

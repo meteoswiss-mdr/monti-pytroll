@@ -41,8 +41,8 @@ def input(in_msg):
     ##in_msg.RGBs.append('VIS008')       # black and white
     ##in_msg.RGBs.append('IR_016')       # black and white
     ##in_msg.RGBs.append('IR_039')       # black and white
-    ##in_msg.RGBs.append('WV_062')       # black and white
-    ##in_msg.RGBs.append('WV_073')       # black and white
+    in_msg.RGBs.append('WV_062')       # black and white
+    #in_msg.RGBs.append('WV_073')       # black and white
     ##in_msg.RGBs.append('IR_087')       # black and white
     ##in_msg.RGBs.append('IR_097')       # black and white
     in_msg.RGBs.append('IR_108')       # black and white
@@ -183,10 +183,10 @@ def input(in_msg):
     in_msg.outputFormat = ".png"
     in_msg.compress_to_8bit=False
 
-    in_msg.scpOutput = False
+    in_msg.scpOutput = True
     #in_msg.scpID="-i /opt/users/$LOGNAME/monti-pytroll/scripts/id_rsa_las"
     #in_msg.scpOutputDir="las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s-%(area)s_"
-    #in_msg.scpProducts = [["MSG_radar-HRVir108","MSG_CRR-HRVir108","MSG_CRPh-HRVir108"]]
+    in_msg.scpProducts = ["HRVir108","WV_062","ir108"]
     
     #in_msg.scpID2="-i /home/cinesat/.ssh/id_dsa_las"
     #in_msg.scpOutputDir2='las@lomux240:/www/proj/OTL/WOL/cll/satimages'

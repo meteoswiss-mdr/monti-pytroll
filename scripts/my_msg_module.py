@@ -844,10 +844,18 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                 rgb_complete.append(rgb)
 
         elif rgb in products.HSAF:
-            
-            from mpop.satin.hsaf_h03 import find_hsaf_files
-            filenames = find_hsaf_files(time_slot, fullname)
-            
+
+            if rgb=="h03":
+                from mpop.satin.hsaf_h03 import find_hsaf_h03_files
+                filenames = find_hsaf_h03_files(time_slot, fullname)
+            elif rgb=="h03b":
+                from mpop.satin.hsaf_h03b import find_hsaf_h03b_files
+                filenames = find_hsaf_h03b_files(time_slot, fullname)
+            else:
+                print "*** ERROR in my_msg_module"
+                print "    HSAF product ", rgb, "not yet implemented"
+                quit()
+                
             if len(filenames) == 0:
                 LOG.info("*** Warning, no HSAF input file found")
             else:

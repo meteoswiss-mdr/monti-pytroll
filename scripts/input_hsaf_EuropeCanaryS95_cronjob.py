@@ -157,7 +157,8 @@ def input(in_msg):
     in_msg.sat = "Hsaf"
     in_msg.sat_nr = 11
     in_msg.RSS = False 
-    in_msg.RGBs.append('h03')
+    #in_msg.RGBs.append('h03')
+    in_msg.RGBs.append('h03b')
     #-------------------
     # experimental
     #in_msg.RGBs.append('clouddepth')     # test according to Mecikalski, 2010
@@ -171,14 +172,14 @@ def input(in_msg):
     in_msg.areas.append('EuropeCanaryS95')
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
-    in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
+    #in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
     #in_msg.areas.append('alps')            # area around Swiss (!!!test phase!!!)
     #in_msg.areas.append('ticino')          # 
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
     #in_msg.areas.append('fullearth')       # full earth 600x300                    # does not yet work
     #in_msg.areas.append('met09globe')      # Cropped globe MSG image 3620x3620     # does not yet work
     #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
-    in_msg.areas.append('odysseyS25')
+    #in_msg.areas.append('odysseyS25')
     in_msg.check_RSS_coverage()
 
     # switch off Rapid scan, if large areas are wanted 
@@ -216,8 +217,8 @@ def input(in_msg):
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
     
-    in_msg.postprocessing_areas=['ccs4','EuropeCanaryS95','odysseyS25'] # !!!!
-    in_msg.postprocessing_composite = ["h03-ir108", "h03-HRV"]
-    #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03-ir108"],["MSG_radar-HRV","MSG_h03-HRV"]]
+    in_msg.postprocessing_areas=['EuropeCanaryS95'] # !!!!
+    in_msg.postprocessing_composite = ["h03b-ir108"]  # , "h03b-HRV"
+    #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03b-ir108"],["MSG_radar-HRV","MSG_h03b-HRV"]]
     #                                 only ccs4                           only ccs4                       only odyssey                      only odyssey
-    #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03-ir108"],["MSG_radar-HRV","MSG_h03-HRV"],["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]] # !!!!
+    #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03b-ir108"],["MSG_radar-HRV","MSG_h03b-HRV"],["MSG_RATE-ir108","MSG_h03b-ir108"],["MSG_RATE-HRV","MSG_h03b-HRV"]] # !!!!

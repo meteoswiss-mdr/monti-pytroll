@@ -103,7 +103,7 @@ def input(in_msg):
     in_msg.show_clouds = 'developing_and_mature'
 
     # directory containing the forecasted brightness temperatures
-    in_msg.nowcastDir = "/data/cinesat/out/"
+    in_msg.nowcastDir = "/data/cinesat/out/C2-BT-forecasts/"
         
     #directors with labels
     in_msg.labelsDir = '/data/cinesat/out/labels/'

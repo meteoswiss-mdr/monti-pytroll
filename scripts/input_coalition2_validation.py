@@ -100,7 +100,7 @@ def input(in_msg):
 
     # directory containing the forecasted brightness temperatures
     if in_msg.nrt:
-        in_msg.nowcastDir = "/data/cinesat/out/"
+        in_msg.nowcastDir = "/data/cinesat/out/C2-BT-forecasts/"
     else:
         in_msg.nowcastDir = '/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels/'
 

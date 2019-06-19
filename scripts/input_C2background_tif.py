@@ -177,7 +177,7 @@ def input(in_msg):
     #in_msg.areas.append('EuropeCanary95')  # upper third of MSG disk, satellite at 9.5 deg East, full resolution 
     # in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
     #in_msg.areas.append('EuroMercator')    # same projection as blitzortung.org
-    #in_msg.areas.append('nrEURO1km')        # Ninjo Alps projection 
+    in_msg.areas.append('nrEURO1km')        # Ninjo Alps projection 
     in_msg.areas.append('nrEURO3km')        # Ninjo Europe projection 
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
@@ -186,7 +186,7 @@ def input(in_msg):
     #in_msg.areas.append('euroHDready')      # Europe in HD resolution 1280 x 720
     #in_msg.areas.append('euroHDfull')      # Europe in full HD resolution 1920 x 1080
     #in_msg.areas.append('SwitzerlandStereo500m')
-    in_msg.areas.append('ccs4')            # CCS4 Swiss projection 710x640
+    #in_msg.areas.append('ccs4')            # CCS4 Swiss projection 710x640
     #in_msg.areas.append('alps95')          # area around Switzerland processed by NWCSAF software 349x151 
     #in_msg.areas.append('ticino')          # stereographic proj of Ticino 342x311
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784

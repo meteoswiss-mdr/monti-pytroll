@@ -590,10 +590,13 @@ if __name__ == '__main__':
     time_slot = in_msg.datetime
     
     if in_msg.nrt:
-        outputDir="/data/cinesat/out/"
+        outputDir = in_msg.nowcastDir
     else:
         # old outputDir="/data/COALITION2/PicturesSatellite/LEL_results_wind/"
         outputDir=time_slot.strftime("/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels/")
+
+    if not exists(outputDir):
+        makedirs(outputDir)
 
     while time_slot <= time_slotSTOP:
     

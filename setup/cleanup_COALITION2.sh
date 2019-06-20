@@ -27,3 +27,5 @@ find /data/cinesat/out/ninjo/*tif           -type f -mmin +100 -delete
 echo "cleanup decompressed MSG/SEVIRI HRIT files"
 find /tmp/SEVIRI_DECOMPRESSED_${LOGNAME}/H-000-MSG* -type f -mmin +55 -delete
 find /tmp/SEVIRI_DECOMPRESSED/H-000-MSG*            -type f -mmin +55 -delete
+echo "cleanup of decompressed HSAF files"
+find /tmp/h03B_*_fdk.grb                            -type f -mmin +55 -delete

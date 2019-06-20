@@ -41,7 +41,8 @@ export UTILS_PATH=/opt/users/common/
 export SAT_UTILS_PATH=/opt/users/common/
 
 export PYTROLLHOME=$VENV/config_files/
-export XRIT_DECOMPRESS_PATH=/opt/users/common/bin/xRITDecompress
+#export XRIT_DECOMPRESS_PATH=/opt/users/common/bin/xRITDecompress
+export XRIT_DECOMPRESS_PATH=$VENV/config_files/setup/xRITDecompress
 export XRIT_DECOMPRESS_OUTDIR=/tmp/SEVIRI_DECOMPRESSED 
 export PSP_CONFIG_FILE=$VENV/lib/python2.7/site-packages/pyspectral/etc/pyspectral.yaml
 #export PYGAC_CONFIG_FILE=$PYTROLLHOME/packages/pygac/etc/pygac.cfg

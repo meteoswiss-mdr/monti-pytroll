@@ -6,6 +6,7 @@ abstract-rendering=0.5.1=np110py27_0
 alabaster=0.7.6=py27_0
 anaconda=2.4.1=np110py27_0
 anaconda-client=1.2.1=py27_0
+appdirs
 argcomplete=1.0.0=py27_1
 astropy=1.0.6=np110py27_0
 babel=2.1.1=py27_0
@@ -167,6 +168,7 @@ tqdm=4.10.0=py27_0
 traitlets=4.1.0=py27_0
 ujson=1.33=py27_0
 unicodecsv=0.14.1=py27_0
+urllib3
 util-linux=2.21=0
 werkzeug=0.11.2=py27_0
 wheel=0.29.0=py27_0

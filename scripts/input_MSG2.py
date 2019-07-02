@@ -206,7 +206,7 @@ def input(in_msg):
     #default see scp_settings.py: e.g. in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
 
     # please download the shape file 
-    in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
+    #in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
         
     in_msg.postprocessing_areas=["ccs4"]
     in_msg.postprocessing_composite=["radar-ir108"]    

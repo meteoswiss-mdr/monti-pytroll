@@ -237,7 +237,7 @@ def input(in_msg):
     in_msg.scpProducts = [["MSG_IR-108cpc","COSMO_SYNMSG-BT-CL-IR10.8","MSG_IR-108-COSMO-minus-MSGpc"]]
 
     # please download the shape file 
-    in_msg.mapDir='/opt/users/common/shapes/'
+    # in_msg.mapDir='/opt/users/common/shapes/'
 
     in_msg.postprocessing_areas=["ccs4"]
     #in_msg.postprocessing_areas=['EuropeCanaryS95']

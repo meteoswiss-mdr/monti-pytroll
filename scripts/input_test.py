@@ -181,7 +181,7 @@ def input(in_msg):
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
 
     # please download the shape file 
-    in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
+    # in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
 
     in_msg.add_title = True
     in_msg.title = None

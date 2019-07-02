@@ -210,7 +210,7 @@ def input(in_msg):
     in_msg.compress_to_8bit=False
 
     # please download the shape file 
-    in_msg.mapDir='/opt/users/common/shapes/'
+    # in_msg.mapDir='/opt/users/common/shapes/'
 
     in_msg.postprocessing_areas=['ccs4','odysseyS25'] # !!!!
     in_msg.postprocessing_composite = ["h03b-HRVir108", "h03b-VIS006ir108"]

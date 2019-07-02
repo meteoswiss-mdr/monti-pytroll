@@ -59,11 +59,13 @@ class input_msg_class:
       self.ftpPassword=None
       self.mapDir = "" 
       if socket.gethostname()[0:5] == 'zueub':
-         self.mapDir = "/opt/users/common/shapes/"
+         self.mapDir = "/data/OWARNA/hau/maps_pytroll/"
       elif socket.gethostname()[0:5] == 'zuerh':
          if environ.get('VENV') is not None:
             self.mapDir = getenv('VENV')+"/share/shapes/" 
             print "... use shape directory ", self.mapDir
+         else:
+            self.mapDir = "/data/OWARNA/hau/maps_pytroll/"
       elif socket.gethostname()[0:7] == 'keschln' or socket.gethostname()[0:7]=="eschaln":
          self.mapDir = "/store/msrad/sat/pytroll/shapes/"
          print "... use shape directory ", self.mapDir

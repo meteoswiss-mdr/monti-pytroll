@@ -154,7 +154,7 @@ def input(in_msg):
     # chose area
     #----------------
     # please download the shape file 
-    in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
+    #in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
     in_msg.mapResolution = 'i'  # 'h'
 
     #in_msg.areas.append('EuropeCanary')    # upper third of MSG disk, satellite at 0.0 deg East, full resolution 

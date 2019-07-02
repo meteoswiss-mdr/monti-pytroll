@@ -57,7 +57,19 @@ class input_msg_class:
       self.ftpServer=None
       self.ftpUser=None
       self.ftpPassword=None
-      self.mapDir = ""
+      self.mapDir = "" 
+      if socket.gethostname()[0:5] == 'zueub':
+         self.mapDir = "/opt/users/common/shapes/"
+      elif socket.gethostname()[0:5] == 'zuerh':
+         if environ.get('VENV') is not None:
+            self.mapDir = getenv('VENV')+"/share/shapes/" 
+            print "... use shape directory ", self.mapDir
+      elif socket.gethostname()[0:7] == 'keschln' or socket.gethostname()[0:7]=="eschaln":
+         self.mapDir = "/store/msrad/sat/pytroll/shapes/"
+         print "... use shape directory ", self.mapDir
+      if self.mapDir == "": 
+         print "*** Warning, unknown location of the shape file for unknown computer "+socket.gethostname()
+         print "    please specify in the input file or produce satellite images without national borders"
       self.mapResolution = None
       self.indicate_mask = True
       self.add_title = True
@@ -90,7 +102,7 @@ class input_msg_class:
       self.logos_dir = "/data/OWARNA/hau/logos/"
       if environ.get('VENV') is not None:
          self.logos_dir = getenv('VENV')+"/share/logos/"
-      print "self.logos_dir", self.logos_dir
+      print "... use logo images in  ", self.logos_dir
       self.add_colorscale = True
       self.fixed_minmax = True
       self.rad_min = {'VIS006':   0, 'VIS008':   0, 'IR_016':   0, 'IR_039': 210, 'WV_062': 210, 'WV_073': 190,\

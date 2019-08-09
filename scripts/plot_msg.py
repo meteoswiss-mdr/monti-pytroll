@@ -191,7 +191,7 @@ def plot_msg(in_msg):
          obj_area = get_area_def(area) 
  
          # reproject data to new area
-         print  area_loaded
+         #print "area_loaded: ", area_loaded
  
          if obj_area == area_loaded: 
             if in_msg.verbose:
@@ -507,7 +507,11 @@ def load_products(data_object, RGBs, in_options, area_loaded, load_CTH=True):
          if in_options.verbose:
             print "    load NWC-SAF product: "+pge.replace('_', '') 
 
-         data_object.load([pge.replace('_', '')], calibrate=in_options.nwcsaf_calibrate, reader_level="seviri-level3") 
+         if in_options.reader_level is None:
+            # try seviri-level3, which is version 2013 hdf reader
+            data_object.load([pge.replace('_', '')], calibrate=in_options.nwcsaf_calibrate, area_extent=area_loaded.area_extent, reader_level="seviri-level3")   
+         else:
+            data_object.load([pge.replace('_', '')], calibrate=in_options.nwcsaf_calibrate, area_extent=area_loaded.area_extent, reader_level=in_options.reader_level)
 
          # False, area_extent=area_loaded.area_extent (difficulties to find correct h5 input file)
          #print data_object.loaded_channels()
@@ -746,6 +750,9 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
         #from trollimage.colormap import EchoTop    ????? why not ????
         #colormap = EchoTop                         ????? why not ????
         colormap = deepcopy(rainbow)
+   elif rgb in products.swisstrt:
+      prop = ma.asarray([0,3])
+      plot_type='TRTimage'
    else:
       # includes products.RGBs_buildin
       prop = ma.asarray([-999.,-999.])
@@ -820,6 +827,17 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
         in_msg.colormap[rgb].set_range(0, 90)
       #if rgb == 'ndvi':
       #   in_msg.colormap[rgb] = rdylgn_r
+   elif plot_type == 'TRTimage':
+      if in_msg.verbose:
+         print "    use mpop/satout/TRTimage.py"
+      from mpop.imageo.TRTimage import TRTimage
+      img = TRTimage( data.traj_IDs, data.TRTcells, obj_area) # , fill=False, minRank=8, alpha_max=1.0, plot_vel=True
+      #img = TRTimage( data.traj_IDs, data.TRTcells, obj_area, minRank=15.01) # minRank=8, alpha_max=1.0, plot_vel=True
+      #img = TRTimage( data.traj_IDs, data.TRTcells, obj_area, TRTcell_ID="2018080113300129", minRank=3) # minRank=8, alpha_max=1.0, plot_vel=True
+      #img = TRTimage( data.traj_IDs, data.TRTcells, obj_area, TRTcell_ID="2018080721300099", minRank=3) # minRank=8, alpha_max=1.0, plot_vel=True
+      #img = TRTimage( data.traj_IDs, data.TRTcells, obj_area, TRTcell_ID="2018080710200036", minRank=-1, plot_nowcast=True, fill=True, Rank_predicted=Rank_predicted)
+      #img = TRTimage( data.traj_IDs, data.TRTcells, obj_area, fill=False) # minRank=8, alpha_max=1.0, plot_vel=True
+      #img = TRTimage( data.traj_IDs, data.TRTcells, obj_area, plot_nowcast=True) # minRank=8, alpha_max=1.0, plot_vel=True
    else:
       print "*** Error in create_PIL_image ("+inspect.getfile(inspect.currentframe())+")"
       print "    unknown plot_type ", plot_type

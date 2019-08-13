@@ -179,7 +179,7 @@ def input(in_msg):
     #in_msg.areas.append('fullearth')       # full earth 600x300                    # does not yet work
     #in_msg.areas.append('met09globe')      # Cropped globe MSG image 3620x3620     # does not yet work
     #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
-    #in_msg.areas.append('odysseyS25')
+    in_msg.areas.append('odysseyS25')
     in_msg.check_RSS_coverage()
 
     # switch off Rapid scan, if large areas are wanted 
@@ -198,6 +198,7 @@ def input(in_msg):
     in_msg.make_plots=True
 
     in_msg.add_title = True
+    in_msg.title_y_line_nr = 2  # (INT) at which line should the title start
     in_msg.add_borders = True
     in_msg.add_rivers = False
     in_msg.add_logos = False
@@ -214,7 +215,7 @@ def input(in_msg):
     in_msg.compress_to_8bit=False
 
     # please download the shape file 
-    in_msg.mapDir='/opt/users/common/shapes/'
+    # in_msg.mapDir='/opt/users/common/shapes/'
 
     #in_msg.scpOutput=True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"

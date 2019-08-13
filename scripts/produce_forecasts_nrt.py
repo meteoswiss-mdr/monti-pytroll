@@ -590,10 +590,13 @@ if __name__ == '__main__':
     time_slot = in_msg.datetime
     
     if in_msg.nrt:
-        outputDir="/data/cinesat/out/"
+        outputDir = in_msg.nowcastDir
     else:
         # old outputDir="/data/COALITION2/PicturesSatellite/LEL_results_wind/"
         outputDir=time_slot.strftime("/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels/")
+
+    if not exists(outputDir):
+        makedirs(outputDir)
 
     while time_slot <= time_slotSTOP:
     
@@ -655,7 +658,7 @@ if __name__ == '__main__':
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, in_msg.sat_nr_str(), "seviri", time_slot)
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
           #area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
-          area_loaded = load_products(global_data_CTP, ['CTP'], in_msg, get_area_def("ccs4"))
+          area_loaded_CTP = load_products(global_data_CTP, ['CTP'], in_msg, get_area_def("alps95"))
           data_CTP = global_data_CTP.project(area, precompute=True)
               
           [nx,ny]=data_CTP['CTP'].data.shape

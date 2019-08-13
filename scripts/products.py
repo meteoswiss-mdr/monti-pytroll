@@ -50,7 +50,7 @@ MSG_all = MSG + MSG_color + RGBs_buildin + RGBs_user + NWCSAF
 
 SEVIRI_viewing_geometry = ['vza','vaa','lat','lon']
 
-HSAF  = ['h03']
+HSAF  = ['h03','h03b']
 
 MSG_OT = ['ir_brightness_temperature',
                'ot_rating_ir',

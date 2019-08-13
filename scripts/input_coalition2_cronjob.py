@@ -103,7 +103,7 @@ def input(in_msg):
     in_msg.show_clouds = 'developing_and_mature'
 
     # directory containing the forecasted brightness temperatures
-    in_msg.nowcastDir = "/data/cinesat/out/"
+    in_msg.nowcastDir = "/data/cinesat/out/C2-BT-forecasts/"
         
     #directors with labels
     in_msg.labelsDir = '/data/cinesat/out/labels/'
@@ -164,7 +164,7 @@ def input(in_msg):
     
 
     # please download the shape file 
-    in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
+    # in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
     in_msg.mapResolution='i'       ## f  full resolution: Original (full) data resolution.          
                                    ## h  high resolution: About 80 % reduction in size and quality. 
                                    ## i  intermediate resolution: Another ~80 % reduction.          

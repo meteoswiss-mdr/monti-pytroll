@@ -5,6 +5,7 @@ from my_msg_module import check_near_real_time
 import sys
 import inspect
 import socket
+from os import environ, getenv
 
 class input_msg_class:
 
@@ -46,7 +47,7 @@ class input_msg_class:
       self.scpOutputDir2 = None
       self.scpID2 = None
       self.scpProducts2 = []
-      self.ninjotifFilename = 'MET%(sat_nr)s_%(RSS)s_%(rgb)s_%(area)s_%Y%m%d%H%M.tif'
+      self.ninjotifFilename = 'MET-%(sat_nr)s_%(RSS)s_%(rgb)s_%(area)s_%Y%m%d%H%M.tif'
       self.upload_ninjotif = False  
       self.socupload = False  
       self.socuploadFilename = 'r0305n.%Y%m%d%H%M.png' 
@@ -56,7 +57,21 @@ class input_msg_class:
       self.ftpServer=None
       self.ftpUser=None
       self.ftpPassword=None
-      self.mapDir = ""
+      self.mapDir = "" 
+      if socket.gethostname()[0:5] == 'zueub':
+         self.mapDir = "/data/OWARNA/hau/maps_pytroll/"
+      elif socket.gethostname()[0:5] == 'zuerh':
+         if environ.get('VENV') is not None:
+            self.mapDir = getenv('VENV')+"/share/shapes/" 
+            print "... use shape directory ", self.mapDir
+         else:
+            self.mapDir = "/data/OWARNA/hau/maps_pytroll/"
+      elif socket.gethostname()[0:7] == 'keschln' or socket.gethostname()[0:7]=="eschaln":
+         self.mapDir = "/store/msrad/sat/pytroll/shapes/"
+         print "... use shape directory ", self.mapDir
+      if self.mapDir == "": 
+         print "*** Warning, unknown location of the shape file for unknown computer "+socket.gethostname()
+         print "    please specify in the input file or produce satellite images without national borders"
       self.mapResolution = None
       self.indicate_mask = True
       self.add_title = True
@@ -64,12 +79,19 @@ class input_msg_class:
       self.title = None               # ' %(sat)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s'
       if socket.gethostname()[0:5] == 'zueub':
          self.font_file = "/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf"
+      elif socket.gethostname()[0:6] == 'zuerh4':
+         self.font_file = "/usr/java/jdk1.8.0_121/jre/lib/fonts/LucidaTypewriterBold.ttf" 
       elif socket.gethostname()[0:5] == 'zuerh':
-         self.font_file = "/usr/java/jdk1.8.0_121/jre/lib/fonts/LucidaTypewriterBold.ttf"
+         if environ.get('VENV') is not None:
+            self.font_file = getenv('VENV')+"/config_files/setup/LucidaTypewriterBold.ttf" 
+            print "... use font file ", self.font_file
+         else:
+            print "*** ERROR, unknown location of the ttf-file, environment variable VENV required"
+            quit()
       elif socket.gethostname()[0:7] == 'keschln' or socket.gethostname()[0:7]=="eschaln":
          self.font_file = "/usr/share/fonts/dejavu/DejaVuSansMono.ttf"
       else:
-         print "*** ERROR, unknown computer "+socket.gethostname()+" "+socket.gethostname()[0:5]+", unknown location of the ttf-file"
+         print "*** ERROR, unknown computer "+socket.gethostname()+", unknown location of the ttf-file"
          quit()
       self.title_color = None
       self.title_y_line_nr = 1        # at which line should the title be written
@@ -79,7 +101,10 @@ class input_msg_class:
       self.add_rivers = False
       self.river_color = None   # default blue for RGB images, and white for BW images
       self.add_logos = True
-      self.logos_dir = "/opt/users/common/logos/"
+      self.logos_dir = "/data/OWARNA/hau/logos/"
+      if environ.get('VENV') is not None:
+         self.logos_dir = getenv('VENV')+"/share/logos/"
+      print "... use logo images in  ", self.logos_dir
       self.add_colorscale = True
       self.fixed_minmax = True
       self.rad_min = {'VIS006':   0, 'VIS008':   0, 'IR_016':   0, 'IR_039': 210, 'WV_062': 210, 'WV_073': 190,\
@@ -90,7 +115,7 @@ class input_msg_class:
                       'WV_062-WV_073': -25, 'WV_062-IR_108': -70, 'WV_073-IR_134':-15, 'IR_087-IR_108':-4.0, 'IR_087-IR_120':-4,'IR_120-IR_108':-6,\
                       'sphr_bl': 0, 'sphr_cape': 150, 'sphr_diffbl': -1.5, 'sphr_diffhl': -0.75, 'sphr_diffki': -7, 'sphr_diffli': -2.5,\
                       'sphr_diffml': -2.5, 'sphr_diffshw': -2.5, 'sphr_difftpw': -3, 'sphr_hl': 0, 'sphr_ki': 0, 'sphr_li': -15, \
-                      'sphr_ml': 0, 'sphr_quality': 0, 'sphr_sflag': 0, 'sphr_shw': -15, 'sphr_tpw': 0, 'h03': 0, \
+                      'sphr_ml': 0, 'sphr_quality': 0, 'sphr_sflag': 0, 'sphr_shw': -15, 'sphr_tpw': 0, 'h03': 0, 'h03b': 0, \
                       'azidiff':0,'cth':0,'cldmask':0,'cot':0,'cph':0,'ctt':210.,'cwp':0,\
                       'dcld':0,'dcot':0,'dcwp':0,'dndv':0,'dreff':0,\
                       'precip':0,'precip_ir':0,'qa':0,'reff':0,'satz':0,'sds':0,'sds_cs':0,'sds_diff':0,'sds_diff_cs':0,\
@@ -106,7 +131,7 @@ class input_msg_class:
                       'WV_062-WV_073':   5,'WV_062-IR_108':    5, 'WV_073-IR_134':  5, 'IR_087-IR_108': 1.5, 'IR_087-IR_120': 4,'IR_120-IR_108': 2,\
                       'sphr_bl': 35, 'sphr_cape': 200, 'sphr_diffbl': 1.5, 'sphr_diffhl': 0.75, 'sphr_diffki': 7, 'sphr_diffli': 2.5,\
                       'sphr_diffml': 2.5, 'sphr_diffshw': 2.5, 'sphr_difftpw': 3, 'sphr_hl': 8, 'sphr_ki': 60, 'sphr_li': 25, \
-                      'sphr_ml': 45, 'sphr_quality': 5000, 'sphr_sflag': 20, 'sphr_shw': 25, 'sphr_tpw': 70, 'h03': 30, \
+                      'sphr_ml': 45, 'sphr_quality': 5000, 'sphr_sflag': 20, 'sphr_shw': 25, 'sphr_tpw': 70, 'h03': 30, 'h03b': 30, \
                       'azidiff':180,'cth':12,'cldmask':3,'cot':256,'cph':2,'ctt':320.,'cwp':10,\
                       'dcld':4,'dcot':50,'dcwp':10,'dndv':4,'dreff':20,\
                       'precip':256,'precip_ir':256,'qa':50,'reff':50,'satz':90,'sds':1200,'sds_cs':1200,'sds_diff':800,'sds_diff_cs':800,\
@@ -120,7 +145,7 @@ class input_msg_class:
                         'CTH': 4, 'CTP':  100,'CTT': 20, 'CT': 1, 'CT_PHASE': 1, 'CMa': 1, 'CMa_DUST':  1, 'CMa_TEST': 1, 'CMa_VOLCANIC': 1, 'clouddepth':1,\
                         'sphr_bl': 5, 'sphr_cape': 10, 'sphr_diffbl': 0.5, 'sphr_diffhl': 0.5, 'sphr_diffki': 2, 'sphr_diffli': 0.5,\
                         'sphr_diffml': 1, 'sphr_diffshw': 0.5, 'sphr_difftpw': 1, 'sphr_hl': 1, 'sphr_ki': 5, 'sphr_li': 1, \
-                        'sphr_ml': 5, 'sphr_quality': 500, 'sphr_sflag': 1, 'sphr_shw': 1, 'sphr_tpw': 5, 'h03': 10, \
+                        'sphr_ml': 5, 'sphr_quality': 500, 'sphr_sflag': 1, 'sphr_shw': 1, 'sphr_tpw': 5, 'h03': 10, 'h03b': 10, \
                         'azidiff':10,'cth':1,'cldmask':1,'cot':10,'cph':1,'ctt':10.,'cwp':2,\
                         'dcld':1,'dcot':10,'dcwp':2,'dndv':1,'dreff':20,\
                         'precip':10,'precip_ir':10,'qa':10,'reff':10,'satz':10,'sds':100,'sds_cs':100,'sds_diff':100,'sds_diff_cs':100,\
@@ -134,7 +159,7 @@ class input_msg_class:
                         'CTH': 1, 'CTP':  50,'CTT': 5, 'CT': 1, 'CT_PHASE': 1, 'CMa': 1, 'CMa_DUST':  1, 'CMa_TEST': 1, 'CMa_VOLCANIC': 1, 'clouddepth':1,
                         'sphr_bl': 1, 'sphr_cape': 5, 'sphr_diffbl': 0.1, 'sphr_diffhl': 0.05, 'sphr_diffki': 0.5, 'sphr_diffli': 0.1,
                         'sphr_diffml': 0.5, 'sphr_diffshw': 0.1, 'sphr_difftpw': 0.5, 'sphr_hl': 0.5, 'sphr_ki': 1, 'sphr_li': 0.5, 
-                        'sphr_ml': 1, 'sphr_quality': 100, 'sphr_sflag': 1, 'sphr_shw': 0.2, 'sphr_tpw': 1, 'h03': 5, \
+                        'sphr_ml': 1, 'sphr_quality': 100, 'sphr_sflag': 1, 'sphr_shw': 0.2, 'sphr_tpw': 1, 'h03': 5, 'h03b': 5, \
                         'azidiff':2,'cth':0.2,'cldmask':1,'cot':2,'cph':1,'ctt':5.,'cwp':1,\
                         'dcld':1,'dcot':5,'dcwp':1,'dndv':1,'dreff':5,\
                         'precip':5,'precip_ir':5,'qa':2,'reff':2,'satz':2,'sds':10,'sds_cs':10,'sds_diff':10,'sds_diff_cs':10,\

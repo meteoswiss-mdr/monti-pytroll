@@ -8,10 +8,10 @@ def input(in_msg):
     # 8=MSG1, 9=MSG2, 10=MSG3
     #in_msg.sat_nr=8
     #in_msg.RSS=False 
-    in_msg.sat_nr=9
-    in_msg.RSS=True
-    #in_msg.sat_nr=10
-    #in_msg.RSS=False 
+    #in_msg.sat_nr=9
+    #in_msg.RSS=True
+    in_msg.sat_nr=10
+    in_msg.RSS=True 
 
     # specify an delay (in minutes), when you like to process a time some minutes ago
     # e.g. current time               2015-05-31 12:33 UTC
@@ -217,7 +217,7 @@ def input(in_msg):
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
 
     # please download the shape file 
-    in_msg.mapDir='/opt/users/common/shapes/'
+    #in_msg.mapDir='/opt/users/common/shapes/'
 
     #in_msg.postprocessing_areas=["ccs4"]
     #in_msg.postprocessing_areas=['EuropeCanaryS95']

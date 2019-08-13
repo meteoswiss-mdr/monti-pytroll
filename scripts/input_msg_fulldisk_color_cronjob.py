@@ -11,13 +11,13 @@ def input(in_msg):
     #in_msg.sat = "meteosat"
     #in_msg.sat_nr=8
     #in_msg.RSS=False 
-    in_msg.sat_nr=9
+    #in_msg.sat_nr=9
     #in_msg.RSS=True
-    in_msg.RSS=False
+    #in_msg.RSS=False
     #in_msg.sat_nr=10
     #in_msg.RSS=False
-    #in_msg.sat_nr=11
-    #in_msg.RSS=False
+    in_msg.sat_nr=11
+    in_msg.RSS=False
     
     # specify an delay (in minutes), when you like to process a time some minutes ago
     # e.g. current time               2015-05-31 12:33 UTC
@@ -100,7 +100,7 @@ def input(in_msg):
     in_msg.RGBs.append('cloudtop')
     in_msg.RGBs.append('convection')         # WV_062-WV_073  IR_039-IR_108  IR_016-VIS006
     ##in_msg.RGBs.append('convection_co2')
-    in_msg.RGBs.append('day_microphysics')   # VIS008         IR_039(solar)  IR_108     # requires the pyspectral modul 
+    #in_msg.RGBs.append('day_microphysics')   # VIS008         IR_039(solar)  IR_108     # requires the pyspectral modul 
     in_msg.RGBs.append('dust')               # IR_120-IR_108  IR_108-IR_087  IR_108
     in_msg.RGBs.append('fog')
     in_msg.RGBs.append('green_snow')
@@ -266,7 +266,7 @@ def input(in_msg):
     in_msg.check_RSS_coverage()
 
     # please download the shape file 
-    in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
+    #in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
     in_msg.mapResolution=None      ## f  full resolution: Original (full) data resolution.          
                                    ## h  high resolution: About 80 % reduction in size and quality. 
                                    ## i  intermediate resolution: Another ~80 % reduction.          

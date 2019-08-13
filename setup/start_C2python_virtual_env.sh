@@ -35,15 +35,16 @@ echo "\$LOGNAME" $LOGNAME
 echo "uname -mrs:" `uname -mrs`
 echo "whoami:" `/usr/bin/whoami`
 
-export ENV_PATH=/opt/users/hau/C2python2_env-v0.2/
+# VENV variable is set in C2python2_env-v0.X/etc/coalition_start.sh
 
 export UTILS_PATH=/opt/users/common/
 export SAT_UTILS_PATH=/opt/users/common/
 
-export PYTROLLHOME=$ENV_PATH/config_files/
-export XRIT_DECOMPRESS_PATH=/opt/users/common/bin/xRITDecompress
+export PYTROLLHOME=$VENV/config_files/
+#export XRIT_DECOMPRESS_PATH=/opt/users/common/bin/xRITDecompress
+export XRIT_DECOMPRESS_PATH=$VENV/config_files/setup/xRITDecompress
 export XRIT_DECOMPRESS_OUTDIR=/tmp/SEVIRI_DECOMPRESSED 
-export PSP_CONFIG_FILE=$ENV_PATH/lib/python2.7/site-packages/pyspectral/etc/pyspectral.yaml
+export PSP_CONFIG_FILE=$VENV/lib/python2.7/site-packages/pyspectral/etc/pyspectral.yaml
 #export PYGAC_CONFIG_FILE=$PYTROLLHOME/packages/pygac/etc/pygac.cfg
 
 if [ "$1" == "offline" ] ; then
@@ -82,9 +83,9 @@ echo "... set EMAIL to: "$EMAIL
 #echo '... set PYTHONPATH to:':$PYTROLLHOME/scripts
 #export PYTHONPATH=$PYTROLLHOME/scripts
 
-echo "*** activate virtual environment: source "$ENV_PATH"/bin/activate"
+echo "*** activate virtual environment: source "$VENV"/bin/activate"
 ##### source activate PyTroll_$LOGNAME  
-source $ENV_PATH/bin/activate
+source $VENV/bin/activate
 
 # some useful alias commands
 alias ll='ls --color=auto -alh'

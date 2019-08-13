@@ -12,7 +12,7 @@ def hr_visual(self):
     img = GeoImage(self["HRV"].data, self.area, self.time_slot,
                    fill_value=0, mode="L")
     img.enhance(stretch="crude")
-    return img 
+    return img
 
 hr_visual.prerequisites = set(["HRV"])
 
@@ -21,11 +21,11 @@ def hr_overview(self):
     """Make a High Resolution Overview RGB image composite from Seviri
     channels.
     """
-    self.check_channels(0.635, 0.85, 10.8, "HRV")
+    self.check_channels('VIS006', 'VIS008', 'IR_108', "HRV")
 
-    ch1 = self[0.635].check_range()
-    ch2 = self[0.85].check_range()
-    ch3 = -self[10.8].data
+    ch1 = self['VIS006'].check_range()
+    ch2 = self['VIS008'].check_range()
+    ch3 = -self['IR_108'].data
 
     img = GeoImage((ch1, ch2, ch3), self.area, self.time_slot,
                    fill_value=(0, 0, 0), mode="RGB")
@@ -42,7 +42,7 @@ def hr_overview(self):
 
     return img
 
-hr_overview.prerequisites = set(["HRV", 0.635, 0.85, 10.8])
+hr_overview.prerequisites = set(["HRV", 'VIS006', 'VIS008', 'IR_108'])
 
 
 def hr_natural(self, stretch=None, gamma=1.8):
@@ -58,11 +58,11 @@ def hr_natural(self, stretch=None, gamma=1.8):
     | VIS0.6             | 0 - 90             | gamma 1.8          |
     +--------------------+--------------------+--------------------+
     """
-    self.check_channels(0.635, 0.85, 1.63)
+    self.check_channels('VIS006', 'VIS008', 'IR_016')
 
-    ch1 = self[1.63].check_range()
-    ch2 = self[0.85].check_range()
-    ch3 = self[0.635].check_range()
+    ch1 = self['IR_016'].check_range()
+    ch2 = self['VIS008'].check_range()
+    ch3 = self['VIS006'].check_range()
 
     img = GeoImage((ch1, ch2, ch3),
                       self.area,
@@ -87,7 +87,7 @@ def hr_natural(self, stretch=None, gamma=1.8):
 
     return img
 
-hr_natural.prerequisites = set(["HRV", 0.635, 0.85, 1.63])
+hr_natural.prerequisites = set(["HRV", 'VIS006', 'VIS008', 'IR_016'])
 
 
 def hr_airmass(self):
@@ -103,11 +103,11 @@ def hr_airmass(self):
     | WV6.2              |   243 to 208 K     | gamma 1            |
     +--------------------+--------------------+--------------------+
     """
-    self.check_channels(6.7, 7.3, 9.7, 10.8)
+    self.check_channels('WV_062', 'WV_073', 'IR_097', 'IR_108')
 
-    ch1 = self[6.7].data - self[7.3].data
-    ch2 = self[9.7].data - self[10.8].data
-    ch3 = self[6.7].data
+    ch1 = self['WV_062'].data - self['WV_073'].data
+    ch2 = self['IR_097'].data - self['IR_108'].data
+    ch3 = self['WV_062'].data
 
     img = GeoImage((ch1, ch2, ch3),
                    self.area,
@@ -127,7 +127,7 @@ def hr_airmass(self):
 
     return img
 
-hr_airmass.prerequisites = set(["HRV", 6.7, 7.3, 9.7, 10.8])
+hr_airmass.prerequisites = set(["HRV", 'WV_062', 'WV_073', 'IR_097', 'IR_108'])
 
 
 def sandwich(self):
@@ -136,7 +136,7 @@ def sandwich(self):
     """
     from trollimage.image import Image as trollimage
 
-    self.check_channels(10.8, "HRV")
+    self.check_channels('IR_108', "HRV")
 
     ## use trollimage to create black white image
     #img = trollimage(self['IR_108'].data, mode="L")
@@ -159,8 +159,8 @@ def sandwich(self):
 
     return img
 
-sandwich.prerequisites = set(["HRV", 10.8])
-#sandwich.prerequisites = set([10.8])   
+sandwich.prerequisites = set(["HRV", 'IR_108'])
+#sandwich.prerequisites = set(['IR_108'])   
 
 
 def HRVFog(self, downscale=False, return_data=False):
@@ -428,38 +428,38 @@ def HRVir108c(self, smooth=False):
     self.check_channels("HRV", "IR_108")
     return daynight_background(self, cos_scaled=True, use_HRV=True, smooth=smooth, colorscale='rainbow')
 
-HRVir108c.prerequisites = set(["VIS006", "HRV", 10.8])
+HRVir108c.prerequisites = set(["VIS006", "HRV", 'IR_108'])
 
 def HRVir108(self, smooth=False):
     self.check_channels("HRV", "IR_108")
     return daynight_background(self, cos_scaled=True, use_HRV=True, smooth=smooth, colorscale='greys')
 
-HRVir108.prerequisites = set(["VIS006", "HRV", 10.8])
+HRVir108.prerequisites = set(["VIS006", "HRV", 'IR_108'])
 
 def hrvIR108(self, smooth=False):
     self.check_channels("HRV", "IR_108")
     return daynight_background(self, cos_scaled=True, use_HRV=True, smooth=smooth, colorscale='greys', white_clouds=False)
 
-hrvIR108.prerequisites = set(["VIS006", "HRV", 10.8])
+hrvIR108.prerequisites = set(["VIS006", "HRV", 'IR_108'])
 
 def VIS006ir108c(self, smooth=False):
     self.check_channels("VIS006", "IR_108")
     return daynight_background(self, cos_scaled=True, use_HRV=False, smooth=smooth, colorscale='rainbow')
 
-VIS006ir108c.prerequisites = set(["VIS006", 10.8])
+VIS006ir108c.prerequisites = set(["VIS006", 'IR_108'])
 
 def VIS006ir108(self, smooth=False):
     self.check_channels("VIS006", "IR_108")
     #return daynight_background(self, cos_scaled=True, use_HRV=False, smooth=smooth, stretch=(0.005, 0.005), colorscale='greys')
     return daynight_background(self, cos_scaled=True, use_HRV=False, smooth=smooth, colorscale='greys')
 
-VIS006ir108.prerequisites = set(["VIS006", 10.8])
+VIS006ir108.prerequisites = set(["VIS006", 'IR_108'])
 
 def vis006IR108(self, smooth=False):
     self.check_channels("VIS006", "IR_108")
     return daynight_background(self, cos_scaled=True, use_HRV=False, smooth=smooth, colorscale='greys', white_clouds=False)
 
-vis006IR108.prerequisites = set(["VIS006", 10.8])
+vis006IR108.prerequisites = set(["VIS006", 'IR_108'])
 
 def sza(self):
 
@@ -542,7 +542,7 @@ def IR_039c_CO2(self):
 
     return img
 
-IR_039c_CO2.prerequisites = set([3.75, 10.8, 13.4])
+IR_039c_CO2.prerequisites = set(['IR_039', 'IR_108', 'IR_134'])
 
 
 def VIS006_minus_IR_016(self):

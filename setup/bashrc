@@ -36,7 +36,7 @@ echo "uname -mrs:" `uname -mrs`
 echo "whoami:" `/usr/bin/whoami`
 
 case $HOSTNAME in
-    "zueub"[2-4][0-9][0-9])
+    "zue"[ur][bh][2-4][0-9][0-9])
 	if [ -d /opt/users/$LOGNAME/monti-pytroll/ ]
         then
             #source /opt/users/$LOGNAME/monti-pytroll/setup/set_paths.sh   # source is not supported by cronjobs
@@ -61,6 +61,10 @@ esac
 
 set_utils_path
 set_conda_path
+if [ ! -d "$CONDA_PATH" ]; then
+    echo "ERROR, CONDA PATH " $CONDA_PATH "does not exists"
+    return
+fi
 set_pytroll_paths
 
 export PPP_CONFIG_DIR=$PYTROLLHOME/etc/
@@ -68,7 +72,7 @@ echo "... set PPP_CONFIG_DIR to: "$PPP_CONFIG_DIR
 
 echo '... configure host dependent settings, HOSTNAME='$HOSTNAME
 case $HOSTNAME in
-"zueub"[2-4][0-9][0-9])
+"zue"[ur][bh][2-4][0-9][0-9])
     # special settings only for zueub computers
     if [ $HOSTNAME == "zueub427" ] || [ $HOSTNAME == "zueub428" ]; then 
     	alias tkdiff='echo tkdiff is too old, use \"meld\" instead; echo  meld '

@@ -178,7 +178,7 @@ def input(in_msg):
     #in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
     #in_msg.areas.append('EuroMercator')    # same projection as blitzortung.org
     #in_msg.areas.append('nrEURO1km')        # Ninjo Alps projection 
-    in_msg.areas.append('nrEURO3km')        # Ninjo Europe projection 
+    #in_msg.areas.append('nrEURO3km')        # Ninjo Europe projection 
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     #in_msg.areas.append('eurotv4n')        # Europe TV4 -  4.1x4.1km 2048x1152
@@ -186,7 +186,7 @@ def input(in_msg):
     #in_msg.areas.append('euroHDready')      # Europe in HD resolution 1280 x 720
     #in_msg.areas.append('euroHDfull')      # Europe in full HD resolution 1920 x 1080
     #in_msg.areas.append('SwitzerlandStereo500m')
-    #in_msg.areas.append('ccs4')            # CCS4 Swiss projection 710x640
+    in_msg.areas.append('ccs4')            # CCS4 Swiss projection 710x640
     #in_msg.areas.append('alps95')          # area around Switzerland processed by NWCSAF software 349x151 
     #in_msg.areas.append('ticino')          # stereographic proj of Ticino 342x311
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
@@ -226,8 +226,8 @@ def input(in_msg):
     in_msg.add_colorscale = True
     in_msg.HRV_enhancement = False
 
-    #in_msg.outputFormats = ['png']
-    in_msg.outputFormats = ['ninjotif']
+    in_msg.outputFormats = ['png']
+    #in_msg.outputFormats = ['ninjotif']
     in_msg.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
     #in_msg.outputDir='./pics/'
     #in_msg.outputDir = "./%Y-%m-%d/%Y-%m-%d_%(rgb)s-%(area)s/"
@@ -249,7 +249,7 @@ def input(in_msg):
     # please download the shape file 
     in_msg.mapDir='/opt/users/common/shapes/'
 
-    #in_msg.postprocessing_areas=["ccs4"]
+    in_msg.postprocessing_areas=["ccs4"]
     #in_msg.postprocessing_areas=['EuropeCanaryS95']
 
     #in_msg.postprocessing_composite=["h03-ir108"] 
@@ -264,13 +264,15 @@ def input(in_msg):
     #in_msg.postprocessing_composite=["hrwdpH-streamdH-HRV","hrwdpH-streamdH-ir108"] 
     #in_msg.postprocessing_composite=["hrwdp-streamd-ir108","TRT-streamd-ir108"] 
     #in_msg.postprocessing_composite = ["VIL-HRVir108"]
-    in_msg.postprocessing_composite = ["VIL-HRVir108pc"]
+    #in_msg.postprocessing_composite = ["VIL-HRVir108pc"]
     #in_msg.postprocessing_composite = ["TRT-radar-HRVir108","THX-HRVir108"]
     #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03-ir108"],["MSG_radar-HRV","MSG_h03-HRV"],["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]]
     #in_msg.postprocessing_montage = [["MSG_h03-ir108","MSG_HRV"],["MSG_h03-ir108","MSG_test"]]
     #in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-radar-convection"]]
     #in_msg.postprocessing_montage = [["MSG_C2rgb-Forecast-IR_108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-radar-convection"]]
     #in_msg.postprocessing_montage = [["MSG_SYNMSG-BT-CL-IR10.8","MSG_IR-108c"]]
+    in_msg.postprocessing_montage = [["RAD_MESHS-HRVir108pc", "MSG_HRVir108"]]
+
     
     #in_msg.resize_composite = 100
     #in_msg.resize_montage = 70

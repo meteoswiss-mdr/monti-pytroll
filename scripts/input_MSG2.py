@@ -82,7 +82,7 @@ def input(in_msg):
     #in_msg.RGBs.append('dust')               # IR_120-IR_108  IR_108-IR_087  IR_108
     #in_msg.RGBs.append('fog')
     #in_msg.RGBs.append('green_snow')
-    in_msg.RGBs.append('ir108')
+    #in_msg.RGBs.append('ir108')
     #in_msg.RGBs.append('natural')            # IR_016         VIS008         VIS006
     #in_msg.RGBs.append('night_fog')          
     #in_msg.RGBs.append('night_microphysics') # IR_120-IR_108  IR_108-IR_039  IR_108
@@ -209,4 +209,5 @@ def input(in_msg):
     in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
         
     in_msg.postprocessing_areas=["ccs4"]
-    in_msg.postprocessing_composite=["radar-ir108"]    
+    #in_msg.postprocessing_composite=["radar-ir108"]    
+    in_msg.postprocessing_composite = ["TRT-radar-HRVir108"]

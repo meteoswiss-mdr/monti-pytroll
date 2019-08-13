@@ -8,7 +8,7 @@ rgbs="[VIS006 VIS008 IR_016 IR_039 WV_062 WV_073 IR_087 IR_097 IR_108 IR_120 IR_
 echo ""
 
 echo "*** create dates"
-if [ 1 -eq 1 ]; then
+if [ 1 -eq 0 ]; then
     # check old dates from archive (offline modus)
     date_start="2015-07-07 00:00"
     date_start_s=$(/bin/date --date "$date_start" +"%s")

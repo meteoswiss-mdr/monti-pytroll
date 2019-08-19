@@ -48,6 +48,7 @@ from trollimage.image import Image as trollimage
 from PIL import ImageFont
 from PIL import ImageDraw 
 from trollimage.colormap import rdbu, greys, rainbow, spectral
+# 'accent', 'blues', 'brbg', 'bugn', 'bupu', 'colorbar', 'colorize', 'dark2', 'diverging_colormaps', 'gnbu', 'greens', 'greys', 'hcl2rgb', 'np', 'oranges', 'orrd', 'paired', 'palettebar', 'palettize', 'pastel1', 'pastel2', 'piyg', 'prgn', 'pubu', 'pubugn', 'puor', 'purd', 'purples', 'qualitative_colormaps', 'rainbow', 'rdbu', 'rdgy', 'rdpu', 'rdylbu', 'rdylgn', 'reds', 'rgb2hcl', 'sequential_colormaps', 'set1', 'set2', 'set3', 'spectral', 'ylgn', 'ylgnbu', 'ylorbr', 'ylorrd'
 
 from my_composites import mask_clouddepth, get_image, get_sza_mask, get_box_mask
 
@@ -156,7 +157,8 @@ def plot_msg(in_msg):
    # -------------------------------------------------------------------
    # load reflectivities, brightness temperatures, NWC-SAF products ...
    # -------------------------------------------------------------------
-   area_loaded = load_products(global_data, RGBs, in_msg, area_loaded)
+   if in_msg.load_data:
+     area_loaded = load_products(global_data, RGBs, in_msg, area_loaded)
    # ----------------------------------------------------------------------
    # load reflectivities, brightness temperatures, NWC-SAF products for t-1
    # ----------------------------------------------------------------------
@@ -226,6 +228,7 @@ def plot_msg(in_msg):
  
          # save reprojected data
          if area in in_msg.save_reprojected_data:
+            print data.area
             save_reprojected_data(data, area, in_msg)
 
          # apply a mask to the data (switched off at the moment)
@@ -417,7 +420,7 @@ def plot_msg(in_msg):
 
                if in_msg.socupload:
                  socuploadFilename = format_name (in_msg.socuploadFilename, data.time_slot, area=area)
-                 command_line_command1 = "cp "+outputFile+" "+outputDir+"/"+socuploadFilename+" 2>&1; "
+                 command_line_command1 = "cp "+outputFile+" "+outputDir+"/"+socuploadFilename+" 2>&1; cd "+outputDir+"; "
                  socuploadCommand  = format_name (in_msg.socuploadCommand,  data.time_slot, area=area)
                  if in_msg.verbose:
                    print command_line_command1
@@ -425,7 +428,7 @@ def plot_msg(in_msg):
                  subprocess.call(command_line_command1+socuploadCommand, shell=True) 
                            
                if 'ninjotif' in in_msg.outputFormats:
-                  ninjotif_file = format_name (outputDir+'/'+in_msg.ninjotifFilename, data.time_slot, sat_nr=data.sat_nr(), RSS=in_msg.RSS, area=area, rgb=rgb+parallax_correction_str )
+                  ninjotif_file = format_name (outputDir+'/ninjo/'+in_msg.ninjotifFilename, data.time_slot, sat_nr=data.sat_nr(), RSS=in_msg.RSS, area=area, rgb=rgb+parallax_correction_str )
                   from plot_coalition2 import pilimage2geoimage
                   GEO_image = pilimage2geoimage(PIL_image, obj_area, data.time_slot)
                   GEO_image.save(ninjotif_file,
@@ -438,9 +441,9 @@ def plot_msg(in_msg):
                if rgb not in RGBs_done:
                   RGBs_done.append(rgb)
    
-      ## start postprocessing
-      for area in in_msg.postprocessing_areas:
-         postprocessing(in_msg, global_data.time_slot, int(data.sat_nr()), area)
+   ## start postprocessing
+   for area in in_msg.postprocessing_areas:
+      postprocessing(in_msg, global_data.time_slot, int(global_data.sat_nr()), area)
 
    if in_msg.verbose:
       print " "
@@ -739,6 +742,10 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
       elif rgb == 'VIL':
         from trollimage.colormap import VIL
         colormap = VIL
+      elif 'EchoTOP' in rgb :
+        #from trollimage.colormap import EchoTop    ????? why not ????
+        #colormap = EchoTop                         ????? why not ????
+        colormap = deepcopy(rainbow)
    else:
       # includes products.RGBs_buildin
       prop = ma.asarray([-999.,-999.])

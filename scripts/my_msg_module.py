@@ -166,25 +166,38 @@ def channel_num2str(channels):
     i=0 
     channels=list(channels)
     for channel in channels:
+        #print "++++++++", channel
         if type(channel) is float:
             if channel == 0.635:
                 channels[i] = 'VIS006'
             elif channel == 0.8:         # sometimes this number is used
                 channels[i] = 'VIS008'
+            elif channel == 0.81:         # sometimes this number is used
+                channels[i] = 'VIS008'
             elif channel == 0.85:        # but most of the times this 
                 channels[i] = 'VIS008'
             elif channel == 1.63:
+                channels[i] = 'IR_016'
+            elif channel == 1.64:
                 channels[i] = 'IR_016'
             elif channel == 3.75:        # sometimes this number is used
                 channels[i] = 'IR_039'
             elif channel == 3.9:         # and sometimes this
                 channels[i] = 'IR_039'
+            elif channel == 3.92:         # and sometimes this
+                channels[i] = 'IR_039'
+            elif channel == 6.25:
+                channels[i] = 'WV_062'
             elif channel == 6.7:
                 channels[i] = 'WV_062'
             elif channel == 7.3:
                 channels[i] = 'WV_073'
+            elif channel == 7.35:
+                channels[i] = 'WV_073'
             elif channel == 8.7:
                 channels[i] = 'IR_087'
+            elif channel == 9.66:
+                channels[i] = 'IR_097'
             elif channel == 9.7:
                 channels[i] = 'IR_097'
             elif channel == 10.8:
@@ -545,6 +558,9 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
     ## currently no check for netCDF data   
     if in_msg.reader_level == "seviri-level8":
        return in_msg.RGBs
+    ## currently no check for (parallax corrected) netCDF data   
+    if in_msg.reader_level == "seviri-level9":
+       return in_msg.RGBs
     ## currently no check for cpp
     if in_msg.sat == "cpp":
        return in_msg.RGBs
@@ -828,10 +844,18 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                 rgb_complete.append(rgb)
 
         elif rgb in products.HSAF:
-            
-            from mpop.satin.hsaf_h03 import find_hsaf_files
-            filenames = find_hsaf_files(time_slot, fullname)
-            
+
+            if rgb=="h03":
+                from mpop.satin.hsaf_h03 import find_hsaf_h03_files
+                filenames = find_hsaf_h03_files(time_slot, fullname)
+            elif rgb=="h03b":
+                from mpop.satin.hsaf_h03b import find_hsaf_h03b_files
+                filenames = find_hsaf_h03b_files(time_slot, fullname)
+            else:
+                print "*** ERROR in my_msg_module"
+                print "    HSAF product ", rgb, "not yet implemented"
+                quit()
+                
             if len(filenames) == 0:
                 LOG.info("*** Warning, no HSAF input file found")
             else:

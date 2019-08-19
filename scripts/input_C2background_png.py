@@ -10,20 +10,18 @@ def input(in_msg):
     #in_msg.RSS=False 
     #in_msg.sat_nr=9
     #in_msg.RSS=True
-    #in_msg.sat_nr=10
-    #in_msg.RSS=False 
-    in_msg.sat_nr=11
-    in_msg.RSS=False 
+    in_msg.sat_nr=10
+    in_msg.RSS=True
 
     # specify an delay (in minutes), when you like to process a time some minutes ago
     # e.g. current time               2015-05-31 12:33 UTC
     # delay 5 min                     2015-05-31 12:28 UTC
     # last Rapid Scan Service picture 2015-05-31 12:25 UTC (Scan start) 
-    in_msg.delay=8
+    in_msg.delay=5
 
     #------------------------------------------------------------------------
     # if not specified (False), current (last) observation time is chosen  
-    # choose specification, if you want a default time without command line arguments 
+    # chosse specification, if you want a default time without command line arguments 
     # (the specified time is overwritten by the command line arguments of plot_msg.py)
     #------------------------------------------------------------------------
     if False:
@@ -51,7 +49,7 @@ def input(in_msg):
     ##in_msg.RGBs.append('WV_073')       # black and white
     ##in_msg.RGBs.append('IR_087')       # black and white
     ##in_msg.RGBs.append('IR_097')       # black and white
-    ##in_msg.RGBs.append('IR_108')       # black and white
+    in_msg.RGBs.append('IR_108')       # black and white
     ##in_msg.RGBs.append('IR_120')       # black and white
     ##in_msg.RGBs.append('IR_134')       # black and white
     #in_msg.RGBs.append('HRV')          # black and white
@@ -85,7 +83,7 @@ def input(in_msg):
     #in_msg.RGBs.append('cloudtop')
     #in_msg.RGBs.append('convection')         # WV_062-WV_073  IR_039-IR_108  IR_016-VIS006
     ##in_msg.RGBs.append('convection_co2')
-    ##in_msg.RGBs.append('day_microphysics')   # VIS008         IR_039(solar)  IR_108     # requires the pyspectral modul 
+    #in_msg.RGBs.append('day_microphysics')   # VIS008         IR_039(solar)  IR_108     # requires the pyspectral modul 
     #in_msg.RGBs.append('dust')               # IR_120-IR_108  IR_108-IR_087  IR_108
     #in_msg.RGBs.append('fog')
     #in_msg.RGBs.append('green_snow')
@@ -98,10 +96,10 @@ def input(in_msg):
     ##in_msg.RGBs.append('overview_sun')
     #in_msg.RGBs.append('red_snow')
     ##in_msg.RGBs.append('refl39_chan')        # requires the pyspectral modul
-    ##in_msg.RGBs.append('snow')               # requires the pyspectral modul
+    #in_msg.RGBs.append('snow')               # requires the pyspectral modul
     ##in_msg.RGBs.append('vis06')
     ##in_msg.RGBs.append('wv_high')
-    ##in_msg.RGBs.append('wv_low')
+    #in_msg.RGBs.append('wv_low')
     #-------------------
     # user defined RGBs
     #in_msg.RGBs.append('HRoverview')
@@ -154,11 +152,10 @@ def input(in_msg):
     #-------------------
     # H-SAF
     #-------------------
-    in_msg.sat = "Hsaf"
-    in_msg.sat_nr = 11
-    in_msg.RSS = False 
+    #in_msg.sat = "HSAF"
+    #in_msg.sat_nr=""
+    #in_msg.RSS=False 
     #in_msg.RGBs.append('h03')
-    in_msg.RGBs.append('h03b')
     #-------------------
     # experimental
     #in_msg.RGBs.append('clouddepth')     # test according to Mecikalski, 2010
@@ -167,58 +164,71 @@ def input(in_msg):
     #----------------
     # chose area
     #----------------
-    #in_msg.areas.append('EuropeCanary')
-    #in_msg.areas.append('EuropeCanary95')
-    in_msg.areas.append('EuropeCanaryS95')
+    #in_msg.areas.append('EuropeCanary')    # upper third of MSG disk, satellite at 0.0 deg East, full resolution 
+    #in_msg.areas.append('EuropeCanary95')  # upper third of MSG disk, satellite at 9.5 deg East, full resolution 
+    in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
+    #in_msg.areas.append('EuroMercator') # 
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
-    #in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
-    #in_msg.areas.append('alps')            # area around Swiss (!!!test phase!!!)
-    #in_msg.areas.append('ticino')          # 
+    in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
+    #in_msg.areas.append('alps95')          # area around Switzerland processed by NWCSAF software 349x151 
+    #in_msg.areas.append('ticino')          # stereographic proj of Ticino 342x311
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
     #in_msg.areas.append('fullearth')       # full earth 600x300                    # does not yet work
-    #in_msg.areas.append('met09globe')      # Cropped globe MSG image 3620x3620     # does not yet work
-    #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
-    #in_msg.areas.append('odysseyS25')
-    in_msg.check_RSS_coverage()
-
-    # switch off Rapid scan, if large areas are wanted 
-    if ('fullearth' in in_msg.areas) or ('met09globe' in in_msg.areas) or ('met09globeFull' in in_msg.areas): 
-       in_msg.RSS=False 
+    #in_msg.areas.append('SeviriDisk95')      # Cropped globe MSG image 3620x3620     # does not yet work
+    #in_msg.areas.append('SeviriDiskFull95')  # Full    globe MSG image 3712x3712     # does not yet work
+    #in_msg.areas.append('SeviriDiskFull00')  # Full    globe MSG image 3712x3712     # does not yet work
+    #in_msg.areas.append('SouthArabia')
+    #in_msg.areas.append('opera_odyssey')
+    
+    # Warning, if large areas are wanted and RSS is specified
+    if in_msg.RSS and (('fullearth' in in_msg.areas) or ('met09globe' in in_msg.areas) or ('met09globeFull' in in_msg.areas)): 
+        print        "*** WARNING, large areas are requested: ", in_msg.areas
+        print        "    as well as rapid scan service is specified, which covers only the uppermost 1/3 of the disk"
+        print        "    (1) continue with enter"
+        junk = input("    (2) abort with Ctrl+c")
 
     in_msg.check_input = False
+    #in_msg.reader_level="seviri-level4" 
     #in_msg.save_reprojected_data=['ccs4']
     in_msg.reprojected_data_filename='%(msg)s_%(area)s_%Y%m%d%H%M_nwcsaf.nc'
     in_msg.reprojected_data_dir='/data/COALITION2/database/meteosat/ccs4/%Y/%m/%d/'
     in_msg.save_statistics=False
 
-    in_msg.make_plots=True
-
+    in_msg.make_plots = True
+    in_msg.fill_value = (0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
     in_msg.add_title = True
-    in_msg.title = ["\n\n%(rgb)s (%(msg)s SEVIRI)"]
-    in_msg.title_y_line_nr = 1  # (INT) at which line should the title start
-    in_msg.add_borders = False
+    in_msg.add_borders = True
     in_msg.add_rivers = False
-    in_msg.add_logos = True
-    in_msg.add_colorscale = False
+    in_msg.add_logos = False
+    in_msg.add_colorscale = True
     in_msg.HRV_enhancement = False
 
     in_msg.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
     #in_msg.outputDir='./pics/'
     #in_msg.outputDir = "./%Y-%m-%d/%Y-%m-%d_%(rgb)s-%(area)s/"
     in_msg.outputDir = '/data/cinesat/out/'
+    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
 
     in_msg.compress_to_8bit=False
 
-    # please download the shape file 
-    # in_msg.mapDir='/opt/users/common/shapes/'
-
-    in_msg.scpOutput = True 
+    #in_msg.scpOutput = True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
-    
-    in_msg.postprocessing_areas=['EuropeCanaryS95'] # !!!!
-    in_msg.postprocessing_composite = ["h03b-ir108"]  # , "h03b-HRV"
-    #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03b-ir108"],["MSG_radar-HRV","MSG_h03b-HRV"]]
-    #                                 only ccs4                           only ccs4                       only odyssey                      only odyssey
-    #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03b-ir108"],["MSG_radar-HRV","MSG_h03b-HRV"],["MSG_RATE-ir108","MSG_h03b-ir108"],["MSG_RATE-HRV","MSG_h03b-HRV"]] # !!!!
+
+    # please download the shape file 
+    #in_msg.mapDir='/opt/users/common/shapes/'
+
+    in_msg.postprocessing_areas=["ccs4","EuropeCanaryS95"]
+    #in_msg.postprocessing_areas=['EuropeCanaryS95']
+    #in_msg.postprocessing_composite=["h03-ir108"] 
+    in_msg.postprocessing_composite=['C2rgb-IR_108']
+    #in_msg.postprocessing_composite=["CTT-ir108","CTH-ir108"] 
+    #in_msg.postprocessing_composite=["hrwdp-ir108", "hrwdc-ir108","streamd-ir108","hrwdr-ir108", "hrwdcnwp-ir108", "hrwdcnnwp-ir108"]    
+    #in_msg.postprocessing_composite=["hrwdr-ir108", "hrwdcnwp-ir108", "hrwdcnnwp-ir108", "streamd-ir108"]    
+    #in_msg.postprocessing_composite=["TRT-streamd-ir108", "TRT-streamd-HRV"] #"hrwdCT-ir108", "hrwdCT-HRV"
+    #in_msg.postprocessing_composite=["hrwdpH-streamdH-HRV", "hrwdpM-streamdM-HRV", "hrwdpL-streamdL-HRV"] #"hrwdCT-ir108", "hrwdCT-HRV"
+    #in_msg.postprocessing_composite=["hrwdp-streamd-HRV", "hrwdp-streamd-ir108"] #"hrwdCT-ir108", "hrwdCT-HRV"
+    #in_msg.postprocessing_composite=["hrwdpL-streamdL-HRV","hrwdpL-streamdL-ir108"] 
+    #in_msg.postprocessing_composite=["hrwdpH-streamdH-HRV","hrwdpH-streamdH-ir108"] 
+    #in_msg.postprocessing_composite=["hrwdp-streamd-ir108","TRT-streamd-ir108"] 

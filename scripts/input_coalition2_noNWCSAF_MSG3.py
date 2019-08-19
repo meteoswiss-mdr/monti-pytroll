@@ -12,7 +12,7 @@ def input(in_msg):
     #in_msg.sat_nr=9
     #in_msg.RSS=True
     in_msg.sat_nr=10
-    in_msg.RSS=False 
+    in_msg.RSS=True 
 
     # specify an delay (in minutes), when you like to process a time some minutes ago
     # e.g. current time               2015-05-31 12:33 UTC
@@ -152,7 +152,7 @@ def input(in_msg):
     
 
     # please download the shape file 
-    in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
+    #in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
     in_msg.mapResolution='i'       ## f  full resolution: Original (full) data resolution.          
                                    ## h  high resolution: About 80 % reduction in size and quality. 
                                    ## i  intermediate resolution: Another ~80 % reduction.          

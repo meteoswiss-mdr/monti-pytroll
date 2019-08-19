@@ -5,6 +5,7 @@ from my_msg_module import check_near_real_time
 import sys
 import inspect
 import socket
+from os import environ, getenv
 
 class input_msg_class:
 
@@ -30,6 +31,7 @@ class input_msg_class:
       self.save_reprojected_data = []
       self.save_statistics = False
       self.HRV_enhancement = False
+      self.load_data = True
       self.make_plots = True
       self.overwrite = True           # usually overwrite existing products
       self.fill_value = None          # black (0,0,0) / white (1,1,1) / transparent None  
@@ -45,6 +47,7 @@ class input_msg_class:
       self.scpOutputDir2 = None
       self.scpID2 = None
       self.scpProducts2 = []
+      self.ninjotifFilename = 'MET-%(sat_nr)s_%(RSS)s_%(rgb)s_%(area)s_%Y%m%d%H%M.tif'
       self.upload_ninjotif = False  
       self.socupload = False  
       self.socuploadFilename = 'r0305n.%Y%m%d%H%M.png' 
@@ -54,7 +57,21 @@ class input_msg_class:
       self.ftpServer=None
       self.ftpUser=None
       self.ftpPassword=None
-      self.mapDir = ""
+      self.mapDir = "" 
+      if socket.gethostname()[0:5] == 'zueub':
+         self.mapDir = "/data/OWARNA/hau/maps_pytroll/"
+      elif socket.gethostname()[0:5] == 'zuerh':
+         if environ.get('VENV') is not None:
+            self.mapDir = getenv('VENV')+"/share/shapes/" 
+            print "... use shape directory ", self.mapDir
+         else:
+            self.mapDir = "/data/OWARNA/hau/maps_pytroll/"
+      elif socket.gethostname()[0:7] == 'keschln' or socket.gethostname()[0:7]=="eschaln":
+         self.mapDir = "/store/msrad/sat/pytroll/shapes/"
+         print "... use shape directory ", self.mapDir
+      if self.mapDir == "": 
+         print "*** Warning, unknown location of the shape file for unknown computer "+socket.gethostname()
+         print "    please specify in the input file or produce satellite images without national borders"
       self.mapResolution = None
       self.indicate_mask = True
       self.add_title = True
@@ -62,6 +79,15 @@ class input_msg_class:
       self.title = None               # ' %(sat)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s'
       if socket.gethostname()[0:5] == 'zueub':
          self.font_file = "/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf"
+      elif socket.gethostname()[0:6] == 'zuerh4':
+         self.font_file = "/usr/java/jdk1.8.0_121/jre/lib/fonts/LucidaTypewriterBold.ttf" 
+      elif socket.gethostname()[0:5] == 'zuerh':
+         if environ.get('VENV') is not None:
+            self.font_file = getenv('VENV')+"/config_files/setup/LucidaTypewriterBold.ttf" 
+            print "... use font file ", self.font_file
+         else:
+            print "*** ERROR, unknown location of the ttf-file, environment variable VENV required"
+            quit()
       elif socket.gethostname()[0:7] == 'keschln' or socket.gethostname()[0:7]=="eschaln":
          self.font_file = "/usr/share/fonts/dejavu/DejaVuSansMono.ttf"
       else:
@@ -75,7 +101,10 @@ class input_msg_class:
       self.add_rivers = False
       self.river_color = None   # default blue for RGB images, and white for BW images
       self.add_logos = True
-      self.logos_dir = "/opt/users/common/logos/"
+      self.logos_dir = "/data/OWARNA/hau/logos/"
+      if environ.get('VENV') is not None:
+         self.logos_dir = getenv('VENV')+"/share/logos/"
+      print "... use logo images in  ", self.logos_dir
       self.add_colorscale = True
       self.fixed_minmax = True
       self.rad_min = {'VIS006':   0, 'VIS008':   0, 'IR_016':   0, 'IR_039': 210, 'WV_062': 210, 'WV_073': 190,\
@@ -86,14 +115,14 @@ class input_msg_class:
                       'WV_062-WV_073': -25, 'WV_062-IR_108': -70, 'WV_073-IR_134':-15, 'IR_087-IR_108':-4.0, 'IR_087-IR_120':-4,'IR_120-IR_108':-6,\
                       'sphr_bl': 0, 'sphr_cape': 150, 'sphr_diffbl': -1.5, 'sphr_diffhl': -0.75, 'sphr_diffki': -7, 'sphr_diffli': -2.5,\
                       'sphr_diffml': -2.5, 'sphr_diffshw': -2.5, 'sphr_difftpw': -3, 'sphr_hl': 0, 'sphr_ki': 0, 'sphr_li': -15, \
-                      'sphr_ml': 0, 'sphr_quality': 0, 'sphr_sflag': 0, 'sphr_shw': -15, 'sphr_tpw': 0, 'h03': 0, \
+                      'sphr_ml': 0, 'sphr_quality': 0, 'sphr_sflag': 0, 'sphr_shw': -15, 'sphr_tpw': 0, 'h03': 0, 'h03b': 0, \
                       'azidiff':0,'cth':0,'cldmask':0,'cot':0,'cph':0,'ctt':210.,'cwp':0,\
                       'dcld':0,'dcot':0,'dcwp':0,'dndv':0,'dreff':0,\
                       'precip':0,'precip_ir':0,'qa':0,'reff':0,'satz':0,'sds':0,'sds_cs':0,'sds_diff':0,'sds_diff_cs':0,\
                       'vza':0,'vaa':0,'sunz':0,'sza':0,'lat':-80,'lon':-80,'time_offset':0,\
                       'ot_anvilmean_brightness_temperature_difference':0,\
                       'SYNMSG_BT_CL_IR10.8': 205,'IR_108-COSMO-minus-MSG':-40,\
-                      'POH':0,'MESHS':2,'VIL':0}
+                      'POH':0,'MESHS':2,'VIL':0,'MaxEcho':-32,'EchoTOP15':0,'EchoTOP20':0,'EchoTOP45':0,'EchoTOP50':0}      
       self.rad_max = {'VIS006':  85, 'VIS008':  90, 'IR_016':  80, 'IR_039': 340, 'WV_062': 260, 'WV_073': 280,\
                       'IR_087': 320, 'IR_097': 285, 'IR_108': 320, 'IR_120': 320, 'IR_134': 290, 'HRV': 100,\
                       'VIS006c':  85, 'VIS008c':  90, 'IR_016c':  80, 'IR_039c': 340, 'WV_062c': 260, 'WV_073c': 280,\
@@ -102,40 +131,42 @@ class input_msg_class:
                       'WV_062-WV_073':   5,'WV_062-IR_108':    5, 'WV_073-IR_134':  5, 'IR_087-IR_108': 1.5, 'IR_087-IR_120': 4,'IR_120-IR_108': 2,\
                       'sphr_bl': 35, 'sphr_cape': 200, 'sphr_diffbl': 1.5, 'sphr_diffhl': 0.75, 'sphr_diffki': 7, 'sphr_diffli': 2.5,\
                       'sphr_diffml': 2.5, 'sphr_diffshw': 2.5, 'sphr_difftpw': 3, 'sphr_hl': 8, 'sphr_ki': 60, 'sphr_li': 25, \
-                      'sphr_ml': 45, 'sphr_quality': 5000, 'sphr_sflag': 20, 'sphr_shw': 25, 'sphr_tpw': 70, 'h03': 30, \
+                      'sphr_ml': 45, 'sphr_quality': 5000, 'sphr_sflag': 20, 'sphr_shw': 25, 'sphr_tpw': 70, 'h03': 30, 'h03b': 30, \
                       'azidiff':180,'cth':12,'cldmask':3,'cot':256,'cph':2,'ctt':320.,'cwp':10,\
                       'dcld':4,'dcot':50,'dcwp':10,'dndv':4,'dreff':20,\
                       'precip':256,'precip_ir':256,'qa':50,'reff':50,'satz':90,'sds':1200,'sds_cs':1200,'sds_diff':800,'sds_diff_cs':800,\
                       'vza':90,'vaa':360,'sunz':90,'sza':90,'lat':80,'lon':80,'time_offset':750,
                       'ot_anvilmean_brightness_temperature_difference':6,\
                       'SYNMSG_BT_CL_IR10.8': 320,'IR_108-COSMO-minus-MSG':40,\
-                      'POH':100,'MESHS':6,'VIL':75}
+                      'POH':100,'MESHS':6,'VIL':75,'MaxEcho':95,'EchoTOP15':16,'EchoTOP20':16,'EchoTOP45':16,'EchoTOP50':16}
       self.tick_marks= {'VIS006': 20, 'VIS008': 20, 'IR_016': 20, 'IR_039': 20, 'WV_062': 20, 'WV_073': 20,\
                         'IR_087': 20, 'IR_097': 20, 'IR_108': 20, 'IR_120': 20, 'IR_134': 20, 'HRV': 20,\
                         'vza': 5, 'vaa': 5, 'lat': 5, 'lon': 5,\
                         'CTH': 4, 'CTP':  100,'CTT': 20, 'CT': 1, 'CT_PHASE': 1, 'CMa': 1, 'CMa_DUST':  1, 'CMa_TEST': 1, 'CMa_VOLCANIC': 1, 'clouddepth':1,\
                         'sphr_bl': 5, 'sphr_cape': 10, 'sphr_diffbl': 0.5, 'sphr_diffhl': 0.5, 'sphr_diffki': 2, 'sphr_diffli': 0.5,\
                         'sphr_diffml': 1, 'sphr_diffshw': 0.5, 'sphr_difftpw': 1, 'sphr_hl': 1, 'sphr_ki': 5, 'sphr_li': 1, \
-                        'sphr_ml': 5, 'sphr_quality': 500, 'sphr_sflag': 1, 'sphr_shw': 1, 'sphr_tpw': 5, 'h03': 10, \
+                        'sphr_ml': 5, 'sphr_quality': 500, 'sphr_sflag': 1, 'sphr_shw': 1, 'sphr_tpw': 5, 'h03': 10, 'h03b': 10, \
                         'azidiff':10,'cth':1,'cldmask':1,'cot':10,'cph':1,'ctt':10.,'cwp':2,\
                         'dcld':1,'dcot':10,'dcwp':2,'dndv':1,'dreff':20,\
                         'precip':10,'precip_ir':10,'qa':10,'reff':10,'satz':10,'sds':100,'sds_cs':100,'sds_diff':100,'sds_diff_cs':100,\
                         'sunz':10,'sza':10,'lat':10,'lon':10,'time_offset':100,
                         'ot_anvilmean_brightness_temperature_difference':1,\
-                        'SYNMSG_BT_CL_IR10.8': 20,'MESHS':1}
+                        'SYNMSG_BT_CL_IR10.8': 20,'MESHS':1,\
+                        'POH':10,'MESHS':0.5,'VIL':5,'MaxEcho':10,'EchoTOP15':2,'EchoTOP20':2,'EchoTOP45':2,'EchoTOP50':2}
       self.minor_tick_marks = {'VIS006': 5, 'VIS008': 5, 'IR_016': 5, 'IR_039': 5, 'WV_062': 5, 'WV_073': 5,\
                         'IR_087': 5, 'IR_097': 5, 'IR_108': 5, 'IR_120': 5, 'IR_134': 5, 'HRV': 5,\
                         'vza': 1, 'vaa': 1, 'lat': 1, 'lon': 1,\
                         'CTH': 1, 'CTP':  50,'CTT': 5, 'CT': 1, 'CT_PHASE': 1, 'CMa': 1, 'CMa_DUST':  1, 'CMa_TEST': 1, 'CMa_VOLCANIC': 1, 'clouddepth':1,
                         'sphr_bl': 1, 'sphr_cape': 5, 'sphr_diffbl': 0.1, 'sphr_diffhl': 0.05, 'sphr_diffki': 0.5, 'sphr_diffli': 0.1,
                         'sphr_diffml': 0.5, 'sphr_diffshw': 0.1, 'sphr_difftpw': 0.5, 'sphr_hl': 0.5, 'sphr_ki': 1, 'sphr_li': 0.5, 
-                        'sphr_ml': 1, 'sphr_quality': 100, 'sphr_sflag': 1, 'sphr_shw': 0.2, 'sphr_tpw': 1, 'h03': 5, \
+                        'sphr_ml': 1, 'sphr_quality': 100, 'sphr_sflag': 1, 'sphr_shw': 0.2, 'sphr_tpw': 1, 'h03': 5, 'h03b': 5, \
                         'azidiff':2,'cth':0.2,'cldmask':1,'cot':2,'cph':1,'ctt':5.,'cwp':1,\
                         'dcld':1,'dcot':5,'dcwp':1,'dndv':1,'dreff':5,\
                         'precip':5,'precip_ir':5,'qa':2,'reff':2,'satz':2,'sds':10,'sds_cs':10,'sds_diff':10,'sds_diff_cs':10,\
                         'sunz':2,'sza':2,'lat':2,'lon':2,'time_offset':10,
                         'ot_anvilmean_brightness_temperature_difference':0.5,\
-                        'SYNMSG_BT_CL_IR10.8': 5,'MESHS':0.5}
+                        'SYNMSG_BT_CL_IR10.8': 5,'MESHS':0.5,\
+                        'POH':5,'MESHS':0.1,'VIL':1,'MaxEcho':5,'EchoTOP15':1,'EchoTOP20':1,'EchoTOP45':1,'EchoTOP50':1}
 
       self.postprocessing_areas     = []
       self.postprocessing_composite = []
@@ -388,7 +419,8 @@ class input_msg_class:
 
       chosen_settings['scale'] = scale
 
-      self.upload_ninjotif = True  
+      #self.upload_ninjotif = True  
+      #print ("set upload_ninjotif = True")
       self.modify_day_color = True
       self.indicate_sza = True
 

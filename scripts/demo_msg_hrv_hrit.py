@@ -6,7 +6,7 @@ import datetime
 from mpop.utils import debug_on
 debug_on()
 
-if False:
+if True:
     from my_msg_module import get_last_SEVIRI_date
     time_slot = get_last_SEVIRI_date(True, delay=5)
 else:

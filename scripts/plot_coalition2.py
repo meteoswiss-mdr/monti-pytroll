@@ -1359,7 +1359,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                         rgbArray2[:,:,2] = c2_data['b'].data
                         rgbArray2[:,:,3] = c2_data['a'].data
                         
-                        c2ninjotif_file = format_name (outputDir+'/'+in_msg.ninjotifFilename, data.time_slot, sat_nr=data.sat_nr(), RSS=True, area=area_ninjotif )
+                        c2ninjotif_file = format_name (outputDir+'/ninjo/'+in_msg.ninjotifFilename, data.time_slot, sat_nr=data.sat_nr(), RSS=True, area=area_ninjotif )
                         print ("... save ninjotif image: display ", c2ninjotif_file, " &")
                         PIL_image = Image.fromarray(rgbArray2, 'RGBA')
                         GEO_image = pilimage2geoimage(PIL_image, c2_data['r'].area_def, data.time_slot)
@@ -1381,8 +1381,8 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                                                 #"/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition3; "+
                                                 #"/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition4; "+
                                                 #"/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition5; "+
-                                                "sleep 4; "+
-                                                "rm  "+c2ninjotif_file+" &", shell=True)
+                                                #"sleep 4; ", shell=True)
+                                                "sleep 4; "+"rm  "+c2ninjotif_file+" &", shell=True)
                                 
                                 print ("rm "+c2ninjotif_file+" &")
                                 #subprocess.call("/tools/mch/datadisp/bin/jwscp_upload."+gethostname()+".tcoalition3 &", shell=True)
@@ -1437,7 +1437,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
           
                 if area == "ccs4" and in_msg.properties_cells == True:
                     print ("**** Computing properties of the cells")
-                    outputDir_labels = outputDir+'/labels/'
+                    outputDir_labels = in_msg.labelsDir
                     """
                     if 'labels_tracked' in in_msg.aux_results:        !!!! UH this might give very hard to find bugs
                         outputDir_labels = outputDir+'/labels/'       !!!! switching on an additional output changes the directory where to read from ...

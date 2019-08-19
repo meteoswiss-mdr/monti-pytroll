@@ -46,22 +46,23 @@ def input(in_msg):
     #----------------
     # chose area
     #----------------
-    in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
-    #in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
     #in_msg.areas.append('alps95')          # area around Switzerland processed by NWCSAF software 349x151 
     #in_msg.areas.append('ticino')          # stereographic proj of Ticino 342x311
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('EuropeCanary')    # upper third of MSG disk, satellite at 0.0 deg East, full resolution 
     #in_msg.areas.append('EuropeCanary95')  # upper third of MSG disk, satellite at 9.5 deg East, full resolution 
+    in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
     #in_msg.areas.append('fullearth')       # full earth 600x300                    # does not yet work
     #in_msg.areas.append('met09globe')      # Cropped globe MSG image 3620x3620     # does not yet work
     #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
     #in_msg.areas.append('odysseyS25')      # Area of Odyssey composite (factor 2.5 smaller)
+    in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640 (should be second after Europe)
     #in_msg.areas.append('EuropeCanaryS95') # "ccs4" "blitzortung" #"eurotv" # "eurotv"
     #in_msg.areas.append("EuroMercator")    # same projection as blitzortung.org
-    
+
+
     in_msg.check_RSS_coverage()
 
     in_msg.properties_cells = False
@@ -108,7 +109,7 @@ def input(in_msg):
 
     # directory containing the forecasted brightness temperatures
     if in_msg.nrt:
-        in_msg.nowcastDir = "/data/cinesat/out/"
+        in_msg.nowcastDir = "/data/cinesat/out/C2-BT-forecasts/"
     else:
         in_msg.nowcastDir = '/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels/'
 
@@ -173,7 +174,7 @@ def input(in_msg):
 
 
     # please download the shape file 
-    in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
+    #in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
     in_msg.mapResolution='i'       ## f  full resolution: Original (full) data resolution.          
                                    ## h  high resolution: About 80 % reduction in size and quality. 
                                    ## i  intermediate resolution: Another ~80 % reduction.          
@@ -349,7 +350,9 @@ def input(in_msg):
         #in_msg.chosen_settings['reader_level']="seviri-level4"
 
     ## !!! BAD FIX !!!
+    in_msg.reader_level="seviri-level8"
     #in_msg.reader_level="seviri-level4"
+
 
     #PLOTTING SETTINGS. Not used??
     #in_msg.layer = ''
@@ -365,7 +368,7 @@ def input(in_msg):
     in_msg.pickle_labels = False; in_msg.shelve_labels = False
 
     in_msg.postprocessing_areas= []
-    #in_msg.postprocessing_areas.append('EuropeCanaryS95')
+    in_msg.postprocessing_areas.append('EuropeCanaryS95')
     #in_msg.postprocessing_areas.append('EuroMercator')
     in_msg.postprocessing_areas.append("ccs4")
     

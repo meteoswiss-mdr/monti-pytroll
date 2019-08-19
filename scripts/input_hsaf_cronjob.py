@@ -157,7 +157,8 @@ def input(in_msg):
     in_msg.sat = "Hsaf"
     in_msg.sat_nr = 11
     in_msg.RSS = False 
-    in_msg.RGBs.append('h03')
+    #in_msg.RGBs.append('h03')
+    in_msg.RGBs.append('h03b')
     #-------------------
     # experimental
     #in_msg.RGBs.append('clouddepth')     # test according to Mecikalski, 2010
@@ -209,20 +210,20 @@ def input(in_msg):
     in_msg.compress_to_8bit=False
 
     # please download the shape file 
-    in_msg.mapDir='/opt/users/common/shapes/'
+    # in_msg.mapDir='/opt/users/common/shapes/'
 
-    in_msg.postprocessing_areas=['ccs4','EuropeCanaryS95','odysseyS25'] # !!!!
-    in_msg.postprocessing_composite = ["h03-HRVir108", "h03-VIS006ir108"]
-    #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03-ir108"],["MSG_radar-HRV","MSG_h03-HRV"]]
+    in_msg.postprocessing_areas=['ccs4','odysseyS25'] # !!!!
+    in_msg.postprocessing_composite = ["h03b-HRVir108", "h03b-VIS006ir108"]
+    #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03b-ir108"],["MSG_radar-HRV","MSG_h03b-HRV"]]
     #                                 only ccs4                           only ccs4                       only odyssey                      only odyssey
-    #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03-ir108"],["MSG_radar-HRV","MSG_h03-HRV"],["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]] # !!!!
+    #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03b-ir108"],["MSG_radar-HRV","MSG_h03b-HRV"],["MSG_RATE-ir108","MSG_h03b-ir108"],["MSG_RATE-HRV","MSG_h03b-HRV"]] # !!!!
 
     in_msg.scpOutput = True 
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
-    in_msg.scpProducts = ["h03-VIS006ir108",["MSG_RATE-VIS006ir108","MSG_h03-VIS006ir108"],["MSG_radar-HRVir108","MSG_h03-HRVir108"]]
+    in_msg.scpProducts = ["h03b-VIS006ir108",["MSG_RATE-VIS006ir108","MSG_h03b-VIS006ir108"],["MSG_radar-HRVir108","MSG_h03b-HRVir108"],"TRT-radar-convection","THX-radar-convection","radar-convection"]
 
     #in_msg.scpID2="-i /opt/users/cinesat/monti-pytroll/scripts/id_rsa_las"
     #in_msg.scpOutputDir2='las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s-%(area)s_'
     #in_msg.scpProducts2 = ['airmass','convection','HRoverview','natural']
-    #in_msg.scpProducts2 = ["h03-VIS006ir108",["MSG_RATE-VIS006ir108","MSG_h03-VIS006ir108"],["MSG_radar-HRVir108","MSG_h03-HRVir108"]]
+    #in_msg.scpProducts2 = ["h03b-VIS006ir108",["MSG_RATE-VIS006ir108","MSG_h03b-VIS006ir108"],["MSG_radar-HRVir108","MSG_h03b-HRVir108"]]

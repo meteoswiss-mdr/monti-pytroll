@@ -3,7 +3,7 @@
 set_utils_path() {
 #function set_utils_path {  # function syntax is not supported by crontab
     case $HOSTNAME in
-    "zueub"[2-4][0-9][0-9])
+    "zue"[ur][bh][2-4][0-9][0-9])
 	export UTILS_PATH=/opt/users/common/
 	export SAT_UTILS_PATH=/opt/users/common/ ;;
     "keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
@@ -22,13 +22,13 @@ set_conda_path() {
 #function set_conda_path {  # function syntax is not supported by crontab
     echo "set_conda_path" $1
     case $HOSTNAME in
-    "zueub"[2-4][0-9][0-9])
+    "zue"[ur][bh][2-4][0-9][0-9])
 	if [[ $# -eq 0 ]]; then 
 	    export CONDA_PATH="/opt/users/common/packages/anaconda2_$LOGNAME/"
 	else
 	    if [ "$1" == "python3" ] || [ "$1" == "py3" ] || [ "$1" == "3" ] ; then
 		echo "set_conda_path python3"
-		export CONDA_PATH="/opt/users/common/packages/anaconda37_$LOGNAME/"
+		export CONDA_PATH="/opt/users/common/packages/anaconda3_$LOGNAME/"
 	    else
 		echo "unknown command line option: set_conda_path" $1
 		export CONDA_PATH=""
@@ -42,6 +42,12 @@ set_conda_path() {
 	return ;;
 	#exit 1 ;;
     esac
+    if [ ! -d "$CONDA_PATH" ]; then
+	echo "ERROR, CONDA PATH " $CONDA_PATH "does not exists"
+	echo "       probably conda is not installed on this server"
+	echo "       please contact Ulrich Hamann"
+	return
+    fi
     export PATH=$CONDA_PATH"/bin:$PATH"
     echo "... set CONDA_PATH to: "$CONDA_PATH
     # echo conda version and conda & python path
@@ -73,7 +79,7 @@ set_conda_path() {
 set_pytroll_paths() {
 # function set_pytroll_paths {   # function syntax is not supported by crontab
 case $HOSTNAME in
-    "zueub"[2-4][0-9][0-9])
+    "zue"[ur][bh][2-4][0-9][0-9])
         if [ -d /opt/users/$LOGNAME/monti-pytroll/ ]
         then
             export PYTROLLHOME=/opt/users/$LOGNAME/monti-pytroll/

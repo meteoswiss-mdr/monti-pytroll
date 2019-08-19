@@ -2,15 +2,22 @@
 
 echo '***'
 echo '*** start produce_forecast_nrt.sh'
-. /opt/users/$LOGNAME/monti-pytroll/setup/bashrc no_virtual_environment
+
+case $HOSTNAME in
+    "zueub"[2-4][0-9][0-9])
+	. /opt/users/$LOGNAME/monti-pytroll/setup/bashrc no_virtual_environment
+	;;
+    "zuerh"[2-4][0-9][0-9])
+	. /opt/users/$LOGNAME/monti-pytroll/setup/start_py_virtual_env.sh
+	;;
+esac
+
 #export python=/usr/bin/python
 #export python=/opt/users/common/packages/anaconda3/envs/PyTroll_$LOGNAME/bin/python
 
-export dir1=$PYTROLLHOME/scripts
-cd ${dir1}
-
-python ${dir1}/produce_forecasts_nrt.py
-#$python ${dir1}/produce_forecasts_nrt.py > /tmp/produce_forecasts_nrt.txt 2>&1
+cd $PYTROLLHOME/scripts
+python $PYTROLLHOME/scripts/produce_forecasts_nrt.py
+#$python $PYTROLLHOME/scripts/produce_forecasts_nrt.py > /tmp/produce_forecasts_nrt.txt 2>&1
 
 # remove uncompressed data older than 10min
 export mm=60

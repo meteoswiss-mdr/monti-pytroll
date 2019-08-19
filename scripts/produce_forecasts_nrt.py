@@ -142,21 +142,20 @@ def get_cosmo_filenames (t_sat, nrt=True, runs_before = 0 ):
 
     yearS, monthS, dayS, hourS, minS = string_date(t_run)
 
-    if nrt:          
-        cosmo = "cosmo-1"
-    else:
-        cosmo = "cosmo2"
+    print "***get_cosmo_filenames***** nrt *******", nrt 
+
+    ### !!! NEED A PROPER FIX !!!!
+    #if nrt:          
+    #    cosmo = "cosmo-1"
+    #else:
+    #    cosmo = "cosmo2"
+    cosmo = "cosmo-1"
 
     if nrt:          
         cosmoDir='/data/cinesat/in/cosmo/' #2016052515_05_cosmo-1_UV_swissXXL
     else:
-        #cosmoDir='/data/COALITION2/database/cosmo/' #20150515_cosmo2_ccs4c2 / 2015051506_00_cosmo2_UVccs4c2.nc or 2015070706_00_cosmo2_UV_ccs4c2.nc
-        cosmoDir='/data/COALITION2/database/cosmo/test_wind/'
-
-    if nrt:
-        cosmoDir += "/"
-    else:
-        cosmoDir += yearS+monthS+dayS+"_"+cosmo+"_"+area+"/"
+        cosmoDir=t_sat.strftime('/data/COALITION2/database/cosmo/wind/%Y/%m/%d/') #20150515_cosmo2_ccs4c2 / 2015051506_00_cosmo2_UVccs4c2.nc or 2015070706_00_cosmo2_UV_ccs4c2.nc
+        #cosmoDir='/data/COALITION2/database/cosmo/test_wind/'
 
     cosmo_file1 = yearS+monthS+dayS+hourS+"_"+hour_forecast1+"_"+cosmo+"_UV*.nc"
     cosmo_file2 = yearS+monthS+dayS+hourS+"_"+hour_forecast2+"_"+cosmo+"_UV*.nc"
@@ -165,6 +164,7 @@ def get_cosmo_filenames (t_sat, nrt=True, runs_before = 0 ):
 
 def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure', area='ccs4', cosmo = None, nrt = False, rapid_scan_mode_satellite = True):
 
+    print "interpolate_cosmo nrt", nrt 
     file1, file2 = get_cosmo_filenames ( datetime(year,month,day,hour,minute), nrt=nrt )
 
     print "... search for ", file1, " and ", file2
@@ -463,6 +463,7 @@ if __name__ == '__main__':
     # load a few standard things 
     from get_input_msg import get_input_msg
     in_msg = get_input_msg('input_coalition2_cronjob')
+    #in_msg = get_input_msg('input_coalition2')
 
     in_msg.resolution = 'i'
     in_msg.sat="Meteosat-"
@@ -589,10 +590,13 @@ if __name__ == '__main__':
     time_slot = in_msg.datetime
     
     if in_msg.nrt:
-        outputDir="/data/cinesat/out/"
+        outputDir = in_msg.nowcastDir
     else:
         # old outputDir="/data/COALITION2/PicturesSatellite/LEL_results_wind/"
         outputDir=time_slot.strftime("/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels/")
+
+    if not exists(outputDir):
+        makedirs(outputDir)
 
     while time_slot <= time_slotSTOP:
     
@@ -654,7 +658,7 @@ if __name__ == '__main__':
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, in_msg.sat_nr_str(), "seviri", time_slot)
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
           #area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
-          area_loaded = load_products(global_data_CTP, ['CTP'], in_msg, get_area_def("ccs4"))
+          area_loaded_CTP = load_products(global_data_CTP, ['CTP'], in_msg, get_area_def("alps95"))
           data_CTP = global_data_CTP.project(area, precompute=True)
               
           [nx,ny]=data_CTP['CTP'].data.shape
@@ -719,6 +723,7 @@ if __name__ == '__main__':
                   u_d[level,:,:], v_d[level,:,:] = HRW_2dfield( hrw_detbas, obj_area )
       
           elif wind_source=="cosmo":
+              print "********** in_msg.nrt *******", in_msg.nrt
               print "year, month, day, hour, minute", year, month, day, hour, minute
               u_d, v_d = interpolate_cosmo(year, month, day, hour, minute, layers, zlevel, area, nrt=in_msg.nrt, rapid_scan_mode_satellite=True)
           else:

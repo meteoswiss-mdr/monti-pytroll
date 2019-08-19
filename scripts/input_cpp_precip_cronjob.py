@@ -223,7 +223,7 @@ def input(in_msg):
     in_msg.areas.append('odysseyS25')
 
     # please download the shape file 
-    in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
+    # in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
     in_msg.mapResolution=None      ## f  full resolution: Original (full) data resolution.          
                                    ## h  high resolution: About 80 % reduction in size and quality. 
                                    ## i  intermediate resolution: Another ~80 % reduction.          

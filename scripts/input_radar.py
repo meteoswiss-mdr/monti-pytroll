@@ -68,8 +68,8 @@ def input(in_msg):
     in_msg.check_RSS_coverage()
 
     # please download the shape file 
-    #in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
-    in_msg.mapDir='/opt/users/common/shapes/'
+    # in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
+    # in_msg.mapDir='/opt/users/common/shapes/'
     in_msg.mapResolution=None      ## f  full resolution: Original (full) data resolution.          
                                    ## h  high resolution: About 80 % reduction in size and quality. 
                                    ## i  intermediate resolution: Another ~80 % reduction.          
@@ -91,10 +91,11 @@ def input(in_msg):
     in_msg.save_statistics=False
 
     in_msg.make_plots=True
-    in_msg.fill_value=(0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
+    #in_msg.fill_value=(0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
+    in_msg.fill_value=None  # black (0,0,0) / white (1,1,1) / transparent None  
     in_msg.add_title = True
-    in_msg.title = [" %(sat)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s"]
-    in_msg.title_y_line_nr = 1  # (INT) at which line should the title start
+    in_msg.title = ["%(sat)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s"]
+    in_msg.title_y_line_nr = 2  # (INT) at which line should the title start
     in_msg.add_borders = True
     in_msg.border_color = 'red'
     in_msg.add_rivers = False
@@ -106,7 +107,7 @@ def input(in_msg):
 
     in_msg.outputFormats = ['png'] 
     #in_msg.outputFormats = ['png','ninjotif'] 
-    in_msg.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
+    in_msg.outputFile = 'RAD_%(rgb)s-%(area)s_%y%m%d%H%M.png'
     in_msg.outputDir='./pics/'
     #in_msg.outputDir = "./%Y-%m-%d/%Y-%m-%d_%(rgb)s-%(area)s/"
     #in_msg.outputDir = '/data/cinesat/out/'
@@ -117,7 +118,7 @@ def input(in_msg):
     in_msg.ninjotifFilename = 'MET%(sat_nr)s_%(RSS)s_%(rgb)s_%(area)s_%Y%m%d%H%M.tif' 
     in_msg.upload_ninjotif = False
 
-    #in_msg.postprocessing_areas=['ccs4']
+    in_msg.postprocessing_areas=['ccs4']
     #in_msg.postprocessing_areas=['EuropeCanaryS95']
     #in_msg.postprocessing_areas=["EuroMercator"]
 
@@ -143,7 +144,8 @@ def input(in_msg):
     #in_msg.postprocessing_composite=["hrwdpH-streamdH-HRV","hrwdpH-streamdH-ir108"]
     #in_msg.postprocessing_composite=["hrwdp-streamd-ir108","TRT-streamd-ir108"]
     #in_msg.postprocessing_composite=["TRT-radar-convection"] # "radar-convection",
-
+    in_msg.postprocessing_composite = ["VIL-HRVir108pc","POH-HRVir108pc","MESHS-HRVir108pc","EchoTOP15-HRVir108pc","EchoTOP20-HRVir108pc","EchoTOP45-HRVir108pc","EchoTOP50-HRVir108pc"]
+    
     #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03-ir108"],["MSG_radar-HRV","MSG_h03-HRV"],["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]]
     #in_msg.postprocessing_montage = [["MSG_h03-ir108","MSG_HRV"],["MSG_h03-ir108","MSG_test"]]
     #in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-radar-convection"]]

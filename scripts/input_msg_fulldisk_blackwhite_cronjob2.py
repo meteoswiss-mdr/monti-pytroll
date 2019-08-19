@@ -12,6 +12,7 @@ def input(in_msg):
     #in_msg.RSS=False 
     #in_msg.sat_nr=9
     #in_msg.RSS=True
+    #in_msg.RSS=False
     #in_msg.sat_nr=10
     #in_msg.RSS=False
     in_msg.sat_nr=11
@@ -257,7 +258,7 @@ def input(in_msg):
     in_msg.check_RSS_coverage()
 
     # please download the shape file 
-    in_msg.mapDir='/opt/users/common/shapes/'
+    #in_msg.mapDir='/opt/users/common/shapes/'
     in_msg.mapResolution=None      ## f  full resolution: Original (full) data resolution.          
                                    ## h  high resolution: About 80 % reduction in size and quality. 
                                    ## i  intermediate resolution: Another ~80 % reduction.          

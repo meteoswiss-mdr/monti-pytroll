@@ -269,7 +269,7 @@ def input(in_msg):
     in_msg.check_RSS_coverage()
 
     # please download the shape file 
-    in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
+    # in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
     in_msg.mapResolution=None      ## f  full resolution: Original (full) data resolution.          
                                    ## h  high resolution: About 80 % reduction in size and quality. 
                                    ## i  intermediate resolution: Another ~80 % reduction.          
@@ -319,7 +319,8 @@ def input(in_msg):
 
     in_msg.socupload = True
     in_msg.socuploadFilename = 'r0305n.%Y%m%d%H%M.png' 
-    in_msg.socuploadCommand = '/tools/ext/wman/custom/bin/socupload -s zuegts3,zuegts4 -f '+in_msg.socuploadFilename+' -c LSSX > /dev/null 2>&1 &' 
+    #in_msg.socuploadCommand = '/tools/ext/wman/custom/bin/socupload -s zuegts3,zuegts4 -f '+in_msg.socuploadFilename+' -c LSSX > /dev/null 2>&1 &' 
+    in_msg.socuploadCommand = '/tools/ext/wman/custom/bin/socupload -y %d%H%M -s zuegts3,zuegts4 -f '+in_msg.socuploadFilename+' -c LSSX > /tmp/socupload.log 2>&1 &' 
     #in_msg.socuploadCommand = '/tools/ext/wman/custom/bin/socupload -s zuegts3,zuegts4 -f '+in_msg.socuploadFilename+' -c LSSD > /dev/null 2>&1 &' 
     
     ##in_msg.postprocessing_areas=['ccs4']

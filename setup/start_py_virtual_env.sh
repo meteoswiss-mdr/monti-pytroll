@@ -2,16 +2,19 @@
 
 # .bashrc
 
+echo bashrc $1
+
 # Source global definitions
 if [ -f /etc/bashrc ]; then
-        . /etc/bashrc
+    echo 'start /etc/bashrc'
+    . /etc/bashrc
 fi
 
 #PS1='\[[\u@ \e[1;31m\]\h \e[0;37m\W]\$\[\e[0m\] '
 
 # when using cronjobs a few common shell variables are not set
 if ! test -n "${HOSTNAME}"; then
-    export HOSTNAME=`/bin/hostname` 
+    export HOSTNAME=`/bin/hostname`
     echo '... set HOSTNAME to:' ${HOSTNAME}
 fi
 if ! test -n "${USER}"; then
@@ -23,7 +26,9 @@ if ! test -n "${logname}"; then
     echo '... set logname to:' ${LOGNAME}
 fi
 
-
+echo ''
+echo '*** current SHELL variables'
+echo "SHELL "${SHELL}
 echo "USER" ${USER}
 echo "\$(logname)" $(logname)
 echo "\$LOGNAME" $LOGNAME
@@ -31,59 +36,45 @@ echo "uname -mrs:" `uname -mrs`
 echo "whoami:" `/usr/bin/whoami`
 
 case $HOSTNAME in
-    "zueub"[2-4][0-9][0-9])
-	if [ -d /opt/users/$LOGNAME/monti-pytroll/ ]
+    "zue"[ur][bh][2-4][0-9][0-9])
+        if [ -d /opt/users/$LOGNAME/monti-pytroll/ ]
         then
-	    echo ". /opt/users/$LOGNAME/monti-pytroll/setup/set_paths.sh"
             #source /opt/users/$LOGNAME/monti-pytroll/setup/set_paths.sh   # source is not supported by cronjobs
-	    . /opt/users/$LOGNAME/monti-pytroll/setup/set_paths.sh
+            . /opt/users/$LOGNAME/monti-pytroll/setup/set_paths.sh
         else
-	    echo ". /opt/users/$LOGNAME/PyTroll/setup/set_paths.sh"
             #source /opt/users/$LOGNAME/PyTroll/setup/set_paths.sh         # source is not supported by cronjobs
-	    . /opt/users/$LOGNAME/PyTroll/setup/set_paths.sh
+            . /opt/users/$LOGNAME/PyTroll/setup/set_paths.sh
         fi
-	alias ncdump=/usr/bin/ncdump
-	export http_proxy=http://proxy.meteoswiss.ch:8080
-	export https_proxy=https://proxy.meteoswiss.ch:8080
-	if [ $HOSTNAME == "hau" ]; then
-	    echo "*** change XAUTHORITY"
-	    export XAUTHORITY=/home/lom/users/$LOGNAME/.Xauthority
-	fi
-	export FULLNAME=`getent passwd $LOGNAME | cut -d ":" -f 5 | cut -d "," -f 1`
-	export FIRSTNAME=`echo $FULLNAME | cut -d " " -f 1`
-	export LASTNAME=`echo $FULLNAME | cut -d " " -f 2`
-	export EMAIL=${FIRSTNAME}.${LASTNAME}@meteoswiss.ch
-	;;
+        ;;
     "keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
         # tmp !!!! BAD DIRTY FIX !!!!
         export LOGNAME_ORG=$LOGNAME
         export LOGNAME=hamann
-	# source /users/$LOGNAME/monti-pytroll/setup/set_paths.sh  # load functions from this script
-	. /users/$LOGNAME/monti-pytroll/setup/set_paths.sh
-	;;
+        # source /users/$LOGNAME/monti-pytroll/setup/set_paths.sh  # load functions from this script
+        . /users/$LOGNAME/monti-pytroll/setup/set_paths.sh
+        ;;
     *)
-	echo "ERROR (1) in setup/bashrc: unknown computer ---"$HOSTNAME"---"
-	return ;;
-	#exit 1 ;;
+        echo "ERROR (1) in setup/bashrc: unknown computer ---"$HOSTNAME"---"
+        return ;;
+        #exit 1 ;;
 esac
 
 set_utils_path
-set_conda_path
-if [ ! -d "$CONDA_PATH" ]; then
-    echo "ERROR, CONDA PATH " $CONDA_PATH "does not exists"
-    return
-fi
+####set_conda_path
 set_pytroll_paths
 
-export PPP_CONFIG_DIR=$PYTROLLHOME/cfg_offline/
+export PPP_CONFIG_DIR=$PYTROLLHOME/etc/
 echo "... set PPP_CONFIG_DIR to: "$PPP_CONFIG_DIR
 
+echo '... configure host dependent settings, HOSTNAME='$HOSTNAME
 case $HOSTNAME in
-"zueub"[2-4][0-9][0-9])
+"zue"[ur][bh][2-4][0-9][0-9])
     # special settings only for zueub computers
-    if [[ $HOSTNAME == "zueub427" ]] || [[ $HOSTNAME == "zueub428" ]]; then 
-	alias tkdiff='echo tkdiff is too old, use \"meld\" instead; echo  meld '
+    if [ $HOSTNAME == "zueub427" ] || [ $HOSTNAME == "zueub428" ]; then
+        alias tkdiff='echo tkdiff is too old, use \"meld\" instead; echo  meld '
     fi
+    alias ncdump=/usr/bin/ncdump
+    echo "... open proxy ports 8080"
     export http_proxy=http://proxy.meteoswiss.ch:8080
     export https_proxy=https://proxy.meteoswiss.ch:8080
     if [ $HOSTNAME == "hau" ]; then
@@ -96,10 +87,10 @@ case $HOSTNAME in
     export EMAIL=${FIRSTNAME}.${LASTNAME}@meteoswiss.ch
     #if [ -f /usr/bin/tkdiff ]
     #then
-    #	echo "...use /usr/bin/tkdiff"
+    #   echo "...use /usr/bin/tkdiff"
     #else
-    #	echo "...use /opt/users/common/packages/tkdiff-unix/tkdiff"
-    #	alias tkdiff='/opt/users/common/packages/tkdiff-unix/tkdiff'
+    #   echo "...use /opt/users/common/packages/tkdiff-unix/tkdiff"
+    #   alias tkdiff='/opt/users/common/packages/tkdiff-unix/tkdiff'
     #fi
     ;;
 "keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
@@ -111,7 +102,7 @@ case $HOSTNAME in
 esac
 
 #export PY_SHAPEFILES=$PYTROLLHOME/shapes/
-
+echo '... set PYTHONPATH to:'$CONDA_PATH/bin:$PYTROLLHOME/scripts
 export PYTHONPATH=$CONDA_PATH/bin:$PYTROLLHOME/scripts
 
 # activate virtual environment
@@ -125,9 +116,12 @@ else
     # deactivate any running virtual environment (activated before)
     source deactivate
     # activate new environment
-    echo "*** activate virtual environment: source activate PyTroll_"$LOGNAME
-    source activate PyTroll_$LOGNAME
+    export ENV_PATH=/opt/users/hau/C2python2_env
+    echo "*** activate virtual environment: source "$ENV_PATH"/bin/activate"
+    ##### source activate PyTroll_$LOGNAME  
+    source $ENV_PATH/bin/activate
 fi
+
 
 
 # some useful alias commands
@@ -137,6 +131,9 @@ alias ls='ls --color=auto'
 # tmp !!!! BAD DIRTY FIX !!!!
 case $HOSTNAME in
     "keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
-	export LOGNAME=$LOGNAME_ORG
-	;;
+        export LOGNAME=$LOGNAME_ORG
+        ;;
 esac
+
+
+

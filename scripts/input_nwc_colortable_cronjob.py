@@ -200,8 +200,7 @@ def input(in_msg):
     in_msg.scpProducts = ["CTH-HRVir108","CTT-HRVir108","sphr_cape-HRVir108",["MSG_radar-HRVir108","MSG_CRR-HRVir108","MSG_CRPh-HRVir108"]]
     
     # please download the shape file 
-    #in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
-    in_msg.mapDir='/opt/users/common/shapes/'
+    # in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
     in_msg.mapResolution=None       ## f  full resolution: Original (full) data resolution.          
                                     ## h  high resolution: About 80 % reduction in size and quality. 
                                     ## i  intermediate resolution: Another ~80 % reduction.          

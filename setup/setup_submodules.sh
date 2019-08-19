@@ -70,15 +70,27 @@ git submodule foreach -q --recursive 'branch="$(git config -f $toplevel/.gitmodu
 echo "Does this look good? (press enter to continue or CTRL+c to abort)"
 read junk
 
-which conda
-echo "Is the correct anaconda activated? (press enter to continue or CTRL+c to abort)"
-read junk
+case $HOSTNAME in
+    "zueub"[2-4][0-9][0-9]|"keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
+	# check conda installation 
+	which conda
+	echo "Is the correct anaconda activated? (press enter to continue or CTRL+c to abort)"
+	read junk
 
-echo ""
-echo "*** Activate virtual environment " PyTroll_$LOGNAME
-echo "============================================= "
-#source activate PyTroll_$(logname) -> logname points to hau, even when using cinesat
-source activate PyTroll_${LOGNAME}
+	echo ""
+	echo "*** Activate virtual environment " PyTroll_$LOGNAME
+	echo "============================================= "
+	#source activate PyTroll_$(logname) -> logname points to hau, even when using cinesat
+	source activate PyTroll_${LOGNAME}
+	;;
+    "zuerh"[2-4][0-9][0-9])
+	echo ""
+	echo "*** Activate python virtualenv "
+	echo "============================================= "
+	export ENV_PATH=/opt/users/hau/C2python2_env
+	source $ENV_PATH/bin/activate
+	;;
+esac
 echo "Is the virtual environement active? (press enter to continue or CTRL+c to abort)"
 read junk
 
@@ -137,15 +149,28 @@ done
 
 echo "*** check your easy-install file, if all packages are installed with develop option"
 echo "    all PyTroll packages shoud look like this:"
-echo "trollimage (1.5.0, /opt/users/"$LOGNAME"/PyTroll/packages/trollimage)"
-echo "    if this is not the case, deinstall and reinstall as develop version"
-echo "pip uninstall package_name"
-echo "cd packages/package_name"
-echo "python setup.py develop"
-echo "==============================================="
-echo "more $CONDA_PATH/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth"
-more $CONDA_PATH/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth
-
+case $HOSTNAME in
+    "zueub"[2-4][0-9][0-9]|"keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
+	echo "trollimage (1.5.0, /opt/users/"$LOGNAME"/PyTroll/packages/trollimage)"
+	echo "    if this is not the case, deinstall and reinstall as develop version"
+	echo "pip uninstall package_name"
+	echo "cd packages/package_name"
+	echo "python setup.py develop"
+	echo "==============================================="
+	echo "more $CONDA_PATH/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth"
+	more $CONDA_PATH/envs/PyTroll_$LOGNAME/lib/python2.7/site-packages/easy-install.pth
+	;;
+    "zuerh"[2-4][0-9][0-9])
+	echo "/opt/users/hau/monti-pytroll/packages/mpop"
+	echo "    if this is not the case, deinstall and reinstall as develop version"
+	echo "pip uninstall package_name"
+	echo "cd packages/package_name"
+	echo "python setup.py develop"
+	echo "==============================================="
+	echo "more $ENV_PATH/lib/python2.7/site-packages/easy-install.pth"
+	more $ENV_PATH/lib/python2.7/site-packages/easy-install.pth
+	;;
+esac 
 
 echo "*** Deactivate virtual environment"
 source deactivate

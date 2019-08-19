@@ -167,17 +167,19 @@ def input(in_msg):
     #----------------
     #in_msg.areas.append('EuropeCanary')
     #in_msg.areas.append('EuropeCanary95')
-    #in_msg.areas.append('EuropeCanaryS95')
+    in_msg.areas.append('EuropeCanaryS95')
+    #in_msg.areas.append('hsaf')
+    #in_msg.areas.append('hsaf_merc')
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
-    in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
+    #in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
     #in_msg.areas.append('alps')            # area around Swiss (!!!test phase!!!)
     #in_msg.areas.append('ticino')          # 
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
     #in_msg.areas.append('fullearth')       # full earth 600x300                    # does not yet work
     #in_msg.areas.append('met09globe')      # Cropped globe MSG image 3620x3620     # does not yet work
     #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
-    #in_msg.areas.append('odysseyS25')
+    in_msg.areas.append('odysseyS25')
     in_msg.check_RSS_coverage()
 
     # switch off Rapid scan, if large areas are wanted 
@@ -196,6 +198,7 @@ def input(in_msg):
     in_msg.make_plots=True
 
     in_msg.add_title = True
+    in_msg.title_y_line_nr = 2  # (INT) at which line should the title start
     in_msg.add_borders = True
     in_msg.add_rivers = False
     in_msg.add_logos = False
@@ -212,7 +215,7 @@ def input(in_msg):
     in_msg.compress_to_8bit=False
 
     # please download the shape file 
-    in_msg.mapDir='/opt/users/common/shapes/'
+    # in_msg.mapDir='/opt/users/common/shapes/'
 
     #in_msg.scpOutput=True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
@@ -228,3 +231,7 @@ def input(in_msg):
     in_msg.scpOutputDir2='las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s-%(area)s_'
     #in_msg.scpProducts2 = ['airmass','convection','HRoverview','natural']
     in_msg.scpProducts2 = ["h03-ir108"]
+
+    #in_msg.postprocessing_areas=["ccs4"]
+    in_msg.postprocessing_areas=['EuropeCanaryS95']
+    in_msg.postprocessing_composite=["h03-VIS006ir108"] 

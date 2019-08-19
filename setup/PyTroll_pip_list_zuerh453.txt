@@ -1,0 +1,90 @@
+Package                       Version             Location                                                    
+----------------------------- ------------------- ------------------------------------------------------------
+aapp-runner                   0.0.1               /opt/users/hau/monti-pytroll/packages/pytroll-aapp-runner   
+aggdraw                       1.3.10              /opt/users/hau/monti-pytroll/packages/aggdraw               
+appdirs                       1.4.3               
+asn1crypto                    0.24.0              
+backports.functools-lru-cache 1.5                 
+bcrypt                        3.1.6               
+bitstring                     3.1.5               
+certifi                       2019.3.9            
+cffi                          1.12.2              
+cftime                        1.0.3.4             
+chardet                       3.0.4               
+cloudpickle                   0.8.1               
+configobj                     5.0.6               
+cryptography                  2.6.1               
+cspp-runner                   0.0.1               /opt/users/hau/monti-pytroll/packages/pytroll-cspp-runner   
+cycler                        0.10.0              
+dask                          1.1.5               
+decorator                     4.4.0               
+docutils                      0.14                
+dpath                         1.4.2               
+enum34                        1.1.6               
+h5py                          2.9.0               
+idna                          2.8                 
+ipaddress                     1.0.22              
+matplotlib                    2.1.2               
+mipp                          1.1.0               /opt/users/hau/monti-pytroll/packages/mipp                  
+modis-runner                  0.0.1               /opt/users/hau/monti-pytroll/packages/pytroll-modis-runner  
+mpmath                        1.1.0               
+mpop                          1.5.1               /opt/users/hau/monti-pytroll/packages/mpop                  
+netCDF4                       1.5.0.1             
+netifaces                     0.10.9              
+networkx                      2.2                 
+numexpr                       2.6.9               
+numpy                         1.16.0              
+osisaf-runner                 0.0.1               /opt/users/hau/monti-pytroll/packages/pytroll-osisaf-runner 
+pandas                        0.24.2              
+paramiko                      2.4.2               
+patsy                         0.5.1               
+Pillow                        6.0.0               
+pip                           19.0.3              
+posttroll                     1.5.0               /opt/users/hau/monti-pytroll/packages/posttroll             
+pps-runner                    0.0.1               /opt/users/hau/monti-pytroll/packages/pytroll-pps-runner    
+product-filter                0.0.1               /opt/users/hau/monti-pytroll/packages/pytroll-product-filter
+pyasn1                        0.4.5               
+pycoast                       1.2.2               /opt/users/hau/monti-pytroll/packages/pycoast               
+pycparser                     2.19                
+pydecorate                    0.2.1               /opt/users/hau/monti-pytroll/packages/pydecorate            
+pygac                         1.0.1               /opt/users/hau/monti-pytroll/packages/pygac                 
+pygranule                     0.1.0               /opt/users/hau/monti-pytroll/packages/pygranule             
+pyinotify                     0.9.6               
+pykdtree                      1.3.1               /opt/users/hau/monti-pytroll/packages/pykdtree              
+PyNaCl                        1.3.0               
+pyninjotiff                   0.1.0               /opt/users/hau/monti-pytroll/packages/pyninjotiff           
+pyorbital                     1.0.1+147.gbee15f0  /opt/users/hau/monti-pytroll/packages/pyorbital             
+pyparsing                     2.4.0               
+pyproj                        2.1.2               
+pyresample                    1.1.5+1097.gbdcdfd2 /opt/users/hau/monti-pytroll/packages/pyresample            
+pyshp                         2.1.0               
+pyspectral                    0.3.0+420.g8aea340  /opt/users/hau/monti-pytroll/packages/pyspectral            
+python-dateutil               2.8.0               
+python-geotiepoints           1.1.7               
+pytroll-collectors            0.8.2               /opt/users/hau/monti-pytroll/packages/pytroll-collectors    
+pytroll-schedule              0.5.2               /opt/users/hau/monti-pytroll/packages/pytroll-schedule      
+pytz                          2018.9              
+PyWavelets                    1.0.2               
+PyYAML                        5.1                 
+pyzmq                         18.0.1              
+requests                      2.21.0              
+satpy                         0.13.0+73.g5a75f75  /opt/users/hau/monti-pytroll/packages/satpy                 
+scikit-image                  0.14.2              
+scipy                         1.2.1               
+scp                           0.13.2              
+setuptools                    40.8.0              
+six                           1.12.0              
+statsmodels                   0.9.0               
+subprocess32                  3.5.3               
+sympy                         1.3                 
+toolz                         0.9.0               
+trollbufr                     0.10.3              /opt/users/hau/monti-pytroll/packages/trollbufr             
+trollduction                  1.3.1               /opt/users/hau/monti-pytroll/packages/trollduction          
+trollflow                     0.6.0               /opt/users/hau/monti-pytroll/packages/trollflow             
+trollflow-sat                 0.12.0              /opt/users/hau/monti-pytroll/packages/trollflow-sat         
+trollimage                    0.4.0+239.g2a75259  /opt/users/hau/monti-pytroll/packages/trollimage            
+trollmoves                    0.1.2               /opt/users/hau/monti-pytroll/packages/trollmoves            
+trollsift                     0.3.2               /opt/users/hau/monti-pytroll/packages/trollsift             
+urllib3                       1.24.1              
+wheel                         0.33.1              
+xarray                        0.12.0              

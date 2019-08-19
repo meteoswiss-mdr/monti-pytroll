@@ -8,11 +8,11 @@ rgbs="[VIS006 VIS008 IR_016 IR_039 WV_062 WV_073 IR_087 IR_097 IR_108 IR_120 IR_
 echo ""
 
 echo "*** create dates"
-if [ 1 -eq 1 ]; then
+if [ 1 -eq 0 ]; then
     # check old dates from archive (offline modus)
-    date_start="2015-07-07 00:00"
+    date_start="2019-04-26 00:00"
     date_start_s=$(/bin/date --date "$date_start" +"%s")
-    date_end="2015-07-07 23:55"
+    date_end="2019-04-28 23:55"
     date_end_s=$(/bin/date --date "$date_end" +"%s")
     . /opt/users/cinesat/monti-pytroll/setup/bashrc_offline no_virtual_environment
     # check satellite in the input file (MSG2 or MSG3) depending on start/end time in line 105/106 and 109/110 
@@ -22,7 +22,7 @@ else
     date_end_s=$(/bin/date --date "$date_end" +"%s") 
     check_time=$(expr 6 \* 60 \* 60 )          # check for the last 6 hours 
     #date_start_s=$(echo "$date_end_s - $check_time" | bc)
-    date_start_s=$(expr $date_end_s - $check_time )
+    date_start_s=$(expr $date_end_s - $check_time ) 
     date_start=$(/bin/date -d @$date_start_s +"%Y-%m-%d %H:%M")
     . /opt/users/cinesat/monti-pytroll/setup/bashrc_offline no_virtual_environment
     # check satellite in the input file (MSG2 or MSG3) depending on start/end time in line 105/106 and 109/110 

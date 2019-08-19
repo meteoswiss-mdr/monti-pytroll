@@ -1,7 +1,7 @@
 from datetime import datetime
 import sys, string, os
 import logging
-sys.path.insert(0, "/home/lom/users/cll/pytroll/install/lib/python2.6/site-packages")
+#sys.path.insert(0, "/home/lom/users/cll/pytroll/install/lib/python2.6/site-packages")
 from mpop.satellites import GeostationaryFactory
 from mpop.projector import get_area_def
 from mpop.utils import debug_on
@@ -36,7 +36,7 @@ if len(sys.argv) > 1:
     if len(sys.argv) < 6:
         print "***           "
         print "*** Warning, please specify date and time completely, e.g."
-        print "***          python plot_radar.py 2014 07 23 16 10 "
+        print "***          python plot_trt_cronjob.py 2014 07 23 16 10 "
         print "***           "
         quit() # quit at this point
     else:
@@ -77,6 +77,7 @@ else:
     cell_ID=''
     cell_dir=''
     global_data.load(['TRTcells']) # ,min_rank=8
+    print "... plot all cells"
 
 #if hasattr(global_data, 'traj_IDs'):
 #    print ""

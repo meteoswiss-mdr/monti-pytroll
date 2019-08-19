@@ -179,6 +179,7 @@ if read_COALITION3:
         TRT_tmp=TRT_Rank_Pred.at_time(time_slot)[['TRT_Rank_pred|5','TRT_Rank_pred|10','TRT_Rank_pred|15','TRT_Rank_pred|20','TRT_Rank_pred|25','TRT_Rank_pred|30','TRT_Rank_pred|35','TRT_Rank_pred|40','TRT_Rank_pred|45']]
         RANKr_0 = TRT_Rank_Pred.at_time(t_0_str)['RANKr']
         Rank_predicted = [RANKr_0.iloc[0]/10.,TRT_tmp.iloc[0]['TRT_Rank_pred|5'],TRT_tmp.iloc[0]['TRT_Rank_pred|10'],TRT_tmp.iloc[0]['TRT_Rank_pred|15'],TRT_tmp.iloc[0]['TRT_Rank_pred|20'],TRT_tmp.iloc[0]['TRT_Rank_pred|25'],TRT_tmp.iloc[0]['TRT_Rank_pred|30'],TRT_tmp.iloc[0]['TRT_Rank_pred|35'],TRT_tmp.iloc[0]['TRT_Rank_pred|40'],TRT_tmp.iloc[0]['TRT_Rank_pred|45']]
+        print Rank_predicted
     else:
         Rank_predicted=None
 else:

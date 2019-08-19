@@ -11,12 +11,14 @@ def input(in_msg):
     #in_msg.sat_nr=8
     #in_msg.RSS=False 
     #in_msg.sat_nr=9
-    #in_msg.RSS=True  
+    #in_msg.RSS=True 
     in_msg.sat_nr=10
     in_msg.RSS=True
+    #in_msg.sat_nr=11
+    #in_msg.RSS=False
 
-    in_msg.delay=5 # process image 'delay' minutes before now
-
+    #in_msg.delay=5 # process image 'delay' minutes before now
+    
     if False:
         # offline mode (always a fixed time) # ignores command line arguments
         year=2015
@@ -60,13 +62,15 @@ def input(in_msg):
     #in_msg.RGBs.append('HRVc')         # colored version
     #-------------------
     # satellite channel differences
-    #in_msg.RGBs.append('WV_062_minus_WV_073')
-    #in_msg.RGBs.append('WV_062_minus_IR_108')
-    #in_msg.RGBs.append('WV_073_minus_IR_134')
-    #in_msg.RGBs.append('IR_087_minus_IR_108')      
-    #in_msg.RGBs.append('IR_087_minus_IR_120')      
-    #in_msg.RGBs.append('IR_120_minus_IR_108')
+    #in_msg.RGBs.append('WV_062-WV_073')
+    #in_msg.RGBs.append('WV_062-IR_108')
+    #in_msg.RGBs.append('WV_073-IR_134')
+    #in_msg.RGBs.append('IR_087-IR_108')      
+    #in_msg.RGBs.append('IR_087-IR_120')      
+    #in_msg.RGBs.append('IR_120-IR_108')
     #in_msg.RGBs.append('trichannel')
+    #in_msg.RGBs.append('IR_039-IR_108')
+    #in_msg.RGBs.append('VIS006-IR_016')
     #-------------------
     # buil in RGBs, see http://mpop.readthedocs.org/en/latest/pp.html
     #                or  http://oiswww.eumetsat.int/~idds/html/doc/best_practices.pdf
@@ -76,11 +80,11 @@ def input(in_msg):
     #in_msg.RGBs.append('cloudtop')
     #in_msg.RGBs.append('convection')         # WV_062-WV_073  IR_039-IR_108  IR_016-VIS006
     ##in_msg.RGBs.append('convection_co2')
-    ##in_msg.RGBs.append('day_microphysics')   # VIS008         IR_039(solar)  IR_108     # requires the pyspectral modul
+    in_msg.RGBs.append('day_microphysics')   # VIS008         IR_039(solar)  IR_108     # requires the pyspectral modul
     #in_msg.RGBs.append('dust')               # IR_120-IR_108  IR_108-IR_087  IR_108
     #in_msg.RGBs.append('fog')
     #in_msg.RGBs.append('green_snow')
-    in_msg.RGBs.append('ir108')
+    #in_msg.RGBs.append('ir108')
     #in_msg.RGBs.append('natural')            # IR_016         VIS008         VIS006
     #in_msg.RGBs.append('night_fog')
     #in_msg.RGBs.append('night_microphysics') # IR_120-IR_108  IR_108-IR_039  IR_108
@@ -97,7 +101,11 @@ def input(in_msg):
     # user defined RGBs
     #in_msg.RGBs.append('HRoverview')
     ##in_msg.RGBs.append('sandwich')
+    #in_msg.RGBs.append('sza')
     ##in_msg.RGBs.append('ndvi')
+    #in_msg.RGBs.append('HRVFog')
+    #in_msg.RGBs.append('DayNightFog')
+    #in_msg.RGBs.append('HRVir108')    
     #-------------------
     # NWC SAF
     ## NWC SAF PEG 1
@@ -140,9 +148,9 @@ def input(in_msg):
     #----------------
     # chose area
     #----------------
-    in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
-    #in_msg.areas.append('alps')            # a bit larger than CCS4 
-    #in_msg.areas.append('ticino')          # zoom to Ticino
+    in_msg.areas.append('ccs4')            # CCS4 Swiss projection 710x640
+    #in_msg.areas.append('alps')            # CCS4 Swiss projection 710x640
+    #in_msg.areas.append('ticino')            # CCS4 Swiss projection 710x640
     #in_msg.areas.append('EuropeCanary')
     #in_msg.areas.append('EuropeCanary95')
     #in_msg.areas.append('EuropeCanaryS95')
@@ -152,18 +160,17 @@ def input(in_msg):
     #in_msg.areas.append('fullearth')       # full earth 600x300                    # does not yet work
     #in_msg.areas.append('met09globe')      # Cropped globe MSG image 3620x3620     # does not yet work
     #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
-    #in_msg.areas.append('odysseyS25')    
     in_msg.check_RSS_coverage()
         
     in_msg.check_input = True    # for radiances check always PRO and EPI files
     #in_msg.check_input = False    # for radiances check always PRO and EPI files
     #in_msg.save_reprojected_data=['EuropeCanaryS95','ccs4']
-    in_msg.save_reprojected_data=[]
+    #in_msg.save_reprojected_data=['ccs4']
     in_msg.reprojected_data_filename='%(msg)s_%(area)s_%Y%m%d%H%M_rad.nc'
     #in_msg.reprojected_data_filename='MSG_test_%Y%m%d%H%M.nc'
     in_msg.reprojected_data_dir='/data/COALITION2/database/meteosat/ccs4/%Y/%m/%d/'
     #in_msg.save_statistics=True
-    in_msg.HRV_enhancement=False
+    in_msg.HRV_enhancement=None
 
     #in_msg.make_plots=False
     in_msg.make_plots=True
@@ -179,6 +186,16 @@ def input(in_msg):
     in_msg.scpOutput = False
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
+    #default: in_msg.scpProducts = ['all']
+    in_msg.scpProducts = ['airmass','ash','cloudtop','convection','day_microphysics','dust','fog',\
+                           'DayNightFog','green_snow','natural','night_fog','night_microphysics','night_overview','overview','red_snow',\
+                           'HRoverview','THX-radar-convection','TRT-radar-convection','radar-convection']
+    #in_msg.scpID2="-i /opt/users/cinesat/monti-pytroll/scripts/id_rsa_las"
+    #in_msg.scpOutputDir2='las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s-%(area)s_'
+    #in_msg.scpProducts2 = ['airmass','convection','HRoverview','natural']
+    #in_msg.scpProducts2 = ['airmass','ash','cloudtop','convection','day_microphysics','dust','fog',\
+    #                       'DayNightFog','green_snow','natural','night_fog','night_microphysics','night_overview','overview','red_snow',\
+    #                       'HRoverview','THX-radar-convection','TRT-radar-convection','radar-convection']
 
     # please download the shape file 
     # in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
@@ -186,17 +203,12 @@ def input(in_msg):
     in_msg.add_title = True
     in_msg.title = None
     in_msg.add_borders = True
-    in_msg.border_color = None   # default for black/white images is white
-    in_msg.add_rivers = False
+    in_msg.add_rivers = False 
     in_msg.add_logos = True
-    in_msg.add_colorscale = False
+    in_msg.add_colorscale = True
     in_msg.fixed_minmax = True
     
     in_msg.postprocessing_areas=['ccs4']
-    #in_msg.postprocessing_composite=["radar-ir108","radar-HRV"]
-    in_msg.postprocessing_composite=["THX-convection"]
-    
-    #in_msg.postprocessing_areas=['odysseyS25']
-    #in_msg.postprocessing_composite=["RATE-ir108","RATE-HRV"]    
-    #in_msg.postprocessing_montage=[["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]]
+    in_msg.postprocessing_composite=["THX-radar-convection","TRT-radar-convection","radar-ir108","radar-HRV"]    
+
     

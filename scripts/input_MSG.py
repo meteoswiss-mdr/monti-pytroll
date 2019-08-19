@@ -12,10 +12,10 @@ def input(in_msg):
     #in_msg.RSS=False 
     #in_msg.sat_nr=9
     #in_msg.RSS=True
-    in_msg.sat_nr=10
-    in_msg.RSS=True
-    #in_msg.sat_nr=11
-    #in_msg.RSS=False
+    #in_msg.sat_nr=10
+    #in_msg.RSS=True
+    in_msg.sat_nr=11
+    in_msg.RSS=False
     
     # specify an delay (in minutes), when you like to process a time some minutes ago
     # e.g. current time               2015-05-31 12:33 UTC
@@ -117,7 +117,7 @@ def input(in_msg):
     ## NWC SAF
     ##-------------------
     ## NWC SAF PEG 1
-    #in_msg.RGBs.append('CMa')
+    in_msg.RGBs.append('CMa')
     #in_msg.RGBs.append('CMa_DUST')
     #in_msg.RGBs.append('CMa_VOLCANIC')
     #in_msg.RGBs.append('CMa_QUALITY')
@@ -206,17 +206,19 @@ def input(in_msg):
     #in_msg.reader_level="seviri-level6"   # viewing geometry nc
     #in_msg.reader_level="seviri-level7"   # hsaf h03
     #in_msg.reader_level="seviri-level8"   # msg radiance ccs4 nc
-    in_msg.reader_level="seviri-level9"    # msg radiance ccs4 nc parallax corrected
-    in_msg.parallax_correction = False     # when using "seviri-level9", set this to False (as data is already par corrected)
+    #in_msg.reader_level="seviri-level9"   # msg radiance ccs4 nc parallax corrected
+    #in_msg.reader_level="seviri-level10"  # new hsaf porduct h03b
+    in_msg.reader_level="seviri-level11"   # NWC SAF version 2016 (except HRW)
+    #in_msg.parallax_correction = True     # when using "seviri-level9", set this to False (as data is already par corrected)
     in_msg.parallax_gapfilling = 'bilinear' # 'False' (default), 'nearest'
     #in_msg.save_reprojected_data=['ccs4']
     in_msg.reprojected_data_filename='%(msg)s_%(area)s_%Y%m%d%H%M_nwcsaf.nc'
     in_msg.reprojected_data_dir='/data/COALITION2/database/meteosat/ccs4/%Y/%m/%d/'
     in_msg.save_statistics=False
 
-    #in_msg.load_data = True
-    in_msg.load_data = True    
-    in_msg.make_plots = True
+    in_msg.load_data = True
+    #in_msg.load_data = False    
+    #in_msg.make_plots = False
     in_msg.fill_value = (0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
     in_msg.add_title = False
     in_msg.add_borders = False

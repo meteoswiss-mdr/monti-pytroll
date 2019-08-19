@@ -5,6 +5,7 @@ from my_msg_module import check_near_real_time
 import sys
 import inspect
 import socket
+from os import environ, getenv
 
 class input_msg_class:
 
@@ -46,7 +47,7 @@ class input_msg_class:
       self.scpOutputDir2 = None
       self.scpID2 = None
       self.scpProducts2 = []
-      self.ninjotifFilename = 'MET%(sat_nr)s_%(RSS)s_%(rgb)s_%(area)s_%Y%m%d%H%M.tif'
+      self.ninjotifFilename = 'MET-%(sat_nr)s_%(RSS)s_%(rgb)s_%(area)s_%Y%m%d%H%M.tif'
       self.upload_ninjotif = False  
       self.socupload = False  
       self.socuploadFilename = 'r0305n.%Y%m%d%H%M.png' 
@@ -56,7 +57,21 @@ class input_msg_class:
       self.ftpServer=None
       self.ftpUser=None
       self.ftpPassword=None
-      self.mapDir = ""
+      self.mapDir = "" 
+      if socket.gethostname()[0:5] == 'zueub':
+         self.mapDir = "/data/OWARNA/hau/maps_pytroll/"
+      elif socket.gethostname()[0:5] == 'zuerh':
+         if environ.get('VENV') is not None:
+            self.mapDir = getenv('VENV')+"/share/shapes/" 
+            print "... use shape directory ", self.mapDir
+         else:
+            self.mapDir = "/data/OWARNA/hau/maps_pytroll/"
+      elif socket.gethostname()[0:7] == 'keschln' or socket.gethostname()[0:7]=="eschaln":
+         self.mapDir = "/store/msrad/sat/pytroll/shapes/"
+         print "... use shape directory ", self.mapDir
+      if self.mapDir == "": 
+         print "*** Warning, unknown location of the shape file for unknown computer "+socket.gethostname()
+         print "    please specify in the input file or produce satellite images without national borders"
       self.mapResolution = None
       self.indicate_mask = True
       self.add_title = True
@@ -64,8 +79,15 @@ class input_msg_class:
       self.title = None               # ' %(sat)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s'
       if socket.gethostname()[0:5] == 'zueub':
          self.font_file = "/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf"
+      elif socket.gethostname()[0:6] == 'zuerh4':
+         self.font_file = "/usr/java/jdk1.8.0_121/jre/lib/fonts/LucidaTypewriterBold.ttf" 
       elif socket.gethostname()[0:5] == 'zuerh':
-         self.font_file = "/usr/java/jdk1.8.0_121/jre/lib/fonts/LucidaTypewriterBold.ttf"
+         if environ.get('VENV') is not None:
+            self.font_file = getenv('VENV')+"/config_files/setup/LucidaTypewriterBold.ttf" 
+            print "... use font file ", self.font_file
+         else:
+            print "*** ERROR, unknown location of the ttf-file, environment variable VENV required"
+            quit()
       elif socket.gethostname()[0:7] == 'keschln' or socket.gethostname()[0:7]=="eschaln":
          self.font_file = "/usr/share/fonts/dejavu/DejaVuSansMono.ttf"
       else:
@@ -80,10 +102,9 @@ class input_msg_class:
       self.river_color = None   # default blue for RGB images, and white for BW images
       self.add_logos = True
       self.logos_dir = "/data/OWARNA/hau/logos/"
-      from os import environ, getenv
       if environ.get('VENV') is not None:
          self.logos_dir = getenv('VENV')+"/share/logos/"
-      print "self.logos_dir", self.logos_dir
+      print "... use logo images in  ", self.logos_dir
       self.add_colorscale = True
       self.fixed_minmax = True
       self.rad_min = {'VIS006':   0, 'VIS008':   0, 'IR_016':   0, 'IR_039': 210, 'WV_062': 210, 'WV_073': 190,\

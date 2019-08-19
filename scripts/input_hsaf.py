@@ -167,7 +167,9 @@ def input(in_msg):
     #----------------
     #in_msg.areas.append('EuropeCanary')
     #in_msg.areas.append('EuropeCanary95')
-    #in_msg.areas.append('EuropeCanaryS95')
+    in_msg.areas.append('EuropeCanaryS95')
+    #in_msg.areas.append('hsaf')
+    #in_msg.areas.append('hsaf_merc')
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     #in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
@@ -213,7 +215,7 @@ def input(in_msg):
     in_msg.compress_to_8bit=False
 
     # please download the shape file 
-    in_msg.mapDir='/opt/users/common/shapes/'
+    # in_msg.mapDir='/opt/users/common/shapes/'
 
     #in_msg.scpOutput=True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
@@ -229,3 +231,7 @@ def input(in_msg):
     in_msg.scpOutputDir2='las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s-%(area)s_'
     #in_msg.scpProducts2 = ['airmass','convection','HRoverview','natural']
     in_msg.scpProducts2 = ["h03-ir108"]
+
+    #in_msg.postprocessing_areas=["ccs4"]
+    in_msg.postprocessing_areas=['EuropeCanaryS95']
+    in_msg.postprocessing_composite=["h03-VIS006ir108"] 

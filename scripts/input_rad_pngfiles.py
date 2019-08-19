@@ -198,7 +198,7 @@ def input(in_msg):
     #                       'HRoverview','THX-radar-convection','TRT-radar-convection','radar-convection']
 
     # please download the shape file 
-    in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
+    #in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
 
     in_msg.add_title = True
     in_msg.title = None

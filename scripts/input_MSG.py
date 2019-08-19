@@ -248,9 +248,10 @@ def input(in_msg):
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
 
     # please download the shape file 
-    in_msg.mapDir='/opt/users/common/shapes/'
+    # in_msg.mapDir='/opt/users/common/shapes/'
+    # default: /data/OWARNA/hau/maps_pytroll/
 
-    #in_msg.postprocessing_areas=["ccs4"]
+    in_msg.postprocessing_areas=["ccs4"]
     #in_msg.postprocessing_areas=['EuropeCanaryS95']
 
     #in_msg.postprocessing_composite=["h03-ir108"] 
@@ -265,13 +266,15 @@ def input(in_msg):
     #in_msg.postprocessing_composite=["hrwdpH-streamdH-HRV","hrwdpH-streamdH-ir108"] 
     #in_msg.postprocessing_composite=["hrwdp-streamd-ir108","TRT-streamd-ir108"] 
     #in_msg.postprocessing_composite = ["VIL-HRVir108"]
-    in_msg.postprocessing_composite = ["VIL-HRVir108pc"]
+    #in_msg.postprocessing_composite = ["VIL-HRVir108pc"]
     #in_msg.postprocessing_composite = ["TRT-radar-HRVir108","THX-HRVir108"]
     #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03-ir108"],["MSG_radar-HRV","MSG_h03-HRV"],["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]]
     #in_msg.postprocessing_montage = [["MSG_h03-ir108","MSG_HRV"],["MSG_h03-ir108","MSG_test"]]
     #in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-radar-convection"]]
     #in_msg.postprocessing_montage = [["MSG_C2rgb-Forecast-IR_108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-radar-convection"]]
     #in_msg.postprocessing_montage = [["MSG_SYNMSG-BT-CL-IR10.8","MSG_IR-108c"]]
+    in_msg.postprocessing_montage = [["RAD_MESHS-HRVir108pc", "MSG_HRVir108"]]
+
     
     #in_msg.resize_composite = 100
     #in_msg.resize_montage = 70

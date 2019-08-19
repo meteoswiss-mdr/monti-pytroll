@@ -428,7 +428,7 @@ def plot_msg(in_msg):
                  subprocess.call(command_line_command1+socuploadCommand, shell=True) 
                            
                if 'ninjotif' in in_msg.outputFormats:
-                  ninjotif_file = format_name (outputDir+'/'+in_msg.ninjotifFilename, data.time_slot, sat_nr=data.sat_nr(), RSS=in_msg.RSS, area=area, rgb=rgb+parallax_correction_str )
+                  ninjotif_file = format_name (outputDir+'/ninjo/'+in_msg.ninjotifFilename, data.time_slot, sat_nr=data.sat_nr(), RSS=in_msg.RSS, area=area, rgb=rgb+parallax_correction_str )
                   from plot_coalition2 import pilimage2geoimage
                   GEO_image = pilimage2geoimage(PIL_image, obj_area, data.time_slot)
                   GEO_image.save(ninjotif_file,

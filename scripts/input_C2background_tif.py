@@ -177,7 +177,7 @@ def input(in_msg):
     #in_msg.areas.append('EuropeCanary95')  # upper third of MSG disk, satellite at 9.5 deg East, full resolution 
     # in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
     #in_msg.areas.append('EuroMercator')    # same projection as blitzortung.org
-    #in_msg.areas.append('nrEURO1km')        # Ninjo Alps projection 
+    in_msg.areas.append('nrEURO1km')        # Ninjo Alps projection 
     in_msg.areas.append('nrEURO3km')        # Ninjo Europe projection 
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
@@ -241,7 +241,7 @@ def input(in_msg):
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
 
     # please download the shape file 
-    in_msg.mapDir='/opt/users/common/shapes/'
+    # in_msg.mapDir='/opt/users/common/shapes/'
 
     #in_msg.postprocessing_areas=["ccs4"]
     #in_msg.postprocessing_areas=['EuropeCanaryS95']

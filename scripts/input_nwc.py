@@ -118,7 +118,7 @@ def input(in_msg):
     #in_msg.RGBs.append('CTH')
     #in_msg.RGBs.append('CTP')
     ## NWC SAF PEG 4
-    in_msg.RGBs.append('CRR')
+    #in_msg.RGBs.append('CRR')
     ## NWC SAF PEG 5
     #in_msg.RGBs.append('PC')
     ## NWC SAF PEG 13 
@@ -151,7 +151,7 @@ def input(in_msg):
     #in_msg.RGBs.append('SPhR_TPW')   # old format
     ## NWC SAF PEG 14
     #in_msg.RGBs.append('PCPh')
-    #in_msg.RGBs.append('CRPh')
+    in_msg.RGBs.append('CRPh')
     #-------------------
     # H-SAF
     #-------------------
@@ -196,7 +196,6 @@ def input(in_msg):
 
     # please download the shape file 
     #in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
-    in_msg.mapDir='/opt/users/common/shapes/'
     in_msg.mapResolution=None       ## f  full resolution: Original (full) data resolution.          
                                     ## h  high resolution: About 80 % reduction in size and quality. 
                                     ## i  intermediate resolution: Another ~80 % reduction.          
@@ -217,3 +216,6 @@ def input(in_msg):
     in_msg.reprojected_data_dir='/data/COALITION2/database/meteosat/ccs4/%Y/%m/%d/'
     in_msg.save_statistics=False
     in_msg.HRV_enhancement=False
+
+    in_msg.postprocessing_areas=["ccs4"]
+    in_msg.postprocessing_composite=["CRPh-HRVir108"] 

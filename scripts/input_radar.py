@@ -34,15 +34,15 @@ def input(in_msg):
     # chose radar product 
     #-------------------    
     ## satellite channels
-    ##in_msg.RGBs.append('PRECIP')     # RZC
-    in_msg.RGBs.append('POH')         # BZC
+    ##in_msg.RGBs.append('PRECIP')      # RZC
+    #in_msg.RGBs.append('POH')         # BZC
     in_msg.RGBs.append('MESHS')       # MZC
-    in_msg.RGBs.append('VIL')         # LZC
-    ##in_msg.RGBs.append('MaxEcho')    # CZC
-    in_msg.RGBs.append('EchoTOP15')   # EZC
-    in_msg.RGBs.append('EchoTOP20')   # EZC
-    in_msg.RGBs.append('EchoTOP45')   # EZC
-    in_msg.RGBs.append('EchoTOP50')   # EZC
+    #in_msg.RGBs.append('VIL')         # LZC
+    ##in_msg.RGBs.append('MaxEcho')     # CZC
+    ##in_msg.RGBs.append('EchoTOP15')   # EZC
+    ##in_msg.RGBs.append('EchoTOP20')   # EZC
+    ##in_msg.RGBs.append('EchoTOP45')   # EZC
+    ##in_msg.RGBs.append('EchoTOP50')   # EZC
     
     #----------------
     # chose area
@@ -68,8 +68,8 @@ def input(in_msg):
     in_msg.check_RSS_coverage()
 
     # please download the shape file 
-    #in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
-    in_msg.mapDir='/opt/users/common/shapes/'
+    # in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
+    # in_msg.mapDir='/opt/users/common/shapes/'
     in_msg.mapResolution=None      ## f  full resolution: Original (full) data resolution.          
                                    ## h  high resolution: About 80 % reduction in size and quality. 
                                    ## i  intermediate resolution: Another ~80 % reduction.          

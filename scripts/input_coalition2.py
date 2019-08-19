@@ -109,7 +109,7 @@ def input(in_msg):
 
     # directory containing the forecasted brightness temperatures
     if in_msg.nrt:
-        in_msg.nowcastDir = "/data/cinesat/out/"
+        in_msg.nowcastDir = "/data/cinesat/out/C2-BT-forecasts/"
     else:
         in_msg.nowcastDir = '/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels/'
 
@@ -174,7 +174,7 @@ def input(in_msg):
 
 
     # please download the shape file 
-    in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
+    #in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
     in_msg.mapResolution='i'       ## f  full resolution: Original (full) data resolution.          
                                    ## h  high resolution: About 80 % reduction in size and quality. 
                                    ## i  intermediate resolution: Another ~80 % reduction.          

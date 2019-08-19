@@ -100,7 +100,7 @@ def input(in_msg):
     in_msg.RGBs.append('cloudtop')
     in_msg.RGBs.append('convection')         # WV_062-WV_073  IR_039-IR_108  IR_016-VIS006
     ##in_msg.RGBs.append('convection_co2')
-    #in_msg.RGBs.append('day_microphysics')   # VIS008         IR_039(solar)  IR_108     # requires the pyspectral modul 
+    in_msg.RGBs.append('day_microphysics')   # VIS008         IR_039(solar)  IR_108     # requires the pyspectral modul 
     in_msg.RGBs.append('dust')               # IR_120-IR_108  IR_108-IR_087  IR_108
     in_msg.RGBs.append('fog')
     in_msg.RGBs.append('green_snow')

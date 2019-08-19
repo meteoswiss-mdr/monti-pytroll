@@ -6,6 +6,7 @@ abstract-rendering
 alabaster
 #anaconda
 anaconda-client
+appdirs
 argcomplete
 #astropy
 babel
@@ -169,6 +170,7 @@ tqdm
 traitlets
 ujson
 unicodecsv
+urllib3
 util-linux
 werkzeug
 wheel

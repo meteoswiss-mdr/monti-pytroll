@@ -80,6 +80,10 @@ swissradar = ['PRECIP','POH','MESHS','VIL', 'MaxEcho','EchoTOP15','EchoTOP20','E
 
 #################
 
+swisstrt = ['TRTcells']
+
+#################
+
 cosmo_vars_2d=["lon_1", "lat_1",\
                "TWATER", "tropopause_height", "tropopause_temperature", "tropopause_pressure", \
                "FF_10M", "VMAX_10M", "CAPE_MU", "CAPE_ML", "CIN_MU", "CIN_ML", \

@@ -1182,7 +1182,7 @@ def get_image(data, rgb):
     elif rgb == 'VIS006' or rgb == 'VIS008' or rgb == 'IR_016' or rgb == 'IR_039' or rgb == 'WV_062' or rgb == 'WV_073' or \
             rgb == 'IR_087' or rgb == 'IR_097' or rgb == 'IR_108' or rgb == 'IR_120' or rgb == 'IR_134' or rgb == 'HRV':
         obj_image = data.image.channel_image
-    elif rgb == 'CT' or rgb == 'CTTH' or 'ctt' or 'cph' or 'cot':
+    elif rgb == 'CT' or rgb == 'CTTH' or rgb == 'ctt' or rgb == 'cph' or rgb == 'cot':
         obj_image = 0
     else:
         print "*** ERROR, undefined rgb mode"

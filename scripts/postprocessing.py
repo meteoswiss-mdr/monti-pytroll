@@ -21,12 +21,19 @@ def get_THX_filename(time_slot, area, outDir, outFile):
     filename =  format_name('THX_'+rgb+'-'+area+'_%y%m%d%H%M_'+dt_str+'_'+dx_str+'.png', time_slot, area=area, rgb="THX")
     return outputDir+filename
 
-def get_radar_filename(time_slot, area, outDir, outFile):
+def get_radar_filename(rgb, time_slot, area, outDir, outFile):
     print "    get_radar_filename radar for ", area
     #outputDir = format_name('./%Y-%m-%d/radar/',  time_slot, area=area)
     #outputDir = "/data/cinesat/out/"
-    outputDir = format_name(outDir, time_slot, area=area, rgb="radar")
-    filename =  format_name('RAD_RZC-'+area+'_%y%m%d%H%M.png', time_slot, area=area)
+    if rgb=='radar':
+        # backward comparbility (old convention for file names of radar products, not that good)
+        outputDir = format_name(outDir, time_slot, area=area, rgb="radar")
+        filename = format_name('RAD_RZC-'+area+'_%y%m%d%H%M.png', time_slot, area=area)   
+    else:
+        # new better file naming 
+        outputDir = format_name(outDir, time_slot, area=area, rgb=rgb)
+        filename = format_name('RAD_'+rgb+'-'+area+'_%y%m%d%H%M.png', time_slot, area=area)   
+    
     return outputDir+filename
 
 def get_odyssey_filename(time_slot, area, outDir, outFile):
@@ -80,24 +87,27 @@ def get_file_list(composite, sat, sat_nr, time_slot, area, outDir, outFile, n=No
         rgb_list  = composite.split("-",n-1)
     file_list = []
 
+    
     for rgb in rgb_list:
         if rgb == 'THX':
             file_list.append (get_THX_filename(time_slot, area, outDir, outFile))
         elif rgb == 'TRT':
             file_list.append (get_TRT_filename(time_slot, area, outDir, outFile))
-        elif rgb in products.MSG_all:
-            file_list.append (get_sat_filename(rgb, 'MSG', sat_nr, time_slot, area, outDir, outFile))
+        elif rgb.replace("pc","") in products.MSG_all:  # also the parallax corrected products (marked as pc)
+            file_list.append (get_sat_filename(rgb, 'MSG', sat_nr, time_slot, area, outDir, 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'))
         elif (rgb == 'radar' or rgb in products.swissradar) and sat != 'cpp':
-            file_list.append (get_radar_filename(time_slot, area, outDir, outFile))
+            file_list.append (get_radar_filename(rgb, time_slot, area, outDir, outFile))
         elif rgb == 'RATE':
             file_list.append (get_odyssey_filename(time_slot, area, outDir, outFile))
         else:
             file_list.append (get_sat_filename(rgb, sat, sat_nr, time_slot, area, outDir, outFile))
 
+        print file_list
+            
         if not isfile(file_list[-1]):
             print "*** ERROR, can not find "+rgb+" file: "+file_list[-1]
             print "    skip composite: "+composite
-            return None 
+            return None
     return file_list
 
 # ---

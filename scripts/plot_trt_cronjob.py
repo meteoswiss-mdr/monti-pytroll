@@ -36,7 +36,7 @@ if len(sys.argv) > 1:
     if len(sys.argv) < 6:
         print "***           "
         print "*** Warning, please specify date and time completely, e.g."
-        print "***          python plot_radar.py 2014 07 23 16 10 "
+        print "***          python plot_trt_cronjob.py 2014 07 23 16 10 "
         print "***           "
         quit() # quit at this point
     else:
@@ -77,6 +77,7 @@ else:
     cell_ID=''
     cell_dir=''
     global_data.load(['TRTcells']) # ,min_rank=8
+    print "... plot all cells"
 
 #if hasattr(global_data, 'traj_IDs'):
 #    print ""

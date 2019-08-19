@@ -457,7 +457,7 @@ if __name__ == '__main__':
               
    # loop over all postprocessing areas
    for area in in_msg.postprocessing_areas:
-       postprocessing(in_msg, in_msg.datetime, int(in_msg.sat_nr), area)
+       postprocessing(in_msg, in_msg.datetime, in_msg.sat_nr, area)
 
    if in_msg.verbose:
       print " "

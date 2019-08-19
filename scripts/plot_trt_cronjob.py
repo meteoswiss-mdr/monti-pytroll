@@ -1,7 +1,7 @@
 from datetime import datetime
 import sys, string, os
 import logging
-sys.path.insert(0, "/home/lom/users/cll/pytroll/install/lib/python2.6/site-packages")
+#sys.path.insert(0, "/home/lom/users/cll/pytroll/install/lib/python2.6/site-packages")
 from mpop.satellites import GeostationaryFactory
 from mpop.projector import get_area_def
 from mpop.utils import debug_on

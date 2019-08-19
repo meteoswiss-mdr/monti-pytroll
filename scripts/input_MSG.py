@@ -49,7 +49,7 @@ def input(in_msg):
     ##in_msg.RGBs.append('WV_073')       # black and white
     ##in_msg.RGBs.append('IR_087')       # black and white
     ##in_msg.RGBs.append('IR_097')       # black and white
-    in_msg.RGBs.append('IR_108')       # black and white
+    #in_msg.RGBs.append('IR_108')       # black and white
     ##in_msg.RGBs.append('IR_120')       # black and white
     ##in_msg.RGBs.append('IR_134')       # black and white
     #in_msg.RGBs.append('HRV')          # black and white
@@ -110,7 +110,7 @@ def input(in_msg):
     #in_msg.RGBs.append('HRVFog')
     #in_msg.RGBs.append('DayNightFog')
     #in_msg.RGBs.append('HRVir108c')
-    #in_msg.RGBs.append('HRVir108')
+    in_msg.RGBs.append('HRVir108')
     #in_msg.RGBs.append('VIS006ir108c')
     #in_msg.RGBs.append('VIS006ir108')
     ##-------------------
@@ -207,7 +207,7 @@ def input(in_msg):
     #in_msg.reader_level="seviri-level7"   # hsaf h03
     #in_msg.reader_level="seviri-level8"   # msg radiance ccs4 nc
     in_msg.reader_level="seviri-level9"    # msg radiance ccs4 nc parallax corrected
-    in_msg.parallax_correction = True     # when using "seviri-level9", set this to False (as data is already par corrected)
+    in_msg.parallax_correction = False     # when using "seviri-level9", set this to False (as data is already par corrected)
     in_msg.parallax_gapfilling = 'bilinear' # 'False' (default), 'nearest'
     #in_msg.save_reprojected_data=['ccs4']
     in_msg.reprojected_data_filename='%(msg)s_%(area)s_%Y%m%d%H%M_nwcsaf.nc'
@@ -215,15 +215,15 @@ def input(in_msg):
     in_msg.save_statistics=False
 
     #in_msg.load_data = True
-    in_msg.load_data = False    
-    in_msg.make_plots = False
+    in_msg.load_data = True    
+    in_msg.make_plots = True
     in_msg.fill_value = (0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
-    in_msg.add_title = True
-    in_msg.add_borders = True
+    in_msg.add_title = False
+    in_msg.add_borders = False
     in_msg.add_rivers = False
     in_msg.add_logos = False
     in_msg.logos_dir = "/opt/users/common/logos/"
-    in_msg.add_colorscale = True
+    in_msg.add_colorscale = False
     in_msg.HRV_enhancement = False
 
     in_msg.outputFormats = ['png']

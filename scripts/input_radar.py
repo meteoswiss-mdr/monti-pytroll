@@ -34,15 +34,15 @@ def input(in_msg):
     # chose radar product 
     #-------------------    
     ## satellite channels
-    ##in_msg.RGBs.append('PRECIP')      # RZC
+    ##in_msg.RGBs.append('PRECIP')     # RZC
     #in_msg.RGBs.append('POH')         # BZC
     in_msg.RGBs.append('MESHS')       # MZC
     #in_msg.RGBs.append('VIL')         # LZC
-    ##in_msg.RGBs.append('MaxEcho')     # CZC
-    ##in_msg.RGBs.append('EchoTOP15')   # EZC
-    ##in_msg.RGBs.append('EchoTOP20')   # EZC
-    ##in_msg.RGBs.append('EchoTOP45')   # EZC
-    ##in_msg.RGBs.append('EchoTOP50')   # EZC
+    ##in_msg.RGBs.append('MaxEcho')    # CZC
+    #in_msg.RGBs.append('EchoTOP15')   # EZC
+    #in_msg.RGBs.append('EchoTOP20')   # EZC
+    #in_msg.RGBs.append('EchoTOP45')   # EZC
+    #in_msg.RGBs.append('EchoTOP50')   # EZC
     
     #----------------
     # chose area
@@ -93,16 +93,16 @@ def input(in_msg):
     in_msg.make_plots=True
     #in_msg.fill_value=(0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
     in_msg.fill_value=None  # black (0,0,0) / white (1,1,1) / transparent None  
-    in_msg.add_title = True
+    in_msg.add_title = False
     in_msg.title = ["%(sat)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s"]
     in_msg.title_y_line_nr = 2  # (INT) at which line should the title start
-    in_msg.add_borders = True
+    in_msg.add_borders = False
     in_msg.border_color = 'red'
     in_msg.add_rivers = False
     in_msg.river_color = 'blue'
     in_msg.add_logos = False
     in_msg.logos_dir = "/opt/users/common/logos/"
-    in_msg.add_colorscale = True
+    in_msg.add_colorscale = False
     in_msg.HRV_enhancement = False
 
     in_msg.outputFormats = ['png'] 
@@ -118,7 +118,7 @@ def input(in_msg):
     in_msg.ninjotifFilename = 'MET%(sat_nr)s_%(RSS)s_%(rgb)s_%(area)s_%Y%m%d%H%M.tif' 
     in_msg.upload_ninjotif = False
 
-    in_msg.postprocessing_areas=['ccs4']
+    #in_msg.postprocessing_areas=['ccs4']
     #in_msg.postprocessing_areas=['EuropeCanaryS95']
     #in_msg.postprocessing_areas=["EuroMercator"]
 

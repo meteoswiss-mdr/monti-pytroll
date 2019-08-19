@@ -36,8 +36,8 @@ def input(in_msg):
     ## satellite channels
     ##in_msg.RGBs.append('PRECIP')      # RZC
     #in_msg.RGBs.append('POH')         # BZC
-    #in_msg.RGBs.append('MESHS')       # MZC
-    in_msg.RGBs.append('VIL')         # LZC
+    in_msg.RGBs.append('MESHS')       # MZC
+    #in_msg.RGBs.append('VIL')         # LZC
     ##in_msg.RGBs.append('MaxEcho')     # CZC
     ##in_msg.RGBs.append('EchoTOP15')   # EZC
     ##in_msg.RGBs.append('EchoTOP20')   # EZC

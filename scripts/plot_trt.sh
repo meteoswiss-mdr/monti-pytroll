@@ -2,7 +2,11 @@
 
 echo '***'
 echo '*** start plot_trt.sh'
-. /opt/users/$LOGNAME/monti-pytroll/setup/bashrc no_virtual_environment
+if [ -d "/opt/users/$LOGNAME/monti-pytroll/" ]; then
+    . /opt/users/$LOGNAME/monti-pytroll/setup/bashrc no_virtual_environment
+else
+    . /opt/users/$LOGNAME/PyTroll/setup/bashrc no_virtual_environment
+fi
 #export python=/usr/bin/python
 #export python=/opt/users/common/packages/anaconda3/envs/PyTroll_$LOGNAME/bin/python
 

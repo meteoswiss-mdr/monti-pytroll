@@ -80,7 +80,7 @@ swissradar = ['PRECIP','POH','MESHS','VIL', 'MaxEcho','EchoTOP15','EchoTOP20','E
 
 #################
 
-swisstrt = ['TRTcells']
+swisstrt = ['TRT']
 
 #################
 

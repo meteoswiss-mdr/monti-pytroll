@@ -561,6 +561,9 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
     ## currently no check for (parallax corrected) netCDF data   
     if in_msg.reader_level == "seviri-level9":
        return in_msg.RGBs
+    ## currently no check for NWCSAF v2016
+    if in_msg.reader_level == "seviri-level11":
+       return in_msg.RGBs
     ## currently no check for cpp
     if in_msg.sat == "cpp":
        return in_msg.RGBs

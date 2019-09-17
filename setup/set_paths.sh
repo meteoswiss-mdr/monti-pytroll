@@ -23,7 +23,8 @@ set_conda_path() {
     echo "set_conda_path" $1
     case $HOSTNAME in
     "zue"[ur][bh][2-4][0-9][0-9])
-	if [[ $# -eq 0 ]]; then 
+	#if [[ $# -eq 0 ]]; then 
+	if [ $# -eq 0 ]; then 
 	    export CONDA_PATH="/opt/users/common/packages/anaconda2_$LOGNAME/"
 	else
 	    if [ "$1" == "python3" ] || [ "$1" == "py3" ] || [ "$1" == "3" ] ; then
@@ -108,4 +109,6 @@ case $HOSTNAME in
     echo "... set XRIT_DECOMPRESS_PATH to: "$XRIT_DECOMPRESS_PATH
     echo "... set XRIT_DECOMPRESS_OUTDIR to: "$XRIT_DECOMPRESS_OUTDIR
     echo "... set PYGAC_CONFIG_FILE to: "$PYGAC_CONFIG_FILE
+    export METRANETLIB_PATH=$PYTROLLHOME/packages/mpop/mpop/satin/metranet
+    echo "... set METRANETLIB_PATH to:" $METRANETLIB_PATH
 }

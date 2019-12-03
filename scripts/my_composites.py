@@ -934,6 +934,36 @@ def clouddepth(self):
 #clouddepth.prerequisites = set(['WV_062','WV_073','IR_087','IR_097','IR_108','IR_120','IR_134'])
 clouddepth.prerequisites = set(['WV_062','WV_073','IR_087','IR_108','IR_120','IR_134'])
 
+# flog / low stratus confidence Level  
+def fls(self):
+    """Make a High Resolution Overview RGB image composite from Seviri
+    channels.
+    """
+    self.check_channels('IR_087','IR_120')
+
+    # threshold for liquid clouds 
+    th_liquid_cloud = 1.8 # K 
+    # cloud_confidence_range
+    ccr  = 1 # K
+    ch_diff = (th_liquid_cloud - (self['IR_120']-self['IR_087']) - ccr) / (2 * ccr) 
+
+    min_data = ch_diff.data.min()
+    max_data = ch_diff.data.max()
+    print "min/max", min_data, max_data
+
+    from trollimage.image import Image as trollimage
+    img = trollimage(ch_diff.data, mode="L", fill_value=(0,0,0))
+
+    colormap = deepcopy(rainbow)
+    #colormap.set_range(min_data, max_data)
+    colormap.set_range(0, 1)
+    colormap.reverse()
+    img.colorize(colormap)
+
+    return img
+
+fls.prerequisites = set(['IR_087','IR_120'])
+
 def streamplot(self):
     """Create streamplot images with U and V wind components 
     """
@@ -1056,7 +1086,7 @@ seviri = [hr_visual, hr_overview, hr_natural, hr_airmass, sandwich, HRVFog, DayN
           HRVir108c, HRVir108, hrvIR108, VIS006ir108c, VIS006ir108, vis006IR108, sza, ndvi, IR_039c_CO2, \
           VIS006_minus_IR_016, IR_039_minus_IR_108, WV_062_minus_WV_073, WV_062_minus_IR_108,\
           WV_073_minus_IR_134, IR_120_minus_IR_108, IR_087_minus_IR_108, IR_087_minus_IR_120, \
-          trichannel, clouddepth, mask_clouddepth]
+          trichannel, clouddepth, mask_clouddepth, fls]
 
 cosmo = [streamplot, streamplot_100hPa, streamplot_200hPa, streamplot_300hPa, streamplot_400hPa, streamplot_500hPa, \
                      streamplot_600hPa, streamplot_700hPa, streamplot_800hPa, streamplot_900hPa, streamplot_1000hPa]
@@ -1157,6 +1187,8 @@ def get_image(data, rgb):
         obj_image = data.image.trichannel
     elif rgb=='clouddepth':
         obj_image = data.image.clouddepth
+    elif rgb=='fls':
+        obj_image = data.image.fls        
     elif rgb=='streamplot':
         obj_image = data.image.streamplot
     elif rgb=='streamplot-100hPa':

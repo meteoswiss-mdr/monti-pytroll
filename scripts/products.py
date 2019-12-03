@@ -18,7 +18,7 @@ RGBs_buildin = ['airmass','ash','cloudtop','convection','convection_co2',\
 RGBs_user = ['HRoverview','hr_natural','hr_airmass','sandwich','HRVFog','DayNightFog',\
              'HRVir108c','HRVir108','hrvIR108','VIS006ir108c','VIS006ir108','vis006IR108','sza','ndvi','IR_039c_CO2',\
              'VIS006-IR_016','IR_039-IR_108','WV_062-WV_073','WV_062-IR_108','IR_087-IR_108',\
-             'IR_087-IR_120','IR_120-IR_108','WV_073-IR_134','trichannel','clouddepth','streamplot',\
+             'IR_087-IR_120','IR_120-IR_108','WV_073-IR_134','trichannel','clouddepth','fls','streamplot',\
              'streamplot-100hPa','streamplot-200hPa','streamplot-300hPa','streamplot-400hPa','streamplot-500hPa',\
              'streamplot-600hPa','streamplot-700hPa','streamplot-800hPa','streamplot-900hPa','streamplot-1000hPa']
 

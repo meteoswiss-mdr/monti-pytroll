@@ -80,6 +80,7 @@ def input(in_msg):
     #in_msg.RGBs.append('IR_087-IR_120')      
     #in_msg.RGBs.append('IR_120-IR_108')
     #in_msg.RGBs.append('trichannel')
+    #in_msg.RGBs.append('fls')     # fog, low stratus
     #-------------------
     # viewing geometry
     #-------------------

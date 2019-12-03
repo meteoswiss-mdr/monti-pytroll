@@ -507,11 +507,18 @@ def load_products(data_object, RGBs, in_options, area_loaded, load_CTH=True):
             print "    load NWC-SAF product: "+pge.replace('_', '') 
 
          if in_options.reader_level is None:
-            # try seviri-level3, which is version 2013 hdf reader
-            data_object.load([pge.replace('_', '')], calibrate=in_options.nwcsaf_calibrate, area_extent=area_loaded.area_extent, reader_level="seviri-level3")   
+           # try seviri-level3, which is version 2013 hdf reader
+           reader_level="seviri-level3"
          else:
-            data_object.load([pge.replace('_', '')], calibrate=in_options.nwcsaf_calibrate, area_extent=area_loaded.area_extent, reader_level=in_options.reader_level)
+           if in_options.reader_level == "seviri-level3" or in_options.reader_level == "seviri-level5" or in_options.reader_level == "seviri-level11":
+             reader_level = in_options.reader_level
+           else:
+             print "*** Warning: reader ", in_options.reader_level, " chosen, but thisis not for NWC-SAF data"
+             print "    try to read v2013 hdf files (reader_level=seviri-level3)"
+             reader_level="seviri-level3"
 
+         data_object.load([pge.replace('_', '')], calibrate=in_options.nwcsaf_calibrate, area_extent=area_loaded.area_extent, reader_level=reader_level)
+             
          # False, area_extent=area_loaded.area_extent (difficulties to find correct h5 input file)
          #print data_object.loaded_channels()
          #loaded_channels = [chn.name for chn in data_object.loaded_channels()]
@@ -824,6 +831,9 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
         from trollimage.colormap import rainbow
         in_msg.colormap[rgb] = deepcopy(rainbow.reverse())
         in_msg.colormap[rgb].set_range(0, 90)
+      if rgb == 'fls':
+        in_msg.colormap[rgb] = deepcopy(rainbow.reverse())
+        in_msg.colormap[rgb].set_range(0, 1)
       #if rgb == 'ndvi':
       #   in_msg.colormap[rgb] = rdylgn_r
    elif plot_type == 'TRTimage':

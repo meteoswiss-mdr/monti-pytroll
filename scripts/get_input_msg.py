@@ -111,7 +111,7 @@ class input_msg_class:
                       'IR_087': 205, 'IR_097': 210, 'IR_108': 205, 'IR_120': 205, 'IR_134': 205, 'HRV': 0,\
                       'VIS006c':   0, 'VIS008c':   0, 'IR_016c':   0, 'IR_039c': 210, 'WV_062c': 210, 'WV_073c': 190,\
                       'IR_087c': 205, 'IR_097c': 210, 'IR_108c': 205, 'IR_120c': 205, 'IR_134c': 205, 'HRVc': 0,\
-                      'CMa': 1, 'CT': 0, 'CT_PHASE': 0, 'CTH': 0, 'CTP':  100.,'CTT': 210., 'PC':0, 'CRR':0, 'clouddepth':0,\
+                      'CMa': 1, 'CT': 0, 'CT_PHASE': 0, 'CTH': 0, 'CTP':  100.,'CTT': 210., 'PC':0, 'CRR':0, 'clouddepth':0, 'fls':0,\
                       'WV_062-WV_073': -25, 'WV_062-IR_108': -70, 'WV_073-IR_134':-15, 'IR_087-IR_108':-4.0, 'IR_087-IR_120':-4,'IR_120-IR_108':-6,\
                       'sphr_bl': 0, 'sphr_cape': 150, 'sphr_diffbl': -1.5, 'sphr_diffhl': -0.75, 'sphr_diffki': -7, 'sphr_diffli': -2.5,\
                       'sphr_diffml': -2.5, 'sphr_diffshw': -2.5, 'sphr_difftpw': -3, 'sphr_hl': 0, 'sphr_ki': 0, 'sphr_li': -15, \
@@ -127,7 +127,7 @@ class input_msg_class:
                       'IR_087': 320, 'IR_097': 285, 'IR_108': 320, 'IR_120': 320, 'IR_134': 290, 'HRV': 100,\
                       'VIS006c':  85, 'VIS008c':  90, 'IR_016c':  80, 'IR_039c': 340, 'WV_062c': 260, 'WV_073c': 280,\
                       'IR_087c': 320, 'IR_097c': 285, 'IR_108c': 320, 'IR_120c': 320, 'IR_134c': 290, 'HRVc': 100,\
-                      'CMa': 4, 'CT': 21, 'CT_PHASE': 3, 'CTH': 12, 'CTP': 1000.,'CTT': 320., 'PC':100, 'CRR':10, 'clouddepth':6,\
+                      'CMa': 4, 'CT': 21, 'CT_PHASE': 3, 'CTH': 12, 'CTP': 1000.,'CTT': 320., 'PC':100, 'CRR':10, 'clouddepth':6, 'fls':1,\
                       'WV_062-WV_073':   5,'WV_062-IR_108':    5, 'WV_073-IR_134':  5, 'IR_087-IR_108': 1.5, 'IR_087-IR_120': 4,'IR_120-IR_108': 2,\
                       'sphr_bl': 35, 'sphr_cape': 200, 'sphr_diffbl': 1.5, 'sphr_diffhl': 0.75, 'sphr_diffki': 7, 'sphr_diffli': 2.5,\
                       'sphr_diffml': 2.5, 'sphr_diffshw': 2.5, 'sphr_difftpw': 3, 'sphr_hl': 8, 'sphr_ki': 60, 'sphr_li': 25, \
@@ -142,7 +142,8 @@ class input_msg_class:
       self.tick_marks= {'VIS006': 20, 'VIS008': 20, 'IR_016': 20, 'IR_039': 20, 'WV_062': 20, 'WV_073': 20,\
                         'IR_087': 20, 'IR_097': 20, 'IR_108': 20, 'IR_120': 20, 'IR_134': 20, 'HRV': 20,\
                         'vza': 5, 'vaa': 5, 'lat': 5, 'lon': 5,\
-                        'CTH': 4, 'CTP':  100,'CTT': 20, 'CT': 1, 'CT_PHASE': 1, 'CMa': 1, 'CMa_DUST':  1, 'CMa_TEST': 1, 'CMa_VOLCANIC': 1, 'clouddepth':1,\
+                        'CTH': 4, 'CTP':  100,'CTT': 20, 'CT': 1, 'CT_PHASE': 1, 'CMa': 1, 'CMa_DUST':  1, 'CMa_TEST': 1, 'CMa_VOLCANIC': 1,\
+                        'clouddepth':1, 'fls':0.5,\
                         'sphr_bl': 5, 'sphr_cape': 10, 'sphr_diffbl': 0.5, 'sphr_diffhl': 0.5, 'sphr_diffki': 2, 'sphr_diffli': 0.5,\
                         'sphr_diffml': 1, 'sphr_diffshw': 0.5, 'sphr_difftpw': 1, 'sphr_hl': 1, 'sphr_ki': 5, 'sphr_li': 1, \
                         'sphr_ml': 5, 'sphr_quality': 500, 'sphr_sflag': 1, 'sphr_shw': 1, 'sphr_tpw': 5, 'h03': 10, 'h03b': 10, \
@@ -156,9 +157,10 @@ class input_msg_class:
       self.minor_tick_marks = {'VIS006': 5, 'VIS008': 5, 'IR_016': 5, 'IR_039': 5, 'WV_062': 5, 'WV_073': 5,\
                         'IR_087': 5, 'IR_097': 5, 'IR_108': 5, 'IR_120': 5, 'IR_134': 5, 'HRV': 5,\
                         'vza': 1, 'vaa': 1, 'lat': 1, 'lon': 1,\
-                        'CTH': 1, 'CTP':  50,'CTT': 5, 'CT': 1, 'CT_PHASE': 1, 'CMa': 1, 'CMa_DUST':  1, 'CMa_TEST': 1, 'CMa_VOLCANIC': 1, 'clouddepth':1,
-                        'sphr_bl': 1, 'sphr_cape': 5, 'sphr_diffbl': 0.1, 'sphr_diffhl': 0.05, 'sphr_diffki': 0.5, 'sphr_diffli': 0.1,
-                        'sphr_diffml': 0.5, 'sphr_diffshw': 0.1, 'sphr_difftpw': 0.5, 'sphr_hl': 0.5, 'sphr_ki': 1, 'sphr_li': 0.5, 
+                        'CTH': 1, 'CTP':  50,'CTT': 5, 'CT': 1, 'CT_PHASE': 1, 'CMa': 1, 'CMa_DUST':  1, 'CMa_TEST': 1, 'CMa_VOLCANIC': 1,\
+                        'clouddepth':1, 'fls':0.1,\
+                        'sphr_bl': 1, 'sphr_cape': 5, 'sphr_diffbl': 0.1, 'sphr_diffhl': 0.05, 'sphr_diffki': 0.5, 'sphr_diffli': 0.1,\
+                        'sphr_diffml': 0.5, 'sphr_diffshw': 0.1, 'sphr_difftpw': 0.5, 'sphr_hl': 0.5, 'sphr_ki': 1, 'sphr_li': 0.5,\
                         'sphr_ml': 1, 'sphr_quality': 100, 'sphr_sflag': 1, 'sphr_shw': 0.2, 'sphr_tpw': 1, 'h03': 5, 'h03b': 5, \
                         'azidiff':2,'cth':0.2,'cldmask':1,'cot':2,'cph':1,'ctt':5.,'cwp':1,\
                         'dcld':1,'dcot':5,'dcwp':1,'dndv':1,'dreff':5,\

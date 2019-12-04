@@ -114,7 +114,7 @@ pytest==2.8.1
 python-dateutil==2.4.2
 #-e git+https://github.com/pytroll/pytroll-schedule.git@19555abbf1ddd80baf59c993108754e536d84eb1#egg=pytroll_schedule&subdirectory=../../../packages/pytroll-schedule
 pytz==2015.7
-PyYAML==3.11
+PyYAML==5.1
 pyzmq==15.2.0
 qtconsole==4.1.1
 redis==2.10.3

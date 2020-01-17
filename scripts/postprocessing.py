@@ -23,8 +23,7 @@ def get_THX_filename(time_slot, area, outDir, outFile):
 
 def get_radar_filename(rgb, time_slot, area, outDir, outFile):
     print "    get_radar_filename radar for ", area
-    #outputDir = format_name('./%Y-%m-%d/radar/',  time_slot, area=area)
-    #outputDir = "/data/cinesat/out/"
+
     if rgb=='radar':
         # backward comparbility (old convention for file names of radar products, not that good)
         outputDir = format_name(outDir, time_slot, area=area, rgb="radar")
@@ -33,30 +32,41 @@ def get_radar_filename(rgb, time_slot, area, outDir, outFile):
         # new better file naming 
         outputDir = format_name(outDir, time_slot, area=area, rgb=rgb)
         filename = format_name('RAD_'+rgb+'-'+area+'_%y%m%d%H%M.png', time_slot, area=area)   
-    
+
+    if not exists(outputDir):
+        print '... create output directory: ' + outputDir
+        from os import makedirs
+        makedirs(outputDir)
+        
     return outputDir+filename
 
 def get_odyssey_filename(time_slot, area, outDir, outFile):
     print "    get_odyssey_filename radar for ", area
-    #outputDir = format_name('./%Y-%m-%d/radar/',  time_slot, area=area)
-    #outputDir = "/data/cinesat/out/"
     outputDir = format_name(outDir, time_slot, area=area, rgb="radar")
+    if not exists(outputDir):
+        print '... create output directory: ' + outputDir
+        from os import makedirs
+        makedirs(outputDir)
     filename =  format_name('ODY_RATE-'+area+'_%y%m%d%H%M.png', time_slot, area=area)
     return outputDir+filename
 
 def get_TRT_filename(time_slot, area, outDir, outFile):
     print "    get_TRT_filename TRT for ", area 
-    #outputDir = format_name('./%Y-%m-%d/radar/',  time_slot, area=area)
-    #outputDir = "/data/cinesat/out/"
     outputDir = format_name(outDir, time_slot, area=area, rgb="TRT")
+    if not exists(outputDir):
+        print '... create output directory: ' + outputDir
+        from os import makedirs
+        makedirs(outputDir)
     filename =  format_name('RAD_TRT-'+area+'_%y%m%d%H%M.png', time_slot, area=area)
     return outputDir+filename
     
 def get_OT_filename(rgb, time_slot, area, outDir, outFile):
     print "    get_OT_filename (overshooting top) for ", area 
-    #outputDir = format_name('./%Y-%m-%d/radar/',  time_slot, area=area)
-    #outputDir = "/data/cinesat/out/"
     outputDir = format_name(outDir, time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
+    if not exists(outputDir):
+        print '... create output directory: ' + outputDir
+        from os import makedirs
+        makedirs(outputDir)
     filename  = format_name(outFile, time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
     return outputDir+filename
 
@@ -64,6 +74,10 @@ def get_sat_filename(rgb, sat, sat_nr, time_slot, area, outDir, outFile):
     print "    get_sat_filename for ", rgb, area
     #outputDir = "/data/cinesat/out/"
     outputDir = format_name(outDir, time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
+    if not exists(outputDir):
+        print '... create output directory: ' + outputDir
+        from os import makedirs
+        makedirs(outputDir)
     filename  = format_name(outFile, time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
     return outputDir+filename
 
@@ -74,7 +88,7 @@ def get_comp_filename(comp_str, sat_nr, time_slot, area, outDir, outFile):
         print '... create output directory: ' + outputDir
         from os import makedirs
         makedirs(outputDir)
-    filename  = format_name('/MSG_'+comp_str.replace("_","-")+'-'+area+'_%y%m%d%H%M.png', time_slot, area=area, sat_nr=sat_nr) 
+    filename  = format_name('MSG_'+comp_str.replace("_","-")+'-'+area+'_%y%m%d%H%M.png', time_slot, area=area, sat_nr=sat_nr) 
     return outputDir+'/'+filename
 
 # ---
@@ -100,7 +114,7 @@ def get_file_list(composite, sat, sat_nr, time_slot, area, outDir, outFile, n=No
         elif rgb == 'RATE':
             file_list.append (get_odyssey_filename(time_slot, area, outDir, outFile))
         else:
-            file_list.append (get_sat_filename(rgb, sat, sat_nr, time_slot, area, outDir, outFile))
+            file_list.append (get_comp_filename(rgb, sat_nr, time_slot, area, outDir, outFile))
 
         print file_list
             
@@ -140,7 +154,7 @@ def n_file_composite(composite, satellite, sat_nr, time_slot, area, outDir, outF
         return composites_done   # return [] as error marker 
 
     # get result filename 
-    comp_file = get_sat_filename(composite, sat, sat_nr, time_slot, area, outDir, outFile) 
+    comp_file = get_comp_filename(composite, sat_nr, time_slot, area, outDir, outFile)
     comp_dir = dirname(comp_file)
     if not exists(comp_dir):
         if verbose:

@@ -81,8 +81,9 @@ def input(in_msg):
     in_msg.make_plots=True
     in_msg.fill_value=(0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
     in_msg.add_title = True
-    in_msg.title = [" %(sat)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s"]
-    in_msg.title_y_line_nr = 1  # (INT) at which line should the title start
+    in_msg.title = ["3rd layer: TRT cells"]
+    #in_msg.title = [" %(sat)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s"]
+    in_msg.title_y_line_nr = 3  # (INT) at which line should the title start
     in_msg.add_borders = True
     in_msg.border_color = 'red'
     in_msg.add_rivers = False

@@ -944,9 +944,14 @@ def fls(self):
     # threshold for liquid clouds 
     th_liquid_cloud = 1.8 # K 
     # cloud_confidence_range
-    ccr  = 1 # K
-    ch_diff = (th_liquid_cloud - (self['IR_120']-self['IR_087']) - ccr) / (2 * ccr) 
+    ccr  = 1.0 # K
+    ch_diff = (th_liquid_cloud - (self['IR_120']-self['IR_087']) - ccr) / (-2. * ccr) 
 
+    #print "min/max", self['IR_108'].data.min(), self['IR_108'].data.max()
+    ## Filter for cold clouds 
+    #print type(self['IR_108'].data),type(ch_diff), 
+    #ch_diff.data[self['IR_108'].data<265.] = float('nan')
+    
     min_data = ch_diff.data.min()
     max_data = ch_diff.data.max()
     print "min/max", min_data, max_data
@@ -954,15 +959,15 @@ def fls(self):
     from trollimage.image import Image as trollimage
     img = trollimage(ch_diff.data, mode="L", fill_value=(0,0,0))
 
-    colormap = deepcopy(rainbow)
+    colormap = deepcopy(rainbow.reverse())
     #colormap.set_range(min_data, max_data)
     colormap.set_range(0, 1)
-    colormap.reverse()
+    print colormap.values
     img.colorize(colormap)
 
     return img
 
-fls.prerequisites = set(['IR_087','IR_120'])
+fls.prerequisites = set(['IR_087','IR_120','IR_108'])
 
 def streamplot(self):
     """Create streamplot images with U and V wind components 

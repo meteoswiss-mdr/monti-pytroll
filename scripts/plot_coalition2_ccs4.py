@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 from datetime import datetime
 import sys, string, os
 import logging
@@ -48,7 +51,7 @@ def create_dir(outputFile):
     path = dirname(outputFile)
     if not exists(path):
         if in_msg.verbose:
-            print '... create output directory: ' + path
+            print('... create output directory: ' + path)
         makedirs(path)
     return outputFile
 
@@ -56,13 +59,13 @@ def create_dir(outputFile):
 
 def force_to_observed_cloud_mask(mod, obs):
     if np.any(mod.mask == True) == False:
-        print "NO MASK ACTIVE!!!!!!!!!"
+        print("NO MASK ACTIVE!!!!!!!!!")
         if np.any(np.isnan(mod)):
             mod = ma.masked_where(np.isnan(mod), mod)
-            print "the invalid are NAN"
+            print("the invalid are NAN")
         else:
             mod = ma.masked_where(mod <= 0, mod)
-            print "the invalid are <= 0"
+            print("the invalid are <= 0")
     mod[mod.mask==True] = np.nan
     mod = fill_with_closest_pixel(mod) 
     mod[obs==True] = np.nan
@@ -111,7 +114,7 @@ def make_figure(values, obj_area, outputFile, colorbar = True, text_to_write = N
     
     PIL_image = fig2img ( fig )
     PIL_image.save(create_dir(outputFile))
-    print "... display ",outputFile," &"
+    print("... display ",outputFile," &")
     plt.close( fig)
 
 # ===============================
@@ -176,7 +179,7 @@ if __name__ == '__main__':
         rapid_scan_active = "active"
     else:
         rapid_scan_active = "not active"
-    print "---Rapid scan mode ", rapid_scan_active
+    print("---Rapid scan mode ", rapid_scan_active)
     
     if clean_mask == 'no_cleaning':
         mask_labelsSmall_lowUS = False
@@ -296,7 +299,7 @@ if __name__ == '__main__':
     delay = 5
 
     ntimes = 2 #in_windshift.ntimes
-    print "... aggregate winddata for ", ntimes, " timesteps" 
+    print("... aggregate winddata for ", ntimes, " timesteps") 
     min_correlation = 85 #in_windshift.min_correlation
     min_conf_nwp = 80 #in_windshift.min_conf_nwp
     min_conf_no_nwp = 80 #in_windshift.min_conf_no_nwp
@@ -324,8 +327,8 @@ if __name__ == '__main__':
     elif forth_mask == 'no_mask':
         name_4Mask = 'none'
     else:
-        print "*** Error in main (Mecikalski_test.py)"
-        print "    unknown 4th mask", forth_mask
+        print("*** Error in main (Mecikalski_test.py)")
+        print("    unknown 4th mask", forth_mask)
         quit() 
 
     if forced_mask == 'IR_039_minus_IR_108':
@@ -335,7 +338,7 @@ if __name__ == '__main__':
     elif forced_mask == 'no_mask':
         name_ForcedMask = 'no'
     else:
-        print "    unknown forcing mask -> applying no forcing mask", forced_mask 
+        print("    unknown forcing mask -> applying no forcing mask", forced_mask) 
         name_ForcedMask = 'no'   
         
     vmin_cd =    [-50.,    -20.,    210.,    -14.,    -32.,    - 3.]
@@ -371,10 +374,10 @@ if __name__ == '__main__':
 
     if len(sys.argv) > 1:
         if len(sys.argv) < 6:
-            print "***           "
-            print "*** Warning, please specify date and time completely, e.g."
-            print "***          python plot_radar.py 2014 07 23 16 10 "
-            print "***           "
+            print("***           ")
+            print("*** Warning, please specify date and time completely, e.g.")
+            print("***          python plot_radar.py 2014 07 23 16 10 ")
+            print("***           ")
             quit() # quit at this point
         else:
             year   = int(sys.argv[1])
@@ -416,7 +419,7 @@ if __name__ == '__main__':
 
     while time_slot <= time_slotSTOP:
     
-          print time_slot
+          print(time_slot)
           year = time_slot.year
           month = time_slot.month
           day = time_slot.day
@@ -457,7 +460,7 @@ if __name__ == '__main__':
           # e.g. area_extent = (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
           area_tuple = (proj4_string, area_extent)
           
-          print "*** read data for ", in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot
+          print("*** read data for ", in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot)
 
           in_msg.datetime = time_slot
           in_msg.RGBs = channels
@@ -474,12 +477,12 @@ if __name__ == '__main__':
           # load product, global_data is changed in this step!
           area_loaded = load_products(global_data, channels, in_msg, area_loaded ) #
           
-          print '... project data to desired area ', area
+          print('... project data to desired area ', area)
           data = global_data.project(area, precompute=True)
           
           # print type(data)
           loaded_channels = [chn.name for chn in data.loaded_channels()]
-          print "... loaded_channels: ", loaded_channels
+          print("... loaded_channels: ", loaded_channels)
          
           data = downscale(data,mode_downscaling)
 
@@ -504,7 +507,7 @@ if __name__ == '__main__':
           # -------------------
       
           nx,ny = data['IR_108'].data.shape
-          print "    nx, ny= ", nx,ny
+          print("    nx, ny= ", nx,ny)
 
           #print type(data['CTP'].data)
           if scale == "europe" or len(sys.argv) < 2:
@@ -512,8 +515,8 @@ if __name__ == '__main__':
           else:
               data['CTP'].data = ma.masked_less(data['CTP'].data, 0)
               mask_CTP = data['CTP'].data.mask
-              print data['CTP'].data.shape
-              print data['CTP'].data.size 
+              print(data['CTP'].data.shape)
+              print(data['CTP'].data.size) 
           #if True:
           #      mask1 = deepcopy(data['CTP'].data)
           #      mask_CTP = np.zeros(mask1.shape)
@@ -564,7 +567,7 @@ if __name__ == '__main__':
           if only_obs_noForecast == True:
               
               # now read the observations of the channels at -30 min
-              print "*** read data for ", in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot30
+              print("*** read data for ", in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot30)
               global_data30 = GeostationaryFactory.create_scene(in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot30)
               # area we would like to read
               area_loaded = get_area_def(area2load)#(in_windshift.areaExtraction)  
@@ -574,7 +577,7 @@ if __name__ == '__main__':
               data30 = downscale(data30,mode_downscaling)
 
               # now read the observations of the channels at -15 min
-              print "*** read data for ", in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot15
+              print("*** read data for ", in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot15)
               global_data15 = GeostationaryFactory.create_scene(in_msg.sat, str(in_msg.sat_nr), "seviri", time_slot15)
               # area we would like to read
               area_loaded15 = get_area_def(area2load)#(in_windshift.areaExtraction)  
@@ -621,7 +624,7 @@ if __name__ == '__main__':
               
               
           else:
-              print "************** ", nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S)                                    
+              print("************** ", nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S))                                    
               wv_062_t15 = pickle.load( open( nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S), "rb" ) ) 
               wv_062_t30 = pickle.load( open( nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast30S+min_forecast30S, dt_forecast2S), "rb" ) )
                       
@@ -648,12 +651,12 @@ if __name__ == '__main__':
               #check if downscaling you are applying matches with the downscaling applied when producing the forecasts
               if True:
                   if any(bz != mode_downscaling for bz in downscalings):
-                      print "The downscaling technique applied for the production of forecast differs from that chosen here"
-                      print "current technique: ", mode_downscaling
-                      print "technique forecast: ", list(set(downscalings))
+                      print("The downscaling technique applied for the production of forecast differs from that chosen here")
+                      print("current technique: ", mode_downscaling)
+                      print("technique forecast: ", list(set(downscalings)))
                       quit()
 
-              print "...correct downscaling: ", mode_downscaling
+              print("...correct downscaling: ", mode_downscaling)
               wv_062_t15 = wv_062_t15 [0]
               wv_062_t30 = wv_062_t30 [0]
                       
@@ -994,7 +997,7 @@ if __name__ == '__main__':
                         
           cw = ContourWriterAGG( in_msg.mapDir)
       
-          print "... create the false color composite (r-g-b) = (", rgb_display,")"
+          print("... create the false color composite (r-g-b) = (", rgb_display,")")
 
           if rgb_display == 'us-cd-gi':
               r = cmin_us + (us/n_tests_us) * (cmax_us - cmin_us)
@@ -1005,8 +1008,8 @@ if __name__ == '__main__':
               g = cmin_us + (us/n_tests_us) * (cmax_us - cmin_us)
               b = cmin_gi + (gi/n_tests_gi) * (cmax_gi - cmin_gi)
           else: 
-              print "*** Error in main (Mecikalski_test.py)"
-              print "    unknown rgb illustration", rgb_display
+              print("*** Error in main (Mecikalski_test.py)")
+              print("    unknown rgb illustration", rgb_display)
               quit()
           
           mask_black = np.where(np.logical_and(np.logical_and(us<=2, cd<=2),gi<=2),0,1) #np.ones(us.shape) #
@@ -1030,8 +1033,8 @@ if __name__ == '__main__':
           elif forced_mask == 'IR_039_minus_IR_108':  
                   force_mask = np.where(IR_039_minus_IR_108 >= force_th_chDiff,1,0)
           elif forced_mask !='no_mask': 
-              print "*** Error in main (Mecikalski_test.py)"
-              print "    unknown forcing mask -> applying no forcing mask", forced_mask     
+              print("*** Error in main (Mecikalski_test.py)")
+              print("    unknown forcing mask -> applying no forcing mask", forced_mask)     
       
           if plot_forced_mask:
               outputFile = out_dir +"/cosmo/Channels/indicators_in_time/masks/"+yearS+monthS+dayS+"_"+hourS+minS+"_4th"+name_4Mask+"_Forced_mask.png"
@@ -1051,8 +1054,8 @@ if __name__ == '__main__':
               mask  = np.logical_or(mature_mask==1,developing_mask==1)
               maskS = '_dam'
           else:
-              print "*** Error in main (Mecikalski.py)"
-              print "    unknown show_clouds: ", show_clouds
+              print("*** Error in main (Mecikalski.py)")
+              print("    unknown show_clouds: ", show_clouds)
               quit()
           
           mask = np.logical_or(mask==1,forced_mask==1)
@@ -1090,12 +1093,12 @@ if __name__ == '__main__':
                   # Remove small black hole
                   mask = ndimage.binary_closing(mask) 
           elif clean_mask != 'no_cleaning':
-              print "*** Error in main (Mecikalski.py)"
-              print "    unknown clean_mask: ", clean_mask
+              print("*** Error in main (Mecikalski.py)")
+              print("    unknown clean_mask: ", clean_mask)
               quit()          
           
 
-          print "-------------------     r min-max",(r.min(),r.max())
+          print("-------------------     r min-max",(r.min(),r.max()))
           
         
           # copy red, green, blue to the rgbArray and apply mask  
@@ -1165,7 +1168,7 @@ if __name__ == '__main__':
           if shelve_labels:
                 labels = labels.astype('uint32') 
                 filename = labels_dir + '/Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)
-                print "*** writing variables ", filename
+                print("*** writing variables ", filename)
                 myShelve = shelve.open(filename)
                 # write data as dictionary into the shelve
                 dict_labels = {'labels': labels, 'metadata': metadata}
@@ -1195,7 +1198,7 @@ if __name__ == '__main__':
               #                        add_borders=in_msg.add_borders, border_color=in_msg.border_color,
               #                        add_rivers=in_msg.add_rivers, river_color=in_msg.river_color, 
               #                        resolution=in_msg.resolution, verbose=in_msg.verbose)
-              print "... save image: display ", c2File, " &"
+              print("... save image: display ", c2File, " &")
               img1.save( create_dir(c2File) ) 
               
               #pickle.dump( img1, open("RGB"+yearS+monthS+dayS+hourS+minS+".p", "wb" ) )
@@ -1219,13 +1222,13 @@ if __name__ == '__main__':
 
 
 
-              print "... create composite "+c2File+" "+hrvFile+" "+out_file
+              print("... create composite "+c2File+" "+hrvFile+" "+out_file)
               subprocess.call("/usr/bin/composite "+c2File+" "+hrvFile+" "+out_file, shell=True)
-              print "... saved composite: display ", out_file, " &"
+              print("... saved composite: display ", out_file, " &")
      
               if True: 
                   if in_msg.verbose:
-                      print "... secure copy "+out_file+ " to "+in_msg.scpOutputDir
+                      print("... secure copy "+out_file+ " to "+in_msg.scpOutputDir)
                   subprocess.call("scp "+in_msg.scpID+" "+out_file+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
 
 

@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 from mpop.satellites import GeostationaryFactory
 from mpop.projector import get_area_def
 import datetime
@@ -17,7 +20,7 @@ else:
 
 time_slot = get_last_SEVIRI_date(rapid_scan, delay=5)
 #time_slot = datetime.datetime(2015, 11, 26, 19, 30)
-print str(time_slot)
+print(str(time_slot))
 
 chn="IR_108"
 global_data = GeostationaryFactory.create_scene(sat, "", "seviri", time_slot)
@@ -47,8 +50,8 @@ else:
     #PIL_image=img.pil_image()
     filesave = time_slot.strftime("MET9-RSS_COAL2TROLL_germ-NPOL-COAL_%y%m%d%H%M.tif")
     
-print "... type(img)", type(img)
-print "... save file ", filesave
+print("... type(img)", type(img))
+print("... save file ", filesave)
 img.save(filesave, fformat='mpop.imageo.formats.ninjotiff', ninjo_product_name="IR_108",
          chan_id=chan_id, data_source="MeteoSwiss COALITION2 algorithm", data_cat="GPRN", image_dt=time_slot)
 

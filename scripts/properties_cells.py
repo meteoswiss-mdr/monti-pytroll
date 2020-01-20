@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 from datetime import datetime
 import sys, string, os
 import logging
@@ -47,7 +50,7 @@ def check_position(mask_current_label):
         return False
 
 def check_cell_same_ID(all_cells, ID):
-    if ID in all_cells.keys():
+    if ID in list(all_cells.keys()):
         return True
     else:
         return False
@@ -148,7 +151,7 @@ def create_dir(outputFile):
 
     path = dirname(outputFile)
     if not exists(path):
-        print '... create output directory: ' + path
+        print('... create output directory: ' + path)
         makedirs(path)
     return outputFile
 
@@ -210,8 +213,8 @@ def properties_cells(t1, tStop, current_labels=None, metadata=None, labels_dir=N
        
     # load a few standard things 
     if in_msg is None:
-        print "*** Error, in property_cells (property_cells)"
-        print "    no input class passed as argument"
+        print("*** Error, in property_cells (property_cells)")
+        print("    no input class passed as argument")
         quit()
         from get_input_msg import get_input_msg
         in_msg = get_input_msg('input_template')
@@ -255,12 +258,12 @@ def properties_cells(t1, tStop, current_labels=None, metadata=None, labels_dir=N
     #labels_dir = '/data/cinesat/out/labels/'
     if labels_dir is None:
         labels_dir = '/opt/users/'+in_msg.user+'/PyTroll/scripts/labels/' #compatible to all users
-        print "... use default directory to save labels: " + labels_dir
+        print("... use default directory to save labels: " + labels_dir)
 
     # loop over time
     while t1 <= tStop:
           
-          print in_msg.sat, str(in_msg.sat_nr), "seviri", t1
+          print(in_msg.sat, str(in_msg.sat_nr), "seviri", t1)
           
           if sat_data is None:
               # now read the data we would like to forecast
@@ -273,7 +276,7 @@ def properties_cells(t1, tStop, current_labels=None, metadata=None, labels_dir=N
               # load product, global_data is changed in this step!
               area_loaded = load_products(global_data, rgb_load, in_msg, area_loaded)
               
-              print '... project data to desired area ', area
+              print('... project data to desired area ', area)
               data = global_data.project(area, precompute=True)
           
           else:
@@ -295,7 +298,7 @@ def properties_cells(t1, tStop, current_labels=None, metadata=None, labels_dir=N
               values_rgb[rrgb,:,:] =  deepcopy(data[rgb_load[rrgb]].data) #-data_108[rgb_load[1]].data
           
           if current_labels is None:
-                print "--- reading labels from shelve files"
+                print("--- reading labels from shelve files")
                 filename =labels_dir +  'Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)
                 
                 myShelve = shelve.open(filename)  
@@ -304,7 +307,7 @@ def properties_cells(t1, tStop, current_labels=None, metadata=None, labels_dir=N
                 metadata = deepcopy(myShelve['metadata'])
                 myShelve.close()
           else:
-                print "--- recieving labels from plot_coaltion2"
+                print("--- recieving labels from plot_coaltion2")
                 data1 = deepcopy(current_labels)
           
           data_new = np.zeros (data1.shape)
@@ -321,7 +324,7 @@ def properties_cells(t1, tStop, current_labels=None, metadata=None, labels_dir=N
           file_previous_labels = labels_dir +  'Labels_%s*'%(year0S+month0S+day0S+hour0S+min0S)
           filename1 = glob.glob(file_previous_labels)
           
-          print "the previous filename is: ", filename1
+          print("the previous filename is: ", filename1)
           
           if t0.hour == 0 and t0.minute == 0:
               check_date = True
@@ -382,7 +385,7 @@ def properties_cells(t1, tStop, current_labels=None, metadata=None, labels_dir=N
               data0 = np.array(data0,'uint32')
               labels0 = np.unique(data0[data0>0])   # this might be an empty tuple [] !HAU!
               
-              print "this should match with output previous step \n", labels0
+              print("this should match with output previous step \n", labels0)
               
               connections = []
               for con in labels0:
@@ -405,9 +408,9 @@ def properties_cells(t1, tStop, current_labels=None, metadata=None, labels_dir=N
                     try:
                         new_id_num = labels0.max()+1
                     except ValueError:
-                        print "labels0: ", labels0
-                        print type(labels0)
-                        print "quitting in properties_cells line 397"
+                        print("labels0: ", labels0)
+                        print(type(labels0))
+                        print("quitting in properties_cells line 397")
                         quit()
               
               #list to make sure you record every split
@@ -557,7 +560,7 @@ def properties_cells(t1, tStop, current_labels=None, metadata=None, labels_dir=N
                       
                       all_cells[id_current].id_prev        = ["ID"+str(labels_previous[lp]) for lp in range(len(labels_previous))]    
                       
-                      print "more correspondence ", ("ID" + str(largest_previous)), "coming from ", ["ID"+str(labels_previous[lp]) for lp in range(len(labels_previous))]
+                      print("more correspondence ", ("ID" + str(largest_previous)), "coming from ", ["ID"+str(labels_previous[lp]) for lp in range(len(labels_previous))])
                       
                       
                   if correct_id_already_created != 0:
@@ -593,10 +596,10 @@ def properties_cells(t1, tStop, current_labels=None, metadata=None, labels_dir=N
               myShelve.close() 
               filenames_for_permission =  glob.glob(labels_dir +  'Labels_%s*'%(yearS+monthS+dayS+hourS+minS))
               for file_per in filenames_for_permission:
-                    print("modified permission: ", file_per)
-                    os.chmod(file_per, 0664)  ## FOR PYTHON3: 0o664          
-              print("....updated cells labels", filename)
-              list_cells = all_cells.keys()
+                    print(("modified permission: ", file_per))
+                    os.chmod(file_per, 0o664)  ## FOR PYTHON3: 0o664          
+              print(("....updated cells labels", filename))
+              list_cells = list(all_cells.keys())
               for cell_connection in list_cells:
                   ancestors = all_cells[cell_connection].id_prev
                   
@@ -610,10 +613,10 @@ def properties_cells(t1, tStop, current_labels=None, metadata=None, labels_dir=N
               d = shelve.open(filename)
               d['connections'] = deepcopy(connections)
               d.close()
-              print("....updated cells connections", labels_dir +  'Labels_%s.shelve'%(year0S+month0S+day0S+hour0S+min0S))
+              print(("....updated cells connections", labels_dir +  'Labels_%s.shelve'%(year0S+month0S+day0S+hour0S+min0S)))
               filenames_for_permission =  glob.glob(labels_dir +  'Labels_%s*'%(year0S+month0S+day0S+hour0S+min0S))
               for file_per in filenames_for_permission:
-                    os.chmod(file_per, 0664)  ## FOR PYTHON3: 0o664               
+                    os.chmod(file_per, 0o664)  ## FOR PYTHON3: 0o664               
               
           print("....starting updating cells")
           filename = create_dir( labels_dir +  'Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS) )
@@ -625,8 +628,8 @@ def properties_cells(t1, tStop, current_labels=None, metadata=None, labels_dir=N
           print("....updated all cells")
           filenames_for_permission =  glob.glob(labels_dir +  'Labels_%s*'%(yearS+monthS+dayS+hourS+minS))
           for file_per in filenames_for_permission:
-                print("modified permission: ", file_per)
-                os.chmod(file_per, 0664)  ## FOR PYTHON3: 0o664          
+                print(("modified permission: ", file_per))
+                os.chmod(file_per, 0o664)  ## FOR PYTHON3: 0o664          
           
           t1 = t1 + timedelta(minutes=5)  
           
@@ -662,12 +665,12 @@ if __name__ == '__main__':
                         time_slot -= timedelta(minutes=delay)
                     nrt = True
                     tStop = time_slot 
-                    print "... chose time (automatically): ", str(tStop)
+                    print("... chose time (automatically): ", str(tStop))
             else:
-                    print "***           "
-                    print "*** Warning, please specify date and time completely, e.g."
-                    print "***          python plot_radar.py 2014 07 23 16 10 "
-                    print "***           "
+                    print("***           ")
+                    print("*** Warning, please specify date and time completely, e.g.")
+                    print("***          python plot_radar.py 2014 07 23 16 10 ")
+                    print("***           ")
                     quit() # quit at this point 
             data_new, first_time_step = properties_cells(t1,tStop,None)        
                     

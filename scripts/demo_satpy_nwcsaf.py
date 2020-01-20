@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 
 #from satpy.utils import debug_on
 #debug_on()
@@ -32,28 +35,33 @@ for p_ in product_list:
     #else:
     #    print ("NWCSAF data product " + product + " is missing or is not readable")
     
-    print "... search files in "+ "/data/COALITION2/database/meteosat/SAFNWC_v2016/2017/07/07/"+p_+"/"
+    print("... search files in "+ "/data/COALITION2/database/meteosat/SAFNWC_v2016/2017/07/07/"+p_+"/")
     files_nwc = find_files_and_readers(sensor='seviri',
                                        start_time=start_time,
                                        end_time=end_time,
                                        #base_dir="/data/COALITION2/database/meteosat/SAFNWC_v2013/2015/07/07/",
                                        base_dir="/data/COALITION2/database/meteosat/SAFNWC_v2016/2017/07/07/"+p_+"/",
-                                       reader='nc_nwcsaf_msg')
+                                       reader='nwcsaf-geo')
     #print files_nwc
     #files = dict(files_sat.items() + files_nwc.items())
-    files = dict(files_nwc.items())
+    files = dict(list(files_nwc.items()))
 
     global_scene = Scene(filenames=files)
-
+    
     #global_scene.load(['cloudtype'])
     global_scene.load(nwcsaf.product[p_])
 
+    print("")
+    print("global_scene")
+    print(global_scene)
+
     global_scene.available_dataset_names()
     #!!# print(global_scene['overview']) ### this one does only work in the develop version
-    print ""
-    print "available_composite_names"
-    print global_scene.available_composite_names()
+    print("")
+    print("available_composite_names")
+    print(global_scene.available_composite_names())
 
+    print("resample")
     local_scene = global_scene.resample("ccs4")
 
     for p_name in nwcsaf.product[p_]:
@@ -65,6 +73,6 @@ for p_ in product_list:
         #local_scene.show(p_name)
         #local_scene.show(p_name, overlay={'coast_dir': '/data/OWARNA/hau/maps_pytroll/', 'color': (255, 0, 0), 'resolution': 'i'})
         local_scene.save_dataset(p_name, "./local_"+p_name+".png", overlay={'coast_dir': '/data/OWARNA/hau/maps_pytroll/', 'color': (255, 0, 0), 'resolution': 'i'})
-        print "display ./local_"+p_name+".png &"
+        print("display ./local_"+p_name+".png &")
 
 

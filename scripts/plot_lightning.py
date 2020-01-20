@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 from datetime import datetime
 import sys, string, os
 import logging
@@ -18,7 +21,7 @@ from os.path import exists
 from os import makedirs
 from pycoast import ContourWriterAGG
 import subprocess
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 from mpop import CONFIG_PATH
 
 import scp_settings
@@ -51,7 +54,7 @@ layer=' 2nd layer'
 add_rivers=True
 add_borders=True
 if len(layer) > 0:
-    print "*** No borders and rivers for an overlay"
+    print("*** No borders and rivers for an overlay")
     add_rivers  = False # no rivers if an overlay is needed
     add_borders = False # no map    if an overlay is needed
 scpOutput = False
@@ -59,13 +62,13 @@ scpOutput = False
 
 if len(sys.argv) > 1:
     if len(sys.argv) < 6:
-        print "***           "
-        print "*** Warning, please specify date and time completely, e.g."
-        print "***          python plot_lightning.py 2014 07 23 16 10 "
-        print "***          arguments given by you:"
+        print("***           ")
+        print("*** Warning, please specify date and time completely, e.g.")
+        print("***          python plot_lightning.py 2014 07 23 16 10 ")
+        print("***          arguments given by you:")
         for i in range(len(sys.argv)):
-            print sys.argv[i]
-        print "***           "
+            print(sys.argv[i])
+        print("***           ")
         quit() # quit at this point
     else:
         year   = int(sys.argv[1])
@@ -97,17 +100,17 @@ area='ccs4'
 #area='EuropeCanaryS95'
 obj_area = get_area_def(area)
 
-print "... read lightning data"
+print("... read lightning data")
 global_data = GeostationaryFactory.create_scene("swisslightning", "", "thx", time_slot)
 global_data.load([prop_str], area=area)
 
-print "... global_data "
-print global_data
+print("... global_data ")
+print(global_data)
 #plot.show_quicklook(ccs4, global_data['precip'].data )
 #print "global_data[prop_str].data", global_data[prop_str].data
-print "... shape: ", global_data[prop_str].data.shape
-print "... min/max: ", global_data[prop_str].data.min(), global_data[prop_str].data.max()
-print "... dt: ", global_data.dt, " min"
+print("... shape: ", global_data[prop_str].data.shape)
+print("... min/max: ", global_data[prop_str].data.min(), global_data[prop_str].data.max())
+print("... dt: ", global_data.dt, " min")
 dt_str = ("%04d" % global_data.dt) + "min"
 
 yearS = str(year)
@@ -154,7 +157,7 @@ if unfold_lightning:
 
     dx_str = ("%03d" % round(dx/1000.)) + "km"
 
-    print "... unfold radius ", dx
+    print("... unfold radius ", dx)
 
     ### !!! THIS IS VERY ROUGH !!!
     ### !!! pixel_size_x != pixel_size_y !!!
@@ -177,7 +180,7 @@ if unfold_lightning:
     elif form == 'gauss':
         dArea = pi*dx/1000.*dx/1000. # !!! ??? what is resonable here ??? !!!
     else:
-        print '*** Error unknown lightning shape'
+        print('*** Error unknown lightning shape')
         quit()
 
 ########## input ###########
@@ -187,10 +190,10 @@ method='logarithmic'
 
 log_str=''
 if method=='logarithmic':
-    print "... data.min(), data.max() = ", prop.min(), prop.max()
-    print "*** transform to logarithmic lightning rate"
+    print("... data.min(), data.max() = ", prop.min(), prop.max())
+    print("*** transform to logarithmic lightning rate")
     prop=np.log10(prop)
-    print "... after log transformation: data.min(), data.max() = ", prop.min(), prop.max()
+    print("... after log transformation: data.min(), data.max() = ", prop.min(), prop.max())
 
     #units='log(flashrate)'
     log_str='log_10 '
@@ -215,13 +218,13 @@ if fixed_minmax:
     if method=='logarithmic':
         min_data = np.log10(min_data)
         max_data = np.log10(max_data)
-    print "... used fixed min/max values for plotting: ", min_data, max_data
+    print("... used fixed min/max values for plotting: ", min_data, max_data)
 
 else:
     min_data=prop.min()
     max_data=prop.max()
     #max_data = np.percentile(prop.data[ind],99.5)
-    print "... used variable min/max values for plotting: ", min_data, max_data
+    print("... used variable min/max values for plotting: ", min_data, max_data)
 
     #if prop_str=='dens' or prop_str=='densIC' or prop_str=='densCG':
     #    max_data=2.0
@@ -272,19 +275,19 @@ if save_statistics:
     str2write = str2write+' '+ "%8.0f" % prop_sum
     str2write = str2write+' '+ "%8.0f" % prop_km2
     str2write = str2write+"\n"
-    print  "date       HH : MM UTC    mean     p50     p75     p90    max       sum     area"
+    print("date       HH : MM UTC    mean     p50     p75     p90    max       sum     area")
     #      "2014 07 23 18 35        1.6162   1.000   2.000   3.000    5.00      160       99"
-    print str2write
+    print(str2write)
     f1.write(str2write)
     f1.close()
-    print "wrote statistics file: emacs "+ statisticFile +" &"
+    print("wrote statistics file: emacs "+ statisticFile +" &")
 
 
 plot_type = 'trollimage'
 #plot_type = 'contours'
 
 if not exists(outputDir):
-    print '... create output directory: ' + outputDir
+    print('... create output directory: ' + outputDir)
     makedirs(outputDir)
 
 if plot_diagram:
@@ -327,10 +330,10 @@ if plot_diagram:
         tick_marks=5
         minor_tick_marks=1  
     else:
-        print "*** Error, unknown property", prop_str
+        print("*** Error, unknown property", prop_str)
 
     if plot_type == 'trollimage':
-        print '... use trollimage to ', method,' plot data (min,max)=',min_data, max_data
+        print('... use trollimage to ', method,' plot data (min,max)=',min_data, max_data)
         if 'fill_value' in locals():
             img = trollimage(prop, mode="L", fill_value=fill_value)  # fillvalue    -> opaque background 
         else:
@@ -356,9 +359,9 @@ if plot_diagram:
         import matplotlib.cm as cm
 
         (ny,nx)=prop.shape
-        X, Y = np.meshgrid(range(nx), np.arange(ny-1, -1, -1))
+        X, Y = np.meshgrid(list(range(nx)), np.arange(ny-1, -1, -1))
 
-        print prop.min(), prop.max()
+        print(prop.min(), prop.max())
 
         fig, ax = prepare_figure(obj_area)
 
@@ -387,7 +390,7 @@ if plot_diagram:
     draw = ImageDraw.Draw(PIL_image)
 
     if add_colorscale:
-        print '... add colorscale ranging from min_data (',min_data,') to max_data (',max_data,')'
+        print('... add colorscale ranging from min_data (',min_data,') to max_data (',max_data,')')
         dc.align_right()
         dc.write_vertically()
         font_scale = aggdraw.Font("black","/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerif-Bold.ttf",size=16)
@@ -417,19 +420,19 @@ if plot_diagram:
 
     if add_rivers:
        if verbose:
-          print "    add rivers to image (resolution="+resolution+")"
+          print("    add rivers to image (resolution="+resolution+")")
        cw.add_rivers(PIL_image, area_def, outline='blue', resolution=resolution, outline_opacity=127, width=1, level=5) # 
        if verbose:
-          print "    add lakes to image (resolution="+resolution+")"
+          print("    add lakes to image (resolution="+resolution+")")
        cw.add_coastlines(PIL_image, area_def, outline='blue', resolution=resolution, outline_opacity=127, width=1, level=2)  #, outline_opacity=0
     if add_borders:
        outline = (255, 0, 0)
        outline = 'black'
        if verbose:
-          print "    add coastlines to image (resolution="+resolution+")"
+          print("    add coastlines to image (resolution="+resolution+")")
        cw.add_coastlines(PIL_image, area_def, outline=outline, resolution=resolution, width=2)  #, outline_opacity=0
        if verbose:
-          print "    add borders to image (resolution="+resolution+")"
+          print("    add borders to image (resolution="+resolution+")")
        cw.add_borders(PIL_image, area_def, outline=outline, resolution=resolution, width=2)       #, outline_opacity=0 
 
     if add_title:
@@ -444,9 +447,9 @@ if plot_diagram:
         if len(layer)==0:
             draw.text((0, 30), ' '+dateS+' '+timeS, title_color, font=font)
 
-    print '... save image as ', outputFile
+    print('... save image as ', outputFile)
     PIL_image.save(outputFile)
 
     if scpOutput:
-        print "... secure copy "+outputFile+ " to "+scpOutputDir
+        print("... secure copy "+outputFile+ " to "+scpOutputDir)
         subprocess.call("scp "+scpID+" "+outputFile+" "+scpOutputDir+" 2>&1 &", shell=True)

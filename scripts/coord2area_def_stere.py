@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 # Copyright (c) 2012
 #
 # code from
@@ -45,7 +48,7 @@ import sys
 from pyproj import Proj
   
 if len(sys.argv) != 8:
-    print "Usage: ", sys.argv[0], "name proj min_lat[degNorth] max_lat[degNorth] min_lon[degEast] max_lon[degEast] resolution[km]"
+    print("Usage: ", sys.argv[0], "name proj min_lat[degNorth] max_lat[degNorth] min_lon[degEast] max_lon[degEast] resolution[km]")
     exit(1)
   
 name = sys.argv[1]
@@ -76,14 +79,14 @@ area_extent = (min(left_ex1, left_ex1),
 xsize = int((area_extent[2] - area_extent[0]) / res)
 ysize = int((area_extent[3] - area_extent[1]) / res)
   
-print "REGION:", name, "{"
-print "\tNAME:\t", name
-print "\tPCS_ID:\t", proj + "_" + str(lon_0) + "_" + str(lat_0)
-print ("\tPCS_DEF:\tproj=" + proj +
+print("REGION:", name, "{")
+print("\tNAME:\t", name)
+print("\tPCS_ID:\t", proj + "_" + str(lon_0) + "_" + str(lat_0))
+print(("\tPCS_DEF:\tproj=" + proj +
        ",lat_0=" + str(lat_0) +
        ",lon_0=" + str(lon_0) +
-       ",ellps=WGS84")
-print "\tXSIZE:\t", xsize
-print "\tYSIZE:\t", ysize
-print "\tAREA_EXTENT:\t", area_extent
-print "};"
+       ",ellps=WGS84"))
+print("\tXSIZE:\t", xsize)
+print("\tYSIZE:\t", ysize)
+print("\tAREA_EXTENT:\t", area_extent)
+print("};")

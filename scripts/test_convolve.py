@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -38,7 +41,7 @@ else:
 
 (nx,ny) = data_2D.shape
 
-print "min/max/mean", data_2D.min(), data_2D.max(), data_2D.mean()
+print("min/max/mean", data_2D.min(), data_2D.max(), data_2D.mean())
 
 # Setup kernels, including unity kernel for original image
 # Choose normalization for linear scale space for MexicanHat
@@ -102,14 +105,14 @@ for i in [1,2,3]:
         k = np.ones([5,3])
         k = k / k.sum()
         title =  "ndimage.convolve 5x3"
-        print title 
+        print(title) 
         smoothed = ndimage.convolve(data_2D, k, mode='nearest')
 
     if i == 2:
 
         if False:
             title = "gaussian_laplace"
-            print "title"
+            print("title")
             #smoothed = data_2D + ndimage.gaussian_laplace(data_2D, 3, mode='nearest') * 10.
             smoothed = ndimage.gaussian_laplace(data_2D, 3, mode='nearest') * 10.
 
@@ -117,7 +120,7 @@ for i in [1,2,3]:
             #sigma=1/2.*np.array([4.5,3.0])  # no artefacts more for shifted fields
             sigma=1/3.*np.array([4.5,3.0])  # conserves a bit better the maxima
             title = "gaussian_filter "+str(sigma)
-            print "... image 2: ", title
+            print("... image 2: ", title)
             smoothed = ndimage.filters.gaussian_filter(data_2D, sigma, mode='nearest')
 
     if i == 3:
@@ -126,7 +129,7 @@ for i in [1,2,3]:
             sigma=1/2.*np.array([4.5,3.0])  # no artefacts more for shifted fields
             #sigma=1/3.*np.array([4.5,3.0])  # conserves a bit better the maxima
             title = "gaussian_filter "+str(sigma)
-            print "title", title
+            print("title", title)
             smoothed = ndimage.filters.gaussian_filter(data_2D, sigma, mode='nearest')
 
         if False:
@@ -136,10 +139,10 @@ for i in [1,2,3]:
             k[6,:] = out
             k[:,0] = out
             k[:,4] = out
-            print k
+            print(k)
             k = k / k.sum()
             title = "ndimage.convolve 5x3 mod A"
-            print "title", title
+            print("title", title)
             smoothed = ndimage.convolve(data_2D, k, mode='nearest')
 
         if False:
@@ -149,10 +152,10 @@ for i in [1,2,3]:
             k[4,0] = corner
             k[0,2] = corner
             k[4,2] = corner
-            print k
+            print(k)
             k = k / k.sum()
             title =  "ndimage.convolve 5x3 mod B"
-            print "title", title 
+            print("title", title) 
             smoothed = ndimage.convolve(data_2D, k, mode='nearest')
 
         if False:
@@ -167,10 +170,10 @@ for i in [1,2,3]:
             k[4,0] = corner
             k[0,2] = corner
             k[4,2] = corner
-            print k
+            print(k)
             k = k / k.sum()
             title =  "ndimage.convolve 5x3 mod C"
-            print "title", title 
+            print("title", title) 
             smoothed = ndimage.convolve(data_2D, k, mode='nearest')
 
         if False:
@@ -244,14 +247,14 @@ for i in [1,2,3]:
 
             f_ishift = np.fft.ifftshift(fshift)
             smoothed = np.fft.ifft2(f_ishift)
-            print type(smoothed), smoothed.shape, smoothed.dtype
+            print(type(smoothed), smoothed.shape, smoothed.dtype)
             smoothed = np.abs(smoothed)
 
             if True:
                 vmin =  smoothed.min()
                 vmax =  smoothed.max()
 
-            print "title", title
+            print("title", title)
 
 
         #kernel = Box2DKernel(n_box)

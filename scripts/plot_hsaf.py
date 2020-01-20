@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 ## does not work!!!
 #import subprocess
 #print "... set python path and config path" 
@@ -39,7 +42,7 @@ layer=''
 add_rivers=False
 add_borders=True
 if len(layer) > 0:
-    print "*** No borders and rivers for an overlay"
+    print("*** No borders and rivers for an overlay")
     add_rivers  = False # no rivers if an overlay is needed
     add_borders = False # no map    if an overlay is needed
 
@@ -69,10 +72,10 @@ delay=10    # usually 8min, between 0->8 and 15->23
 
 if len(sys.argv) > 1:
     if len(sys.argv) < 6:
-        print "***           "
-        print "*** Warning, please specify date and time completely, e.g."
-        print "***          python plot_hsaf.py 2014 07 23 16 10 "
-        print "***           "
+        print("***           ")
+        print("*** Warning, please specify date and time completely, e.g.")
+        print("***          python plot_hsaf.py 2014 07 23 16 10 ")
+        print("***           ")
         quit() # quit at this point
     else:
         year   = int(sys.argv[1])
@@ -97,8 +100,8 @@ else:
         minute=45
 
 time_slot = datetime(year, month, day, hour, minute)
-print "*** "
-print "*** read hsaf data (plot_hsaf.py)"
+print("*** ")
+print("*** read hsaf data (plot_hsaf.py)")
 #global_data = GeostationaryFactory.create_scene("dem", "", "dem", time_slot)
 #prop_str = 'dem'
 
@@ -131,29 +134,29 @@ outputDir='./pics/'
 parallax_str=''
 if parallax_correction:
     if estimate_cth:
-        print "*** estimate cth"
-        print "... read IR_108"
+        print("*** estimate cth")
+        print("... read IR_108")
         IR_data = GeostationaryFactory.create_scene("Meteosat-9", "", "seviri", time_slot)
         IR_data.load(['IR_108'], reader_level="seviri-level2")
-        print "    reproject IR_108 to projection of hsaf"  
+        print("    reproject IR_108 to projection of hsaf")  
         IR_data = IR_data.project('hsaf', precompute=True)  # return statement is necessary
         global_data.parallax_corr(fill="nearest", estimate_cth=True, IR_108=IR_data['IR_108'], cth_atm="best", time_slot=time_slot, replace=True)
         parallax_str='-PC-ECTH'
         #plot.show_quicklook(global_data['CTH'].area_def, global_data['CTH'].data)
     else:
-        print "... take cth from NWC-SAF"
-        print "*** read CTH"
+        print("... take cth from NWC-SAF")
+        print("*** read CTH")
         global_data.load(['CTTH'], reader_level="seviri-level3")
         from my_msg_module import convert_NWCSAF_to_radiance_format
         convert_NWCSAF_to_radiance_format(global_data, global_data['CTTH'].area, 'CTH', True, True)
         global_data.channels.remove('CTTH')
-        print "reproject CTH to projection of hsaf"  
+        print("reproject CTH to projection of hsaf")  
         global_data = global_data.project('hsaf', precompute=True)  # return statement is necessary
         global_data.parallax_corr(fill="nearest", estimate_cth=False, replace=True)  # fill="False", "nearest" or "bilinear"
         parallax_str='-PC-CTH'
 
 if not exists(outputDir):
-    print '... create output directory: ' + outputDir
+    print('... create output directory: ' + outputDir)
     makedirs(outputDir)
 
 for area in areas:
@@ -196,12 +199,12 @@ for area in areas:
         str2write = str2write+' '+ "%7.2f" % prop_max
         str2write = str2write+' '+ "%8.0f" % area_km2
         str2write = str2write+"\n"
-        print  "date       HH : MM UTC    mean      p50     p75     p90   max      area"
+        print("date       HH : MM UTC    mean      p50     p75     p90   max      area")
         #      "2014-07-23 18 : 00 UTC    2.1661    1.00    2.00    5.05  118.05  54868"
-        print str2write
+        print(str2write)
         f1.write(str2write) 
         f1.close()
-        print "wrote statistics file: emacs "+ statisticFile +" &"
+        print("wrote statistics file: emacs "+ statisticFile +" &")
 
 
     #outputFile = "./pics/radar.png"
@@ -221,13 +224,13 @@ for area in areas:
         colormap   = rainbow
         colormap_r = rainbow.reverse()
         max_data = prop.max()
-        print 'max_data: ', max_data
+        print('max_data: ', max_data)
         if prop.max() < 10:
             max_data = max_data-(max_data%1)
-            print 'round(max_data): ', max_data
+            print('round(max_data): ', max_data)
         else:
             max_data=max_data-(max_data%10)
-            print 'round(max_data): ', max_data
+            print('round(max_data): ', max_data)
 
     colormap.set_range(min_data, max_data)
 
@@ -238,7 +241,7 @@ for area in areas:
         tick_marks=2        # default
         minor_tick_marks=1  # default    
 
-    print "*** min(set) / min(data) / max: ", min_data, prop.min(), max_data
+    print("*** min(set) / min(data) / max: ", min_data, prop.min(), max_data)
 
     method='linear'
     #method='logarithmic'
@@ -254,7 +257,7 @@ for area in areas:
         tick_marks=1        # default
         minor_tick_marks=0.1   # default
 
-    print '... use trollimage to ', method,' plot data (min,max)=',min_data, max_data
+    print('... use trollimage to ', method,' plot data (min,max)=',min_data, max_data)
     if 'fill_value' in locals():
         img = trollimage(prop, mode="L", fill_value=fill_value) 
     else:
@@ -287,25 +290,25 @@ for area in areas:
 
     if add_rivers:
        if verbose:
-          print "    add rivers to image (resolution="+resolution+")"
+          print("    add rivers to image (resolution="+resolution+")")
        cw.add_rivers(PIL_image, area_def, outline='blue', resolution=resolution, outline_opacity=127, width=1, level=5) # 
        if verbose:
-          print "    add lakes to image (resolution="+resolution+")"
+          print("    add lakes to image (resolution="+resolution+")")
        cw.add_coastlines(PIL_image, area_def, outline='blue', resolution=resolution, outline_opacity=127, width=1, level=2)  #, outline_opacity=0
     if add_borders:
        outline = (255, 0, 0)
        outline = 'black'
        if verbose:
-          print "    add coastlines to image (resolution="+resolution+")"
+          print("    add coastlines to image (resolution="+resolution+")")
        cw.add_coastlines(PIL_image, area_def, outline=outline, resolution=resolution, width=2)  #, outline_opacity=0
        if verbose:
-          print "    add borders to image (resolution="+resolution+")"
+          print("    add borders to image (resolution="+resolution+")")
        cw.add_borders(PIL_image, area_def, outline=outline, resolution=resolution, width=2)       #, outline_opacity=0 
 
     # add MeteoSwiss and Pytroll logo
     if add_logos:
         if verbose:
-            print '... add logos'
+            print('... add logos')
         dc.align_right()
         if add_colorscale:
             dc.write_vertically()
@@ -314,7 +317,7 @@ for area in areas:
         #dc.add_logo("/opt/users/common/logos/EUMETSAT_logo2_tiny_white.png",height=60.0)
 
     if add_colorscale:
-        print '... add colorscale ranging from min_data (',min_data,') to max_data (',max_data,')'
+        print('... add colorscale ranging from min_data (',min_data,') to max_data (',max_data,')')
         dc.align_right()
         dc.write_vertically()
         font_scale = aggdraw.Font("black","/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerif-Bold.ttf",size=16)
@@ -340,5 +343,5 @@ for area in areas:
         title = layer+' HSAF, '+'h03'+' ['+data['h03'].units+']'
         draw.text((0, y_pos_title),title, title_color, font=font)
 
-    print '... save image as ', outputFile
+    print('... save image as ', outputFile)
     PIL_image.save(outputFile)

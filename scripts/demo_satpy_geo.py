@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
@@ -71,7 +74,7 @@ else:
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print "Usage: " + sys.argv[0] + " time_string(%Y%m%d%H%M)"
+        print("Usage: " + sys.argv[0] + " time_string(%Y%m%d%H%M)")
         sys.exit()
 
     time_string = sys.argv[1]

@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 #!/usr/bin/python
 import datetime
 import logging
@@ -25,10 +28,10 @@ delay=0
 
 if len(sys.argv) > 1:
     if len(sys.argv) < 6:
-        print "***           "
-        print "*** Warning, please specify date and time completely, e.g."
-        print "***          python plot_odyssey.py 2014 07 23 16 10 "
-        print "***           "
+        print("***           ")
+        print("*** Warning, please specify date and time completely, e.g.")
+        print("***          python plot_odyssey.py 2014 07 23 16 10 ")
+        print("***           ")
         quit() # quit at this point
     else:
         year   = int(sys.argv[1])
@@ -70,7 +73,7 @@ minS   = "%02d" % minute
 dateS=yearS+'-'+monthS+'-'+dayS
 timeS=hourS+':'+minS+'UTC' 
 
-print dateS, timeS
+print(dateS, timeS)
 
 #import sys, string, os
 #sys.path.insert(0, "/opt/users/mbc/pytroll/install/lib/python2.6/site-packages")
@@ -81,7 +84,7 @@ global_data = GeostationaryFactory.create_scene("odyssey", "", "radar", time_slo
 
 global_data.load([prop_str])
 
-print global_data
+print(global_data)
 
 color_mode='RainRate'
 
@@ -93,8 +96,8 @@ area='EuroMercator' # should be the same as blitzortung
 
 reproject=True
 if reproject:
-   print '-------------------'
-   print "start projection"
+   print('-------------------')
+   print("start projection")
    # PROJECT data to new area 
    data = global_data.project(area, precompute=True)
    #data[prop_str].product_name = global_data[prop_str].product_name
@@ -108,17 +111,17 @@ if not exists(outputDir):
 outputFile = outputDir+'ODY_'+prop_str+'-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS +'.png'
 
 # define area
-print '-------------------'
+print('-------------------')
 obj_area = get_area_def(area)
-print 'obj_area ', obj_area
+print('obj_area ', obj_area)
 proj4_string = obj_area.proj4_string     
 # e.g. proj4_string = '+proj=geos +lon_0=0.0 +a=6378169.00 +b=6356583.80 +h=35785831.0'
-print 'proj4_string ',proj4_string
+print('proj4_string ',proj4_string)
 area_extent = obj_area.area_extent              
 # e.g. area_extent = (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
 area_def = (proj4_string, area_extent)
-print '-------------------'
-print 'area_def ', area_def
+print('-------------------')
+print('area_def ', area_def)
 
 
 prop=global_data[prop_str].data
@@ -199,7 +202,7 @@ units=global_data[prop_str].info["units"]
 
 if add_logos:
    if verbose:
-      print '... add logos'
+      print('... add logos')
    dc.align_right()
    if add_colorscale:
       dc.write_vertically()
@@ -213,7 +216,7 @@ fontsize=18
 font = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaSansRegular.ttf", fontsize)
 
 if add_colorscale:
-   print '... add colorscale ranging from min_data (',min_data,') to max_data (',max_data,')'
+   print('... add colorscale ranging from min_data (',min_data,') to max_data (',max_data,')')
    dc.align_right()
    dc.write_vertically()
    #font_scale = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf", fontsize)
@@ -251,7 +254,7 @@ if add_title:
 
    
 PIL_image.save(outputFile)
-print '... save image as ', outputFile
+print('... save image as ', outputFile)
 
 # Austria works with
 # https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_watershed/py_watershed.html
@@ -282,10 +285,10 @@ if find_maxima:
     ref_min=43
     
     data_max = filters.maximum_filter(data, neighborhood_size)
-    print data_max.max()
+    print(data_max.max())
     maxima = (data == data_max)
     data_min = filters.minimum_filter(data, neighborhood_size)
-    print data_min.max()
+    print(data_min.max())
     diff = ((data_max - data_min) > threshold)
     #print "diff: ", diff
     maxima[diff == False] = 0
@@ -308,13 +311,13 @@ if find_maxima:
         plt.autoscale(False)
         outputFile = outputDir+'odd_'+prop_str+'-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS +'.png'
         plt.savefig(outputFile, bbox_inches = 'tight')
-        print "display "+outputFile+" &"
+        print("display "+outputFile+" &")
         
         plt.autoscale(False)
         plt.plot(x,y, 'ro', markersize=2.5)
         outputFile = outputDir+'odm_'+prop_str+'-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS +'.png'
         plt.savefig(outputFile, bbox_inches = 'tight')
-        print "display "+outputFile+" &"
+        print("display "+outputFile+" &")
     else:
         prop = np.full(data.shape, False, dtype=bool)
         for i,j in zip(x,y):

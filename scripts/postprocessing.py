@@ -1,3 +1,8 @@
+from __future__ import division
+from __future__ import print_function
+
+
+
 
 from my_msg_module import format_name
 from os.path import isfile, join, exists, dirname
@@ -7,8 +12,8 @@ import inspect
 from copy import deepcopy
 
 def get_THX_filename(time_slot, area, outDir, outFile):
-    print "    get_THX_filename THX for ", area
-    from ConfigParser import ConfigParser
+    print("    get_THX_filename THX for ", area)
+    from configparser import ConfigParser
     from mpop import CONFIG_PATH
     conf = ConfigParser()
     conf.read(join(CONFIG_PATH, "swisslightning.cfg"))
@@ -22,7 +27,7 @@ def get_THX_filename(time_slot, area, outDir, outFile):
     return outputDir+filename
 
 def get_radar_filename(rgb, time_slot, area, outDir, outFile):
-    print "    get_radar_filename radar for ", area
+    print("    get_radar_filename radar for ", area)
 
     if rgb=='radar':
         # backward comparbility (old convention for file names of radar products, not that good)
@@ -34,58 +39,58 @@ def get_radar_filename(rgb, time_slot, area, outDir, outFile):
         filename = format_name('RAD_'+rgb+'-'+area+'_%y%m%d%H%M.png', time_slot, area=area)   
 
     if not exists(outputDir):
-        print '... create output directory: ' + outputDir
+        print('... create output directory: ' + outputDir)
         from os import makedirs
         makedirs(outputDir)
         
     return outputDir+filename
 
 def get_odyssey_filename(time_slot, area, outDir, outFile):
-    print "    get_odyssey_filename radar for ", area
+    print("    get_odyssey_filename radar for ", area)
     outputDir = format_name(outDir, time_slot, area=area, rgb="radar")
     if not exists(outputDir):
-        print '... create output directory: ' + outputDir
+        print('... create output directory: ' + outputDir)
         from os import makedirs
         makedirs(outputDir)
     filename =  format_name('ODY_RATE-'+area+'_%y%m%d%H%M.png', time_slot, area=area)
     return outputDir+filename
 
 def get_TRT_filename(time_slot, area, outDir, outFile):
-    print "    get_TRT_filename TRT for ", area 
+    print("    get_TRT_filename TRT for ", area) 
     outputDir = format_name(outDir, time_slot, area=area, rgb="TRT")
     if not exists(outputDir):
-        print '... create output directory: ' + outputDir
+        print('... create output directory: ' + outputDir)
         from os import makedirs
         makedirs(outputDir)
     filename =  format_name('RAD_TRT-'+area+'_%y%m%d%H%M.png', time_slot, area=area)
     return outputDir+filename
     
 def get_OT_filename(rgb, time_slot, area, outDir, outFile):
-    print "    get_OT_filename (overshooting top) for ", area 
+    print("    get_OT_filename (overshooting top) for ", area) 
     outputDir = format_name(outDir, time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
     if not exists(outputDir):
-        print '... create output directory: ' + outputDir
+        print('... create output directory: ' + outputDir)
         from os import makedirs
         makedirs(outputDir)
     filename  = format_name(outFile, time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
     return outputDir+filename
 
 def get_sat_filename(rgb, sat, sat_nr, time_slot, area, outDir, outFile):
-    print "    get_sat_filename for ", rgb, area
+    print("    get_sat_filename for ", rgb, area)
     #outputDir = "/data/cinesat/out/"
     outputDir = format_name(outDir, time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
     if not exists(outputDir):
-        print '... create output directory: ' + outputDir
+        print('... create output directory: ' + outputDir)
         from os import makedirs
         makedirs(outputDir)
     filename  = format_name(outFile, time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
     return outputDir+filename
 
 def get_comp_filename(comp_str, sat_nr, time_slot, area, outDir, outFile):
-    print "    get_comp_filename ", comp_str
+    print("    get_comp_filename ", comp_str)
     outputDir = format_name(outDir, time_slot, area=area, rgb=comp_str.replace("_","-"), sat_nr=sat_nr)
     if not exists(outputDir):
-        print '... create output directory: ' + outputDir
+        print('... create output directory: ' + outputDir)
         from os import makedirs
         makedirs(outputDir)
     filename  = format_name('MSG_'+comp_str.replace("_","-")+'-'+area+'_%y%m%d%H%M.png', time_slot, area=area, sat_nr=sat_nr) 
@@ -116,11 +121,11 @@ def get_file_list(composite, sat, sat_nr, time_slot, area, outDir, outFile, n=No
         else:
             file_list.append (get_comp_filename(rgb, sat_nr, time_slot, area, outDir, outFile))
 
-        print file_list
+        print(file_list)
             
         if not isfile(file_list[-1]):
-            print "*** ERROR, can not find "+rgb+" file: "+file_list[-1]
-            print "    skip composite: "+composite
+            print("*** ERROR, can not find "+rgb+" file: "+file_list[-1])
+            print("    skip composite: "+composite)
             return None
     return file_list
 
@@ -141,7 +146,7 @@ def n_file_composite(composite, satellite, sat_nr, time_slot, area, outDir, outF
                          scpOutDir2=scpOutDir2, scpID2=scpID2, scpProducts2=scpProducts2, 
                          bits_per_pixel=bits_per_pixel, compress_to_8bit=compress_to_8bit, verbose=verbose)
 
-    print "    create ", n_rgb ," file composite ", composite
+    print("    create ", n_rgb ," file composite ", composite)
 
     if satellite == "meteosat":
         sat = 'MSG'
@@ -158,12 +163,12 @@ def n_file_composite(composite, satellite, sat_nr, time_slot, area, outDir, outF
     comp_dir = dirname(comp_file)
     if not exists(comp_dir):
         if verbose:
-            print '... create output directory: ' + comp_dir
+            print('... create output directory: ' + comp_dir)
         makedirs(comp_dir)
 
     command="/usr/bin/composite -depth "+str(bits_per_pixel)+" "+file_list[0]+" "+file_list[1]+" "+comp_file
     if verbose:
-        print "    "+command
+        print("    "+command)
     subprocess.call(command, shell=True) #+" 2>&1 &"
     # check if file is produced
     if isfile(comp_file):
@@ -173,7 +178,7 @@ def n_file_composite(composite, satellite, sat_nr, time_slot, area, outDir, outF
         if (composite in scpProducts) or ('all' in [x.lower() for x in scpProducts if type(x)==str]):
             scpOutputDir = format_name (scpOutDir, time_slot, area=area, rgb=composite, sat=sat, sat_nr=sat_nr )
             if verbose:
-                print "/usr/bin/scp "+scpID+" "+comp_file+" "+scpOutputDir+" 2>&1 &"
+                print("/usr/bin/scp "+scpID+" "+comp_file+" "+scpOutputDir+" 2>&1 &")
             subprocess.call("/usr/bin/scp "+scpID+" "+comp_file+" "+scpOutputDir+" 2>&1 &", shell=True)
             
     if scpOutput and (scpID2 is not None) and (scpOutDir2 is not None):
@@ -181,20 +186,20 @@ def n_file_composite(composite, satellite, sat_nr, time_slot, area, outDir, outF
             scpOutputDir2 = format_name (scpOutDir2, time_slot, area=area, rgb=composite, sat=sat, sat_nr=sat_nr )
             if compress_to_8bit:
                 if verbose:
-                    print "... secure copy "+comp_file.replace(".png","-fs8.png")+ " to "+scpOutputDir2
+                    print("... secure copy "+comp_file.replace(".png","-fs8.png")+ " to "+scpOutputDir2)
                 subprocess.call("scp "+scpID2+" "+comp_file.replace(".png","-fs8.png")+" "+scpOutputDir2+" 2>&1 &", shell=True)
             else:
                 if verbose:
-                    print "... secure copy "+comp_file+ " to "+scpOutputDir2
+                    print("... secure copy "+comp_file+ " to "+scpOutputDir2)
                 subprocess.call("scp "+scpID2+" "+comp_file+" "+scpOutputDir2+" 2>&1 &", shell=True)
 
     if ftpUpload:
-        print "... ftpUpload requested"
+        print("... ftpUpload requested")
         if ftpServer==None or ftpUser==None or ftpPassword==None:
-            print "*** ERROR, ftp input is not complete"
-            print "ftp_server=", ftpServer
-            print "ftp_user=", ftpUser
-            print "ftp_password=", ftpPassword
+            print("*** ERROR, ftp input is not complete")
+            print("ftp_server=", ftpServer)
+            print("ftp_user=", ftpUser)
+            print("ftp_password=", ftpPassword)
         else:
             if (composite in ftpProducts):
                 command_line = "curl -T "+comp_file+" "+ftpServer+" --user "+ftpUser+":"+ftpPassword
@@ -247,15 +252,15 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
             postprocessing_composite=in_msg.postprocessing_composite
     
         if in_msg.verbose:
-            print "=================================="
-            print "*** start post processing for area: ", area, ', time: ', str(time_slot)
-            print "... desired composites: ", postprocessing_composite
+            print("==================================")
+            print("*** start post processing for area: ", area, ', time: ', str(time_slot))
+            print("... desired composites: ", postprocessing_composite)
 
         composites_done = []
 
         for composite in postprocessing_composite:
 
-            print "... creating composite: ", composite
+            print("... creating composite: ", composite)
             composites_done = n_file_composite(composite, in_msg.sat, sat_nr, time_slot, area, in_msg.outputDir, in_msg.outputFile,
                                                scpOutput=in_msg.scpOutput, scpOutDir=in_msg.scpOutputDir, scpID=in_msg.scpID, scpProducts=in_msg.scpProducts,
                                                scpOutDir2=in_msg.scpOutputDir2, scpID2=in_msg.scpID2, scpProducts2=in_msg.scpProducts2,
@@ -264,15 +269,15 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
 
         if in_msg.verbose:
             if len(composites_done) > 0:
-                print "... produced composites: "
+                print("... produced composites: ")
                 for comp in composites_done:
-                    print "   ", comp
+                    print("   ", comp)
             else:
-                print "*** Warning, no composites produced "
+                print("*** Warning, no composites produced ")
 
     # ----------------------------------------------
     if in_msg.verbose:
-        print "*** start montage_pictures for area: ", area
+        print("*** start montage_pictures for area: ", area)
     
     montage_done = []
     if hasattr(in_msg, 'postprocessing_montage'):
@@ -286,15 +291,15 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
             postprocessing_montage=in_msg.postprocessing_montage
     
         if in_msg.verbose:
-            print ""
-            print "*** start post processing for area: ", area, ', time: ', str(time_slot)
-            print "... desired montages: ", postprocessing_montage
+            print("")
+            print("*** start post processing for area: ", area, ', time: ', str(time_slot))
+            print("... desired montages: ", postprocessing_montage)
             
         for montage in postprocessing_montage:
             if len(montage) == 0:
                 continue
 
-            print "... creating montage: ", montage
+            print("... creating montage: ", montage)
             # sleep_str = " && sleep 1 "
             sleep_str = " "
 
@@ -326,21 +331,21 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
             
             for mfile in montage:
 
-                print '    analyse first filename', mfile
+                print('    analyse first filename', mfile)
                 rgb = mfile.split("_")[1]
                 outputDir = format_name(in_msg.outputDir,  time_slot, rgb=rgb, area=area)
                 
                 next_file = outputDir+"/"+format_name(mfile+'-'+area+'_%y%m%d%H%M.png', time_slot, area=area)
                 if not isfile(next_file):
                     files_complete=False
-                    print "*** Warning, can not find "+mfile+" file: "+next_file
+                    print("*** Warning, can not find "+mfile+" file: "+next_file)
                     if area in ["ccs4","EuropeCanaryS95","odysseyS25","euroHDready","SeviriDiskFull00S4"]:
                         # produce image with placeholder for missing product
                         files += " "+"/opt/users/common/logos/missing_product_textbox_"+area+".png"
                         outfile += mfile[mfile.index("_")+1:]+"-"
                     else:
-                        print "*** ERROR, can not find "+mfile+" file: "+next_file
-                        print "*** skip montage: ", montage
+                        print("*** ERROR, can not find "+mfile+" file: "+next_file)
+                        print("*** skip montage: ", montage)
                         files_exist=False
                 else:
                     files += " "+outputDir+"/"+format_name(mfile+'-'+area+'_%y%m%d%H%M.png', time_slot, area=area)
@@ -350,7 +355,7 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
             outputDir = format_name(in_msg.outputDir,  time_slot, rgb=outfile[:-1], area=area)
             if not exists(outputDir):
                if in_msg.verbose:
-                  print '... create output directory: ' + outputDir
+                  print('... create output directory: ' + outputDir)
                makedirs(outputDir)
 
             montage_name=deepcopy(outfile[:-1])
@@ -367,13 +372,13 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
 
             if files_exist and nr_files_exist>0:
                 if in_msg.verbose:
-                    print "/usr/bin/montage -tile "+tile+" -geometry +0+0 "+files + " " + outfile  +" 2>&1 "+sleep_str
+                    print("/usr/bin/montage -tile "+tile+" -geometry +0+0 "+files + " " + outfile  +" 2>&1 "+sleep_str)
                 subprocess.call("/usr/bin/montage -tile "+tile+" -geometry +0+0 "+files + " " + outfile  +" 2>&1 "+sleep_str, shell=True)
 
                 if hasattr(in_msg, 'resize_montage'):
                     if in_msg.resize_montage != 100:
                         if in_msg.verbose:
-                            print "/usr/bin/convert -resize "+str(in_msg.resize_montage)+"% " + outfile  +" tmp.png 2>&1 "+sleep_str
+                            print("/usr/bin/convert -resize "+str(in_msg.resize_montage)+"% " + outfile  +" tmp.png 2>&1 "+sleep_str)
                         subprocess.call("/usr/bin/convert -resize "+str(in_msg.resize_montage)+"% " + outfile  +" tmp.png; mv tmp.png "+ outfile+" 2>&1 ", shell=True)
 
                 # check if file is produced
@@ -384,7 +389,7 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
                     if (montage in in_msg.scpProducts) or ('all' in [x.lower() for x in in_msg.scpProducts if type(x)==str]):
                         scpOutputDir = format_name (in_msg.scpOutputDir, time_slot, area=area, rgb=montage_name, sat=in_msg.sat, sat_nr=sat_nr )
                         if in_msg.verbose:
-                            print "    /usr/bin/scp "+in_msg.scpID+" "+outfile+" "+scpOutputDir+" 2>&1 &"
+                            print("    /usr/bin/scp "+in_msg.scpID+" "+outfile+" "+scpOutputDir+" 2>&1 &")
                         subprocess.call("/usr/bin/scp "+in_msg.scpID+" "+outfile+" "+scpOutputDir+" 2>&1 &", shell=True)
 
                 if in_msg.scpOutput and (in_msg.scpID2 is not None) and (in_msg.scpOutputDir2 is not None):
@@ -392,22 +397,22 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
                         scpOutputDir2 = format_name (in_msg.scpOutputDir2, time_slot, area=area, rgb=montage_name, sat=in_msg.sat, sat_nr=sat_nr )
                         if in_msg.compress_to_8bit:
                             if in_msg.verbose:
-                                print "    scp "+in_msg.scpID2+" "+outfile.replace(".png","-fs8.png")+" "+scpOutputDir2+" 2>&1 &"
+                                print("    scp "+in_msg.scpID2+" "+outfile.replace(".png","-fs8.png")+" "+scpOutputDir2+" 2>&1 &")
                             subprocess.call("scp "+in_msg.scpID2+" "+outfile.replace(".png","-fs8.png")+" "+scpOutputDir2+" 2>&1 &", shell=True)
                         else:
                             if in_msg.verbose:
-                                print "    scp "+in_msg.scpID2+" "+outfile+" "+scpOutputDir2+" 2>&1 &"
+                                print("    scp "+in_msg.scpID2+" "+outfile+" "+scpOutputDir2+" 2>&1 &")
                             subprocess.call("scp "+in_msg.scpID2+" "+outfile+" "+scpOutputDir2+" 2>&1 &", shell=True)
                         
         if in_msg.verbose:
             if len(montage_done) > 0:
-                print "... produced montages: "
+                print("... produced montages: ")
                 for montage in montage_done:
-                    print "   ", montage
+                    print("   ", montage)
             else:
                 if len(postprocessing_montage) > 0:
                     if len(postprocessing_montage[0]) > 0:
-                        print "*** Warning, no montages produced (requested ",postprocessing_montage,")"
+                        print("*** Warning, no montages produced (requested ",postprocessing_montage,")")
 
     return composites_done, montage_done
 
@@ -415,19 +420,19 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
 #-----------------------------------------------------------------------------------------
 
 def print_usage():
-         print "***           "
-         print "*** Error, not enough command line arguments"
-         print "***        please specify at least an input file"
-         print "***        possible calls are:"
-         print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG "
-         print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 "
-         print "                                 date and time must be completely given"
-         print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'ccs4'           (overwrite in_msg.postprocessing_areas)"
-         print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ['ccs4','euro4'] (overwrite in_msg.postprocessing_areas)"
-         print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'ccs4' 'h03-ir108'                 (overwrite postprocessing_composite)"
-         print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'ccs4' ['h03-ir108','h03-airmass'] (overwrite postprocessing_composite)"
-         print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ['ccs4','euro4'] ['h03-ir108','h03-airmass'] (several composites and areas)"
-         print "***           "
+         print("***           ")
+         print("*** Error, not enough command line arguments")
+         print("***        please specify at least an input file")
+         print("***        possible calls are:")
+         print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG ")
+         print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ")
+         print("                                 date and time must be completely given")
+         print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'ccs4'           (overwrite in_msg.postprocessing_areas)")
+         print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ['ccs4','euro4'] (overwrite in_msg.postprocessing_areas)")
+         print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'ccs4' 'h03-ir108'                 (overwrite postprocessing_composite)")
+         print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'ccs4' ['h03-ir108','h03-airmass'] (overwrite postprocessing_composite)")
+         print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ['ccs4','euro4'] ['h03-ir108','h03-airmass'] (several composites and areas)")
+         print("***           ")
          quit() # quit at this point
 #-----------------------------------------------------------------------------------------
 
@@ -473,18 +478,18 @@ if __name__ == '__main__':
    from get_input_msg import parse_commandline_and_read_inputfile
    in_msg = parse_commandline_and_read_inputfile()
     
-   print "*** start postprocessing for: "
-   print "    areas: ", in_msg.postprocessing_areas
-   print "    date: ", in_msg.datetime
-   print "    composite: ", in_msg.postprocessing_composite
-   print "    montage: ", in_msg.postprocessing_montage
+   print("*** start postprocessing for: ")
+   print("    areas: ", in_msg.postprocessing_areas)
+   print("    date: ", in_msg.datetime)
+   print("    composite: ", in_msg.postprocessing_composite)
+   print("    montage: ", in_msg.postprocessing_montage)
               
    # loop over all postprocessing areas
    for area in in_msg.postprocessing_areas:
        postprocessing(in_msg, in_msg.datetime, in_msg.sat_nr, area)
 
    if in_msg.verbose:
-      print " "
+      print(" ")
 
    #RGBs_done = plot_msg(in_msg)
    #print "*** Satellite pictures produced for ", RGBs_done 

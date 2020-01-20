@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 # 'small program to read lightning data, format lat,lon,time,type,current'
 
 from numpy import genfromtxt, floor, zeros, arange, meshgrid, rot90
@@ -20,7 +23,7 @@ mm=fname[10:12]
 date0 = date(int(year),1,1) + timedelta(int(doy)-1) 
 #date1 = date0 + timedelta(seconds=(int(hh)*3600+int(mm)*60)) ## does not work, why?!?
 date2=datetime(date0.year, date0.month, date0.day, int(hh), int(mm), 0)
-print "... plot data for "+date2.strftime("%Y-%m-%d %H:%M UTC")
+print("... plot data for "+date2.strftime("%Y-%m-%d %H:%M UTC"))
 
 ## file format
 ## lat       lon       time        type   current
@@ -85,4 +88,4 @@ plt.colorbar(img_light)
 #plt.show()
 outputFile="lightning.png"
 savefig(outputFile)
-print '... save figure as ', outputFile
+print('... save figure as ', outputFile)

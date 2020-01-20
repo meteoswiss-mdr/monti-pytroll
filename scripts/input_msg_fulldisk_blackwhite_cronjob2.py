@@ -1,9 +1,12 @@
+from __future__ import division
+from __future__ import print_function
+
 
 def input(in_msg):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
-    print "*** read input from ", in_msg.input_file
+    print("*** read input from ", in_msg.input_file)
 
     # 8=MSG1, 9=MSG2, 10=MSG3
     in_msg.sat = "Meteosat"
@@ -319,4 +322,4 @@ def input(in_msg):
     #default: in_msg.scpProducts = ['all']
     #in_msg.scpProducts = ['IR_108c', "radar-convection"] # list of rgb, composite and montage strings
     #in_msg.scpProducts = ["C2rgb-IR_108"]
-    in_msg.scpProducts = [["MSG_rrMlp-HRVir108","MSG_RATE-HRVir108","MSG_h03-HRVir108"]]
+    in_msg.scpProducts = [["MSG_rrMlp-HRVir108","MSG_RATE-HRVir108","MSG_h03b-HRVir108"]]

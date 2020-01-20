@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 from datetime import datetime, timedelta
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -15,7 +18,7 @@ from mpop.projector import get_area_def
 import shelve
 from copy import deepcopy
 import numpy as np
-import cPickle as pickle
+import pickle as pickle
 from skimage.transform import resize
 import scipy.misc as sm
 import matplotlib.dates as mdates
@@ -84,7 +87,7 @@ def figure_labels(labels, outputFile, timeObs, dt, area_plot="ccs4", add_name = 
     else:
           PIL_image.save(create_dir(outputFile)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_Forc"+hourSf+minSf+".png")
           path = (outputFile)+"Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_Forc"+hourSf+minSf+".png"
-    print "... display ",path," &"
+    print("... display ",path," &")
     plt.close( fig)    
 #savefig('demo.png', transparent=True)
 
@@ -117,14 +120,14 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
         
         unique_labels = np.unique(labels_all[labels_all>0])
         if verbose:
-            print("... cells with unique labels: ", unique_labels)
+            print(("... cells with unique labels: ", unique_labels))
                 
         forecasted_labels = {}
         forecasted_areas = []    
         at_least_one_cell = False        
 
         if verbose:
-            print "*** computing history backward (", labels_dir, ")"
+            print("*** computing history backward (", labels_dir, ")")
 
         for interesting_cell in unique_labels:
 
@@ -135,7 +138,7 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
               #                                                        current time, cell_id, backward?   time_stop
               if area is None or len(area)<=1:  
                   if verbose:
-                        print "new cell or cell with COM outside domain"
+                        print("new cell or cell with COM outside domain")
                   continue
               at_least_one_cell = True 
                  
@@ -147,7 +150,7 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
               
               if False:
                     ind1, area1, displacement1, time1, center = history_backward(ttt, interesting_cell, False, ttt+timedelta(hours=1), labels_dir=labels_dir)
-                    print "******** computed history forward"
+                    print("******** computed history forward")
             
                     t2 = time1 #[::-1]
                     y2 = area1 #[::-1]
@@ -172,7 +175,7 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
               indx = np.where(t==ttt)[0] + 1
       
               if verbose:
-                    print "*** compute displacement "
+                    print("*** compute displacement ")
 
               if displacement.shape[1]==2:
                     if len(displacement) == 0:
@@ -186,7 +189,7 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
                             print("VALUE ERROR")
                             print(displacement)
                             quit()
-                    print "    computed displacement dx, dy = ", dx, dy
+                    print("    computed displacement dx, dy = ", dx, dy)
       
               else:
                     print("wrong displacement")
@@ -197,7 +200,7 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
               index_stop = 12
               
               
-              print("*** calculate forecasts for cell ID"+str(interesting_cell))
+              print(("*** calculate forecasts for cell ID"+str(interesting_cell)))
               if verbose:
                   print("index   time    area  growth")
                   print("----------------------------")
@@ -235,7 +238,7 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
                   #    print("dy ", dy)
 
                   if verbose:
-                      print(indx + i, dt, area_new, growth) 
+                      print((indx + i, dt, area_new, growth)) 
 
                   #figure_labels(label_cell, outputDir, ttt, dt, area_plot="ccs4", add_name = "before")
 
@@ -244,7 +247,7 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
                   #figure_labels(shifted_label, outputDir, ttt, dt, area_plot="ccs4", add_name = "before_shifted")
                   #quit()
                   if verbose:
-                      print("   after shift ", sum(sum(shifted_label)))
+                      print(("   after shift ", sum(sum(shifted_label))))
                   
                   if sum(sum(shifted_label))==0: #the cell is outside the domain
                       break
@@ -301,7 +304,7 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
       
                   area_current = sum(sum(label_cell))
                   if verbose:
-                      print("end ", area_current)
+                      print(("end ", area_current))
                   forecasted_areas.append(area_current)
                   #add check to make sure the area you produced is more or less correct
       
@@ -358,7 +361,7 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
         
         currentRGB_im = glob.glob(currentRGB_im_filename)
         if len(currentRGB_im)<1:  
-            print "No file found:", currentRGB_im_filename
+            print("No file found:", currentRGB_im_filename)
 
         # get background file 
         if BackgroundFile is None:
@@ -398,18 +401,18 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
             background_im_filename = '/data/COALITION2/PicturesSatellite/LEL_results_wind/'+yearS+'-'+monthS+'-'+dayS+'/RGB-HRV_dam/'+yearS+monthS+dayS+'_'+hourS+minS+'*.png'
         else:
             if verbose:
-                print "... BackgroundFile ", BackgroundFile
+                print("... BackgroundFile ", BackgroundFile)
             background_im_filename = BackgroundFile
             
         # searching background file (wildcards are possible)
         background_im = glob.glob(background_im_filename)
         if len(background_im) == 0:
-            print "*** Error in plot_forecast_area (test_forecast.py)"
-            print "    no background file found: ", background_im_filename
+            print("*** Error in plot_forecast_area (test_forecast.py)")
+            print("    no background file found: ", background_im_filename)
             quit()
         elif len(background_im) > 1:
-            print "*** Warning in plot_forecast_area (test_forecast.py)"
-            print "    several background files found: ", background_im
+            print("*** Warning in plot_forecast_area (test_forecast.py)")
+            print("    several background files found: ", background_im)
 
         # read background file
         im = plt.imread(background_im[0])
@@ -438,7 +441,7 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
               for i in range(len(time_wanted)-1,-1,-1):
                   ind_time = time_wanted [i]
                   
-                  for key, forc_labels in forecasted_labels.iteritems():  #forecasted_labels["ID"+str(interesting_cell)]=[]  
+                  for key, forc_labels in forecasted_labels.items():  #forecasted_labels["ID"+str(interesting_cell)]=[]  
                       
                       if len(forc_labels)>ind_time:
                           #plt.contour(np.flipud(forc_labels[ind_time]),[0.5],colors = color_wanted_cont[i]) #colors='w') #
@@ -454,13 +457,13 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
                         
                         ind_time = time_wanted [i]
                         
-                        for key, forc_labels in forecasted_labels.iteritems():  #forecasted_labels["ID"+str(interesting_cell)]=[]  
+                        for key, forc_labels in forecasted_labels.items():  #forecasted_labels["ID"+str(interesting_cell)]=[]  
                             
                             if len(forc_labels)>ind_time:
                                 plt.contour(np.flipud(forc_labels[ind_time]),[0.5],colors = color_wanted[i]) #colors='w') #
         else:
-            print "*** Warning, no COALITION2 cell detected "
-            print "    produce empty figure ..."
+            print("*** Warning, no COALITION2 cell detected ")
+            print("    produce empty figure ...")
         
         
         PIL_image = fig2img ( fig )
@@ -486,10 +489,10 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
             #     dic_figure['rgb']= 'C2rgb-Forecast-HRV' #'C2rgbForecastTMP-IR-108'
             #     dic_figure['area']='ccs4'
             #     path_output = (outputFile)+standardOutputName%dic_figure
-            #     print "creating composite: ",currentRGB_im[0],"+",path
+            #     print ("creating composite: ",currentRGB_im[0],"+",path)
         #        subprocess.call("/usr/bin/composite "+currentRGB_im[0]+" "+path+" "+path_output, shell=True)
         
-        #print "... display ",path_output," &"
+        #print ("... display ",path_output," &")
 
             #dic_figure={}
             #dic_figure['rgb']= 'Forecast' #'C2rgbForecastTMP-IR-108'
@@ -500,12 +503,12 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
             #path = (outputDir)+in_msg.outputFile%dic_figure
             path = outputFile
 
-        print "... display ",path," &"
+        print("... display ",path," &")
 
         plt.close( fig)                             
         if True:
             if verbose:
-                print "path foreground", currentRGB_im[0]
+                print("path foreground", currentRGB_im[0])
             
             if in_msg is None:
                 path_composite = (outputFile)+yearS+monthS+dayS+"_Obs"+hourS+minS+"Forecast_composite.png"     
@@ -533,21 +536,21 @@ def plot_forecast_area(ttt, model, outputDir, current_labels = None, t_stop=None
                 
             if in_msg.nrt == True:
                 if verbose:
-                    print "---starting post processing"
+                    print("---starting post processing")
                 #if area in in_msg.postprocessing_areas:
                 in_msg.postprocessing_composite = deepcopy(in_msg.postprocessing_composite2)
 
                 postprocessing(in_msg, ttt, in_msg.sat_nr, "ccs4")
-            #print "... display",path_composite,"&"
+            #print ("... display",path_composite,"&")
             if in_msg.scpOutput and in_msg.nrt == True and False: #not necessary because already done within postprocessing
-                print "... secure copy "+path_composite+ " to "+in_msg.scpOutputDir #
+                print("... secure copy "+path_composite+ " to "+in_msg.scpOutputDir) #
                 subprocess.call("scp "+in_msg.scpID+" "+path_composite  +" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)    #BackgroundFile   #
         
         if False:
             for i in range(12):    
                   contour_files = glob.glob(outputDir + "Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_Forc"+hourSf+minSf+"_ID*.png")
                   if verbose:
-                            print("Files found: ",contour_files)
+                            print(("Files found: ",contour_files))
                   if len(contour_files)>0:
                       background_file = "/data/COALITION2/PicturesSatellite/LEL_results_wind/"+yearS+"-"+monthS+"-"+dayS+"/RGB-HRV_dam/"+yearS+monthS+dayS+"_"+hourS+minS+"*.png"
                       out_file1 = create_dir( outputDir+"/Contours/")+"Obs"+hourS+minS+"_Forc"+hourSf+minSf+".png"
@@ -587,7 +590,7 @@ cset1 = plt.contourf(X, Y, Z, levels,
     else:
           PIL_image.save(create_dir(outputDir)+"/Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_Forc"+hourSf+minSf+".png")
           path = (outputDir)+"/Forecast"+yearS+monthS+dayS+"_Obs"+hourS+minS+"_Forc"+hourSf+minSf+".png"
-    print "... display ",path," &"
+    print ("... display ",path," &")
     plt.close( fig)   
 """
 

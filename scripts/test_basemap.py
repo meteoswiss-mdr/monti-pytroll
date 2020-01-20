@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 # https://pyresample.readthedocs.org/en/latest/plot.html#displaying-data-quickly
 
 import numpy as np
@@ -20,4 +23,4 @@ col = bmap.imshow(result, origin='upper')
 
 filename='test_basemap.png'
 plt.savefig('./'+filename, bbox_inches='tight')
-print "display "+filename+" &"
+print("display "+filename+" &")

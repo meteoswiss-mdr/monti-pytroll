@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 import numpy as np
 import matplotlib.pyplot as plt 
 
@@ -76,7 +79,7 @@ if plot_stats:
     ylabel('precipiation rate / mm/h')
     title('mean precipitation rate')
     grid(True)
-    print "final image: display "+folder+"/RAD_RZC_ccs4_"+date2+"_stats.png &"
+    print("final image: display "+folder+"/RAD_RZC_ccs4_"+date2+"_stats.png &")
     savefig(folder+"/RAD_RZC_ccs4_"+date2+"_stats.png")
     #show()
 
@@ -110,7 +113,7 @@ if plot_both:
     title('total precipitation and precipitation area')
     xlim(t_start, t_end)
     grid(True)
-    print "final image: display "+folder+"/RAD_RZC_ccs4_"+date2+"_both.png &"
+    print("final image: display "+folder+"/RAD_RZC_ccs4_"+date2+"_both.png &")
     savefig(folder+"/RAD_RZC_ccs4_"+date2+"_both.png")
     #plt.show()
 
@@ -136,7 +139,7 @@ if plot_total:
     ylabel('total precip / 10**9 l/h')
     title('temporal evolution of the precipitation in Tecino')
     grid(True)
-    print "final image: display "+folder+"/RAD_RZC_ccs4_"+date2+"_total.png &"
+    print("final image: display "+folder+"/RAD_RZC_ccs4_"+date2+"_total.png &")
     savefig(folder+"/RAD_RZC_ccs4_"+date2+"_total.png")
 
 if plot_area:
@@ -153,5 +156,5 @@ if plot_area:
     ylabel('area with prep>0.1mm/h / 10**3 km**2')
     title('temporal evolution precipitation area')
     grid(True)
-    print "final image: display "+folder+"/RAD_RZC_ccs4_"+date2+"_area.png &"
+    print("final image: display "+folder+"/RAD_RZC_ccs4_"+date2+"_area.png &")
     savefig(folder+"/RAD_RZC_ccs4_"+date2+"_area.png")

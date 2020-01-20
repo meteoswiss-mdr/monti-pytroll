@@ -1,9 +1,12 @@
+from __future__ import division
+from __future__ import print_function
+
 
 def input(in_msg):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
-    print "*** read input from ", in_msg.input_file
+    print("*** read input from ", in_msg.input_file)
 
     # 8=MSG1, 9=MSG2, 10=MSG3
     in_msg.sat = "Meteosat"
@@ -12,10 +15,10 @@ def input(in_msg):
     #in_msg.RSS=False 
     #in_msg.sat_nr=9
     #in_msg.RSS=True
-    #in_msg.sat_nr=10
-    #in_msg.RSS=True
-    in_msg.sat_nr=11
-    in_msg.RSS=False
+    in_msg.sat_nr=10
+    in_msg.RSS=True
+    #in_msg.sat_nr=11
+    #in_msg.RSS=False
     
     # specify an delay (in minutes), when you like to process a time some minutes ago
     # e.g. current time               2015-05-31 12:33 UTC
@@ -75,6 +78,7 @@ def input(in_msg):
     #in_msg.RGBs.append('IR_087-IR_120')      
     #in_msg.RGBs.append('IR_120-IR_108')
     #in_msg.RGBs.append('trichannel')
+    #in_msg.RGBs.append('fls')
     #-------------------
     # build in RGBs, see http://mpop.readthedocs.org/en/latest/pp.html
     #                or  http://oiswww.eumetsat.int/~idds/html/doc/best_practices.pdf
@@ -110,7 +114,7 @@ def input(in_msg):
     #in_msg.RGBs.append('HRVFog')
     #in_msg.RGBs.append('DayNightFog')
     #in_msg.RGBs.append('HRVir108c')
-    in_msg.RGBs.append('HRVir108')
+    #in_msg.RGBs.append('HRVir108')
     #in_msg.RGBs.append('VIS006ir108c')
     #in_msg.RGBs.append('VIS006ir108')
     ##-------------------
@@ -186,7 +190,8 @@ def input(in_msg):
     #in_msg.areas.append('euroHDready')      # Europe in HD resolution 1280 x 720
     #in_msg.areas.append('euroHDfull')      # Europe in full HD resolution 1920 x 1080
     #in_msg.areas.append('SwitzerlandStereo500m')
-    in_msg.areas.append('ccs4')            # CCS4 Swiss projection 710x640
+    #in_msg.areas.append('ccs4')            # CCS4 Swiss projection 710x640
+    in_msg.areas.append('cosmo1')
     #in_msg.areas.append('alps95')          # area around Switzerland processed by NWCSAF software 349x151 
     #in_msg.areas.append('ticino')          # stereographic proj of Ticino 342x311
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
@@ -201,14 +206,15 @@ def input(in_msg):
     in_msg.check_RSS_coverage()
 
     in_msg.check_input = False
-    #in_msg.reader_level="seviri-level4"   # hdf5
-    #in_msg.reader_level="seviri-level5"   # NWC SAF HRW hdf5
+    #in_msg.reader_level="seviri-level3"   # NWC SAF version 2013 hdf5
+    #in_msg.reader_level="seviri-level4"   # MSG radiance hdf5
+    #in_msg.reader_level="seviri-level5"   # NWC SAF version 2013 HRW hdf5
     #in_msg.reader_level="seviri-level6"   # viewing geometry nc
     #in_msg.reader_level="seviri-level7"   # hsaf h03
     #in_msg.reader_level="seviri-level8"   # msg radiance ccs4 nc
     #in_msg.reader_level="seviri-level9"   # msg radiance ccs4 nc parallax corrected
     #in_msg.reader_level="seviri-level10"  # new hsaf porduct h03b
-    in_msg.reader_level="seviri-level11"   # NWC SAF version 2016 (except HRW)
+    #in_msg.reader_level="seviri-level11"   # NWC SAF version 2016 (except HRW)
     #in_msg.parallax_correction = True     # when using "seviri-level9", set this to False (as data is already par corrected)
     in_msg.parallax_gapfilling = 'bilinear' # 'False' (default), 'nearest'
     #in_msg.save_reprojected_data=['ccs4']
@@ -220,8 +226,11 @@ def input(in_msg):
     #in_msg.load_data = False    
     #in_msg.make_plots = False
     in_msg.fill_value = (0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
-    in_msg.add_title = False
-    in_msg.add_borders = False
+    in_msg.add_title = True
+    in_msg.title = [" %(sat)s, %Y-%m-%d %H:%MUTC, %(rgb)s"]  #, %(area)s
+    #in_msg.title = ["%(sat)s, %(rgb)s, %(area)s","%Y-%m-%d %H:%MUTC"]
+    in_msg.add_borders = True
+    in_msg.border_color = 'white'
     in_msg.add_rivers = False
     in_msg.add_logos = False
     in_msg.logos_dir = "/opt/users/common/logos/"
@@ -240,6 +249,7 @@ def input(in_msg):
     #    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%(rgb)s/%Y-%m-%d/'
     #    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/GPM/%Y-%m-%d/'
     in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
+    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/tmp/'
     #in_msg.outputDir = '/data/cinesat/out/'
         
     in_msg.compress_to_8bit=False
@@ -251,9 +261,16 @@ def input(in_msg):
     # please download the shape file 
     # in_msg.mapDir='/opt/users/common/shapes/'
     # default: /data/OWARNA/hau/maps_pytroll/
+    #in_msg.mapResolution=None      ## f  full resolution: Original (full) data resolution.          
+                                    ## h  high resolution: About 80 % reduction in size and quality. 
+                                    ## i  intermediate resolution: Another ~80 % reduction.          
+                                    ## l  low resolution: Another ~80 % reduction.                   
+                                    ## c  crude resolution: Another ~80 % reduction. 
 
-    in_msg.postprocessing_areas=["ccs4"]
+    #in_msg.postprocessing_areas=["ccs4"]
     #in_msg.postprocessing_areas=['EuropeCanaryS95']
+    #in_msg.postprocessing_areas=['EuroMercator']
+    #in_msg.postprocessing_areas=['cosmo1']
 
     #in_msg.postprocessing_composite=["h03-ir108"] 
     #in_msg.postprocessing_composite=["hrwdp-ir108"] 
@@ -268,13 +285,19 @@ def input(in_msg):
     #in_msg.postprocessing_composite=["hrwdp-streamd-ir108","TRT-streamd-ir108"] 
     #in_msg.postprocessing_composite = ["VIL-HRVir108"]
     #in_msg.postprocessing_composite = ["VIL-HRVir108pc"]
-    #in_msg.postprocessing_composite = ["TRT-radar-HRVir108","THX-HRVir108"]
-    #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03-ir108"],["MSG_radar-HRV","MSG_h03-HRV"],["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]]
+    #in_msg.postprocessing_composite = ["TRT-PRECIP-HRVir108","THX-HRVir108"]
+    #in_msg.postprocessing_composite = ["C2rgb-IR_108","TRT-PRECIP-HRVir108","THX-HRVir108"]
+    #in_msg.postprocessing_composite = ["TRT-PRECIP-HRVir108","THX-HRVir108"]
+    #in_msg.postprocessing_composite=["TRT-C2rgb-IR_108","TRT-C2rgb-HRVir108"]  # used by plot_coalition2
+    
+    #in_msg.postprocessing_montage = [["MSG_PRECIP-ir108","MSG_h03-ir108"],["MSG_PRECIP-HRV","MSG_h03-HRV"],["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]]
     #in_msg.postprocessing_montage = [["MSG_h03-ir108","MSG_HRV"],["MSG_h03-ir108","MSG_test"]]
-    #in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-radar-convection"]]
-    #in_msg.postprocessing_montage = [["MSG_C2rgb-Forecast-IR_108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-radar-convection"]]
+    #in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108","MSG_CT","MSG_HRoverview","MSG_TRT-PRECIP-convection","MSG_PRECIP-convection","MSG_THX-PRECIP-convection"]]
+    #in_msg.postprocessing_montage = [["MSG_C2rgb-Forecast-IR_108","MSG_CT","MSG_HRoverview","MSG_TRT-PRECIP-convection","MSG_PRECIP-convection","MSG_THX-PRECIP-convection"]]
     #in_msg.postprocessing_montage = [["MSG_SYNMSG-BT-CL-IR10.8","MSG_IR-108c"]]
-    in_msg.postprocessing_montage = [["RAD_MESHS-HRVir108pc", "MSG_HRVir108"]]
+    #in_msg.postprocessing_montage = [["RAD_MESHS-HRVir108pc", "MSG_HRVir108"]]
+    #in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108","MSG_TRT-PRECIP-HRVir108","MSG_THX-HRVir108"]]
+    in_msg.postprocessing_montage=[['MSG_day-microphysics', 'MSG_night-microphysics',"MSG_IR-108c",'MSG_DayNightFog','MSG_CT','MSG_fls']] 
 
     
     #in_msg.resize_composite = 100

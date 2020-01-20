@@ -1,9 +1,12 @@
+from __future__ import division
+from __future__ import print_function
+
 
 def input(in_msg):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
-    print "*** read input from ", in_msg.input_file
+    print("*** read input from ", in_msg.input_file)
 
     # 8=MSG1, 9=MSG2, 10=MSG3
     #in_msg.sat_nr=8
@@ -183,10 +186,10 @@ def input(in_msg):
     
     # Warning, if large areas are wanted and RSS is specified
     if in_msg.RSS and (('fullearth' in in_msg.areas) or ('met09globe' in in_msg.areas) or ('met09globeFull' in in_msg.areas)): 
-        print        "*** WARNING, large areas are requested: ", in_msg.areas
-        print        "    as well as rapid scan service is specified, which covers only the uppermost 1/3 of the disk"
-        print        "    (1) continue with enter"
-        junk = input("    (2) abort with Ctrl+c")
+        print("*** WARNING, large areas are requested: ", in_msg.areas)
+        print("    as well as rapid scan service is specified, which covers only the uppermost 1/3 of the disk")
+        print("    (1) continue with enter")
+        junk = eval(input("    (2) abort with Ctrl+c"))
 
     in_msg.check_input = False
     #in_msg.reader_level="seviri-level4" 

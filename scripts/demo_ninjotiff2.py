@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 #!/opt/users/common/packages/anaconda3/envs/PyTroll_hau/bin/python
 # -*- coding: utf-8 -*-
 """
@@ -95,7 +98,7 @@ if __name__ == '__main__':
     try:
         os.environ['PPP_CONFIG_DIR']
     except KeyError:
-        print >>sys.stderr, "PPP_CONFIG_DIR is not defined"
+        print("PPP_CONFIG_DIR is not defined", file=sys.stderr)
         sys.exit(2)
 
     from mpop.satellites import GeostationaryFactory
@@ -111,7 +114,7 @@ if __name__ == '__main__':
         i__ =  os.path.basename(filename).split('-')
         TIMESLOT = datetime.strptime(i__[6], '%Y%m%d%H%M')
         SATNO = "%02d" % (7 + int(i__[2][3]))
-        print "... satellite number "+str(SATNO)
+        print("... satellite number "+str(SATNO))
     except IndexError:
         #print >> sys.stderr, "usage: ninjotiff_example <MSG EPI filename>"
         #exit(2)
@@ -125,7 +128,7 @@ if __name__ == '__main__':
         #TIMESLOT = get_last_SEVIRI_date(RSS, delay=10)
         TIMESLOT = datetime(2015, 7, 7, 16, 0, 0)
 
-    print "*** MSG ", SATNO, str(TIMESLOT)
+    print("*** MSG ", SATNO, str(TIMESLOT))
         
     # Areas to be loaded into and to be projected onto.
     AREAS = (
@@ -239,7 +242,7 @@ if __name__ == '__main__':
         # Resample to Plate Caree.
         scene = global_data.project(area_out, mode='quick', precompute=True)
         img = scene.image.convection()
-        print "type(img) ", type(img)
+        print("type(img) ", type(img))
         #type(img)  <class 'mpop.imageo.geo_image.GeoImage'>
 
         filename = ('MSG-' + TIMESLOT.strftime("%Y%m%d_%H%M") + '-' +

@@ -7,8 +7,10 @@ from mpop.utils import debug_on
 debug_on()
 
 if True:
+    #from my_msg_module import get_last_SEVIRI_date
+    #time_slot = get_last_SEVIRI_date(True, delay=5)
     from my_msg_module import get_last_SEVIRI_date
-    time_slot = get_last_SEVIRI_date(True, delay=5)
+    time_slot = get_last_SEVIRI_date(False, delay=5)
 else:
     import sys
     if len(sys.argv) <= 2:
@@ -24,7 +26,8 @@ else:
 
 print str(time_slot)
 
-global_data = GeostationaryFactory.create_scene("Meteosat-10", "", "seviri", time_slot)
+#global_data = GeostationaryFactory.create_scene("Meteosat-10", "", "seviri", time_slot)
+global_data = GeostationaryFactory.create_scene("Meteosat-9", "", "seviri", time_slot)
 #global_data = GeostationaryFactory.create_scene("Meteosat-8", "", "seviri", time_slot)
 #europe = get_area_def("EuropeCanaryS95")
 global_data.load(['HRV'], reader_level="seviri-level2")  # , area_extent=europe.area_extent

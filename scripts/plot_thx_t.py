@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 import numpy as np
 import matplotlib.pyplot as plt 
 
@@ -32,12 +35,12 @@ mmax = d[:, 9]
 ssum = d[:,10]
 area = d[:,11]
 
-print "size(year) ", type(year), year.shape
+print("size(year) ", type(year), year.shape)
 
 file2=folder+'/THX_dens-ccs4_'+date2+'_0005min_005km.txt'
 d_both = np.loadtxt(file2) #, skiprows=2
 ssum_both = d_both[:,10]
-print "size(ssum_both) ", type(ssum_both), ssum_both.shape
+print("size(ssum_both) ", type(ssum_both), ssum_both.shape)
 
 
 from pylab import *
@@ -56,14 +59,14 @@ size_x=0.925
 size_y=0.77
 
 t = hour + minute / 60.
-print "size(time) ", size(t)
+print("size(time) ", size(t))
 
 if plot_stats:
     fig=figure(figsize=figuresize)
     axe = fig.add_axes([pos_x,pos_y,size_x,size_y])
 
     s = ssum_both
-    print "size(sum)", size(s)
+    print("size(sum)", size(s))
     plot(t, s, 'g.')
     s2 = running_mean(ssum_both, 10)
     plot(t[4:t.size-5], s2, 'g-', label="total lightnings")
@@ -93,7 +96,7 @@ if plot_stats:
     title('lightning rate in Tecino')
     grid(True)
     savefig(folder+"/THX_rate_ccs4_"+date2+".png")
-    print "display "+folder+"/THX_rate_ccs4_"+date2+".png &"
+    print("display "+folder+"/THX_rate_ccs4_"+date2+".png &")
     #show()
 
 if plot_both:

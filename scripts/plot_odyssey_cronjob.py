@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 #!/usr/bin/python
 import datetime
 import logging
@@ -21,14 +24,14 @@ LOG = logging.getLogger(__name__)
 
 delay=0
 
-print "... number of arguments:", len(sys.argv)
+print("... number of arguments:", len(sys.argv))
 
 if len(sys.argv) > 1:
     if len(sys.argv) < 6:
-        print "***           "
-        print "*** Warning, please specify date and time completely, e.g."
-        print "***          python plot_hsaf.py 2014 07 23 16 10 "
-        print "***           "
+        print("***           ")
+        print("*** Warning, please specify date and time completely, e.g.")
+        print("***          python plot_hsaf.py 2014 07 23 16 10 ")
+        print("***           ")
         quit() # quit at this point
     else:
         year   = int(sys.argv[1])
@@ -75,7 +78,7 @@ timeS=hourS+':'+minS+'UTC'
 debug_on()
 
 time_slot = datetime.datetime(year, month, day, hour, minute)
-print "... process date: ",  str(time_slot)
+print("... process date: ",  str(time_slot))
 
 global_data = GeostationaryFactory.create_scene("odyssey", "", "radar", time_slot)
 
@@ -93,8 +96,8 @@ area='odysseyS25'
 
 reproject=True
 if reproject:
-   print '-------------------'
-   print "start projection"
+   print('-------------------')
+   print("start projection")
    # PROJECT data to new area 
    data = global_data.project(area, precompute=True)
    #data[prop_str].product_name = global_data[prop_str].product_name
@@ -107,16 +110,16 @@ outputFile = outputDir+'ODY_'+prop_str+'-'+area+'_'+yearS[2:]+monthS+dayS+hourS+
 
 
 # define area
-print '-------------------'
-print 'obj_area ', obj_area
+print('-------------------')
+print('obj_area ', obj_area)
 proj4_string = obj_area.proj4_string     
 # e.g. proj4_string = '+proj=geos +lon_0=0.0 +a=6378169.00 +b=6356583.80 +h=35785831.0'
-print 'proj4_string ',proj4_string
+print('proj4_string ',proj4_string)
 area_extent = obj_area.area_extent              
 # e.g. area_extent = (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
 area_def = (proj4_string, area_extent)
-print '-------------------'
-print 'area_def ', area_def
+print('-------------------')
+print('area_def ', area_def)
 
 
 prop=global_data[prop_str].data
@@ -188,7 +191,7 @@ units=global_data[prop_str].info["units"]
 
 if add_logos:
    if verbose:
-      print '... add logos'
+      print('... add logos')
    dc.align_right()
    if add_colorscale:
       dc.write_vertically()
@@ -202,7 +205,7 @@ fontsize=18
 font = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf", fontsize)
 
 if add_colorscale:
-   print '... add colorscale ranging from min_data (',min_data,') to max_data (',max_data,')'
+   print('... add colorscale ranging from min_data (',min_data,') to max_data (',max_data,')')
    dc.align_right()
    dc.write_vertically()
    #font_scale = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf", fontsize)
@@ -240,7 +243,7 @@ if add_title:
 
 
 PIL_image.save(outputFile)
-print '... save image as ', outputFile
+print('... save image as ', outputFile)
 
 # make composite and scp composite
 if True:

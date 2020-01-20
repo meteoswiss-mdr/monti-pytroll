@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 
 
 def msg_pixcoord2area(Y_UL, X_UL, Y_LR, X_LR, HRVis, SUB_LON_DEG):
@@ -48,23 +51,23 @@ def msg_pixcoord2area(Y_UL, X_UL, Y_LR, X_LR, HRVis, SUB_LON_DEG):
 # ------------------------------------------------------------------------------
 
 def print_usage(nargv):
-         print "***           "
-         print "*** Error, wrong number of command line arguments", nargv
-         print "***        please specify at least "
-         print "***        possible calls are:"
-         print "*** python msg_pixcoord2area.py  <Y_UL> <X_UL> <Y_LR> <X_LR> [<HRVis>] [<SUB_LON_DEG>] [<qiet>] "
-         print "    python msg_pixcoord2area.py   3341   2054   3218   1819                                        "
-         print "    python msg_pixcoord2area.py   3341   2054   3218   1819     vis                       # default "
-         print "    python msg_pixcoord2area.py   3341   2054   3218   1819     hrv                       # hrv resolution"
-         print "    python msg_pixcoord2area.py   3341   2054   3218   1819     vis         9.5           # subsatellite longitude 9.5 deg East == MSG2"
-         print "    python msg_pixcoord2area.py   3341   2054   3218   1819     vis         9.5     q     # quiet" 
+         print("***           ")
+         print("*** Error, wrong number of command line arguments", nargv)
+         print("***        please specify at least ")
+         print("***        possible calls are:")
+         print("*** python msg_pixcoord2area.py  <Y_UL> <X_UL> <Y_LR> <X_LR> [<HRVis>] [<SUB_LON_DEG>] [<qiet>] ")
+         print("    python msg_pixcoord2area.py   3341   2054   3218   1819                                        ")
+         print("    python msg_pixcoord2area.py   3341   2054   3218   1819     vis                       # default ")
+         print("    python msg_pixcoord2area.py   3341   2054   3218   1819     hrv                       # hrv resolution")
+         print("    python msg_pixcoord2area.py   3341   2054   3218   1819     vis         9.5           # subsatellite longitude 9.5 deg East == MSG2")
+         print("    python msg_pixcoord2area.py   3341   2054   3218   1819     vis         9.5     q     # quiet") 
          quit() # quit at this point
 
-         print "    where, X_UL is the column nr of the upper left pixel"
-         print "    where, Y_UL is the line   nr of the upper left pixel"
-         print "    where, X_LR is the column nr of the upper left pixel"
-         print "    where, Y_LR is the line   nr of the upper left pixel"
-         print "    e.g."
+         print("    where, X_UL is the column nr of the upper left pixel")
+         print("    where, Y_UL is the line   nr of the upper left pixel")
+         print("    where, X_LR is the column nr of the upper left pixel")
+         print("    where, Y_LR is the line   nr of the upper left pixel")
+         print("    e.g.")
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -97,7 +100,7 @@ if __name__ == '__main__':
             elif sys.argv[5]=="0" or sys.argv[5]=="vis" or sys.argv[5]=="VIS" or sys.argv[5]=="ir" or sys.argv[5]=="IR":
                 HRVis="vis"
             else: 
-                print "\n*** Error, unkown 5th command line argument: ", sys.argv[5], "\n"
+                print("\n*** Error, unkown 5th command line argument: ", sys.argv[5], "\n")
                 exit ()
 
             if len(sys.argv) > 6:
@@ -108,28 +111,28 @@ if __name__ == '__main__':
 
     if quiet != 1:
 
-        print " "
-        print "... search area for"
-        print "    MSG SEVIRI pixel upper left  = [",Y_UL,",",X_UL,"]" 
-        print "    MSG SEVIRI pixel lower right = [",Y_LR,",",X_LR,"]"
+        print(" ")
+        print("... search area for")
+        print("    MSG SEVIRI pixel upper left  = [",Y_UL,",",X_UL,"]") 
+        print("    MSG SEVIRI pixel lower right = [",Y_LR,",",X_LR,"]")
         if HRVis=="hrv":
-            print "... use HRV coordinates!"
+            print("... use HRV coordinates!")
         else:
-            print "... use VIS-IR (non-HRV) coordinates!"
-        print "... use subsatellite longitude:", SUB_LON_DEG
+            print("... use VIS-IR (non-HRV) coordinates!")
+        print("... use subsatellite longitude:", SUB_LON_DEG)
 
 
     area_def = msg_pixcoord2area(Y_UL, X_UL, Y_LR, X_LR, HRVis, SUB_LON_DEG)
 
     if quiet != 1:
-        print ""
-    print "REGION:", area_def.area_id, "{"
-    print "\tNAME:\t", area_def.name
-    print "\tPCS_ID:\t", area_def.proj_id
-    print ("\tPCS_DEF:\tproj="+area_def.proj_dict['proj']+", lon_0=" + area_def.proj_dict['lon_0'] + ", a="+area_def.proj_dict['a']+", b="+area_def.proj_dict['b']+", h="+area_def.proj_dict['h'])
-    print "\tXSIZE:\t", area_def.x_size 
-    print "\tYSIZE:\t", area_def.y_size
-    print "\tAREA_EXTENT:\t", area_def.area_extent
-    print "};"
+        print("")
+    print("REGION:", area_def.area_id, "{")
+    print("\tNAME:\t", area_def.name)
+    print("\tPCS_ID:\t", area_def.proj_id)
+    print(("\tPCS_DEF:\tproj="+area_def.proj_dict['proj']+", lon_0=" + area_def.proj_dict['lon_0'] + ", a="+area_def.proj_dict['a']+", b="+area_def.proj_dict['b']+", h="+area_def.proj_dict['h']))
+    print("\tXSIZE:\t", area_def.x_size) 
+    print("\tYSIZE:\t", area_def.y_size)
+    print("\tAREA_EXTENT:\t", area_def.area_extent)
+    print("};")
     if quiet != 1:
-        print ""
+        print("")

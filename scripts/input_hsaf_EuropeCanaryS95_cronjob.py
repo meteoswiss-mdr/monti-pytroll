@@ -1,9 +1,12 @@
+from __future__ import division
+from __future__ import print_function
+
 
 def input(in_msg):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
-    print "*** read input from ", in_msg.input_file
+    print("*** read input from ", in_msg.input_file)
 
     # 8=MSG1, 9=MSG2, 10=MSG3
     #in_msg.sat_nr=8
@@ -218,7 +221,7 @@ def input(in_msg):
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
     
     in_msg.postprocessing_areas=['EuropeCanaryS95'] # !!!!
-    in_msg.postprocessing_composite = ["h03b-ir108"]  # , "h03b-HRV"
+    in_msg.postprocessing_composite = ["h03b-ir108","h03b-HRVir108"]  # , "h03b-HRV"
     #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03b-ir108"],["MSG_radar-HRV","MSG_h03b-HRV"]]
     #                                 only ccs4                           only ccs4                       only odyssey                      only odyssey
     #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03b-ir108"],["MSG_radar-HRV","MSG_h03b-HRV"],["MSG_RATE-ir108","MSG_h03b-ir108"],["MSG_RATE-HRV","MSG_h03b-HRV"]] # !!!!

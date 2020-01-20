@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 #from __future__ import print_function
 
 from datetime import datetime, timedelta
@@ -63,15 +66,15 @@ class input_msg_class:
       elif socket.gethostname()[0:5] == 'zuerh':
          if environ.get('VENV') is not None:
             self.mapDir = getenv('VENV')+"/share/shapes/" 
-            print "... use shape directory ", self.mapDir
+            print("... use shape directory ", self.mapDir)
          else:
             self.mapDir = "/data/OWARNA/hau/maps_pytroll/"
       elif socket.gethostname()[0:7] == 'keschln' or socket.gethostname()[0:7]=="eschaln":
          self.mapDir = "/store/msrad/sat/pytroll/shapes/"
-         print "... use shape directory ", self.mapDir
+         print("... use shape directory ", self.mapDir)
       if self.mapDir == "": 
-         print "*** Warning, unknown location of the shape file for unknown computer "+socket.gethostname()
-         print "    please specify in the input file or produce satellite images without national borders"
+         print("*** Warning, unknown location of the shape file for unknown computer "+socket.gethostname())
+         print("    please specify in the input file or produce satellite images without national borders")
       self.mapResolution = None
       self.indicate_mask = True
       self.add_title = True
@@ -84,14 +87,14 @@ class input_msg_class:
       elif socket.gethostname()[0:5] == 'zuerh':
          if environ.get('VENV') is not None:
             self.font_file = getenv('VENV')+"/config_files/setup/LucidaTypewriterBold.ttf" 
-            print "... use font file ", self.font_file
+            print("... use font file ", self.font_file)
          else:
-            print "*** ERROR, unknown location of the ttf-file, environment variable VENV required"
+            print("*** ERROR, unknown location of the ttf-file, environment variable VENV required")
             quit()
       elif socket.gethostname()[0:7] == 'keschln' or socket.gethostname()[0:7]=="eschaln":
          self.font_file = "/usr/share/fonts/dejavu/DejaVuSansMono.ttf"
       else:
-         print "*** ERROR, unknown computer "+socket.gethostname()+", unknown location of the ttf-file"
+         print("*** ERROR, unknown computer "+socket.gethostname()+", unknown location of the ttf-file")
          quit()
       self.title_color = None
       self.title_y_line_nr = 1        # at which line should the title be written
@@ -104,13 +107,13 @@ class input_msg_class:
       self.logos_dir = "/data/OWARNA/hau/logos/"
       if environ.get('VENV') is not None:
          self.logos_dir = getenv('VENV')+"/share/logos/"
-      print "... use logo images in  ", self.logos_dir
+      print("... use logo images in  ", self.logos_dir)
       self.add_colorscale = True
       self.fixed_minmax = True
       self.rad_min = {'VIS006':   0, 'VIS008':   0, 'IR_016':   0, 'IR_039': 210, 'WV_062': 210, 'WV_073': 190,\
                       'IR_087': 205, 'IR_097': 210, 'IR_108': 205, 'IR_120': 205, 'IR_134': 205, 'HRV': 0,\
                       'VIS006c':   0, 'VIS008c':   0, 'IR_016c':   0, 'IR_039c': 210, 'WV_062c': 210, 'WV_073c': 190,\
-                      'IR_087c': 205, 'IR_097c': 210, 'IR_108c': 205, 'IR_120c': 205, 'IR_134c': 205, 'HRVc': 0,\
+                      'IR_087c': 205, 'IR_097c': 210, 'IR_108c': 255, 'IR_120c': 205, 'IR_134c': 205, 'HRVc': 0,\
                       'CMa': 1, 'CT': 0, 'CT_PHASE': 0, 'CTH': 0, 'CTP':  100.,'CTT': 210., 'PC':0, 'CRR':0, 'clouddepth':0, 'fls':0,\
                       'WV_062-WV_073': -25, 'WV_062-IR_108': -70, 'WV_073-IR_134':-15, 'IR_087-IR_108':-4.0, 'IR_087-IR_120':-4,'IR_120-IR_108':-6,\
                       'sphr_bl': 0, 'sphr_cape': 150, 'sphr_diffbl': -1.5, 'sphr_diffhl': -0.75, 'sphr_diffki': -7, 'sphr_diffli': -2.5,\
@@ -126,7 +129,7 @@ class input_msg_class:
       self.rad_max = {'VIS006':  85, 'VIS008':  90, 'IR_016':  80, 'IR_039': 340, 'WV_062': 260, 'WV_073': 280,\
                       'IR_087': 320, 'IR_097': 285, 'IR_108': 320, 'IR_120': 320, 'IR_134': 290, 'HRV': 100,\
                       'VIS006c':  85, 'VIS008c':  90, 'IR_016c':  80, 'IR_039c': 340, 'WV_062c': 260, 'WV_073c': 280,\
-                      'IR_087c': 320, 'IR_097c': 285, 'IR_108c': 320, 'IR_120c': 320, 'IR_134c': 290, 'HRVc': 100,\
+                      'IR_087c': 320, 'IR_097c': 285, 'IR_108c': 295, 'IR_120c': 320, 'IR_134c': 290, 'HRVc': 100,\
                       'CMa': 4, 'CT': 21, 'CT_PHASE': 3, 'CTH': 12, 'CTP': 1000.,'CTT': 320., 'PC':100, 'CRR':10, 'clouddepth':6, 'fls':1,\
                       'WV_062-WV_073':   5,'WV_062-IR_108':    5, 'WV_073-IR_134':  5, 'IR_087-IR_108': 1.5, 'IR_087-IR_120': 4,'IR_120-IR_108': 2,\
                       'sphr_bl': 35, 'sphr_cape': 200, 'sphr_diffbl': 1.5, 'sphr_diffhl': 0.75, 'sphr_diffki': 7, 'sphr_diffli': 2.5,\
@@ -180,7 +183,7 @@ class input_msg_class:
 
       import getpass
       self.user = getpass.getuser()
-      print ("*** working with username \'"+self.user+"\'")
+      print(("*** working with username \'"+self.user+"\'"))
 
 
    def add_rgb(self, rgb):
@@ -198,8 +201,8 @@ class input_msg_class:
          # overwrite the input file by optional argument timeslot
          self.update_datetime(timeslot.year, timeslot.month, timeslot.day, timeslot.hour, timeslot.minute)
       else:
-         print ("*** ERROR in input_msg_class.init_datetime ("+inspect.getfile(inspect.currentframe())+")")
-         print ('    timeslot must be a datetime.date, not a %s' % type(timeslot))
+         print(("*** ERROR in input_msg_class.init_datetime ("+inspect.getfile(inspect.currentframe())+")"))
+         print(('    timeslot must be a datetime.date, not a %s' % type(timeslot)))
          raise TypeError('*** ERROR timeslot must be a datetime.date, not a %s' % type(timeslot))
          quit()
 
@@ -214,7 +217,7 @@ class input_msg_class:
 
    def get_last_SEVIRI_date(self):
       from my_msg_module import get_last_SEVIRI_date
-      print ("... initialize date: RSS mode = ", self.RSS, ", delay = ", self.delay)
+      print(("... initialize date: RSS mode = ", self.RSS, ", delay = ", self.delay))
       self.datetime = get_last_SEVIRI_date(self.RSS, delay=self.delay)
       # first 120min are saved in the near real time archive
       self.nrt = check_near_real_time(self.datetime, 120)
@@ -223,10 +226,10 @@ class input_msg_class:
    def check_RSS_coverage(self):
       # Warning, if large areas are wanted and RSS is specified
       if self.RSS and (('fullearth' in self.areas) or ('met09globe' in self.areas) or ('met09globeFull' in self.areas)): 
-         print  ("*** WARNING, large areas are requested: ", self.areas)
+         print(("*** WARNING, large areas are requested: ", self.areas))
          print  ("    as well as rapid scan service is selected, which covers only the uppermost 1/3 of the disk")
          print  ("    (1) continue with enter")
-         junk = input("    (2) abort with Ctrl+c")
+         junk = eval(input("    (2) abort with Ctrl+c"))
 
    def sat_nr_str(self):
       # returns a string for the satellite number according to the convection of the satellite name
@@ -250,8 +253,8 @@ class input_msg_class:
          else:
             sat_nr_str = self.sat_nr          # for unknown satellite names just copy the string
       else:
-         print ("*** Error in sat_nr_str ("+inspect.getfile(inspect.currentframe())+")")
-         print ("    unknown type of sat_nr", type(self.sat_nr))
+         print(("*** Error in sat_nr_str ("+inspect.getfile(inspect.currentframe())+")"))
+         print(("    unknown type of sat_nr", type(self.sat_nr)))
          quit()
 
       if self.sat[0:8] == "Meteosat" or self.sat[0:4] == "Hsaf":
@@ -313,13 +316,13 @@ class input_msg_class:
             d={'msg':'MSG', 'msg_nr':str(int(self.sat_nr)-7), 'sat':self.sat, 'sat_nr':str(self.sat_nr),'0sat_nr':str(self.sat_nr).zfill(2)}
             msg_str = layout % d
          else:
-            print ("*** Error in msg_str ("+inspect.getfile(inspect.currentframe())+")")
-            print ("    try to get msg_string for sat number", self.sat_nr, " which is not meteosat SECOND generation ")
+            print(("*** Error in msg_str ("+inspect.getfile(inspect.currentframe())+")"))
+            print(("    try to get msg_string for sat number", self.sat_nr, " which is not meteosat SECOND generation "))
             quit()
 
       else:
-         print ("*** Error in msg_str ("+inspect.getfile(inspect.currentframe())+")")
-         print ("    try to get msg_string for sat ", self.sat, " which is not Meteosat/meteosat")
+         print(("*** Error in msg_str ("+inspect.getfile(inspect.currentframe())+")"))
+         print(("    try to get msg_string for sat ", self.sat, " which is not Meteosat/meteosat"))
          quit()
       return msg_str
 
@@ -396,22 +399,22 @@ class input_msg_class:
          else:
             default_settings = global_settings
 
-         for key, value in chosen_settings.iteritems():
+         for key, value in chosen_settings.items():
             if value is None:
                chosen_settings[key] = deepcopy(default_settings[key])
 
       if scale == "broad":
          if chosen_settings['use_TB_forecast'] == True:
-            print ("The area you chose ", area," is larger than the available forecast (ccs4).\n Suggestion: use only observation (set use_TB_forecast to False or None)")
+            print(("The area you chose ", area," is larger than the available forecast (ccs4).\n Suggestion: use only observation (set use_TB_forecast to False or None)"))
             quit()
 
-      for key, value in chosen_settings.iteritems():
+      for key, value in chosen_settings.items():
          if value != default_settings[key]:
-            print ("    WARNING: not reccomended choice: ", key, " set to ", value,". Reccomended: ", default_settings[key])
+            print(("    WARNING: not reccomended choice: ", key, " set to ", value,". Reccomended: ", default_settings[key]))
 
       # switch off Rapid scan, if large areas are wanted ess' in self.aux_results
       if area in self.areasNoRapidScan and self.rapid_scan_mode==True: 
-         print ("Over the area you chose ", area," there is no Rapid Scan available.\n Suggestion: set rapid_scan_mode to False")
+         print(("Over the area you chose ", area," there is no Rapid Scan available.\n Suggestion: set rapid_scan_mode to False"))
          quit()
 
       if chosen_settings['rapid_scan_mode']==True:
@@ -438,7 +441,7 @@ def get_input_msg(input_file):
    from os import getcwd
    from os import path
 
-   print ("... read input file from directory:", getcwd())
+   print(("... read input file from directory:", getcwd()))
 
    # define input class
    in_msg = input_msg_class()
@@ -454,13 +457,13 @@ def get_input_msg(input_file):
          return in_msg
       else:
          # Empty file exists
-         print ("*** ERROR in get_input_msg ("+inspect.getfile(inspect.currentframe())+")")
-         print ('    input file %s.py is empty' % input_file)
+         print(("*** ERROR in get_input_msg ("+inspect.getfile(inspect.currentframe())+")"))
+         print(('    input file %s.py is empty' % input_file))
          quit()
    except OSError as e:
       # File does not exists or is non accessible
-      print ("*** ERROR in get_input_msg ("+inspect.getfile(inspect.currentframe())+")")
-      print ('    input file %s.py does not exist' % input_file)
+      print(("*** ERROR in get_input_msg ("+inspect.getfile(inspect.currentframe())+")"))
+      print(('    input file %s.py does not exist' % input_file))
       quit()
       
    
@@ -587,7 +590,7 @@ def parse_commandline():
    #print (args)
 
    if len(args) < 1:
-      print (parser.print_help())
+      print((parser.print_help()))
       # error also cause program to exit
       parser.error("\n*** Error, at least the input file is necessary, e.g. input_msg.py\n")
    else:
@@ -617,10 +620,10 @@ def parse_commandline_and_read_inputfile(input_file=None):
    in_msg = get_input_msg(input_file)
    
    print ('*** overwrite options of the input_file with command line arguments')
-   for opt, value in options.__dict__.items():
+   for opt, value in list(options.__dict__.items()):
       if value is not None:
          if opt!='date':
-            print ('...', opt, ' = ', value)
+            print(('...', opt, ' = ', value))
             setattr(in_msg, opt, value)
          else:
             in_msg.update_datetime(options.date[0],options.date[1],options.date[2],options.date[3],options.date[4])
@@ -634,13 +637,13 @@ def parse_commandline_and_read_inputfile(input_file=None):
 
    from datetime import datetime
    if datetime.now() < in_msg.datetime:
-      print ("*** ERROR in parse_commandline_and_read_inputfile ("+inspect.getfile(inspect.currentframe())+")")
-      print ('    in_msg.datetime is in the future ', in_msg.datetime)
+      print(("*** ERROR in parse_commandline_and_read_inputfile ("+inspect.getfile(inspect.currentframe())+")"))
+      print(('    in_msg.datetime is in the future ', in_msg.datetime))
       raise TypeError('*** ERROR: in_msg.datetime is in the future '+str(in_msg.datetime))
       quit()
       
-   print ("  date:", in_msg.datetime)
-   print ("  NRT: ", in_msg.nrt)
+   print(("  date:", in_msg.datetime))
+   print(("  NRT: ", in_msg.nrt))
    #print in_msg.__dict__
    
    return in_msg

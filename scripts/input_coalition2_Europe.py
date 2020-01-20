@@ -54,7 +54,7 @@ def input(in_msg):
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('EuropeCanary')    # upper third of MSG disk, satellite at 0.0 deg East, full resolution 
     #in_msg.areas.append('EuropeCanary95')  # upper third of MSG disk, satellite at 9.5 deg East, full resolution 
-    in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
+    #in_msg.areas.append('EuropeCanaryS95')  # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
     #in_msg.areas.append('fullearth')       # full earth 600x300                    # does not yet work
@@ -353,10 +353,15 @@ def input(in_msg):
         #in_msg.chosen_settings['reader_level']="seviri-level4"
 
     ## !!! BAD FIX !!!
-    in_msg.reader_level="seviri-level8"
-    #in_msg.reader_level="seviri-level4"
-
-
+    #in_msg.reader_level="seviri-level4"   # hdf5
+    #in_msg.reader_level="seviri-level5"   # NWC SAF HRW hdf5
+    #in_msg.reader_level="seviri-level6"   # viewing geometry nc
+    #in_msg.reader_level="seviri-level7"   # hsaf h03
+    in_msg.reader_level="seviri-level8"   # msg radiance ccs4 nc
+    #in_msg.reader_level="seviri-level9"   # msg radiance ccs4 nc parallax corrected
+    #in_msg.reader_level="seviri-level10"  # new hsaf porduct h03b
+    #in_msg.reader_level="seviri-level11"   # NWC SAF version 2016 (except HRW)
+    
     #PLOTTING SETTINGS. Not used??
     #in_msg.layer = ''
     #in_msg.layer = ' 2nd layer'
@@ -371,13 +376,13 @@ def input(in_msg):
     in_msg.pickle_labels = False; in_msg.shelve_labels = False
 
     in_msg.postprocessing_areas= []
-    in_msg.postprocessing_areas.append('EuropeCanaryS95')
+    #in_msg.postprocessing_areas.append('EuropeCanaryS95')
     #in_msg.postprocessing_areas.append('EuroMercator')
     in_msg.postprocessing_areas.append("ccs4")
     
     #in_msg.postprocessing_composite1=["C2rgb-ir108"]
     #in_msg.postprocessing_composite2=["C2rgb-Forecast-ir108"]  
-    in_msg.postprocessing_composite1=["C2rgb-IR_108"]                   # used by plot_coalition2
+    in_msg.postprocessing_composite1=["TRT-C2rgb-IR_108","TRT-C2rgb-HRVir108"]  # used by plot_coalition2
     #in_msg.postprocessing_composite1=["C2rgbPC-IR_108"]                # used by plot_coalition2
     #in_msg.postprocessing_composite1=["C2rgb-overview"]                # used by plot_coalition2
     #in_msg.postprocessing_composite2=["C2rgb-Forecast-IR_108"]       # used by plot_coalition2
@@ -437,7 +442,7 @@ def input(in_msg):
         print "    in_msg.postprocessing_composite: ", in_msg.postprocessing_composite
     """
     #in_msg.check_input = False
-    in_msg.parallax_correction = False
+    #in_msg.parallax_correction = False
     #in_msg.parallax_correction = True
     in_msg.parallax_gapfilling = 'nearest' # 'False' (default), 'nearest', 'bilinear'
 

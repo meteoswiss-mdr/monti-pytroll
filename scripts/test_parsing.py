@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 
 
 from get_input_msg import parse_commandline_and_read_inputfile
@@ -28,6 +31,6 @@ in_msg = parse_commandline_and_read_inputfile()
 #        print '   ', opt, ' = ', value
 #        setattr(in_msg, opt, value)
         
-print ""
-print in_msg.datetime
-print ""
+print("")
+print(in_msg.datetime)
+print("")

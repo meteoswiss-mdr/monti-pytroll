@@ -93,8 +93,8 @@ time_slot = datetime(year, month, day, hour, minute)
 print "*** "
 print "*** read radar data (plot_radar.py)"
 global_data = GeostationaryFactory.create_scene("swissradar", "", "radar", time_slot)
-#prop_str='PRECIP'                     # RZC
-prop_str='POH'    # does not work!!!  # BZC
+prop_str='PRECIP'                     # RZC
+#prop_str='POH'    # does not work!!!  # BZC
 #prop_str='MESHS' # does not work!!!  # MZC
 #prop_str='VIL'                       # LZC
 #prop_str='MaxEcho'                   # CZC

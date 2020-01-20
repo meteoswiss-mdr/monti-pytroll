@@ -34,9 +34,9 @@ def input(in_msg):
     # chose radar product 
     #-------------------    
     ## satellite channels
-    ##in_msg.RGBs.append('PRECIP')     # RZC
+    in_msg.RGBs.append('PRECIP')     # RZC
     #in_msg.RGBs.append('POH')         # BZC
-    in_msg.RGBs.append('MESHS')       # MZC
+    #in_msg.RGBs.append('MESHS')       # MZC
     #in_msg.RGBs.append('VIL')         # LZC
     ##in_msg.RGBs.append('MaxEcho')    # CZC
     #in_msg.RGBs.append('EchoTOP15')   # EZC
@@ -93,7 +93,7 @@ def input(in_msg):
     in_msg.make_plots=True
     #in_msg.fill_value=(0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
     in_msg.fill_value=None  # black (0,0,0) / white (1,1,1) / transparent None  
-    in_msg.add_title = False
+    in_msg.add_title = True
     in_msg.title = ["%(sat)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s"]
     in_msg.title_y_line_nr = 2  # (INT) at which line should the title start
     in_msg.add_borders = False

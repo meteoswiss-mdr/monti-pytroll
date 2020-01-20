@@ -6,6 +6,9 @@ output:
   image function according to the input string
 '''
 
+from __future__ import division
+from __future__ import print_function
+
 import products 
 import inspect
 import logging
@@ -45,7 +48,7 @@ def get_last_SEVIRI_date(RSS, delay=0, time_slot=None):
     if (time_slot is None):
         # get the current time
         gmt = gmtime()
-        #print "GMT time: "+ str(gmt)
+        #print ("GMT time: "+ str(gmt))
         # or alternatively 
         # utc = datetime.datetime.utcnow()
         # convert to datetime format
@@ -96,8 +99,8 @@ def check_near_real_time(time_slot, minutes):
     # get the current time
     gmt = gmtime()
     t0 = datetime.datetime(gmt.tm_year, gmt.tm_mon, gmt.tm_mday, gmt.tm_hour, gmt.tm_min, 0) 
-    #print "    current time ", str(t0)
-    #print "    time of interest ", str(time_slot)
+    #print ("    current time ", str(t0))
+    #print ("    time of interest ", str(time_slot))
 
     # if specified time is older than current time 'minutes' min 
     if time_slot < (t0 - datetime.timedelta(seconds=minutes*60)):
@@ -166,7 +169,7 @@ def channel_num2str(channels):
     i=0 
     channels=list(channels)
     for channel in channels:
-        #print "++++++++", channel
+        #print ("++++++++", channel)
         if type(channel) is float:
             if channel == 0.635:
                 channels[i] = 'VIS006'
@@ -276,8 +279,8 @@ def choose_msg(date, RSS=True):
     # automatic choise of the Meteosat satellite (depending on RSS mode)
     if date <  datetime.datetime(2008, 5, 13, 0, 0):   # before 13.05.2008 only nominal MSG1 (meteosat8), no Rapid Scan Service yet
         if RSS:
-            print "*** Error in choose_msg (my_msg_module.py)"
-            print "    no RSS available yet for ", str(date)
+            print ("*** Error in choose_msg (my_msg_module.py)")
+            print ("    no RSS available yet for ", str(date))
             quit()
         else:
             sat_nr = 8 
@@ -321,7 +324,7 @@ def choose_area_loaded_msg(sat, sat_nr, date_time):
            #area_loaded = get_area_def("EuropeCanary")
            #area_loaded = get_area_def("alps")  # new projection of SAM
         else:
-          print "*** Error (A), unknown satellite number ", sat_nr, "in plot_msg (plot_msg.py)"
+          print ("*** Error (A), unknown satellite number ", sat_nr, "in plot_msg (plot_msg.py)")
           area_loaded = get_area_def("hsaf")  # 
      elif date_time.year > 2012:
         if sat_nr == 8:
@@ -335,7 +338,7 @@ def choose_area_loaded_msg(sat, sat_nr, date_time):
            #area_loaded = get_area_def("EuropeCanary")
            #area_loaded = get_area_def("alps")  # new projection of SAM
         else:
-           print "*** Error (B), unknown satellite number ", sat_nr, "in plot_msg (plot_msg.py)"
+           print ("*** Error (B), unknown satellite number ", sat_nr, "in plot_msg (plot_msg.py)")
            area_loaded = get_area_def("hsaf")  # 
      else:
         if sat_nr == 8:
@@ -393,8 +396,8 @@ def check_RSS(sat_nr, date):
         elif int(sat_nr) == 9 or int(sat_nr) == 10:
             RSS = True 
         elif int(sat_nr) == 8:
-            print "*** Attention!!!: This is Indian Ocean Data Coverage ***"
-            print "*** Attention!!!: This is Indian Ocean Data Coverage ***"
+            print ("*** Attention!!!: This is Indian Ocean Data Coverage ***")
+            print ("*** Attention!!!: This is Indian Ocean Data Coverage ***")
             RSS = True 
         else:
             RSS = None 
@@ -429,7 +432,7 @@ def format_name (folder, time_slot, rgb=None, sat=None, sat_nr=None, RSS=None, a
         new_folder = new_folder.replace("%(sat)s", sat )
 
     if (sat_nr is not None) and sat_nr != "":
-        #print "... replace sat_nr", sat_nr
+        #print ("... replace sat_nr", sat_nr)
         #new_folder = (new_folder % {"msg": "MSG"+str(int(sat_nr)-7)})
         new_folder = new_folder.replace("%(msg)s", "MSG-"+str(int(sat_nr)-7))
         new_folder = new_folder.replace("%(sat_nr)s", str(int(sat_nr)) )  # get rid of leading 0
@@ -462,7 +465,7 @@ def check_loaded_channels(rgbs, data):
 
     from my_composites import get_image
 
-    print "... check if all needed channels are loaded for ", rgbs
+    print ("... check if all needed channels are loaded for ", rgbs)
 
     # check if all prerequisites are loaded
     all_loaded = True
@@ -473,8 +476,8 @@ def check_loaded_channels(rgbs, data):
         rgbs = [rgbs]
 
     if (type(rgbs) is not list):
-        print "*** Error in check_loaded_channels" 
-        print "    unknown type for rgbs ", type(rgbs), rgbs
+        print ("*** Error in check_loaded_channels")
+        print ("    unknown type for rgbs ", type(rgbs), rgbs)
         quit()
 
     for rgb in rgbs:
@@ -483,15 +486,15 @@ def check_loaded_channels(rgbs, data):
             obj_image = get_image(data, rgb)
             for pre in channel_num2str(obj_image.prerequisites):
                 if pre not in loaded_channels:
-                    print "*** Warning: missing channel ", pre, ", skip ", rgb
+                    print ("*** Warning: missing channel ", pre, ", skip ", rgb)
                     all_loaded = False
         elif rgb in products.MSG_color:
             if rgb.replace("c","") not in loaded_channels:
-                print "*** Warning: missing channel ", rgb.replace("c",""), ", skip ", rgb
+                print ("*** Warning: missing channel ", rgb.replace("c",""), ", skip ", rgb)
                 all_loaded = False
         else:
             if rgb not in loaded_channels:
-                print "*** Warning: missing channel ", rgb, ", skip ", rgb
+                print ("*** Warning: missing channel ", rgb, ", skip ", rgb)
                 all_loaded = False
 
     return all_loaded
@@ -543,12 +546,12 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
     #    RSSS='___'
     RSSS='???'
 
-    print in_msg.check_input
-
     # choose MSG satellite
     if in_msg.sat_nr is None:
         in_msg.sat_nr = choose_msg(in_msg.datetime, RSS=in_msg.RSS)
 
+    print ("in_msg.reader_level", in_msg.reader_level)
+        
     ## currently no check for hdf data
     if in_msg.reader_level == "seviri-level4":
        return in_msg.RGBs
@@ -557,6 +560,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
        return in_msg.RGBs
     ## currently no check for netCDF data   
     if in_msg.reader_level == "seviri-level8":
+       print ("... no check for input data completeness for netCDF data")
        return in_msg.RGBs
     ## currently no check for (parallax corrected) netCDF data   
     if in_msg.reader_level == "seviri-level9":
@@ -590,13 +594,13 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
     channels_complete=[False,False,False,False,False,False,False,False,False,False,False,False]
     pro_file_checked=False
 
-    print "... read config file ", os.path.join(CONFIG_PATH, fullname + ".cfg")
-    print "... use satellite "+in_msg.sat_str()
+    print ("... read config file ", os.path.join(CONFIG_PATH, fullname + ".cfg"))
+    print ("... use satellite "+in_msg.sat_str())
 
     for rgb in needed_input:
 
         if in_msg.verbose:
-            print "... check input for ", rgb
+            print ("... check input for ", rgb)
 
         if rgb in products.MSG or rgb in products.MSG_color or rgb in products.RGBs_buildin or rgb in products.RGBs_user:
 
@@ -607,7 +611,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
             #inputDirectory="/data/cinesat/in/eumetcast1/"
 
             if in_msg.verbose:
-                print '... check input in directory '+inputDirectory
+                print ('... check input in directory '+inputDirectory)
 
             if not pro_file_checked:
 
@@ -621,7 +625,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                     # update pro_file with new sat_nr and search for prolog files
                     MSG = in_msg.msg_str(layout="%(msg)s%(msg_nr)s")
                     if in_msg.verbose:
-                        print "... check input files for ", MSG, str(in_msg.datetime), in_msg.RGBs
+                        print ("... check input files for ", MSG, str(in_msg.datetime), in_msg.RGBs)
                     #pro_file = "?-000-"+MSG+"__-"+MSG+"_"+RSSS+"_???-_________-PRO______-"+yearS+monthS+dayS+hourS+minuteS+"-__"
                     inputDirectory = time_slot.strftime(conf.get("seviri-level1", "dir"))
                     pro_file = time_slot.strftime(conf.get("seviri-level1", "filename_pro"))
@@ -629,19 +633,19 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                     pro_filename = glob.glob(inputDirectory+'/'+pro_file)
 
                     if len(pro_filename) > 0:
-                        print "    found prologue file ", pro_filename
+                        print ("    found prologue file ", pro_filename)
                         break  # prologue file found, break this loop and check if epilog is there
                     else:
                         if there_is_no_backup_satellite:
                             # reset sat_nr and return empty rgb_complete
                             in_msg.sat_nr = sat_nr_org 
                             if in_msg.verbose:
-                                print "*** Warning, no prolog file found, cannot process anything"
+                                print ("*** Warning, no prolog file found, cannot process anything")
                             return []  # rgb_complete is empty 
                         else:
                             # try backup satellite
                             if in_msg.verbose:
-                                print "*** Warning, no prologue file found for Meteosat ",in_msg.sat_nr ," : "+inputDirectory+'/'+pro_file
+                                print ("*** Warning, no prologue file found for Meteosat ",in_msg.sat_nr ," : "+inputDirectory+'/'+pro_file)
                             # before July 2016: Meteosat 8 is RSS backup for Meteosat 9, but also try Meteosat 10 if possible
                             if in_msg.datetime < datetime.datetime(2016, 7, 1, 0, 0): 
                                 if in_msg.sat_nr == 9:
@@ -649,13 +653,13 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                                     fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
                                     conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
                                     if in_msg.verbose:
-                                        print "... try backup satellite ", in_msg.sat_nr
+                                        print ("... try backup satellite ", in_msg.sat_nr)
                                 elif in_msg.sat_nr == 8:
                                     in_msg.sat_nr = 10
                                     fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
                                     conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
                                     if in_msg.verbose:
-                                        print "... try backup satellite ", in_msg.sat_nr
+                                        print ("... try backup satellite ", in_msg.sat_nr)
                                 elif in_msg.sat_nr == 10:
                                     there_is_no_backup_satellite = True  
                                 else:
@@ -667,7 +671,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                                     fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
                                     conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
                                     if in_msg.verbose:
-                                        print "... try backup satellite ", in_msg.sat_nr
+                                        print ("... try backup satellite ", in_msg.sat_nr)
                                 elif in_msg.sat_nr == 8:   # indian ocean data coverage, no backup
                                     LOG.info("*** Warning, Meteosat satellite number", in_msg.sat_nr, " is Indian Ocean Data Coverage")
                                     there_is_no_backup_satellite = True  
@@ -682,7 +686,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                                     fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
                                     conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
                                     if in_msg.verbose:
-                                        print "... try backup satellite ", in_msg.sat_nr
+                                        print ("... try backup satellite ", in_msg.sat_nr)
                                 elif in_msg.sat_nr == 9:
                                     in_msg.sat_nr = 11
                                     # change RSS
@@ -690,7 +694,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                                     fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
                                     conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
                                     if in_msg.verbose:
-                                        print "... try backup satellite ", in_msg.sat_nr
+                                        print ("... try backup satellite ", in_msg.sat_nr)
                                 elif in_msg.sat_nr == 11:
                                     there_is_no_backup_satellite = True  
                                 elif in_msg.sat_nr == 8:
@@ -706,16 +710,16 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                 #if len(filter(listdir(inputDirectory), epi_file)) == 0:
                 if len(epi_filename) == 0:
                     if in_msg.verbose:
-                        print "*** Warning, no epilogue file found: "+inputDirectory+'/'+epi_file
+                        print ("*** Warning, no epilogue file found: "+inputDirectory+'/'+epi_file)
                     return rgb_complete
                 else:
-                    print "    found epilogue file", epi_filename
+                    print ("    found epilogue file", epi_filename)
 
             # retrieve channels needed for specific rgb
             channels_needed = rgb_prerequisites(rgb, sat=in_msg.sat_str(), sat_nr=in_msg.sat_nr_str(), verbose=False)
         
             if in_msg.verbose:
-                print "    check input files for "+ rgb+ ', channels needed: ', list(channels_needed)
+                print ("    check input files for "+ rgb+ ', channels needed: ', list(channels_needed))
         
             fname1= "?-000-"+MSG+"__-"+MSG+"_???_???-"
             # channel
@@ -727,17 +731,17 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
             input_any = False
             for channel in channels_needed:
                 if not channels_complete[channel_str2ind(channel)]:
-                    # print "... search input files of ", channel
+                    # print ("... search input files of ", channel)
                     if channel != "HRV":
                         all_segments=''
                         for seg in segments:
                             all_segments=all_segments+str(seg)
                         all_segments='['+all_segments+']'
                         search_pattern=fname1+channel+fname2+"00000"+all_segments+fname3
-                        #print "    search pattern: ", search_pattern
+                        #print ("    search pattern: ", search_pattern)
                         #for this_file in filter(listdir(inputDirectory), search_pattern):
-                        #    print this_file
-                        #    print path.isfile(inputDirectory+this_file), access(inputDirectory+this_file, R_OK)
+                        #    print (this_file)
+                        #    print (path.isfile(inputDirectory+this_file), access(inputDirectory+this_file, R_OK))
                         #n_files = len(filter(listdir(inputDirectory), search_pattern))
                         n_files = len(glob.glob(inputDirectory+'/'+search_pattern))
         
@@ -750,10 +754,10 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
         
                         if in_msg.verbose:
                             if input_complete==False:
-                                print "*** Warning, input not complete for "+channel+ ' ('+rgb+')'
-                                print "***          found only "+str(n_files)+" input segments (expected "+str(len(segments))+ " segments)"
+                                print ("*** Warning, input not complete for "+channel+ ' ('+rgb+')')
+                                print ("***          found only "+str(n_files)+" input segments (expected "+str(len(segments))+ " segments)")
                             #else:
-                            #   print '    input complete for '+channel+ ' ('+rgb+')'+' '+search_pattern
+                            #   print ('    input complete for '+channel+ ' ('+rgb+')'+' '+search_pattern)
                     else:
 
                         for seg in HRsegments:
@@ -764,16 +768,16 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                             if n_files == 0:
                                 input_complete=False
                                 if in_msg.verbose:
-                                    print "*** Warning, missing file: " + search_pattern
+                                    print ("*** Warning, missing file: " + search_pattern)
     
                             elif n_files == 1:
                                 input_any = True
                             #    if in_msg.verbose:
-                            #        print "    found file: ", fname1+"HRV___"+fname2+"0000"+segS+fname3
+                            #        print ("    found file: ", fname1+"HRV___"+fname2+"0000"+segS+fname3)
                 
                             if n_files != 0 and n_files != 1:
-                                print "*** ERROR in check_input (my_msg_module.py)"
-                                print "*** ERROR this should not happen, please contact the developers (Uli, Lorenzo)"
+                                print ("*** ERROR in check_input (my_msg_module.py)")
+                                print ("*** ERROR this should not happen, please contact the developers (Uli, Lorenzo)")
                             search_pattern=''
 
                         # if we are not checking (for all segments)
@@ -783,7 +787,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
 
                 #else:
                 #    if in_msg.verbose:
-                #        print "    input for channel "+channel+" is already checked and complete"
+                #        print ("    input for channel "+channel+" is already checked and complete")
         
                 # remember channels that are complete
                 if input_complete:
@@ -791,9 +795,9 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
         
                 if in_msg.verbose:
                     if input_complete:
-                        print '    input complete for '+channel+ ' ('+rgb+')' #+' '+search_pattern
+                        print ('    input complete for '+channel+ ' ('+rgb+')') #+' '+search_pattern
                     else:
-                        print "*** Warning, input not complete for "+channel+ ' ('+rgb+')'
+                        print ("*** Warning, input not complete for "+channel+ ' ('+rgb+')')
         
                 if input_complete == False:
                     break
@@ -828,22 +832,22 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
             elif rgb == 'CRPh':
                 filename = (pathname % {"number": "14", "product": "CRPh_"})
             else:
-                print "*** ERROR in check_input (my_msg_module.py)"
-                print "    unknown NWC-SAF product ", rgb
+                print ("*** ERROR in check_input (my_msg_module.py)")
+                print ("    unknown NWC-SAF product ", rgb)
                 quit()
 
-            print "... search for ", filename
+            print ("... search for ", filename)
 
             if len(glob.glob(filename)) == 0:
                 if in_msg.verbose:
-                    print "*** Warning, no NWC SAF file found: "+filename
+                    print ("*** Warning, no NWC SAF file found: "+filename)
 
                 # if parallax correction is desired and there is not CTH,
                 # tell main program that no images can be produced
                 if in_msg.parallax_correction and rgb=='CTH':
                     return []
             else:
-                print "    NWC SAF file found: "+glob.glob(filename)[0]
+                print ("    NWC SAF file found: "+glob.glob(filename)[0])
                 rgb_complete.append(rgb)
 
         elif rgb in products.HSAF:
@@ -855,8 +859,8 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                 from mpop.satin.hsaf_h03b import find_hsaf_h03b_files
                 filenames = find_hsaf_h03b_files(time_slot, fullname)
             else:
-                print "*** ERROR in my_msg_module"
-                print "    HSAF product ", rgb, "not yet implemented"
+                print ("*** ERROR in my_msg_module")
+                print ("    HSAF product ", rgb, "not yet implemented")
                 quit()
                 
             if len(filenames) == 0:
@@ -893,8 +897,8 @@ def get_NWC_pge_name(rgb):
         pge = "CRPh_"
 
     else:
-        print "*** Error in get_NWC_pge_name (my_msg_module.py)"
-        print "    unknown NWC-SAF product", rgb
+        print ("*** Error in get_NWC_pge_name (my_msg_module.py)")
+        print ("    unknown NWC-SAF product", rgb)
         quit()
 
     return pge
@@ -922,7 +926,7 @@ def convert_NWCSAF_to_radiance_format(satscene, area, rgb, nwcsaf_calibrate, IS_
     from numpy import ndarray
     from mpop.channel import Channel
 
-    print "    convert ", rgb, " to the normal format of a radiance/brightness temperature data set"
+    print ("    convert ", rgb, " to the normal format of a radiance/brightness temperature data set")
 
     pge = get_NWC_pge_name(rgb)
 
@@ -1010,38 +1014,38 @@ def convert_NWCSAF_to_radiance_format(satscene, area, rgb, nwcsaf_calibrate, IS_
         palette = satscene[pge].crph_pc_palette
         units= 'l / (m2 h)'
     else:
-        print "*** ERROR in my_msg_module, unknown rgb: ", rgb
+        print ("*** ERROR in my_msg_module, unknown rgb: ", rgb)
         quit()
   
 
-    #print "    prop.shape: ", prop.shape
-    #print "    dir(satscene[pge])", dir(satscene[pge])
-    #print "    satscene[pge].num_of_columns", satscene[pge].num_of_columns
-    #print "    satscene[pge].num_of_lines", satscene[pge].num_of_lines
-    #print "    satscene[pge].area", satscene[pge].area
-    #print "    satscene[pge].area_def", satscene[pge].area_def
-    #print "    satscene[pge].shape", satscene[pge].shape
-    #print "    dir(satscene[pge].info)", dir(satscene[pge].info)
-    #print "    satscene[pge].is_loaded", satscene[pge].is_loaded
-    #print "    satscene[pge].product_name", satscene[pge].product_name
+    #print ("    prop.shape: ", prop.shape)
+    #print ("    dir(satscene[pge])", dir(satscene[pge]))
+    #print ("    satscene[pge].num_of_columns", satscene[pge].num_of_columns)
+    #print ("    satscene[pge].num_of_lines", satscene[pge].num_of_lines)
+    #print ("    satscene[pge].area", satscene[pge].area)
+    #print ("    satscene[pge].area_def", satscene[pge].area_def)
+    #print ("    satscene[pge].shape", satscene[pge].shape)
+    #print ("    dir(satscene[pge].info)", dir(satscene[pge].info))
+    #print ("    satscene[pge].is_loaded", satscene[pge].is_loaded)
+    #print ("    satscene[pge].product_name", satscene[pge].product_name)
 
     if isinstance(prop, ndarray): # normal array as CT
         data = ma.asarray(prop)
-        print "(my_msg_module) Mask NWCSAF array (org: unmasked numpy array), min/max = ", prop.min(), prop.max(), ', no_data = ', no_data 
+        print ("(my_msg_module) Mask NWCSAF array (org: unmasked numpy array), min/max = ", prop.min(), prop.max(), ', no_data = ', no_data)
         data.mask = (data == no_data) # create mask 
     elif isinstance(prop, ma.core.MaskedArray):
         data = ma.asarray(prop.data)  # already a masked array
-        print "(my_msg_module) Mask NWCSAF array (org: masked array), min/max:", prop.data.min(), prop.data.max(), ', no_data = ', no_data 
+        print ("(my_msg_module) Mask NWCSAF array (org: masked array), min/max:", prop.data.min(), prop.data.max(), ', no_data = ', no_data) 
         data.mask = (data == no_data) # create mask 
 #    elif isinstance(prop, MsgSPhRData):
 #        data = ma.asarray(prop.data)  # already a masked array
-#        print "(my_msg_module) min/max B2", prop.data.min(), prop.data.max()
+#        print ("(my_msg_module) min/max B2", prop.data.min(), prop.data.max())
 #        data.mask = (data == no_data) # create mask         
     else:
-        print "*** ERROR, unknown data format", type(prop)
+        print ("*** ERROR, unknown data format", type(prop))
         quit()
 
-    print "... append ", rgb, satscene[pge].resolution, data.min(), data.max() 
+    print ("... append ", rgb, satscene[pge].resolution, data.min(), data.max())
     if units is None:
         satscene.channels.append(Channel(name=rgb,
                                          wavelength_range=[0.,0.,0.],
@@ -1054,8 +1058,8 @@ def convert_NWCSAF_to_radiance_format(satscene, area, rgb, nwcsaf_calibrate, IS_
                                          data=data,
                                          calibration_unit=units))
 
-    #print rgb
-    print '(my_msg_module) min/max: ', satscene[rgb].data.min(), satscene[rgb].data.max()
+    #print (rgb)
+    print ('(my_msg_module) min/max: ', satscene[rgb].data.min(), satscene[rgb].data.max())
 
     # satscene[rgb].data = data
     satscene[rgb].info['satname'] = satscene.satname
@@ -1064,7 +1068,7 @@ def convert_NWCSAF_to_radiance_format(satscene, area, rgb, nwcsaf_calibrate, IS_
     satscene[rgb].info['time'] = satscene.time_slot
     satscene[rgb].info['units'] = units
     #for key, value in satscene[rgb].info.items():
-    #    print (key), satscene[rgb].info[key]
+    #    print ((key), satscene[rgb].info[key])
 
     #quit()
 
@@ -1073,11 +1077,11 @@ def convert_NWCSAF_to_radiance_format(satscene, area, rgb, nwcsaf_calibrate, IS_
     
     if palette is not None:
         if palette.size > 0:
-            print "(my_msg_module) copy palette for ", rgb
+            print ("(my_msg_module) copy palette for ", rgb)
             satscene[rgb].palette = palette
-            #print "(my_msg_module) palette ", palette
+            #print ("(my_msg_module) palette ", palette)
         else:
-            print "*** Warning, empty palette"
+            print ("*** Warning, empty palette")
 
     #if IS_PYRESAMPLE_LOADED:
     #
@@ -1089,7 +1093,7 @@ def convert_NWCSAF_to_radiance_format(satscene, area, rgb, nwcsaf_calibrate, IS_
     #    for param in proj_params:
     #        key, val = param.split("=")
     #        proj_dict[key.replace("+","")] = val
-    #        #print key.replace("+",""), val
+    #        #print (key.replace("+",""), val)
     #        # Build area_def on-the-fly
     #    satscene[rgb].area = geometry.AreaDefinition(
     #        satscene.satname + satscene.instrument_name +
@@ -1101,7 +1105,7 @@ def convert_NWCSAF_to_radiance_format(satscene, area, rgb, nwcsaf_calibrate, IS_
     #        prop.shape[1],
     #        prop.shape[0],
     #        area.area_extent)
-    #    print "(plot_msg.py) satscene[rgb].area: ", satscene[rgb].area
+    #    print ("(plot_msg.py) satscene[rgb].area: ", satscene[rgb].area)
     #    #Area ID: meteosatseviri[-4823148.08905083  1969764.67835886  4178061.40840017  5570248.47733926](1200, 3000)
     #    #Name: On-the-fly area
     #    #Projection ID: geos
@@ -1112,7 +1116,7 @@ def convert_NWCSAF_to_radiance_format(satscene, area, rgb, nwcsaf_calibrate, IS_
     #
     #else:
     #    LOGGER.warning("pyresample missing. Can only work in satellite projection")
-    #    print "*** Error, pyresample missing"
+    #    print ("*** Error, pyresample missing")
 
 
 """
@@ -1134,7 +1138,7 @@ def read_SEVIRI_viewing_geometry(lon0, folder):
 
     lon0_str = '{0:02d}'.format(int(10*lon0))
     ncfile_str = folder+'/MSG_SEVIRI_lon'+lon0_str+'_geometry.nc'
-    print ncfile_str
+    print ("... read MSG geometry file: ", ncfile_str)
 
     ncfile = Dataset(ncfile_str,'r') 
     # ncfile = Dataset('/data/COALITION2/database/meteosat/SEVIRI/MSG_SEVIRI_lon00_geometry.nc','r') 
@@ -1143,9 +1147,6 @@ def read_SEVIRI_viewing_geometry(lon0, folder):
     vza = ncfile.variables['vza'][:]
     vaa = ncfile.variables['vaa'][:]
 
-    print type(vza)
-    print vza.shape
-
     ## check the data.
     #for data in vza: # [vza, vaa]
     #    nx,ny = data.shape
@@ -1153,9 +1154,9 @@ def read_SEVIRI_viewing_geometry(lon0, folder):
     #    vza_check.shape = (nx,ny) # reshape to 2d array
     #    try:
     #        assert_array_equal(data, data_check)
-    #        print '*** SUCCESS reading example file '+ncfile
+    #        print ('*** SUCCESS reading example file '+ncfile)
     #    except:
-    #        print '*** FAILURE reading example file '+ncfile
+    #        print ('*** FAILURE reading example file '+ncfile)
 
     # close the file.
     ncfile.close()
@@ -1186,7 +1187,7 @@ def read_SEVIRI_viewing_geometry(lon0, folder):
     img.colorize(colormap)
     img.show()
     #img.save("test_vaa.png")
-    #print "display test_vaa.png &"
+    #print ("display test_vaa.png &")
 
     return [vza, vaa] 
 
@@ -1255,12 +1256,12 @@ def ContourImage(prop, area, clevels=[0.0], vmin=None, vmax=None, alpha=None, li
       import matplotlib.cm as cm
       colormap=cm.autumn_r
 
-    print "... CountourImage with clevels = ", clevels, ", (vmin/vmax) =", vmin, vmax, ', alpha=', alpha
+    print ("... CountourImage with clevels = ", clevels, ", (vmin/vmax) =", vmin, vmax, ', alpha=', alpha)
 
     if alpha is None: 
       CS = plt.contour(X, Y, prop.filled(), clevels, linewidths=linewidths, cmap=colormap, vmin=vmin, vmax=vmax) # , linestyles='solid'
     else:
-      print "    half transparent plotting with alpha = ", alpha
+      print ("    half transparent plotting with alpha = ", alpha)
       CS = plt.contour(X, Y, prop.filled(), clevels, linewidths=linewidths, cmap=colormap, vmin=vmin, vmax=vmax, alpha=alpha) 
 
     ## opaque higher levels 

@@ -497,9 +497,9 @@ if __name__ == '__main__':
     dt_forecast1S = "%02d" % dt_forecast1
     dt_forecast2S = "%02d" % dt_forecast2
     
-    ForecastTime=5 #time in minutes from observation at t=0 when you want each observation (first forecast after ForecastTime, second after 2*ForecastTime...)
-    NumComputationSteps=1 #number of computation time steps: the number of steps when the velocity should be updated within each ForecastTime
-    NumForecast=dt_forecast2/ForecastTime #6number of forecasts you want to produce from observation at t=0
+    ForecastTime = 5 #time in minutes from observation at t=0 when you want each observation (first forecast after ForecastTime, second after 2*ForecastTime...)
+    NumComputationSteps = 1 #number of computation time steps: the number of steps when the velocity should be updated within each ForecastTime
+    NumForecast = int(dt_forecast2/ForecastTime) #6number of forecasts you want to produce from observation at t=0
 
     downscaling_data = True
     mode_downscaling = 'gaussian_225_125'

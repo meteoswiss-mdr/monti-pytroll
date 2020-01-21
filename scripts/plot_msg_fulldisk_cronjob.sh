@@ -20,8 +20,8 @@ echo "************************************************************"
 echo "    python" $PYTROLLHOME/scripts/loop_msg.py input_msg_fulldisk_color_cronjob.py 
 python $PYTROLLHOME/scripts/loop_msg.py input_msg_fulldisk_color_cronjob.py
 
-python postprocessing.py --scp --parea EuropeCanaryS95  -c ["h03-HRVir108"]                                                      input_hsaf_cronjob.py
-python postprocessing.py       --parea odysseyS25       -c ["h03-HRVir108","RATE-HRVir108"]                                      input_hsaf_cronjob.py
-python postprocessing.py --scp --parea odysseyS25       -c '' -m [["MSG_rrMlp-HRVir108","MSG_RATE-HRVir108","MSG_h03-HRVir108"]] input_hsaf_cronjob.py
+python postprocessing.py --scp --parea EuropeCanaryS95  -c ["h03b-HRVir108"]                                                      input_hsaf_cronjob.py
+python postprocessing.py       --parea odysseyS25       -c ["h03b-HRVir108","RATE-HRVir108"]                                      input_hsaf_cronjob.py
+python postprocessing.py --scp --parea odysseyS25       -c '' -m [["MSG_rrMlp-HRVir108","MSG_RATE-HRVir108","MSG_h03b-HRVir108"]] input_hsaf_cronjob.py
 
 echo ""

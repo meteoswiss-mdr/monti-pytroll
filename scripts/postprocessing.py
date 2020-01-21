@@ -426,9 +426,9 @@ def print_usage():
          print("                                 date and time must be completely given")
          print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'ccs4'           (overwrite in_msg.postprocessing_areas)")
          print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ['ccs4','euro4'] (overwrite in_msg.postprocessing_areas)")
-         print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'ccs4' 'h03-ir108'                 (overwrite postprocessing_composite)")
-         print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'ccs4' ['h03-ir108','h03-airmass'] (overwrite postprocessing_composite)")
-         print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ['ccs4','euro4'] ['h03-ir108','h03-airmass'] (several composites and areas)")
+         print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'ccs4' 'h03b-ir108'                 (overwrite postprocessing_composite)")
+         print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'ccs4' ['h03b-ir108','h03b-airmass'] (overwrite postprocessing_composite)")
+         print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ['ccs4','euro4'] ['h03b-ir108','h03b-airmass'] (several composites and areas)")
          print("***           ")
          quit() # quit at this point
 #-----------------------------------------------------------------------------------------

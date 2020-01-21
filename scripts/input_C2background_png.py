@@ -158,7 +158,7 @@ def input(in_msg):
     #in_msg.sat = "HSAF"
     #in_msg.sat_nr=""
     #in_msg.RSS=False 
-    #in_msg.RGBs.append('h03')
+    #in_msg.RGBs.append('h03b')
     #-------------------
     # experimental
     #in_msg.RGBs.append('clouddepth')     # test according to Mecikalski, 2010
@@ -224,7 +224,7 @@ def input(in_msg):
 
     in_msg.postprocessing_areas=["ccs4","EuropeCanaryS95"]
     #in_msg.postprocessing_areas=['EuropeCanaryS95']
-    #in_msg.postprocessing_composite=["h03-ir108"] 
+    #in_msg.postprocessing_composite=["h03b-ir108"] 
     in_msg.postprocessing_composite=['C2rgb-IR_108']
     #in_msg.postprocessing_composite=["CTT-ir108","CTH-ir108"] 
     #in_msg.postprocessing_composite=["hrwdp-ir108", "hrwdc-ir108","streamd-ir108","hrwdr-ir108", "hrwdcnwp-ir108", "hrwdcnnwp-ir108"]    

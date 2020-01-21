@@ -314,9 +314,9 @@ def input(in_msg):
     #in_msg.postprocessing_areas=['EuropeCanaryS95','odysseyS25']
     in_msg.postprocessing_areas=['EuropeCanaryS95']
     #in_msg.postprocessing_composite=["THX-IR_108","radar-convection","THX-radar-convection"]    
-    #in_msg.postprocessing_composite=["RATE-HRV", "RATE-ir108","h03-HRV", "h03-ir108"]
+    #in_msg.postprocessing_composite=["RATE-HRV", "RATE-ir108","h03b-HRV", "h03b-ir108"]
     in_msg.postprocessing_composite=["h03b-VIS006ir108"]
-    #in_msg.postprocessing_montage=[["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]]
+    #in_msg.postprocessing_montage=[["MSG_RATE-ir108","MSG_h03b-ir108"],["MSG_RATE-HRV","MSG_h03b-HRV"]]
         
     in_msg.scpOutput = True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"

@@ -1,9 +1,6 @@
 from __future__ import division
 from __future__ import print_function
 
-
-
-
 from my_msg_module import format_name
 from os.path import isfile, join, exists, dirname
 from os import makedirs
@@ -13,7 +10,7 @@ from copy import deepcopy
 
 def get_THX_filename(time_slot, area, outDir, outFile):
     print("    get_THX_filename THX for ", area)
-    from configparser import ConfigParser
+    from ConfigParser import ConfigParser
     from mpop import CONFIG_PATH
     conf = ConfigParser()
     conf.read(join(CONFIG_PATH, "swisslightning.cfg"))

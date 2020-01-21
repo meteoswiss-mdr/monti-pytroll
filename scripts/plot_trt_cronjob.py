@@ -75,11 +75,11 @@ if 'cell' in locals():
     cell_ID='_'+cell[8:]
     cell_dir='/ID'+cell[8:]+'/'
     print("search cell id", cell_ID)
-    global_data.load(['TRTcells'], cell=cell)
+    global_data.load(['TRT'], cell=cell)
 else:
     cell_ID=''
     cell_dir=''
-    global_data.load(['TRTcells']) # ,min_rank=8
+    global_data.load(['TRT']) # ,min_rank=8
     print("... plot all cells")
 
 #if hasattr(global_data, 'traj_IDs'):
@@ -88,7 +88,7 @@ else:
 #    print ""
 #    if len(global_data.traj_IDs) > 0:
 #           traj = global_data.traj_IDs[0]
-#           print traj, global_data.TRTcells[traj].date, global_data.TRTcells[traj].lon, global_data.TRTcells[traj].lat
+#           print traj, global_data.TRT[traj].date, global_data.TRT[traj].lon, global_data.TRT[traj].lat
 
 #print "global_data ", global_data
 area="ccs4"
@@ -103,9 +103,9 @@ obj_area = get_area_def(area)
 #plot.show_quicklook(obj_area, global_data['precip'].data )
 #print "global_data['precip'].data", global_data['precip'].data
 #print "global_data['precip'].data", global_data['precip'].data[355,:]
-#print "shape: ", global_data['TRTcells'].data.shape
+#print "shape: ", global_data['TRT'].data.shape
 
-prop = np.ma.asarray(global_data['TRTcells'].data)
+prop = np.ma.asarray(global_data['TRT'].data)
 prop.mask = (prop == 9999.9) | (prop <= 0.0001) 
 
 #print "prop.shape ", prop.shape
@@ -194,7 +194,7 @@ else:
     colorscale=False
     black_vel=True
 
-    PIL_image = TRTimage( global_data.traj_IDs, global_data.TRTcells, obj_area) # minRank=8, alpha_max=1.0, plot_vel=True
+    PIL_image = TRTimage( global_data.traj_IDs, global_data.TRT, obj_area) # minRank=8, alpha_max=1.0, plot_vel=True
 
 # create decorator 
 dc = DecoratorAGG(PIL_image)
@@ -232,13 +232,13 @@ if False:
 
     for traj in global_data.traj_IDs:
         
-        if global_data.TRTcells[traj].RANKr > min_rank:
+        if global_data.TRT[traj].RANKr > min_rank:
 
-            x0=global_data.TRTcells[traj].jCH
-            y0=global_data.TRTcells[traj].iCH
-            vx=global_data.TRTcells[traj].vel_x
-            vy=global_data.TRTcells[traj].vel_y
-            RANKr=global_data.TRTcells[traj].RANKr
+            x0=global_data.TRT[traj].jCH
+            y0=global_data.TRT[traj].iCH
+            vx=global_data.TRT[traj].vel_x
+            vy=global_data.TRT[traj].vel_y
+            RANKr=global_data.TRT[traj].RANKr
             print(traj, ("%6.0f,%6.0f,%6.0f,%6.0f,%6.0f  " % (RANKr, x0, y0, vx, vy)))
 
             if isnan(x0) or isnan(y0) or isnan(vx) or isnan(vy) or isnan(RANKr):

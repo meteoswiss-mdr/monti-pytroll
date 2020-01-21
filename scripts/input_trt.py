@@ -32,7 +32,7 @@ def input(in_msg):
     #----------------------
     # choose RGBs 
     #----------------------
-    in_msg.RGBs.append('TRTcells')       # black and white'TRTcells'
+    in_msg.RGBs.append('TRT')       # black and white'TRT cells'
     #in_msg.TRT_cell='2014072316550030'
     
     #----------------

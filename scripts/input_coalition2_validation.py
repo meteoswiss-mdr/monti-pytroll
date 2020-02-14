@@ -1,8 +1,11 @@
+from __future__ import division
+from __future__ import print_function
+
 def input(in_msg):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
-    print "*** read input from ", in_msg.input_file
+    print("*** read input from ", in_msg.input_file)
 
     #in_msg.sat = "meteosat"  # default "meteosat"
     in_msg.sat = "Meteosat"
@@ -168,7 +171,7 @@ def input(in_msg):
     #in_msg.forecasts_in_rapid_scan_mode = True
 
     if in_msg.RSS==False:
-        print "*** Warning: use TB forecast in 15min mode, as they are only available every 15min"
+        print("*** Warning: use TB forecast in 15min mode, as they are only available every 15min")
         in_msg.forecasts_in_rapid_scan_mode = False
     
     in_msg.choose_forecast_times()
@@ -201,7 +204,7 @@ def input(in_msg):
         #in_msg.chosen_settings['use_TB_forecast'] = None; check_overwriting+=1 
         
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print("you are overwriting your settings!!!! Check: ", current_setting)
             quit()
             
         
@@ -215,7 +218,7 @@ def input(in_msg):
         #in_msg.chosen_settings['mode_downscaling'] = None; check_overwriting+=1
         
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print("you are overwriting your settings!!!! Check: ", current_setting)
             quit()
                     
         
@@ -227,7 +230,7 @@ def input(in_msg):
         #in_msg.chosen_settings['mask_labelsSmall_lowUS'] = None; check_overwriting+=1
         
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print("you are overwriting your settings!!!! Check: ", current_setting)
             quit()
                     
         
@@ -241,7 +244,7 @@ def input(in_msg):
         #in_msg.chosen_settings['clean_mask'] = None; check_overwriting+=1
         
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print("you are overwriting your settings!!!! Check: ", current_setting)
             quit()
                 
         
@@ -253,7 +256,7 @@ def input(in_msg):
         #in_msg.chosen_settings['rapid_scan_mode'] = None; check_overwriting+=1
         
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print("you are overwriting your settings!!!! Check: ", current_setting)
             quit()
                     
         
@@ -266,7 +269,7 @@ def input(in_msg):
         #in_msg.chosen_settings['forth_mask'] = None; check_overwriting+=1
         
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print("you are overwriting your settings!!!! Check: ", current_setting)
             quit()
                     
         
@@ -278,7 +281,7 @@ def input(in_msg):
         #in_msg.chosen_settings['forced_mask'] = 'CloudType'; check_overwriting+=1
         #in_msg.chosen_settings['forced_mask'] = None; check_overwriting+=1
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print("you are overwriting your settings!!!! Check: ", current_setting)
             quit()
                     
         
@@ -290,7 +293,7 @@ def input(in_msg):
         #in_msg.chosen_settings['mask_cirrus'] = None; check_overwriting+=1
         
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print("you are overwriting your settings!!!! Check: ", current_setting)
             quit()
                     
         
@@ -302,7 +305,7 @@ def input(in_msg):
         #in_msg.chosen_settings['reader_level']= None; check_overwriting+=1
         
         #if check_overwriting > 1:
-        #    print "you are overwriting your settings!!!! Check: ", current_setting
+        #    print("you are overwriting your settings!!!! Check: ", current_setting)
         #    quit()
             
     else:
@@ -348,7 +351,7 @@ def input(in_msg):
 
     #INPUT NEEDED FOR PRODUCE_FORECASTS!!!!!!!!!!!
     #in_msg.ntimes = 2 #in_windshift.ntimes
-    #print "... aggregate winddata for ", ntimes, " timesteps" 
+    #print ("... aggregate winddata for ", ntimes, " timesteps")
     #min_correlation = 85 #in_windshift.min_correlation
     #min_conf_nwp = 80 #in_windshift.min_conf_nwp
     #min_conf_no_nwp = 80 #in_windshift.min_conf_no_nwp
@@ -368,29 +371,29 @@ def input(in_msg):
     """
     if in_msg.area in broad_areas:
         if in_msg.use_TB_forecast == True:
-            print "*** Error in plot_coalition2.py"
-            print "    currently no brightness temperature forecast"
-            print "    implemented for areas outside Switzerland"
+            print ("*** Error in plot_coalition2.py")
+            print ("    currently no brightness temperature forecast")
+            print ("    implemented for areas outside Switzerland")
             quit()
 
     # -------------   
     # input checks 
     # -------------   
     if in_msg.verbose:
-        print "*** Given input:"
-        print "    in_msg.sat: ", in_msg.sat, in_msg.sat_nr
-        print "    in_msg.area: ", in_msg.area
-        print "    in_msg.delay: ", in_msg.delay
-        print "    in_msg.show_clouds: ", in_msg.show_clouds
-        print "    in_msg.use_TB_forecast: ", in_msg.use_TB_forecast
+        print ("*** Given input:")
+        print ("    in_msg.sat: ", in_msg.sat, in_msg.sat_nr)
+        print ("    in_msg.area: ", in_msg.area)
+        print ("    in_msg.delay: ", in_msg.delay)
+        print ("    in_msg.show_clouds: ", in_msg.show_clouds)
+        print ("    in_msg.use_TB_forecast: ", in_msg.use_TB_forecast)
         if in_msg.use_TB_forecast:
-            print "    in_msg.nowcastDir: ", in_msg.nowcastDir
-        print "    in_msg.rapid_scan_mode: ", in_msg.rapid_scan_mode
-        print "    in_msg.results: ", in_msg.results
-        print "    in_msg.aux_results: ", in_msg.aux_results
-        print "    in_msg.outputDir: ", in_msg.outputDir
-        print "    in_msg.postprocessing_areas: ", in_msg.postprocessing_areas
-        print "    in_msg.postprocessing_composite: ", in_msg.postprocessing_composite
+            print ("    in_msg.nowcastDir: ", in_msg.nowcastDir)
+        print ("    in_msg.rapid_scan_mode: ", in_msg.rapid_scan_mode)
+        print ("    in_msg.results: ", in_msg.results)
+        print ("    in_msg.aux_results: ", in_msg.aux_results)
+        print ("    in_msg.outputDir: ", in_msg.outputDir)
+        print ("    in_msg.postprocessing_areas: ", in_msg.postprocessing_areas)
+        print ("    in_msg.postprocessing_composite: ", in_msg.postprocessing_composite)
     """
     #in_msg.check_input = False
 

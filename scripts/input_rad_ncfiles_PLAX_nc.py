@@ -9,25 +9,23 @@ def input(in_msg):
     print("*** read input from ", in_msg.input_file)
 
     # 8=MSG1, 9=MSG2, 10=MSG3
+    in_msg.sat = "Meteosat"
+    #in_msg.sat = "meteosat"
     #in_msg.sat_nr=8
     #in_msg.RSS=False 
     #in_msg.sat_nr=9
     #in_msg.RSS=True
     in_msg.sat_nr=10
-    in_msg.RSS=False 
+    in_msg.RSS=True
 
     # specify an delay (in minutes), when you like to process a time some minutes ago
     # e.g. current time               2015-05-31 12:33 UTC
     # delay 5 min                     2015-05-31 12:28 UTC
     # last Rapid Scan Service picture 2015-05-31 12:25 UTC (Scan start) 
-    in_msg.delay=15
-    
-    #------------------------------------------------------------------------
-    # if not specified (False), current (last) observation time is chosen  
-    # chosse specification, if you want a default time without command line arguments 
-    # (the specified time is overwritten by the command line arguments of plot_msg.py)
-    #------------------------------------------------------------------------
+    in_msg.delay=5
+
     if False:
+        # offline mode (always a fixed time) # ignores command line arguments
         year=2015
         month=2
         day=10
@@ -43,18 +41,18 @@ def input(in_msg):
     # chose RGB mode
     #-------------------
     ## satellite channels
-    ##in_msg.RGBs.append('VIS006')       # black and white
-    ##in_msg.RGBs.append('VIS008')       # black and white
-    ##in_msg.RGBs.append('IR_016')       # black and white
-    ##in_msg.RGBs.append('IR_039')       # black and white
-    ##in_msg.RGBs.append('WV_062')       # black and white
-    ##in_msg.RGBs.append('WV_073')       # black and white
-    ##in_msg.RGBs.append('IR_087')       # black and white
-    ##in_msg.RGBs.append('IR_097')       # black and white
-    ##in_msg.RGBs.append('IR_108')       # black and white
-    ##in_msg.RGBs.append('IR_120')       # black and white
-    ##in_msg.RGBs.append('IR_134')       # black and white
-    ##in_msg.RGBs.append('HRV')          # black and white
+    in_msg.RGBs.append('VIS006')       # black and white
+    in_msg.RGBs.append('VIS008')       # black and white
+    in_msg.RGBs.append('IR_016')       # black and white
+    in_msg.RGBs.append('IR_039')       # black and white
+    in_msg.RGBs.append('WV_062')       # black and white
+    in_msg.RGBs.append('WV_073')       # black and white
+    in_msg.RGBs.append('IR_087')       # black and white
+    in_msg.RGBs.append('IR_097')       # black and white
+    in_msg.RGBs.append('IR_108')       # black and white
+    in_msg.RGBs.append('IR_120')       # black and white
+    in_msg.RGBs.append('IR_134')       # black and white
+    in_msg.RGBs.append('HRV')          # black and white
     #in_msg.RGBs.append('VIS006c')      # colored version
     #in_msg.RGBs.append('VIS008c')      # colored version
     #in_msg.RGBs.append('IR_016c')      # colored version
@@ -82,6 +80,13 @@ def input(in_msg):
     #in_msg.RGBs.append('IR_120_minus_IR_108')
     #in_msg.RGBs.append('trichannel')
     #-------------------
+    # viewing geometry
+    #-------------------
+    #in_msg.RGBs.append('vza')   # known bug: cant be displayed for original projection, e.g. met09globeFull
+    #in_msg.RGBs.append('vaa')
+    #in_msg.RGBs.append('lat')
+    #in_msg.RGBs.append('lon')
+    #-------------------    
     # buil in RGBs, see http://mpop.readthedocs.org/en/latest/pp.html
     #                or  http://oiswww.eumetsat.int/~idds/html/doc/best_practices.pdf
     #-------------------      # RED            GREEN          BLUE
@@ -174,7 +179,7 @@ def input(in_msg):
     #-------------------
     # CPP (cloud physical products from KNMI)
     #-------------------
-    in_msg.sat = "cpp"
+    #in_msg.sat = "cpp"
     #in_msg.RGBs.append('azidiff')
     #in_msg.RGBs.append('cth')
     #in_msg.RGBs.append('cldmask')
@@ -187,7 +192,7 @@ def input(in_msg):
     #in_msg.RGBs.append('dcwp')
     #in_msg.RGBs.append('dndv')
     #in_msg.RGBs.append('dreff')
-    in_msg.RGBs.append('precip')
+    #in_msg.RGBs.append('precip')
     #in_msg.RGBs.append('precip_ir')
     #in_msg.RGBs.append('qa')
     #in_msg.RGBs.append('reff')
@@ -201,7 +206,29 @@ def input(in_msg):
     #in_msg.RGBs.append('lon')
     #in_msg.RGBs.append('time_offset')
     #-------------------
-
+    # msg-ot (Overshooting tops from Bedka 2016)
+    #-------------------
+    #in_msg.RGBs.append('ir_brightness_temperature')
+    #in_msg.RGBs.append('ot_rating_ir')
+    #in_msg.RGBs.append('ot_id_number')
+    #in_msg.RGBs.append('ot_anvilmean_brightness_temperature_difference')
+    #in_msg.RGBs.append('ir_anvil_detection')
+    #in_msg.RGBs.append('visible_reflectance')
+    #in_msg.RGBs.append('ot_rating_visible')
+    #in_msg.RGBs.append('ot_rating_shadow')
+    #in_msg.RGBs.append('ot_probability')
+    #in_msg.RGBs.append('surface_based_cape')
+    #in_msg.RGBs.append('most_unstable_cape')
+    #in_msg.RGBs.append('most_unstable_equilibrium_level_temperature')
+    #in_msg.RGBs.append('tropopause_temperature')
+    #in_msg.RGBs.append('surface_1km_wind_shear')
+    #in_msg.RGBs.append('surface_3km_wind_shear')
+    #in_msg.RGBs.append('surface_6km_wind_shear')
+    #in_msg.RGBs.append('ot_potential_temperature')
+    #in_msg.RGBs.append('ot_height')
+    #in_msg.RGBs.append('ot_pressure')
+    #in_msg.RGBs.append('parallax_correction_latitude')
+    #in_msg.RGBs.append('parallax_correction_longitude')
 
     # experimental
     #in_msg.RGBs.append('clouddepth')     # test according to Mecikalski, 2010
@@ -210,20 +237,20 @@ def input(in_msg):
     #----------------
     # chose area
     #----------------
-    #in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
+    in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
+    #in_msg.areas.append('alps95')          # area around Switzerland processed by NWCSAF software 349x151 
+    #in_msg.areas.append('ticino')          # stereographic proj of Ticino 342x311
     #in_msg.areas.append('germ')            # Germany 1024x1024
-    #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     #in_msg.areas.append('EuropeCanary')    # upper third of MSG disk, satellite at 0.0 deg East, full resolution 
     #in_msg.areas.append('EuropeCanary95')  # upper third of MSG disk, satellite at 9.5 deg East, full resolution 
     #in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
-    #in_msg.areas.append('alps95')          # area around Switzerland processed by NWCSAF software 349x151 
-    #in_msg.areas.append('ticino')          # stereographic proj of Ticino 342x311
+    #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
     #in_msg.areas.append('fullearth')       # full earth 600x300                    # does not yet work
     #in_msg.areas.append('met09globe')      # Cropped globe MSG image 3620x3620     # does not yet work
     #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
-    #in_msg.areas.append('SeviriDiskFull00S4')
-    in_msg.areas.append('odysseyS25')
+    #in_msg.areas.append('odysseyS25')      # Area of Odyssey composite (factor 2.5 smaller)
+    in_msg.check_RSS_coverage()
 
     # please download the shape file 
     # in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
@@ -232,48 +259,64 @@ def input(in_msg):
                                    ## i  intermediate resolution: Another ~80 % reduction.          
                                    ## l  low resolution: Another ~80 % reduction.                   
                                    ## c  crude resolution: Another ~80 % reduction.   
-
     
     # switch off Rapid scan, if large areas are wanted 
     if ('fullearth' in in_msg.areas) or ('met09globe' in in_msg.areas) or ('met09globeFull' in in_msg.areas): 
-       in_msg.RSS=False 
+       in_msg.RSS=False  
 
-    in_msg.check_input = False
-    #in_msg.reader_level="seviri-level4" 
-    #in_msg.save_reprojected_data=['ccs4']
-    in_msg.reprojected_data_filename='%(msg)s_%(area)s_%Y%m%d%H%M_nwcsaf.nc'
-    in_msg.reprojected_data_dir='/data/COALITION2/database/meteosat/ccs4/%Y/%m/%d/'
+    #in_msg.check_input = True    # for radiances check always PRO and EPI files
+    in_msg.check_input = False    # for radiances check always PRO and EPI files
+    #in_msg.reader_level="seviri-level3"   # NWC SAF version 2013 hdf5
+    #in_msg.reader_level="seviri-level4"   # MSG radiance hdf5
+    #in_msg.reader_level="seviri-level5"   # NWC SAF version 2013 HRW hdf5
+    #in_msg.reader_level="seviri-level6"   # viewing geometry nc
+    #in_msg.reader_level="seviri-level7"   # hsaf h03
+    in_msg.reader_level="seviri-level8"    # msg radiance ccs4 nc
+    #in_msg.reader_level="seviri-level9"   # msg radiance ccs4 nc parallax corrected
+    #in_msg.reader_level="seviri-level10"  # new hsaf porduct h03b
+    #in_msg.reader_level="seviri-level11"   # NWC SAF version 2016 (except HRW)    
+    in_msg.parallax_correction = True
+    #in_msg.estimate_cth=True
+    in_msg.parallax_gapfilling = 'bilinear' # 'False' (default), 'nearest'
+    #in_msg.parallax_gapfilling = 'nearest' # 'False' (default), 
+    in_msg.save_reprojected_data=['ccs4']
+    in_msg.reprojected_data_filename='%(msg)s_%(area)s_%Y%m%d%H%M_rad_PLAX.nc'
+    #in_msg.reprojected_data_filename='MSG_test_%Y%m%d%H%M.nc'
+    in_msg.reprojected_data_dir='/data/COALITION2/database/meteosat/ccs4_PLAX/%Y/%m/%d/'
+    #in_msg.save_statistics=True
     in_msg.save_statistics=False
-
-    in_msg.make_plots=True
-    in_msg.fill_value=None  # black (0,0,0) / white (1,1,1) / transparent None  
+    in_msg.HRV_enhancement=False
+    
+    in_msg.make_plots=False
+    in_msg.fill_value=(0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
     in_msg.add_title = True
+    in_msg.title = [" MSG-2, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s"]
+    in_msg.title_y_line_nr = 1  # (INT) at which line should the title start
     in_msg.add_borders = True
     in_msg.border_color = 'red'
     in_msg.add_rivers = False
     in_msg.river_color = 'blue'
-    in_msg.add_logos = True
+    in_msg.add_logos = False
+    in_msg.logos_dir = "/opt/users/common/logos/"
     in_msg.add_colorscale = False
     in_msg.HRV_enhancement = False
 
-    in_msg.outputFile = '%(sat)s_%(rgb)s-%(area)s_%y%m%d%H%M.png'
-    #in_msg.outputDir='./pics/'
+    in_msg.outputFormats = ['png','ninjotif'] 
+    in_msg.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
+    in_msg.outputDir='./pics/'
     #in_msg.outputDir = "./%Y-%m-%d/%Y-%m-%d_%(rgb)s-%(area)s/"
-    in_msg.outputDir = '/data/cinesat/out/'
-    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
-
+    #in_msg.outputDir = '/data/cinesat/out/'
+    in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
     in_msg.compress_to_8bit=False
+    
+    in_msg.ninjotifFilename = 'MET%(sat_nr)s_%(RSS)s_%(rgb)s_%(area)s_%Y%m%d%H%M.tif' 
+    in_msg.upload_ninjotif = False
 
-    in_msg.scpOutput = True
+    #in_msg.postprocessing_areas=['ccs4']
+    in_msg.postprocessing_composite=["THX-IR_108","radar-convection","THX-radar-convection"]    
+
+    #in_msg.scpOutput = True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
-    
-    #in_msg.postprocessing_areas=['odysseyS25','SeviriDiskFull00S4']
-    in_msg.postprocessing_areas=['odysseyS25']
-    in_msg.postprocessing_composite=['precip-ir108','precip-HRV']
-    in_msg.postprocessing_montage = [["MSG_RATE-ir108","cpp_precip-ir108"],["MSG_RATE-HRV","cpp_precip-HRV"]]
-    #in_msg.postprocessing_areas=['ccs4','EuropeCanaryS95']
-    #in_msg.postprocessing_composite=['cth-ir108', 'cot-ir108', 'ctt-ir108','reff-ir108', 'precip-ir108','precip_ir-ir108']    
-    #in_msg.postprocessing_composite=['reff-ir108','precip-ir108', 'cot-ir108']    
-    #in_msg.postprocessing_composite=['cth-ir108']    
-    #in_msg.postprocessing_composite=['cot-ir108']    
+    #default: in_msg.scpProducts = ['all']
+    in_msg.scpProducts = ['IR_108c', "radar-convection"] # list of rgb, composite and montage strings

@@ -1209,6 +1209,24 @@ REGION: worldeqc30km {
         AREA_EXTENT: (-20037508.3428, -10018754.1714, 20037508.3428, 10018754.1714)
 };
 
+REGION: world_plat_13500_6750 { 
+        NAME:           world_plat_13500_6750
+        PCS_ID:         world_plat_13500_6750
+        PCS_DEF:        proj=eqc,ellps=WGS84
+        XSIZE:          13500
+        YSIZE:           6750
+        AREA_EXTENT:    (-20037508.342789244, -10018754.171394622, 20037508.342789244, 10018754.171394622)
+};
+
+REGION: world_plat_C1_21600_21600 { 
+        NAME:           world_plat_21600_21600
+        PCS_ID:         world_plat_21600_21600
+        PCS_DEF:        proj=eqc,ellps=WGS84
+        XSIZE:          21600
+        YSIZE:          21600
+        AREA_EXTENT:    (0.0, 0.0, 10018754.171394622, 10018754.171394622)
+};
+
 REGION: world_plat_21600_10800 {
         NAME:           world_plat_21600_10800
         PCS_ID:         world_plat_21600_10800

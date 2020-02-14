@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 # Source: http://www.swisstopo.admin.ch/internet/swisstopo/en/home/topics/survey/sys/refsys/projections.html (see PDFs under "Documentation")
 # converted to python with https://www.varycode.com/
 
@@ -189,9 +192,9 @@ if __name__ == '__main__':
 	from ApproxSwissProj import ApproxSwissProj 
 	ccs4 = ApproxSwissProj()
 
-	print ""
-	print "dir(ccs4)"
-	print dir(ccs4)
+	print("")
+	print("dir(ccs4)")
+	print(dir(ccs4))
 	# 'WGS84toLV03', 'WGStoCHh', 'WGStoCHx', 'WGStoCHy'
 	# 'CHtoWGSheight', 'CHtoWGSlat', 'CHtoWGSlng'
 
@@ -200,35 +203,35 @@ if __name__ == '__main__':
 	lng =  7.4667
 	xCH = ccs4.WGStoCHx(lat,lng)
 	yCH = ccs4.WGStoCHy(lat,lng)
-	print "*** Bern    is located at ", xCH, yCH, "in the ccs4 grid"
+	print("*** Bern    is located at ", xCH, yCH, "in the ccs4 grid")
 
 	# example Locarno
 	lat = 46.1667
 	lng =  8.8
 	xCH = ccs4.WGStoCHx(lat,lng)
 	yCH = ccs4.WGStoCHy(lat,lng)
-	print "... Locarno is located at ", xCH, yCH, "in the ccs4 grid"
+	print("... Locarno is located at ", xCH, yCH, "in the ccs4 grid")
 
-	print ""
+	print("")
 
 	# lower left corner
 	lat = ccs4.CHtoWGSlat(255000.0, -160000.0)  # y, x
 	lng = ccs4.CHtoWGSlng(255000.0, -160000.0)  # y, x
-	print "*** lower left corner of ccs4 is (ApproxSwissProj): ", lat, lng
+	print("*** lower left corner of ccs4 is (ApproxSwissProj): ", lat, lng)
 
 	# alternative way
 	from pyproj import Proj
 	p = Proj(proj="somerc", lat_0=46.9524055555556, lon_0=7.43958333333333, ellps="bessel", x_0=600000, y_0=200000, k_0=1)
 	lng1, lat1 = p(255000.0, -160000.0, inverse=True)
-	print "    lower left corner of ccs4 is          (pyproj): ", lat1, lng1
+	print("    lower left corner of ccs4 is          (pyproj): ", lat1, lng1)
 	lng2, lat2 = p(255000.0,  480000.0, inverse=True)
-	print "    upper left corner of ccs4 is          (pyproj): ", lat2, lng2
+	print("    upper left corner of ccs4 is          (pyproj): ", lat2, lng2)
 	lng3, lat3 = p(965000.0, -160000.0, inverse=True)
-	print "    lower right corner of ccs4 is          (pyproj): ", lat3, lng3
+	print("    lower right corner of ccs4 is          (pyproj): ", lat3, lng3)
 	lng4, lat4 = p(965000.0,  480000.0, inverse=True)
-	print "    upper right corner of ccs4 is          (pyproj): ", lat4, lng4
-	print ""
-	print "python coord2area_def_stere.py nrCOAL1km stere ", min([lat1,lat2,lat3,lat4]),max([lat1,lat2,lat3,lat4]), \
-	                                                         min([lng1,lng2,lng3,lng4]), max([lng1,lng2,lng3,lng4]), 1.0
+	print("    upper right corner of ccs4 is          (pyproj): ", lat4, lng4)
+	print("")
+	print("python coord2area_def_stere.py nrCOAL1km stere ", min([lat1,lat2,lat3,lat4]),max([lat1,lat2,lat3,lat4]), \
+	                                                         min([lng1,lng2,lng3,lng4]), max([lng1,lng2,lng3,lng4]), 1.0)
 
-	print ""    
+	print("")    

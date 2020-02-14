@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 #!/usr/bin/python
 import datetime
 import logging
@@ -21,13 +24,13 @@ delay=10
 
 if len(sys.argv) > 1:
     if len(sys.argv) != 6:
-        print "***           "
-        print "*** Warning, please specify date and time completely, e.g."
-        print "***          python plot_hsaf.py 2014 07 23 16 10 "
-        print "***           "
+        print("***           ")
+        print("*** Warning, please specify date and time completely, e.g.")
+        print("***          python plot_hsaf.py 2014 07 23 16 10 ")
+        print("***           ")
         quit() # quit at this point
     else:
-        print "*** get date from command line"
+        print("*** get date from command line")
         year   = int(sys.argv[1])
         month  = int(sys.argv[2])
         day    = int(sys.argv[3])
@@ -84,15 +87,15 @@ channel_list=['VIS006','VIS008','IR_016','IR_039','WV_062','WV_073','IR_087','IR
 if load_radar:
     global_radar = GeostationaryFactory.create_scene("odyssey", "", "radar", time_slot)
     global_radar.load([prop_str])
-    print global_radar
-    print "========================="
+    print(global_radar)
+    print("=========================")
 
 if load_sat:
     global_sat = GeostationaryFactory.create_scene("meteosat", "09", "seviri", time_slot)
     #global_sat.load(['IR_108'], reader_level="seviri-level2") 
     global_sat.load(channel_list, reader_level="seviri-level2")
-    print global_sat
-    print "========================="
+    print(global_sat)
+    print("=========================")
 
 
 color_mode='RainRate'
@@ -109,8 +112,8 @@ area='EuropeOdyssey95'
 
 reproject=True
 if reproject:
-   print '-------------------'
-   print "start projection"
+   print('-------------------')
+   print("start projection")
    # PROJECT data to new area 
    if load_radar:
        data_radar = global_radar.project(area, precompute=True)
@@ -141,19 +144,19 @@ verbose=True
 resolution='l'
 
 # define area for drawing borders
-print '-------------------'
+print('-------------------')
 obj_area = get_area_def(area)
-print 'obj_area ', obj_area
+print('obj_area ', obj_area)
 
 if plot_radar or plot_sat:
     proj4_string = obj_area.proj4_string     
     # e.g. proj4_string = '+proj=geos +lon_0=0.0 +a=6378169.00 +b=6356583.80 +h=35785831.0'
-    print 'proj4_string ',proj4_string
+    print('proj4_string ',proj4_string)
     area_extent = obj_area.area_extent              
     # e.g. area_extent = (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
     area_def = (proj4_string, area_extent)
-    print '-------------------'
-    print 'area_def ', area_def
+    print('-------------------')
+    print('area_def ', area_def)
 
 
 if plot_radar and load_radar:
@@ -204,7 +207,7 @@ if plot_radar and load_radar:
     layer=' 2nd layer'
 
     if add_borders:
-        print "*** add borders" 
+        print("*** add borders") 
         cw = ContourWriterAGG('/data/OWARNA/hau/pytroll/shapes/')
         cw.add_coastlines(PIL_image, area_def, outline='white', resolution=resolution, outline_opacity=127, width=1, level=2)  #, outline_opacity=0
 
@@ -222,7 +225,7 @@ if plot_radar and load_radar:
 
     if add_logos:
        if verbose:
-          print '... add logos'
+          print('... add logos')
        dc.align_right()
        if add_colorscale:
           dc.write_vertically()
@@ -235,7 +238,7 @@ if plot_radar and load_radar:
     font = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf", fontsize)
 
     if add_colorscale:
-       print '... add colorscale ranging from min_radar (',min_radar,') to max_radar (',max_radar,')'
+       print('... add colorscale ranging from min_radar (',min_radar,') to max_radar (',max_radar,')')
        dc.align_right()
        dc.write_vertically()
        #font_scale = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf", fontsize)
@@ -273,7 +276,7 @@ if plot_radar and load_radar:
 
     outputFile = outputDir+'ODY_'+prop_str+'-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS +'.png'
     PIL_image.save(outputFile)
-    print '... save image as ', outputFile
+    print('... save image as ', outputFile)
 
 
 global_sat = global_sat.parallax_corr(fill='bilinear', estimate_cth='standard', replace=True)
@@ -284,14 +287,14 @@ if plot_sat and load_sat:
     img = global_sat.image.channel_image('IR_108')
     PIL_image=img.pil_image()
     if add_borders:
-        print "*** add borders" 
+        print("*** add borders") 
         cw = ContourWriterAGG('/data/OWARNA/hau/pytroll/shapes/')
         outline = 'red'
         cw.add_coastlines(PIL_image, area_def, outline=outline, resolution=resolution, width=2)  #, outline_opacity=0
         cw.add_borders(PIL_image, area_def, outline=outline, resolution=resolution, width=2)       #, outline_opacity=0 
 
     PIL_image.save(outputFile)
-    print '... save image as ', outputFile
+    print('... save image as ', outputFile)
 
 # obj_area.shape  # (480, 850)
 # obj_area.size   # 408000
@@ -310,7 +313,7 @@ area_size = global_sat["IR_108"].data.size
 
 fitting=False
 if fitting:
-    print "*** start fitting"
+    print("*** start fitting")
 
     import matplotlib.pyplot as plt
 
@@ -325,12 +328,12 @@ if fitting:
     x_min = 200
     x_max = 330
     x = (x - x_min) / (x_max - x_min)
-    print "x min/max", x.min(), x.max()
+    print("x min/max", x.min(), x.max())
 
     y_min =   1.0
     y_max = 100.0
     y = np.ma.masked_less_equal(y, y_min)
-    print "y min/max (masked)", y.min(), y.max()
+    print("y min/max (masked)", y.min(), y.max())
 
     #y[y<y_min] = y_min
     y[y>y_max] = y_max
@@ -341,10 +344,10 @@ if fitting:
 
     if normalisation=='log':
         y = np.log(y)
-        print "y min/max (log)", y.min(), y.max()
+        print("y min/max (log)", y.min(), y.max())
     elif normalisation=='min_max':
         y = (y - y_min) / (y_max - y_min)
-        print "y min/max (norm)", y.min(), y.max()
+        print("y min/max (norm)", y.min(), y.max())
     #elif normalisation=='min_max':
     #    pass
 
@@ -406,7 +409,7 @@ if plot_fit2:
     olsmod = sm.OLS(y, X)
     olsres = olsmod.fit()
     if verbose:
-        print (olsres.summary())
+        print((olsres.summary()))
 
     #x_pred = np.linspace(x1.min(), x1.max(), 50)
 
@@ -424,7 +427,7 @@ if plot_sns:
     import numpy as np, pandas as pd; np.random.seed(0)
     import seaborn as sns
     tips = sns.load_dataset("tips")
-    print type(tips)
+    print(type(tips))
     g = sns.jointplot(x="total_bill", y="tip", data=tips, kind='reg',
                   joint_kws={'color':'green'}) # Scatter and regression all green
 
@@ -434,7 +437,7 @@ write_netCDF=True
 if write_netCDF:
 
     nc_outfile = '/data/COALITION2/database/radar/odyssey/machine_learning/ODYRATE_SEVIRI_' + datetime1.strftime("%Y%m%d_%H%M") + '.nc'
-    print "*** write data to: ncdump ", nc_outfile
+    print("*** write data to: ncdump ", nc_outfile)
 
     import netCDF4 as nc4
     f = nc4.Dataset(nc_outfile,'w', format='NETCDF4')
@@ -444,7 +447,7 @@ if write_netCDF:
     m = global_radar[prop_str+'-MASK'].data.reshape(area_size)
     y = global_radar[prop_str].data.reshape(area_size)
     y  = y[m==False]
-    print "dataset length", len(y)
+    print("dataset length", len(y))
 
     xx = global_sat['IR_108'].data.reshape(area_size)  
     xx = xx[m==False]
@@ -461,16 +464,16 @@ if write_netCDF:
     cos_sza =  np.cos(np.deg2rad(sza))
 
     for i in range(100):
-        print y.tolist(0)[i], xx[i], lon[i], lat[i], np.cos(np.deg2rad(sza[i]))
+        print(y.tolist(0)[i], xx[i], lon[i], lat[i], np.cos(np.deg2rad(sza[i])))
 
     #tempgrp.createDimension('idata', area_size)
     tempgrp.createDimension('ndata', len(y))
 
     #IR_108 = tempgrp.createVariable('IR_108', 'f4', 'idata')
 
-    varids = range(len(channel_list))
-    for chn,i in zip(channel_list,range(len(channel_list))):
-        print chn, i
+    varids = list(range(len(channel_list)))
+    for chn,i in zip(channel_list,list(range(len(channel_list)))):
+        print(chn, i)
         varids[i] = tempgrp.createVariable(chn, 'f4', 'ndata')
     ODY_RAINRATE = tempgrp.createVariable('ODY_RAINRATE','f4', 'ndata')
     #time = tempgrp.createVariable('Time', 'i4', 'time')
@@ -485,12 +488,12 @@ if write_netCDF:
     csza[:]         = cos_sza
 
 
-    for chn,i in zip(channel_list,range(len(channel_list))):
+    for chn,i in zip(channel_list,list(range(len(channel_list)))):
 
         x = global_sat[chn].data.reshape(area_size)  
         x = x[m==False]
 
-        print chn, i
+        print(chn, i)
         varids[i][:] = x
 
 

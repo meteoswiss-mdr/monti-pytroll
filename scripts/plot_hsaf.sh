@@ -1,5 +1,7 @@
 #!/bin/bash
 
+. /opt/users/$LOGNAME/monti-pytroll/setup/bashrc no_virtual_environment
+
 # go to operational pytroll folder  
 export dir1=/data/OWARNA/hau/pytroll/programs/
 export PYTHONPATH=/home/cinesat/python/lib/python2.7/site-packages

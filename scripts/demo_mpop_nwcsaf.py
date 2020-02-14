@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 from mpop.satellites import GeostationaryFactory
 from mpop.projector import get_area_def
 import datetime
@@ -27,13 +30,13 @@ elif sat_nr=="11":
     delay=10
     area="EuropeCanaryS"
 else:
-    print "Unknown satellite"
+    print("Unknown satellite")
     quit()
 
-print "... Meteosat ", sat_nr,", Rapid Scan mode: ", Rapid_Scan
+print("... Meteosat ", sat_nr,", Rapid Scan mode: ", Rapid_Scan)
 time_slot = get_last_SEVIRI_date(Rapid_Scan, delay=delay)
 #time_slot = datetime.datetime(2015, 11, 26, 15, 30)
-print str(time_slot)
+print(str(time_slot))
 
 global_data = GeostationaryFactory.create_scene("meteosat", sat_nr, "seviri", time_slot)
 
@@ -45,10 +48,10 @@ prop="CTH"
 from my_msg_module import get_NWC_pge_name
 pge = get_NWC_pge_name(prop)
 
-print "read pge: ", pge
+print("read pge: ", pge)
 nwcsaf_calibrate=True   # converts data into physical units
 global_data.load([pge], calibrate=nwcsaf_calibrate, reader_level="seviri-level3")  # , area_extent=europe.area_extent
-print global_data
+print(global_data)
 
 # get lon/lat coordinates of the original "alps" projection
 if False:
@@ -56,11 +59,11 @@ if False:
     #print type(lonlats)   # tuple
     import numpy as np
     lonlatsnp = np.asarray(lonlats)
-    print lonlatsnp.shape
-    print lonlatsnp[:,0,0]
-    print lonlatsnp[:,0,-1]
-    print lonlatsnp[:,-1,0]
-    print lonlatsnp[:,-1,-1]
+    print(lonlatsnp.shape)
+    print(lonlatsnp[:,0,0])
+    print(lonlatsnp[:,0,-1])
+    print(lonlatsnp[:,-1,0])
+    print(lonlatsnp[:,-1,-1])
 
 # convert structure from data["CTTH"].height.data etc to data["CTH"].data
 from my_msg_module import convert_NWCSAF_to_radiance_format

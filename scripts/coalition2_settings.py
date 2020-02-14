@@ -24,7 +24,8 @@ background_color = [  0,  0,  0]   # black
 
 # foregroud and background opacity (== 1 - transparency)
 #foregroud_alpha  = 200      # pretty opaque
-foregroud_alpha  = 255      # opaque
+#foregroud_alpha  = 255      # opaque (default until 2019-09-19)
+foregroud_alpha  =   80      # semi-transparent for "sandwich" product
 background_alpha =   50      # transparent
 #background_alpha = 255     # opaque
 

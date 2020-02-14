@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib as mpl
@@ -40,13 +43,13 @@ for variable in variables:
             axarr[i].plot(x_axis, all[variable][version], color = color,label=name)
     i+=1
 
-print "ok so far"
+print("ok so far")
 axarr[0].set_ylabel('Er area [%]')
 axarr[1].set_ylabel('Er IR10.8 [K]')
 #axarr[2].set_ylabel('Er North-South [km]')
 #axarr[3].set_ylabel('Er West-East [km]')
 axarr[2].set_ylabel('Er centers [km]')
-print "seems still ok"
+print("seems still ok")
 #plt.show()
 #f.subplots_adjust(right=0.6)
 #plt.legend()   

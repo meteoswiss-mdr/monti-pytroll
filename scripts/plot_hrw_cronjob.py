@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 from datetime import datetime
 import sys, string, os
 import logging
@@ -140,18 +143,18 @@ if add_title:
         layer=layer+':'
 
     if detailed:
-        print "*** plot detailed winds"
+        print("*** plot detailed winds")
         detailed_str = 'detailed'      # hrw_channels=None, min_correlation=None, cloud_type=None, style='barbs'
         detailed_char = 'd'                    
     else:
-        print "*** plot basic winds"
+        print("*** plot basic winds")
         detailed_str = 'basic'
         detailed_char = 'b'
 
 
 for plot_mode in plot_modes:
 
-    print "    create HRW plot, plot mode = ", plot_mode
+    print("    create HRW plot, plot mode = ", plot_mode)
     if plot_mode in HRWimages:
         if detailed:
             PIL_image = HRWimage( global_data['HRW'].HRW_detailed, obj_area, color_mode=plot_mode, legend=legend)  
@@ -187,14 +190,14 @@ for plot_mode in plot_modes:
 
 
     else:
-        print "*** Error in plot_hrw.py"
-        print "    unknown plot_mode"
+        print("*** Error in plot_hrw.py")
+        print("    unknown plot_mode")
         quit()
 
     output_dir = format_name(in_msg.outputDir,  time_slot, area=area, rgb=rgb_str, sat='MSG', sat_nr=10)
     outputFile = output_dir+'/' + format_name(in_msg.outputFile, time_slot, area=area, rgb=rgb_str, sat='MSG', sat_nr=10)
     if not exists(output_dir):
-        print '... create output directory: ' + output_dir
+        print('... create output directory: ' + output_dir)
         makedirs(output_dir)
 
     # create decorator 
@@ -220,7 +223,7 @@ for plot_mode in plot_modes:
         draw = ImageDraw.Draw(PIL_image)
         draw.text((0, y_pos_title),title, title_color, font=font)
 
-    print '... save image as ', outputFile
+    print('... save image as ', outputFile)
     PIL_image.save(outputFile)
 
 postprocessing(in_msg, time_slot, int(10), area)

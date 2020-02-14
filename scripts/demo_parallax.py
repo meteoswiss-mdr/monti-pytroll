@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 from mpop.satellites import GeostationaryFactory
 from mpop.projector import get_area_def
 import datetime
@@ -10,7 +13,7 @@ from pydecorate import DecoratorAGG
 def show_or_save_image(img, save_png, name):
     if save_png:
         pngfile = 'parallax_demo_'+name+'.png'
-        print "saved file: "+pngfile
+        print("saved file: "+pngfile)
         img.save(pngfile)  
     else:
         img.show() 
@@ -29,7 +32,7 @@ def show_image(data, dataname, save_png, colors="rainbow", min_data=None, max_da
     if max_data is None:
         max_data=data.max()
     img = trollimage(data, mode="L", fill_value=[0,0,0])
-    print min_data, max_data
+    print(min_data, max_data)
     colormap = get_colormap(colors, min_data, max_data)
     img.colorize(colormap)
     if title is not None:
@@ -44,12 +47,12 @@ def show_image(data, dataname, save_png, colors="rainbow", min_data=None, max_da
 
     if add_colorscale:
         dc = DecoratorAGG(PIL_image)
-        print colormap
+        print(colormap)
         colormap_r = colormap.reverse()
         dc.align_right()
         dc.write_vertically()
-        print colors
-        print colormap_r
+        print(colors)
+        print(colormap_r)
         dc.add_scale(colormap_r, extend=True, tick_marks=5, minor_tick_marks=1, line_opacity=100) #, tick_marks=tick_marks, minor_tick_marks=minor_tick_marks, unit=units
         
     show_or_save_image(PIL_image, save_png, dataname)
@@ -89,14 +92,14 @@ if __name__ == '__main__':
         time_slot = get_last_SEVIRI_date(False, delay=3)
     else:
         time_slot = datetime.datetime(2015, 7, 7, 14, 35)
-        print "*** CHECK THAT YOU ACTIVATED OFFLINE ENVIRONMENT "
+        print("*** CHECK THAT YOU ACTIVATED OFFLINE ENVIRONMENT ")
         import subprocess
         #subprocess.call(". ../setup/bashrc_offline ", shell=True)
         import os
         os.environ['PPP_CONFIG_DIR']=os.environ['PYTROLLHOME']+"/cfg_offline/"
-        print "... set PPP_CONFIG_DIR to: " + os.environ['PPP_CONFIG_DIR']
+        print("... set PPP_CONFIG_DIR to: " + os.environ['PPP_CONFIG_DIR'])
         
-    print str(time_slot)
+    print(str(time_slot))
 
     ## define the geostationary factory 
     ## --------------------------------
@@ -111,7 +114,7 @@ if __name__ == '__main__':
     #global_data.load([chn])
     #global_nwc.load(['CTTH'], reader_level="seviri-level3")
     loaded_channels = [c.name for c in global_data.loaded_channels()]
-    print loaded_channels
+    print(loaded_channels)
     
     # reproject data to your desired projection
     ## ----------------------------------------
@@ -137,15 +140,15 @@ if __name__ == '__main__':
 
         # get the orbital of the satellite
         ## -----------------------------------------
-        print "... data.get_orbital(use_NEAR_for_DEEP_space=True)"
+        print("... data.get_orbital(use_NEAR_for_DEEP_space=True)")
         orbital = data.get_orbital(use_NEAR_for_DEEP_space=True)
 
         # calculate the viewing geometry of the SEVIRI sensor
         ## --------------------------------------------------
-        print "... calculate the viewing geometry of the SEVIRI sensor"
+        print("... calculate the viewing geometry of the SEVIRI sensor")
         (azi, ele) = data['IR_108'].get_viewing_geometry(orbital, data.time_slot)
-        print "azi.min(), azi.max()", azi.min(), azi.max()
-        print "ele.min(), ele.max()", ele.min(), ele.max()
+        print("azi.min(), azi.max()", azi.min(), azi.max())
+        print("ele.min(), ele.max()", ele.min(), ele.max())
 
         if not estimate_CTH:
             # possible call of the parallax correction 
@@ -165,7 +168,7 @@ if __name__ == '__main__':
 
 
     loaded_channels = [c.name for c in data.loaded_channels()]
-    print loaded_channels
+    print(loaded_channels)
 
     if show_azimuth:
         show_image(azi, "azi", save_png, colors=colors, min_data=None, max_data=None, title='azimuth')
@@ -195,6 +198,6 @@ if __name__ == '__main__':
 
     if save_data:
         ncOutputFile = data.time_slot.strftime("./test_rad_PLAX.nc")
-        print "... save reprojected data: ncview "+ ncOutputFile+ " &" 
+        print("... save reprojected data: ncview "+ ncOutputFile+ " &") 
         #data.save(ncOutputFile, to_format="netcdf4", compression=False)
         data.save(ncOutputFile, band_axis=2, concatenate_bands=False) # netCDF4 is default 

@@ -1,6 +1,11 @@
+from __future__ import division
+from __future__ import print_function
+
 """ 30.06.2016 copied from "produce_forecasts_nrt.py"
 which was operational on SatLive
 """
+
+
 
 from datetime import datetime
 import sys, string, os
@@ -221,7 +226,7 @@ def check_cosmo_area (nc_cosmo, area):
     
     #checks if the pixel size of the cosmo model and the wanted area match, if not quits
     if dy_cosmo != area_wanted.pixel_size_y or dx_cosmo != area_wanted.pixel_size_x:
-        print "Error: the pixel size of the wind data doesn't match with the chosen area definition"
+        print("Error: the pixel size of the wind data doesn't match with the chosen area definition")
         quit()
     
     #checks if the area wanted is smaller or equal to the cosmo area, if not it quits
@@ -231,7 +236,7 @@ def check_cosmo_area (nc_cosmo, area):
         y_min_cut = abs(y_min_cosmo - y_min_wanted)/1000
         y_max_cut = abs(y_max_cosmo - y_max_wanted)/1000
     else:
-        print "Error: the area chosen ("+area+") is larger than the wind data (cosmo) area available"
+        print("Error: the area chosen ("+area+") is larger than the wind data (cosmo) area available")
         quit()
  
     return x_min_cut, x_max_cut, y_min_cut, y_max_cut
@@ -265,7 +270,7 @@ def get_cosmo_filenames (t_sat, nrt=True, runs_before=0, area = "ccs4c2" ):
 
     # if runs_before is set to a value >0, it subtracts 3*runs_before hours to t_run
     if runs_before != 0:
-        print "    try ", runs_before ," model start(s) before "
+        print("    try ", runs_before ," model start(s) before ")
         t_run -= runs_before * timedelta(hours = 3) 
 
     # gets the forecasting time corresponding to the t_sat, given the t_run (hour before and hour after)
@@ -332,32 +337,32 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
 
     file1, file2 = get_cosmo_filenames ( datetime(year,month,day,hour,minute), nrt=nrt, runs_before = runs_before, area = area  )
 
-    print "... search for ", file1, " and ", file2
+    print("... search for ", file1, " and ", file2)
     filename1 = glob.glob(file1)
     filename2 = glob.glob(file2)
 
     if len(filename1)>1 or len(filename2)>1:
-        print "Warning, more than one cosmo file available!!"
-        print "Files t1", filename1
-        print "Files t2", filename2
+        print("Warning, more than one cosmo file available!!")
+        print("Files t1", filename1)
+        print("Files t2", filename2)
             
     if len(filename1)<1 or len(filename2)<1:
-        print "*** Warning, found no cosmo wind data "
+        print("*** Warning, found no cosmo wind data ")
         # look for the result of the COSMO run before
         file1, file2 = get_cosmo_filenames ( datetime(year,month,day,hour,minute),nrt = nrt, runs_before = runs_before + 1, area = area )
 
-        print "... search for preveous COSMO run: ", file1, " and ", file2
+        print("... search for preveous COSMO run: ", file1, " and ", file2)
         filename1 = glob.glob(file1)
         filename2 = glob.glob(file2)
         
         if len(filename1)>1 or len(filename2)>1:
-            print "Warning, more than one cosmo file available!!"
-            print "Files t1", filename1
-            print "Files t2", filename2
+            print("Warning, more than one cosmo file available!!")
+            print("Files t1", filename1)
+            print("Files t2", filename2)
         elif len(filename1)<1 or len(filename2)<1:
-            print "*** Error, no cosmo wind data with model start " #, str(datetime(year,month,day,hour,minute))
-            print file1
-            print file2
+            print("*** Error, no cosmo wind data with model start ") #, str(datetime(year,month,day,hour,minute))
+            print(file1)
+            print(file2)
             quit()
     
     file_cosmo_1 = filename1[0]
@@ -365,8 +370,8 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     
     #cosmoDir='/data/cinesat/in/cosmo' #2016052400_03_cosmo-1_UV_swissXXL.nc
 
-    print '... read ', file_cosmo_1  
-    print '... read ', file_cosmo_2
+    print('... read ', file_cosmo_1)  
+    print('... read ', file_cosmo_2)
     
     nc_cosmo_1 = netCDF4.Dataset(file_cosmo_1,'r',format='NETCDF4') 
     nc_cosmo_2 = netCDF4.Dataset(file_cosmo_2,'r',format='NETCDF4') 
@@ -377,10 +382,10 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     pressure2 = nc_cosmo_2.variables['z_1'][:]
     pressure2 = pressure2.astype(int)    
     
-    print "    pressure levels in file1: ", pressure1
-    print "    pressure levels in file2: ", pressure2
+    print("    pressure levels in file1: ", pressure1)
+    print("    pressure levels in file2: ", pressure2)
     
-    print "    pressures chosen: ", layers
+    print("    pressures chosen: ", layers)
     u_all1 = nc_cosmo_1.variables['U'][:]
     v_all1 = nc_cosmo_1.variables['V'][:]
     u_all2 = nc_cosmo_2.variables['U'][:]
@@ -398,8 +403,8 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     
     if len(layers)>1:
         p_chosen = np.sort(layers)[::-1]
-        print "layers ", layers
-        print "p_chosen ", p_chosen
+        print("layers ", layers)
+        print("p_chosen ", p_chosen)
         #quit()
     else:
         p_chosen = layers
@@ -420,7 +425,7 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
 
     # !!! !hau! this is not nice
     if p_chosen[0] not in pressure1: # pressure1.all() != p_chosen[0]:
-        print "no value in: ", pressure1, "is equal to p_chosen: ",p_chosen[0]
+        print("no value in: ", pressure1, "is equal to p_chosen: ",p_chosen[0])
         for elem in range(len(p_chosen)):
             p_chosen[elem]*=100   # convert hPa to Pa
     
@@ -431,8 +436,8 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
         # search index, where the pressure is equal to the pressure of interest (might be different for file1 and file2)
         i1 = np.where(pressure1==p_chosen[g])[0][0]
         i2 = np.where(pressure2==p_chosen[g])[0][0]
-        print "... temporal interpolation for wind field at", p_chosen[g]
-        print g, len(p_chosen), np.where(pressure1==p_chosen[g])[0][0]
+        print("... temporal interpolation for wind field at", p_chosen[g])
+        print(g, len(p_chosen), np.where(pressure1==p_chosen[g])[0][0])
         u1 = u_all1[0, i1, x_max_cut1 : nx1-x_min_cut1, y_min_cut1 : ny1 - y_max_cut1] 
         u2 = u_all2[0, i2, x_max_cut2 : nx2-x_min_cut2, y_min_cut2 : ny2 - y_max_cut2]     #### UH index changed i1 -> i2 !!! ###
         v1 = v_all1[0, i1, x_max_cut1 : nx1-x_min_cut1, y_min_cut1 : ny1 - y_max_cut1]     #### UH index changed i2 -> i1 !!! ###
@@ -440,16 +445,16 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
         u_d[g,:,:] = previous*u1 + (1-previous)*u2
         v_d[g,:,:] = previous*v1 + (1-previous)*v2      
 
-    print "*** u_d[0].shape", u_d.shape[1], u_d.shape[2]
-    print "previous ", previous
+    print("*** u_d[0].shape", u_d.shape[1], u_d.shape[2])
+    print("previous ", previous)
     return u_d, v_d, p_chosen
     
 
 def calculate_displacement(u_d,v_d,n_levels,size_x,size_y,ForecastTime,NumComputationSteps):
 
 
-    print "***"
-    print "*** calculate displacement"
+    print("***")
+    print("*** calculate displacement")
 
     dx_d = np.zeros(u_d.shape)
     dy_d = np.zeros(v_d.shape)
@@ -457,7 +462,7 @@ def calculate_displacement(u_d,v_d,n_levels,size_x,size_y,ForecastTime,NumComput
     for level in range(n_levels):   # !!!!!!!
     #for level in [0]:
 
-          print "... calculate displacement for level ", level, n_levels
+          print("... calculate displacement for level ", level, n_levels)
           u = u_d[level,:,:]
           v = v_d[level,:,:]
 
@@ -502,11 +507,11 @@ def add_points_outside(forecast,x_matrix,y_matrix, xy_inside):
     y_new = np.reshape(y_new,y_new.size)        
     xy_new = np.column_stack((x_new,y_new))  
     xy_new = xy_new[~np.isnan(xy_new).any(axis=1)]                      
-    print "*** add new particles for empty pixels"
+    print("*** add new particles for empty pixels")
     #store tracking coordinates for next step of this level
-    print "xy2.shape, xy_new.shape", xy2.shape, xy_new.shape
+    print("xy2.shape, xy_new.shape", xy2.shape, xy_new.shape)
     xy_new = np.vstack((xy2, xy_new))
-    print "... number of particles for next step (xy_new.shape)", xy_new.shape
+    print("... number of particles for next step (xy_new.shape)", xy_new.shape)
     xy_levels = deepcopy(xy_new)
     return xy_levels    
 
@@ -540,7 +545,7 @@ def load_rgb(satellite, satellite_nr, satellites_name, time_slot, rgb, area, in_
       area_loaded = get_area_def("EuropeCanary95")#(in_windshift.areaExtraction)  
       # load product, global_data is changed in this step!
       area_loaded = load_products(global_data_RGBforecast, [rgb], in_msg, area_loaded)
-      print '... project data to desired area ', area
+      print('... project data to desired area ', area)
       fns = global_data_RGBforecast.project(area, precompute=True)
 
     else:
@@ -565,26 +570,26 @@ def compute_new_xy(xy1, dx_ds, dy_ds,  max_x_m, max_y_m):
     xy1_px[:,0] = m_to_pixel(xy1[:,0],size_x,'to_pixel')
     xy1_px[:,1] = m_to_pixel(xy1[:,1],size_y,'to_pixel')
     
-    print '... calculate new particle positions'
+    print('... calculate new particle positions')
     
     xy2 = np.zeros(xy1.shape)
     xy2[:,0] = xy1[:,0] + dx_ds[level, xy1_px[:,0], xy1_px[:,1] ]
     xy2[:,1] = xy1[:,1] + dy_ds[level, xy1_px[:,0], xy1_px[:,1] ]
     
     # remove particles outside the domain 
-    print "... limits before removing: ", xy2.min(), xy2.max(),  
+    print("... limits before removing: ", xy2.min(), xy2.max(), end=' ')  
 
 
     ind_inside = np.where( np.logical_and( np.logical_and(0<=xy2[:,0],xy2[:,0]<max_x_m), np.logical_and(0<=xy2[:,1],xy2[:,1]<max_y_m) ) )
-    print type(ind_inside)
-    print np.array(ind_inside).max(), np.array(ind_inside).min()
-    print np.array(ind_inside).shape
+    print(type(ind_inside))
+    print(np.array(ind_inside).max(), np.array(ind_inside).min())
+    print(np.array(ind_inside).shape)
 
     xy2    = np.squeeze(xy2[ind_inside,:])
     xy1_px = np.squeeze(xy1_px[ind_inside,:])
     
-    print "... limits after removing: ", xy2.min(), xy2.max(),  
-    print "... number of particles after removing those outside (xy2_px.shape)", xy2.shape
+    print("... limits after removing: ", xy2.min(), xy2.max(), end=' ')  
+    print("... number of particles after removing those outside (xy2_px.shape)", xy2.shape)
     
     #convert xy2 in pixel to do the shift for each channel
     xy2_px = np.zeros(xy2.shape, dtype=np.int)   ### initialize as integer ###
@@ -603,14 +608,14 @@ def mask_rgb_based_pressure(data,p_min,p_max,data_CTP):
 ########################################################################################## 
 ########################################################################################## 
 def print_usage():
-         print "***           "
-         print "*** Error, not enough command line arguments"
-         print "***        please specify at least an input file"
-         print "***        possible calls are:"
-         print "*** python "+inspect.getfile(inspect.currentframe())+" input_coalition2 "
-         print "*** python "+inspect.getfile(inspect.currentframe())+" input_coalition2 2014 07 23 16 10 "
-         print "                                 date and time must be completely given"
-         print "***           "
+         print("***           ")
+         print("*** Error, not enough command line arguments")
+         print("***        please specify at least an input file")
+         print("***        possible calls are:")
+         print("*** python "+inspect.getfile(inspect.currentframe())+" input_coalition2 ")
+         print("*** python "+inspect.getfile(inspect.currentframe())+" input_coalition2 2014 07 23 16 10 ")
+         print("                                 date and time must be completely given")
+         print("***           ")
          quit() # quit at this point
 #----------------------------------------------------------------------------------------------------------------
 
@@ -622,8 +627,8 @@ if __name__ == '__main__':
     from get_input_msg import get_date_and_inputfile_from_commandline
     in_msg = get_date_and_inputfile_from_commandline(print_usage=print_usage)
 
-    print in_msg.dt_forecast1
-    print in_msg.dt_forecast2
+    print(in_msg.dt_forecast1)
+    print(in_msg.dt_forecast2)
 
     if len(sys.argv) > 7:
         if len(sys.argv) <12:
@@ -640,13 +645,13 @@ if __name__ == '__main__':
 
     time_slot = in_msg.datetime
 
-    print "" 
-    print "*** define more input parameters" 
+    print("") 
+    print("*** define more input parameters") 
 
     area = in_msg.area_forecast
  
     ntimes=2 #in_windshift.ntimes
-    print "... aggregate winddata for ", ntimes, " timesteps" 
+    print("... aggregate winddata for ", ntimes, " timesteps") 
     min_correlation = 85 #in_windshift.min_correlation
     min_conf_nwp = 80 #in_windshift.min_conf_nwp
     min_conf_no_nwp = 80 #in_windshift.min_conf_no_nwp
@@ -675,9 +680,9 @@ if __name__ == '__main__':
     dt_forecast2 = in_msg.dt_forecast2
         
     if rapid_scan_mode == True:
-        print "... RAPID SCAN MODE"
+        print("... RAPID SCAN MODE")
     else:
-        print "... NOT RAPID SCAN MODE"
+        print("... NOT RAPID SCAN MODE")
     
     dt_forecast1S = "%02d" % dt_forecast1
     dt_forecast2S = "%02d" % dt_forecast2
@@ -708,8 +713,8 @@ if __name__ == '__main__':
         elif zlevel == 'modellevel':
             layers=[36,24,16] #cosmo model layers
         else:
-            print "*** Error in main ("+inspect.getfile(inspect.currentframe())+")"
-            print "    unknown zlevel", zlevel
+            print("*** Error in main ("+inspect.getfile(inspect.currentframe())+")")
+            print("    unknown zlevel", zlevel)
             quit()
         
     # ------------------------------------------
@@ -726,15 +731,15 @@ if __name__ == '__main__':
     # e.g. area_extent = (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
     area_tuple = (proj4_string, area_extent)    
 
-    print "in_msg.nwcsaf_calibrate ", in_msg.nwcsaf_calibrate
+    print("in_msg.nwcsaf_calibrate ", in_msg.nwcsaf_calibrate)
 
-    print "" 
-    print "*** start production of forecasts" 
+    print("") 
+    print("*** start production of forecasts") 
 
 
     while time_slot <= time_slotSTOP:
 
-          print "process "+str(time_slot)
+          print("process "+str(time_slot))
 
           outputDir = time_slot.strftime(in_msg.outputDirForecasts)
                   
@@ -751,7 +756,7 @@ if __name__ == '__main__':
                   if in_msg.sat[0:8]=="Meteosat":
                       sat_nr_str = str(int(sat_nr_str)) # get rid of leading zeros (0) 
               else:
-                  print "*** Waring, unknown type of sat_nr", type(in_msg.sat_nr)
+                  print("*** Waring, unknown type of sat_nr", type(in_msg.sat_nr))
                   sat_nr_str = in_msg.sat_nr
           #print in_msg.sat, " and ", sat_nr_str
           #in_msg.sat_nr_str = sat_nr_str
@@ -776,13 +781,13 @@ if __name__ == '__main__':
           size_y = obj_area.pixel_size_y  
           
           #print obj_area
-          print "area extent:\n", obj_area.area_extent
-          print "x min  ",        obj_area.area_extent[0]
-          print "x size ",        obj_area.pixel_size_x
+          print("area extent:\n", obj_area.area_extent)
+          print("x min  ",        obj_area.area_extent[0])
+          print("x size ",        obj_area.pixel_size_x)
           
           # check if input data is complete 
           if in_msg.verbose:
-              print "*** check input data", in_msg.RGBs
+              print("*** check input data", in_msg.RGBs)
           #RGBs = check_input(in_msg, in_msg.sat+sat_nr_str, in_msg.datetime)  
           # in_msg.sat_nr might be changed to backup satellite
           
@@ -809,7 +814,7 @@ if __name__ == '__main__':
                   time.sleep(25)          
           
           # read CTP to distinguish high, medium and low clouds
-          print ("*** read data for ", in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", time_slot)
+          print(("*** read data for ", in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", time_slot))
           global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot)
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
           #area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
@@ -823,21 +828,21 @@ if __name__ == '__main__':
                 tmp_press.append(1001)
                 tmp_press.sort() #ordered decreasing
                 
-                print tmp_press
+                print(tmp_press)
                 n_levels_pressure = len(tmp_press)
                 p_levels = np.zeros(data_CTP['CTP'].data.shape)
                 p_levels[:,:]=np.nan
                 p_min = 0
 
-                print("    n_levels_pressure (should be 3): ", n_levels_pressure)
-                print "    unique pressure levels: ",np.unique(p_levels)
+                print(("    n_levels_pressure (should be 3): ", n_levels_pressure))
+                print("    unique pressure levels: ",np.unique(p_levels))
 
                 for i_plot_press in range(n_levels_pressure):
                     p_max = tmp_press[i_plot_press]
-                    print("    p_min: ", p_min, "p_max: ",p_max)
+                    print(("    p_min: ", p_min, "p_max: ",p_max))
                     p_levels[np.where(np.logical_and(data_CTP['CTP'].data>p_min,data_CTP['CTP'].data<=p_max))] = i_plot_press + 2
-                    print "    unique: ",np.unique(p_levels)
-                    print "    index: ", i_plot_press
+                    print("    unique: ",np.unique(p_levels))
+                    print("    index: ", i_plot_press)
                     p_min = deepcopy(p_max)
                 if True:
                     fig = plt.figure()
@@ -873,10 +878,10 @@ if __name__ == '__main__':
                 plt.show()
                 plt.savefig("/data/COALITION2/PicturesSatellite/LEL_results_wind//"+yearS+"-"+monthS+"-"+dayS+"/channels_fig//Pressure_"+yearS+monthS+dayS+hourS+minS+".png")
                 plt.close(fig)
-                print np.unique(p_levels)
+                print(np.unique(p_levels))
           
           # read all rgbs
-          print ("*** read data for ", in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot)
+          print(("*** read data for ", in_msg.sat_str(),in_msg.sat_nr_str(), "seviri", time_slot))
           global_data = GeostationaryFactory.create_scene(in_msg.sat_str(), in_msg.sat_nr_str(), "seviri",  time_slot)
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
           area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
@@ -927,8 +932,8 @@ if __name__ == '__main__':
                   plt.close(fig)
           
           
-          print "" 
-          print "*** read wind fields"  
+          print("") 
+          print("*** read wind fields")  
           
           if wind_source=="HRW":
               u_d=np.zeros((n_levels,nx,ny))
@@ -947,10 +952,10 @@ if __name__ == '__main__':
       
                      # choose basic or detailed (and get a fresh copy) 
                   if detailed:
-                      print '... calculate gridded 2d wind field High' 
+                      print('... calculate gridded 2d wind field High') 
                       hrw_detbas = hrw_data['HRW'].HRW_detailed                   
                   else:
-                      print '... calculate gridded 2d wind field High' 
+                      print('... calculate gridded 2d wind field High') 
                       hrw_detbas =  hrw_data['HRW'].HRW_basic       
       
                   u_d[level,:,:], v_d[level,:,:] = HRW_2dfield( hrw_detbas, obj_area )
@@ -959,8 +964,8 @@ if __name__ == '__main__':
               u_d, v_d, pressures_wind = interpolate_cosmo(year, month, day, hour, minute,
                                                 layers, zlevel, area, nrt=in_msg.nrt, rapid_scan_mode_satellite = True)
           else:
-              print "*** Error in main ("+inspect.getfile(inspect.currentframe())+")"
-              print "    unknown wind source ", wind_source
+              print("*** Error in main ("+inspect.getfile(inspect.currentframe())+")")
+              print("    unknown wind source ", wind_source)
               quit()
       
       
@@ -977,8 +982,8 @@ if __name__ == '__main__':
           p_min = 1001
           no_data = -1000000000
           #xy_levels = np.zeros((n_levels,nx*ny,2))
-          print "nx ",nx
-          print "ny "
+          print("nx ",nx)
+          print("ny ")
           forecasts_out = np.zeros((len(channel_nr),2,nx,ny))
           forecasts_NextStep = np.zeros((len(channel_nr),n_levels,nx,ny))
           
@@ -988,7 +993,7 @@ if __name__ == '__main__':
        
           for level in range(n_levels):
           
-              print "... calculation for level ", level
+              print("... calculation for level ", level)
       
               p_max = p_min
               
@@ -1001,14 +1006,14 @@ if __name__ == '__main__':
                 continue
               
               if pressures_wind[level] > p_max or pressures_wind[level] < p_min:
-                    print "ERROR: you are moving the clouds at a certain level (%s-%s) with wind from another level (%s)"%(str(p_min),str(p_max),str(pressures_wind[level]))
+                    print("ERROR: you are moving the clouds at a certain level (%s-%s) with wind from another level (%s)"%(str(p_min),str(p_max),str(pressures_wind[level])))
                     quit()
               
               u = u_d[level,:,:]
               v = v_d[level,:,:]  
       
               for t in range(1,NumForecast+1):
-                  print "*** timestep ",t," of ",NumForecast
+                  print("*** timestep ",t," of ",NumForecast)
                   if t==1: #if first timestep create x and y matrices covering entire image
                       xy_levels = initial_xy(x_matrixs,y_matrixs)
       
@@ -1028,7 +1033,7 @@ if __name__ == '__main__':
                               continue
                       
                       forecast1 = forecasts_NextStep[channel_nr[rgb],level,:,:]
-                      print "*** calculating the nowcasted values of ", rgb
+                      print("*** calculating the nowcasted values of ", rgb)
                       forecast2 = nowcastRGB(forecast1,xy1_px,xy2_px)
       
                   
@@ -1044,13 +1049,13 @@ if __name__ == '__main__':
                               ind_time = 0
                           else:
                               ind_time = 1
-                          print "forecast 2: ",forecast2.shape
-                          print "forecast out: ",forecasts_out.shape
+                          print("forecast 2: ",forecast2.shape)
+                          print("forecast out: ",forecasts_out.shape)
                           
                           #forecasts_out[channel_nr[rgb],ind_time,np.where(forecast2!=no_data)] = forecast2[np.where(forecast2!=no_data)]
                           temp = deepcopy(forecasts_out[channel_nr[rgb],ind_time,:,:])
                           temp [forecast2!=no_data] = forecast2[forecast2!=no_data]
-                          print "temp ",temp.shape
+                          print("temp ",temp.shape)
                           forecasts_out[channel_nr[rgb],ind_time,:,:] = deepcopy(temp) #np.where(forecast2!=no_data,forecast2,forecasts_out)
                           if level == (n_levels-1) or p_min == 0:
                             
@@ -1067,7 +1072,7 @@ if __name__ == '__main__':
                             #####outputFile = "pickles/%s_%s_%s_t%s_%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime),name_tmp)
                             
                             
-                            print "... pickle data to file: ", outputFile
+                            print("... pickle data to file: ", outputFile)
                             
                             PIK = []
                             if area == "ccs4":
@@ -1075,11 +1080,11 @@ if __name__ == '__main__':
                             elif area == "ccs4c2": 
                                     PIK.append( forecasts_out[channel_nr[rgb],ind_time,20:nx-40,85:ny-135])
                             else:
-                                    print "unknown area, saving entire domain"
+                                    print("unknown area, saving entire domain")
                                     PIK.append( forecasts_out[channel_nr[rgb],ind_time,:,:])
                                 
                             PIK.append(mode_downscaling)
-                            print mode_downscaling
+                            print(mode_downscaling)
                             
                             pickle.dump(PIK, open(outputFile,"wb"))
                             
@@ -1116,8 +1121,8 @@ if __name__ == '__main__':
                                 fig.savefig(outputFig) 
                                 plt.close(fig)
       
-          print "TOTAL TIME: ", time.time()-time_start_TOT
-          print "Final check lead time:", dt_forecast1
-          print dt_forecast2
+          print("TOTAL TIME: ", time.time()-time_start_TOT)
+          print("Final check lead time:", dt_forecast1)
+          print(dt_forecast2)
           time_slot = time_slot + timedelta(minutes=5)
 

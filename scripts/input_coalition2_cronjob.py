@@ -1,19 +1,23 @@
+from __future__ import division
+from __future__ import print_function
+
 def input(in_msg):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
-    print "*** read input from ", in_msg.input_file
+    print("*** read input from ", in_msg.input_file)
 
     #in_msg.sat = "meteosat"  # default "meteosat"
     in_msg.sat = "Meteosat"
     # 8=MSG1, 9=MSG2, 10=MSG3
     #in_msg.sat_nr=8
     #in_msg.RSS=False 
-    #in_msg.sat_nr=9
+    in_msg.sat_nr=9
     #in_msg.RSS=True
-    in_msg.sat_nr=10
-    in_msg.RSS=True
-
+    in_msg.RSS=False 
+    #in_msg.sat_nr=10
+    #in_msg.RSS=True
+    
     # specify an delay (in minutes), when you like to process a time some minutes ago
     # e.g. current time               2015-05-31 12:33 UTC
     # delay 5 min                     2015-05-31 12:28 UTC
@@ -180,7 +184,7 @@ def input(in_msg):
     #in_msg.forecasts_in_rapid_scan_mode = True
 
     if in_msg.RSS==False:
-        print "*** Warning: use TB forecast in 15min mode, as they are only available every 15min"
+        print("*** Warning: use TB forecast in 15min mode, as they are only available every 15min")
         in_msg.forecasts_in_rapid_scan_mode = False
     
     in_msg.choose_forecast_times()
@@ -221,7 +225,7 @@ def input(in_msg):
         #in_msg.chosen_settings['use_TB_forecast'] = None; check_overwriting+=1 
         
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print("you are overwriting your settings!!!! Check: ", current_setting)
             quit()
             
         
@@ -235,7 +239,7 @@ def input(in_msg):
         #in_msg.chosen_settings['mode_downscaling'] = None; check_overwriting+=1
         
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print("you are overwriting your settings!!!! Check: ", current_setting)
             quit()
                     
         
@@ -247,7 +251,7 @@ def input(in_msg):
         #in_msg.chosen_settings['mask_labelsSmall_lowUS'] = None; check_overwriting+=1
         
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print("you are overwriting your settings!!!! Check: ", current_setting)
             quit()
                     
         
@@ -261,7 +265,7 @@ def input(in_msg):
         #in_msg.chosen_settings['clean_mask'] = None; check_overwriting+=1
         
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print("you are overwriting your settings!!!! Check: ", current_setting)
             quit()
                 
         
@@ -273,7 +277,7 @@ def input(in_msg):
         #in_msg.chosen_settings['rapid_scan_mode'] = None; check_overwriting+=1
         
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print("you are overwriting your settings!!!! Check: ", current_setting)
             quit()
                     
         
@@ -286,7 +290,7 @@ def input(in_msg):
         #in_msg.chosen_settings['forth_mask'] = None; check_overwriting+=1
         
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print("you are overwriting your settings!!!! Check: ", current_setting)
             quit()
                     
         
@@ -298,7 +302,7 @@ def input(in_msg):
         #in_msg.chosen_settings['forced_mask'] = 'CloudType'; check_overwriting+=1
         #in_msg.chosen_settings['forced_mask'] = None; check_overwriting+=1
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print("you are overwriting your settings!!!! Check: ", current_setting)
             quit()
                     
         
@@ -310,7 +314,7 @@ def input(in_msg):
         #in_msg.chosen_settings['mask_cirrus'] = None; check_overwriting+=1
         
         if check_overwriting > 1:
-            print "you are overwriting your settings!!!! Check: ", current_setting
+            print("you are overwriting your settings!!!! Check: ", current_setting)
             quit()
                     
         

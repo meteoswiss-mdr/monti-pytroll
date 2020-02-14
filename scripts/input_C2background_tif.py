@@ -1,9 +1,12 @@
+from __future__ import division
+from __future__ import print_function
+
 
 def input(in_msg):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
-    print "*** read input from ", in_msg.input_file
+    print("*** read input from ", in_msg.input_file)
 
     # 8=MSG1, 9=MSG2, 10=MSG3
     in_msg.sat = "Meteosat"
@@ -246,7 +249,7 @@ def input(in_msg):
     #in_msg.postprocessing_areas=["ccs4"]
     #in_msg.postprocessing_areas=['EuropeCanaryS95']
 
-    #in_msg.postprocessing_composite=["h03-ir108"] 
+    #in_msg.postprocessing_composite=["h03b-ir108"] 
     #in_msg.postprocessing_composite=["hrwdp-ir108"] 
     #in_msg.postprocessing_composite=["CTT-ir108","CTH-ir108"] 
     #in_msg.postprocessing_composite=["hrwdp-ir108", "hrwdc-ir108","streamd-ir108","hrwdr-ir108", "hrwdcnwp-ir108", "hrwdcnnwp-ir108"]    
@@ -257,8 +260,8 @@ def input(in_msg):
     #in_msg.postprocessing_composite=["hrwdpL-streamdL-HRV","hrwdpL-streamdL-ir108"] 
     #in_msg.postprocessing_composite=["hrwdpH-streamdH-HRV","hrwdpH-streamdH-ir108"] 
     #in_msg.postprocessing_composite=["hrwdp-streamd-ir108","TRT-streamd-ir108"] 
-    #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03-ir108"],["MSG_radar-HRV","MSG_h03-HRV"],["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]]
-    #in_msg.postprocessing_montage = [["MSG_h03-ir108","MSG_HRV"],["MSG_h03-ir108","MSG_test"]]
+    #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03b-ir108"],["MSG_radar-HRV","MSG_h03b-HRV"],["MSG_RATE-ir108","MSG_h03b-ir108"],["MSG_RATE-HRV","MSG_h03b-HRV"]]
+    #in_msg.postprocessing_montage = [["MSG_h03b-ir108","MSG_HRV"],["MSG_h03b-ir108","MSG_test"]]
     #in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-radar-convection"]]
     #in_msg.postprocessing_montage = [["MSG_C2rgb-Forecast-IR_108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-radar-convection"]]
     #in_msg.postprocessing_montage = [["MSG_SYNMSG-BT-CL-IR10.8","MSG_IR-108c"]]

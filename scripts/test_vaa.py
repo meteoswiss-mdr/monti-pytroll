@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from mpop.satellites import GeostationaryFactory
 from mpop.projector import get_area_def
 import datetime
@@ -15,7 +17,7 @@ prop = global_data["vaa"].data
 plot_type='trollimage'
 min_data = prop.min()
 max_data = prop.max()
-print prop.shape, min_data, max_data
+print (prop.shape, min_data, max_data)
 
 from trollimage.colormap import rainbow
 colormap = rainbow

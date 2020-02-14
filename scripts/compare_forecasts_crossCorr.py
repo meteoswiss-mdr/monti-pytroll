@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 import numpy as np
 from datetime import datetime, timedelta
 from produce_forecasts_develop import string_date
@@ -47,10 +50,10 @@ def plot_diff(img_obs,img_mod,label_mod, lead_time):
 def setBoxColors(bp,ind,color):
     #inspired from answer to: http://stackoverflow.com/questions/16592222/matplotlib-group-boxplots
     
-    print "index_model: ", ind
-    print "index single: ", ind
-    print "index double: ", ind*2
-    print "shape double: ", len(bp['fliers'])
+    print("index_model: ", ind)
+    print("index single: ", ind)
+    print("index double: ", ind*2)
+    print("shape double: ", len(bp['fliers']))
     
     plt.setp(bp['boxes'][ind], color=color)
     plt.setp(bp['caps'][ind], color=color)
@@ -174,27 +177,27 @@ if __name__ == "__main__":
         img_obs.mask[:,:] = False
         
         if True:
-            print "pickles/"+year0S+month0S+day0S+"_"+hour0S+min0S+"_CTT_t"+leadS+"_1layer.p"
+            print("pickles/"+year0S+month0S+day0S+"_"+hour0S+min0S+"_CTT_t"+leadS+"_1layer.p")
             tmp = pickle.load(open( "pickles/"+year0S+month0S+day0S+"_"+hour0S+min0S+"_CTT_t"+leadS+"_1layer.p","rb"))
             tmp = (tmp[0]-img_obs)
             diff1.append(tmp)
             tmp = tmp.flatten()
-            print "0 before"
-            print "max: ", tmp.max()
-            print "mean: ", tmp.mean()
-            print "number points: ", tmp.size
-            #print "median: ", tmp.median()
+            print("0 before")
+            print("max: ", tmp.max())
+            print("mean: ", tmp.mean())
+            print("number points: ", tmp.size)
+            #print("median: ", tmp.median())
 
             tmp1 = []
             for err in tmp:
                 if abs(err) <= 50:
                     tmp1.append(err)
             tmp1 = np.array(tmp1)
-            print "0 after"
-            print "max: ", tmp1.max()
-            print "mean: ", tmp1.mean()
-            print "number points: ", tmp1.size
-            #print "median: ", tmp1.mmedian()        
+            print("0 after")
+            print("max: ", tmp1.max())
+            print("mean: ", tmp1.mean())
+            print("number points: ", tmp1.size)
+            #print("median: ", tmp1.mmedian())    
             
             diff.append(tmp1)    
             #diff.append(tmp[0]-img_obs) #diff.append((tmp[0]-img_obs).flatten()) #pickles/20151015_0500_CTT_t05_1layer.p
@@ -203,29 +206,29 @@ if __name__ == "__main__":
             diff1.append(tmp)
             tmp = tmp.flatten()
             tmp1 = []
-            print "1 before"
-            print "max: ", tmp.max()
-            print "mean: ", tmp.mean()
-            print "number points: ", tmp.size
-            #print "median: ", tmp.median()
+            print("1 before")
+            print("max: ", tmp.max())
+            print("mean: ", tmp.mean())
+            print("number points: ", tmp.size)
+            #print("median: ", tmp.median())
             for err in tmp:
                 if abs(err) <= 50:
                     tmp1.append(err)
             tmp1 = np.array(tmp1)
-            print "1 after"
-            print "max: ", tmp1.max()
-            print "mean: ", tmp1.mean()
-            print "number points: ", tmp1.size
-            #print "median: ", tmp1.median() 
+            print("1 after")
+            print("max: ", tmp1.max())
+            print("mean: ", tmp1.mean())
+            print("number points: ", tmp1.size)
+            #print("median: ", tmp1.median())
             diff.append(tmp1) 
             #diff.append(tmp[0]-img_obs)
         tmp = pickle.load(open( "pickles/forced/"+year0S+month0S+day0S+"_"+hour0S+min0S+"_CTT_t"+leadS+"_1layerForced_mask.p","rb"))  #pickles/forced/20151015_0500_CTT_t05_1layerForced_mask.p
         tmp.mask[:,:] = False
         
-        print "1 layer"
-        print "corr_coeff, mean, std, median, count, meanNonZero, stdNonZero, medianNonZero, countNonZero"
+        print("1 layer")
+        print("corr_coeff, mean, std, median, count, meanNonZero, stdNonZero, medianNonZero, countNonZero")
         corr_coeff, mean, std, median, count, meanNonZero, stdNonZero, medianNonZero, countNonZero = compute_stats(deepcopy(data['CTT'].data), tmp)
-        print corr_coeff, mean, std, median, count, meanNonZero, stdNonZero, medianNonZero, countNonZero
+        print(corr_coeff, mean, std, median, count, meanNonZero, stdNonZero, medianNonZero, countNonZero)
         
         diff1.append(tmp-img_obs)
         
@@ -256,10 +259,10 @@ if __name__ == "__main__":
         tmp = pickle.load(open( "pickles/forced/"+year0S+month0S+day0S+"_"+hour0S+min0S+"_CTT_t"+leadS+"_3layerForced_mask.p","rb"))
         tmp.mask[:,:] = False
         
-        print "3 layers"
-        print "corr_coeff, mean, std, median, count, meanNonZero, stdNonZero, medianNonZero, countNonZero"
+        print("3 layers")
+        print("corr_coeff, mean, std, median, count, meanNonZero, stdNonZero, medianNonZero, countNonZero")
         corr_coeff, mean, std, median, count, meanNonZero, stdNonZero, medianNonZero, countNonZero = compute_stats(deepcopy(data['CTT'].data), tmp)
-        print corr_coeff, mean, std, median, count, meanNonZero, stdNonZero, medianNonZero, countNonZero
+        print(corr_coeff, mean, std, median, count, meanNonZero, stdNonZero, medianNonZero, countNonZero)
         
         diff1.append(tmp-img_obs)
         flat = (tmp-img_obs).flatten()
@@ -291,13 +294,13 @@ if __name__ == "__main__":
         #diff.append(tmp-img_obs)
         
         for diff_count in diff:
-            print len(diff_count)
+            print(len(diff_count))
            
         
         if True:
             model_ind_plot = 0
             for diff_one in diff1:
-                #print diff_one
+                #print(diff_one)
                 #diff_one = np.reshape(diff_one, img_obs.shape)
                 #diff_one
                 fig = plt.figure()
@@ -331,11 +334,11 @@ if __name__ == "__main__":
     
     fig = plt.figure()
     plt.subplot(311)
-    print time1
+    print(time1)
     plt.scatter(time1, means1,color = "blue", label = '1 p layer, forced mask')
-    print time1
+    print(time1)
     plt.scatter(time1, means2, color = "red", label = '3 p layer, forced mask')
-    print time1
+    print(time1)
     plt.ylabel("Mean")
     plt.legend(loc="best")
     plt.subplot(312)

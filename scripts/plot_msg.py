@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 #!/usr/bin/python
 
 # program to plot SEVIRI observations   
@@ -66,9 +69,9 @@ from mpop.utils import debug_on
 debug_on() 
 
 try:
-  basestring
+  str
 except NameError:
-  basestring = str
+  str = str
 
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
@@ -94,14 +97,14 @@ def plot_msg(in_msg):
    if in_msg.sat_nr is None:
       in_msg.sat_nr=choose_msg(in_msg.datetime,in_msg.RSS)
 
-   area_loaded = choose_area_loaded_msg(in_msg.sat, in_msg.sat_nr, in_msg.datetime)  
+   area_loaded = choose_area_loaded_msg(in_msg.sat, in_msg.sat_nr, in_msg.datetime)
    
    # define contour write for coasts, borders, rivers
    cw = ContourWriterAGG(in_msg.mapDir)
    
    # check if input data is complete 
    if in_msg.verbose:
-      print "*** check input data for ", in_msg.sat_str()
+      print("*** check input data for ", in_msg.sat_str())
    RGBs = check_input(in_msg, in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str(), in_msg.datetime)  
    # in_msg.sat_nr might be changed to backup satellite
 
@@ -111,21 +114,21 @@ def plot_msg(in_msg):
    ##  return []
    
    if len(RGBs) != len(in_msg.RGBs):
-      print "*** Warning, input not complete."
-      print "*** Warning, process only: ", RGBs
+      print("*** Warning, input not complete.")
+      print("*** Warning, process only: ", RGBs)
    #else:
    #   print "... produce plots for ", RGBs
 
    if in_msg.verbose:
-      print '*** Create plots for '
-      print '    Satellite/Sensor: ' + in_msg.sat_str() 
-      print '    Satellite number: ' + in_msg.sat_nr_str() +' // ' +str(in_msg.sat_nr)
-      print '    Satellite instrument: ' + in_msg.instrument
-      print '    Date/Time:        '+ str(in_msg.datetime)
-      print '    RGBs:            ', in_msg.RGBs
-      print '    parallax_correction: ', in_msg.parallax_correction
-      print '    Area:            ', in_msg.areas
-      print '    reader level:    ', in_msg.reader_level
+      print('*** Create plots for ')
+      print('    Satellite/Sensor: ' + in_msg.sat_str()) 
+      print('    Satellite number: ' + in_msg.sat_nr_str() +' // ' +str(in_msg.sat_nr))
+      print('    Satellite instrument: ' + in_msg.instrument)
+      print('    Date/Time:        '+ str(in_msg.datetime))
+      print('    RGBs:            ', in_msg.RGBs)
+      print('    parallax_correction: ', in_msg.parallax_correction)
+      print('    Area:            ', in_msg.areas)
+      print('    reader level:    ', in_msg.reader_level)
 
    # define satellite data object
    #global_data = GeostationaryFactory.create_scene(in_msg.sat, in_msg.sat_nr_str(), "seviri", in_msg.datetime)
@@ -149,7 +152,7 @@ def plot_msg(in_msg):
       return RGBs
 
    if in_msg.verbose:
-      print "*** load satellite channels for " + in_msg.sat_str()+in_msg.sat_nr_str()+" ", global_data.fullname
+      print("*** load satellite channels for " + in_msg.sat_str()+in_msg.sat_nr_str()+" ", global_data.fullname)
 
    # initialize processed RGBs
    RGBs_done=[]
@@ -187,7 +190,7 @@ def plot_msg(in_msg):
    # --------------------------------------
    if len(RGBs) > 0:
       for area in in_msg.areas:
-         print ""
+         print("")
          obj_area = get_area_def(area) 
  
          # reproject data to new area
@@ -195,12 +198,12 @@ def plot_msg(in_msg):
  
          if obj_area == area_loaded: 
             if in_msg.verbose:
-               print "*** Use data for the area loaded: ", area
+               print("*** Use data for the area loaded: ", area)
             #obj_area = area_loaded
             data = global_data
          else:
             if in_msg.verbose:    
-               print "*** Reproject data to area: ", area, "(org projection: ",  area_loaded.name, ")"     
+               print("*** Reproject data to area: ", area, "(org projection: ",  area_loaded.name, ")")     
             obj_area = get_area_def(area)
             # PROJECT data to new area 
             data = global_data.project(area, precompute=True)
@@ -210,13 +213,13 @@ def plot_msg(in_msg):
             loaded_products = [chn.name for chn in data.loaded_channels()]
 
             if 'CTH' not in loaded_products:
-               print "*** Error in plot_msg ("+inspect.getfile(inspect.currentframe())+")"
-               print "    Cloud Top Height is needed for parallax correction "
-               print "    either load CTH or specify the estimation of the CTH in the input file (load 10.8 in this case)"
+               print("*** Error in plot_msg ("+inspect.getfile(inspect.currentframe())+")")
+               print("    Cloud Top Height is needed for parallax correction ")
+               print("    either load CTH or specify the estimation of the CTH in the input file (load 10.8 in this case)")
                quit()
 
             if in_msg.verbose:
-               print "    perform parallax correction for loaded channels: ", loaded_products
+               print("    perform parallax correction for loaded channels: ", loaded_products)
 
             data = data.parallax_corr(fill=in_msg.parallax_gapfilling, estimate_cth=in_msg.estimate_cth, replace=True)
 
@@ -228,7 +231,7 @@ def plot_msg(in_msg):
  
          # save reprojected data
          if area in in_msg.save_reprojected_data:
-            print data.area
+            print(data.area)
             save_reprojected_data(data, area, in_msg)
 
          # apply a mask to the data (switched off at the moment)
@@ -242,7 +245,7 @@ def plot_msg(in_msg):
             #statisticFile = '/data/COALITION2/database/meteosat/ccs4/'+yearS+'/'+monthS+'/'+dayS+'/MSG_'+area+'_'+yearS[2:]+monthS+dayS+'.txt'
             statisticFile = './'+yearS+'-'+monthS+'-'+dayS+'/MSG_'+area+'_'+yearS[2:]+monthS+dayS+'.txt'
             if in_msg.verbose:
-               print "*** write statistics (average values) to "+statisticFile
+               print("*** write statistics (average values) to "+statisticFile)
             f1 = open(statisticFile,'a')   # mode append
             i_rgb=0
             for rgb in RGBs:
@@ -279,7 +282,7 @@ def plot_msg(in_msg):
                   if area == 'ccs4' and (5 < in_msg.datetime.hour) and (in_msg.datetime.hour < 19) and \
                                          rgb in ['VIS006','VIS008','VIS006c','VIS008c','overview','overview_sun','natural','green_snow','red_snow','convection']:  
                      HRV_enhancement=True
-                     print "*** switch on HRV enhancement"
+                     print("*** switch on HRV enhancement")
                   else:
                      HRV_enhancement=False
                else:
@@ -316,7 +319,7 @@ def plot_msg(in_msg):
                # add MeteoSwiss and Pytroll logo
                if in_msg.add_logos:
                   if in_msg.verbose:
-                     print '... add logos'
+                     print('... add logos')
                   dc.align_right()
                   if in_msg.add_colorscale:
                      dc.write_vertically()
@@ -337,11 +340,11 @@ def plot_msg(in_msg):
                      loaded_channels = [chn.name for chn in data.loaded_channels()]
                      if rgb in loaded_channels:
                        if hasattr(data[rgb], 'info'):
-                         print "    hasattr(data[rgb], 'info')", data[rgb].info.keys()
-                         if 'units' in data[rgb].info.keys():
-                           print "'units' in data[rgb].info.keys()"
+                         print("    hasattr(data[rgb], 'info')", list(data[rgb].info.keys()))
+                         if 'units' in list(data[rgb].info.keys()):
+                           print("'units' in data[rgb].info.keys()")
                            unit = data[rgb].info['units']
-                  print "... units = ", unit
+                  print("... units = ", unit)
                   add_colorscale(dc, rgb, in_msg, unit=unit)
 
                if in_msg.parallax_correction:
@@ -359,26 +362,26 @@ def plot_msg(in_msg):
                path= dirname(outputFile)
                if not exists(path):
                   if in_msg.verbose:
-                     print '... create output directory: ' + path
+                     print('... create output directory: ' + path)
                   makedirs(path)
 
                # save file
                if exists(outputFile) and not in_msg.overwrite:
                   if stat(outputFile).st_size > 0:
-                     print '... outputFile '+outputFile+' already exists (keep old file)'
+                     print('... outputFile '+outputFile+' already exists (keep old file)')
                   else: 
-                     print '*** Warning, outputFile'+outputFile+' already exists, but is empty (overwrite file)'
+                     print('*** Warning, outputFile'+outputFile+' already exists, but is empty (overwrite file)')
                      PIL_image.save(outputFile, optimize=True)  # optimize -> minimize file size
-                     chmod(outputFile, 0777)  ## FOR PYTHON3: 0o664  # give access read/write access to group members
+                     chmod(outputFile, 0o777)  ## FOR PYTHON3: 0o664  # give access read/write access to group members
                else:
                   if in_msg.verbose:
-                     print '... save final file: ' + outputFile
+                     print('... save final file: ' + outputFile)
                   PIL_image.save(outputFile, optimize=True)  # optimize -> minimize file size
-                  chmod(outputFile, 0777)  ## FOR PYTHON3: 0o664  # give access read/write access to group members
+                  chmod(outputFile, 0o777)  ## FOR PYTHON3: 0o664  # give access read/write access to group members
 
                if in_msg.compress_to_8bit:
                   if in_msg.verbose:
-                     print '... compress to 8 bit image: display '+outputFile.replace(".png","-fs8.png")+' &'
+                     print('... compress to 8 bit image: display '+outputFile.replace(".png","-fs8.png")+' &')
                   subprocess.call("/usr/bin/pngquant -force 256 "+outputFile+" 2>&1 &", shell=True) # 256 == "number of colors"
 
                #if in_msg.verbose:
@@ -395,12 +398,12 @@ def plot_msg(in_msg):
                      if in_msg.compress_to_8bit:
                         command_line_command="scp "+in_msg.scpID+" "+outputFile.replace(".png","-fs8.png")+" "+scpOutputDir+" 2>&1 &"
                         if in_msg.verbose:
-                           print "... secure copy: "+command_line_command
+                           print("... secure copy: "+command_line_command)
                         subprocess.call(command_line_command, shell=True)
                      else:
                         command_line_command="scp "+in_msg.scpID+" "+outputFile+" "+scpOutputDir+" 2>&1 &"
                         if in_msg.verbose:
-                           print "... secure copy: "+command_line_command
+                           print("... secure copy: "+command_line_command)
                         subprocess.call(command_line_command, shell=True)
 
                if in_msg.scpOutput and (in_msg.scpID2 is not None) and (in_msg.scpOutputDir2 is not None):
@@ -409,12 +412,12 @@ def plot_msg(in_msg):
                      if in_msg.compress_to_8bit:
                         command_line_command="scp "+in_msg.scpID2+" "+outputFile.replace(".png","-fs8.png")+" "+scpOutputDir2+" 2>&1 &"
                         if in_msg.verbose:
-                           print "... secure copy: "+command_line_command
+                           print("... secure copy: "+command_line_command)
                         subprocess.call(command_line_command, shell=True)
                      else:
                         command_line_command="scp "+in_msg.scpID2+" "+outputFile+" "+scpOutputDir2+" 2>&1 &"
                         if in_msg.verbose:
-                           print "... secure copy: "+command_line_command
+                           print("... secure copy: "+command_line_command)
                         subprocess.call(command_line_command, shell=True)
 
                if in_msg.socupload:
@@ -422,8 +425,8 @@ def plot_msg(in_msg):
                  command_line_command1 = "cp "+outputFile+" "+outputDir+"/"+socuploadFilename+" 2>&1; cd "+outputDir+"; "
                  socuploadCommand  = format_name (in_msg.socuploadCommand,  data.time_slot, area=area)
                  if in_msg.verbose:
-                   print command_line_command1
-                   print socuploadCommand
+                   print(command_line_command1)
+                   print(socuploadCommand)
                  subprocess.call(command_line_command1+socuploadCommand, shell=True) 
                            
                if 'ninjotif' in in_msg.outputFormats:
@@ -434,8 +437,8 @@ def plot_msg(in_msg):
                                 fformat='mpop.imageo.formats.ninjotiff',
                                 ninjo_product_name=rgb, chan_id = products.ninjo_chan_id[rgb.replace("_","-")+"_"+area],
                                 nbits=8)
-                  chmod(ninjotif_file, 0777)
-                  print ("... save ninjotif image: display ", ninjotif_file, " &")
+                  chmod(ninjotif_file, 0o777)
+                  print(("... save ninjotif image: display ", ninjotif_file, " &"))
 
                if rgb not in RGBs_done:
                   RGBs_done.append(rgb)
@@ -445,7 +448,7 @@ def plot_msg(in_msg):
       postprocessing(in_msg, global_data.time_slot, int(global_data.sat_nr()), area)
 
    if in_msg.verbose:
-      print " "
+      print(" ")
 
    return RGBs_done
 
@@ -457,7 +460,7 @@ def plot_msg(in_msg):
 def load_products(data_object, RGBs, in_options, area_loaded, load_CTH=True):
 
    if in_options.verbose:
-      print "*** load products ", RGBs
+      print("*** load products ", RGBs)
       
    # check if PyResample is loaded
    try:
@@ -473,9 +476,9 @@ def load_products(data_object, RGBs, in_options, area_loaded, load_CTH=True):
       if 'CTH' not in RGBs and load_CTH:
          RGBs.append('CTH')
       if in_options.nwcsaf_calibrate == False:
-         print "*** Error in plot_msg ("+inspect.getfile(inspect.currentframe())+")"
-         print "    in_options.nwcsaf_calibrate = ", in_options.nwcsaf_calibrate
-         print "    parallax correction needs physical (calibrated) CTH values"
+         print("*** Error in plot_msg ("+inspect.getfile(inspect.currentframe())+")")
+         print("    in_options.nwcsaf_calibrate = ", in_options.nwcsaf_calibrate)
+         print("    parallax correction needs physical (calibrated) CTH values")
          quit()
 
    # load all channels / information 
@@ -484,7 +487,7 @@ def load_products(data_object, RGBs, in_options, area_loaded, load_CTH=True):
          for channel in products.MSG:
             if rgb.find(channel) != -1:                   # if a channel name (IR_108) is in the rgb name (IR_108c)
                if in_options.verbose: 
-                  print "    load prerequisites by name: ", channel, ", reader:", in_options.reader_level,"+++"
+                  print("    load prerequisites by name: ", channel, ", reader:", in_options.reader_level,"+++")
                if in_options.reader_level is None:
                   data_object.load([channel], area_extent=area_loaded.area_extent)   # try all reader levels  load the corresponding data
                else:
@@ -493,7 +496,7 @@ def load_products(data_object, RGBs, in_options, area_loaded, load_CTH=True):
       elif rgb in products.RGBs_buildin or rgb in products.RGBs_user:
          obj_image = get_image(data_object, rgb)          # find corresponding RGB image object
          if in_options.verbose:
-            print "    load prerequisites by function: ", obj_image.prerequisites
+            print("    load prerequisites by function: ", obj_image.prerequisites)
          if in_options.reader_level is None:
             data_object.load(obj_image.prerequisites, area_extent=area_loaded.area_extent)   # load prerequisites
          else:
@@ -504,7 +507,7 @@ def load_products(data_object, RGBs, in_options, area_loaded, load_CTH=True):
          pge = get_NWC_pge_name(rgb)
 
          if in_options.verbose:
-            print "    load NWC-SAF product: "+pge.replace('_', '') 
+            print("    load NWC-SAF product: "+pge.replace('_', '')) 
 
          if in_options.reader_level is None:
            # try seviri-level3, which is version 2013 hdf reader
@@ -513,26 +516,30 @@ def load_products(data_object, RGBs, in_options, area_loaded, load_CTH=True):
            if in_options.reader_level == "seviri-level3" or in_options.reader_level == "seviri-level5" or in_options.reader_level == "seviri-level11":
              reader_level = in_options.reader_level
            else:
-             print "*** Warning: reader ", in_options.reader_level, " chosen, but thisis not for NWC-SAF data"
-             print "    try to read v2013 hdf files (reader_level=seviri-level3)"
+             print("*** Warning: reader ", in_options.reader_level, " chosen, but thisis not for NWC-SAF data")
+             print("    try to read v2013 hdf files (reader_level=seviri-level3)")
              reader_level="seviri-level3"
 
-         data_object.load([pge.replace('_', '')], calibrate=in_options.nwcsaf_calibrate, area_extent=area_loaded.area_extent, reader_level=reader_level)
+         # as we only deal with one area, skip area extent 
+         # data_object.load([pge.replace('_', '')], calibrate=in_options.nwcsaf_calibrate, area_extent=area_loaded.area_extent, reader_level=reader_level)
+         data_object.load([pge.replace('_', '')], calibrate=in_options.nwcsaf_calibrate, reader_level=reader_level)
              
          # False, area_extent=area_loaded.area_extent (difficulties to find correct h5 input file)
          #print data_object.loaded_channels()
-         #loaded_channels = [chn.name for chn in data_object.loaded_channels()]
+         loaded_channels = [chn.name for chn in data_object.loaded_channels()]
+         print(loaded_channels)
          #if pge not in loaded_channels:
          #   return []
+         
          if area_loaded != data_object[pge].area:
-            print "*** Warning: NWC-SAF input file on a differnt grid ("+data_object[pge].area.name+") than suggested input area ("+area_loaded.name+")"
-            print "    use "+data_object[pge].area.name+" as standard grid"
+            print("*** Warning: NWC-SAF input file on a differnt grid ("+data_object[pge].area.name+") than suggested input area ("+area_loaded.name+")")
+            print("    use "+data_object[pge].area.name+" as standard grid")
             area_loaded = data_object[pge].area
          convert_NWCSAF_to_radiance_format(data_object, area_loaded, rgb, in_options.nwcsaf_calibrate, IS_PYRESAMPLE_LOADED)
 
       elif rgb in products.SEVIRI_viewing_geometry:
          if in_options.verbose:
-            print "    load SEVIRI viewing geometry: ", rgb, " with reader_level: ", in_options.reader_level
+            print("    load SEVIRI viewing geometry: ", rgb, " with reader_level: ", in_options.reader_level)
          data_object.load([rgb], reader_level=in_options.reader_level)
          #print data_object[rgb].data.shape, data_object[rgb].data.min(), data_object[rgb].data.max()
          area_loaded = data_object[rgb].area
@@ -545,14 +552,14 @@ def load_products(data_object, RGBs, in_options, area_loaded, load_CTH=True):
          
       else: 
          if in_options.verbose:
-            print "    load " + str(in_options.sat_str()) +" product by name: ", rgb
+            print("    load " + str(in_options.sat_str()) +" product by name: ", rgb)
          data_object.load([rgb])   # , area_extent=area_loaded.area_extent load the corresponding data
          area_loaded = data_object[rgb].area
 
       if in_options.HRV_enhancement==True or in_options.HRV_enhancement is None:
          # load also the HRV channel (there is a check inside in the load function, if the channel is already loaded)
          if in_options.verbose:
-            print "    load additionally the HRV channel for HR enhancement"
+            print("    load additionally the HRV channel for HR enhancement")
          data_object.load(["HRV"], area_extent=area_loaded.area_extent)
 
    # loaded_channels = [chn.name for chn in data_object.loaded_channels()]
@@ -583,6 +590,8 @@ def choose_map_resolution(area, MapResolutionInputfile):
          resolution='i' 
       elif area.find("ticino") != -1:
          resolution='h'
+      elif area.find("cosmo") != -1:
+         resolution='i'
       else:
          resolution='l'
    else:
@@ -595,7 +604,7 @@ def choose_map_resolution(area, MapResolutionInputfile):
 
 def save_reprojected_data(data, area, in_msg, concatenate_bands=False):
 
-   print "*** save reprojected data" 
+   print("*** save reprojected data") 
    _sat_nr = int(data.sat_nr())-7 if int(data.sat_nr())-7 > 0 else 0  # use data.sat_nr() instead of data.number
    # directory / path 
    nc_dir  = (data.time_slot.strftime(in_msg.reprojected_data_dir)
@@ -604,7 +613,7 @@ def save_reprojected_data(data, area, in_msg, concatenate_bands=False):
    # check if output directory exists, if not create it
    if not exists(nc_dir):
       if in_msg.verbose:
-         print '... create output directory: ' + nc_dir
+         print('... create output directory: ' + nc_dir)
       makedirs(nc_dir)
    # filename
    nc_file = (data.time_slot.strftime(in_msg.reprojected_data_filename)
@@ -612,7 +621,7 @@ def save_reprojected_data(data, area, in_msg, concatenate_bands=False):
                  "msg": "MSG"+str(_sat_nr)})
    ncOutputFile = join(nc_dir, nc_file)
    if in_msg.verbose:
-      print "... save reprojected data: ncview "+ ncOutputFile+ " &" 
+      print("... save reprojected data: ncview "+ ncOutputFile+ " &") 
    #data.save(ncOutputFile, to_format="netcdf4", compression=False)
    data.save(ncOutputFile, band_axis=2, concatenate_bands=concatenate_bands) # netCDF4 is default 
            # mpop/satout/cfscene.py -> mpop/satout/netcdf4.py
@@ -632,7 +641,7 @@ def mask_data(data, area):
    # mask for the cloud depths tests (masked data)
    #if area == 'ccs4':
    if area == False:     # !!! at the moment switched off !!! 
-      print '... apply convective mask'
+      print('... apply convective mask')
       mask_depth = data.image.mask_clouddepth()
       #print type(mask_depth.max)
       #print dir(mask_depth.max)
@@ -664,8 +673,8 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
    from trollimage.colormap import rainbow   # reload in order to be save not to use a scaled colormap
 
    if in_msg.verbose:
-      print ""
-      print "*** make image for: ", rgb
+      print("")
+      print("*** make image for: ", rgb)
 
    # default colormap 
    if colormap=='rainbow':
@@ -674,7 +683,7 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
       from trollimage.colormap import greys
       colormap = deepcopy(greys)
    else:
-      print "*** ERROR, unknown colormap ", colormap ," in create_PIL_image ("+inspect.getfile(inspect.currentframe())+")"
+      print("*** ERROR, unknown colormap ", colormap ," in create_PIL_image ("+inspect.getfile(inspect.currentframe())+")")
       quit()
 
    # get the data array that you want to plot 
@@ -775,19 +784,19 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
    # replace default with fixed min/max if specified 
 
    if in_msg.fixed_minmax:
-      if rgb in in_msg.rad_min.keys():
+      if rgb in list(in_msg.rad_min.keys()):
          min_data = in_msg.rad_min[rgb]
       else:
          if rgb not in products.RGBs_buildin:
-            print "*** Warning, no specified minimum for plotting in get_input_msg.py or input file"
-      if rgb in in_msg.rad_max.keys():
+            print("*** Warning, no specified minimum for plotting in get_input_msg.py or input file")
+      if rgb in list(in_msg.rad_max.keys()):
          max_data = in_msg.rad_max[rgb]
       else:
          if rgb not in products.RGBs_buildin:
-            print "*** Warning, no specified maximum for plotting in get_input_msg.py or input file"
+            print("*** Warning, no specified maximum for plotting in get_input_msg.py or input file")
    if in_msg.verbose and rgb not in products.RGBs_buildin:
-      print '... set value range from min_data (',min_data,') to max_data (',max_data,')'
-      print '    min/max value of colormap', colormap.values[0], colormap.values[-1]
+      print('... set value range from min_data (',min_data,') to max_data (',max_data,')')
+      print('    min/max value of colormap', colormap.values[0], colormap.values[-1])
 
    # specifies if a colorbar does make sense at all
    in_msg.colormap={}
@@ -795,12 +804,12 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
    # make the image
    if plot_type == 'channel_image':
       if in_msg.verbose:
-         print "    use data.image.channel_image for black and white pictures"
+         print("    use data.image.channel_image for black and white pictures")
       img = data.image.channel_image(rgb)
       in_msg.colormap[rgb] = None 
    elif plot_type == 'trollimage':
       if in_msg.verbose:
-         print "    use trollimage.image.image for colorized pictures (min="+str(min_data)+", max="+str(max_data)+")"
+         print("    use trollimage.image.image for colorized pictures (min="+str(min_data)+", max="+str(max_data)+")")
       img = trollimage(prop, mode="L", fill_value=in_msg.fill_value)
       if colormap.values[0] == 0.0 and colormap.values[-1]==1.0:  # scale normalized colormap to range of data 
          colormap.set_range(min_data, max_data)
@@ -811,7 +820,7 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
       min_data = 0.
       max_data = float(len(data[rgb].palette)-1)
       if in_msg.verbose:
-         print "    use GeoImage and colorize with a palette (min="+str(min_data)+", max="+str(max_data)+")"
+         print("    use GeoImage and colorize with a palette (min="+str(min_data)+", max="+str(max_data)+")")
       img = GeoImage( prop, data.area, data.time_slot, mode="P", palette = data[rgb].palette, fill_value=in_msg.fill_value )
       colormap = convert_palette2colormap(data[rgb].palette)
       colormap.set_range(min_data, max_data)  # no return value!
@@ -824,7 +833,7 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
    elif plot_type == 'user_defined':
       obj_image = get_image(data, rgb)
       if in_msg.verbose:
-         print "    use get_image function defined in my_composites.py"
+         print("    use get_image function defined in my_composites.py")
       img = obj_image()
       in_msg.colormap[rgb] = None
       if rgb == 'sza':
@@ -838,24 +847,24 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
       #   in_msg.colormap[rgb] = rdylgn_r
    elif plot_type == 'TRTimage':
       if in_msg.verbose:
-         print "    use mpop/satout/TRTimage.py"
+         print("    use mpop/satout/TRTimage.py")
       from mpop.imageo.TRTimage import TRTimage
-      img = TRTimage( data.traj_IDs, data.TRTcells, obj_area) # , fill=False, minRank=8, alpha_max=1.0, plot_vel=True
-      #img = TRTimage( data.traj_IDs, data.TRTcells, obj_area, minRank=15.01) # minRank=8, alpha_max=1.0, plot_vel=True
-      #img = TRTimage( data.traj_IDs, data.TRTcells, obj_area, TRTcell_ID="2018080113300129", minRank=3) # minRank=8, alpha_max=1.0, plot_vel=True
-      #img = TRTimage( data.traj_IDs, data.TRTcells, obj_area, TRTcell_ID="2018080721300099", minRank=3) # minRank=8, alpha_max=1.0, plot_vel=True
-      #img = TRTimage( data.traj_IDs, data.TRTcells, obj_area, TRTcell_ID="2018080710200036", minRank=-1, plot_nowcast=True, fill=True, Rank_predicted=Rank_predicted)
-      #img = TRTimage( data.traj_IDs, data.TRTcells, obj_area, fill=False) # minRank=8, alpha_max=1.0, plot_vel=True
-      #img = TRTimage( data.traj_IDs, data.TRTcells, obj_area, plot_nowcast=True) # minRank=8, alpha_max=1.0, plot_vel=True
+      img = TRTimage( data.traj_IDs, data.TRT, obj_area) # , fill=False, minRank=8, alpha_max=1.0, plot_vel=True
+      #img = TRTimage( data.traj_IDs, data.TRT, obj_area, minRank=15.01) # minRank=8, alpha_max=1.0, plot_vel=True
+      #img = TRTimage( data.traj_IDs, data.TRT, obj_area, TRTcell_ID="2018080113300129", minRank=3) # minRank=8, alpha_max=1.0, plot_vel=True
+      #img = TRTimage( data.traj_IDs, data.TRT, obj_area, TRTcell_ID="2018080721300099", minRank=3) # minRank=8, alpha_max=1.0, plot_vel=True
+      #img = TRTimage( data.traj_IDs, data.TRT, obj_area, TRTcell_ID="2018080710200036", minRank=-1, plot_nowcast=True, fill=True, Rank_predicted=Rank_predicted)
+      #img = TRTimage( data.traj_IDs, data.TRT, obj_area, fill=False) # minRank=8, alpha_max=1.0, plot_vel=True
+      #img = TRTimage( data.traj_IDs, data.TRT, obj_area, plot_nowcast=True) # minRank=8, alpha_max=1.0, plot_vel=True
    else:
-      print "*** Error in create_PIL_image ("+inspect.getfile(inspect.currentframe())+")"
-      print "    unknown plot_type ", plot_type
+      print("*** Error in create_PIL_image ("+inspect.getfile(inspect.currentframe())+")")
+      print("    unknown plot_type ", plot_type)
       quit()
 
 
    if HRV_enhancement:
       if in_msg.verbose:
-         print "enhance the image with the HRV channel"
+         print("enhance the image with the HRV channel")
       luminance = GeoImage((data["HRV"].data), data.area, data.time_slot,
                            crange=(0, 100), mode="L")
       luminance.enhance(gamma=2.0)
@@ -868,18 +877,18 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
    #   img.add_overlay(color=(0, 0, 0), width=0.5, resolution=None)
 
    if isinstance(img, Image.Image):
-     print "    already PIL image, no conversion needed"
+     print("    already PIL image, no conversion needed")
      PIL_image=img
    else:
      # convert image to PIL image 
      if hasattr(img, 'pil_image'):
         if in_msg.verbose:
-           print "    convert to PIL_image by pil_image function"
+           print("    convert to PIL_image by pil_image function")
         PIL_image=img.pil_image()
 
      else:
         if in_msg.verbose:
-           print "    convert to PIL_image by saving and reading"
+           print("    convert to PIL_image by saving and reading")
 
         tmp_file = format_name ("/tmp/%Y-%m-%d_%m-%d_%(rgb)s_tmp.png", in_msg.datetime, rgb=rgb)
         img.save(tmp_file)
@@ -906,22 +915,22 @@ def add_borders_and_rivers(PIL_image, cw, area_tuple, add_borders=True, border_c
       if river_color is None:
          river_color  = 'white'
    else:
-      print "*** Error in add_borders_and_rivers ("+inspect.getfile(inspect.currentframe())+")"
-      print "    Unknown image mode", PIL_image.mode
+      print("*** Error in add_borders_and_rivers ("+inspect.getfile(inspect.currentframe())+")")
+      print("    Unknown image mode", PIL_image.mode)
 
    if add_rivers:
       if verbose:
-         print "    add rivers to image (resolution="+resolution+")"
+         print("    add rivers to image (resolution="+resolution+")")
       cw.add_rivers(PIL_image, area_tuple, outline=river_color, resolution=resolution, outline_opacity=127, width=0.5, level=5) # 
       if verbose:
-         print "    add lakes to image (resolution="+resolution+")"
+         print("    add lakes to image (resolution="+resolution+")")
       cw.add_coastlines(PIL_image, area_tuple, outline=river_color, resolution=resolution, outline_opacity=127, width=0.5, level=2)  #, outline_opacity=0
    if add_borders:
       if verbose:
-         print "    add coastlines to image (resolution="+resolution+")"
+         print("    add coastlines to image (resolution="+resolution+")")
       cw.add_coastlines(PIL_image, area_tuple, outline=border_color, resolution=resolution, width=1)  #, outline_opacity=0
       if verbose:
-         print "    add borders to image (resolution="+resolution+")"
+         print("    add borders to image (resolution="+resolution+")")
       cw.add_borders(PIL_image, area_tuple, outline=border_color, resolution=resolution, width=1)     #, outline_opacity=0 
 
    return PIL_image
@@ -944,7 +953,7 @@ def indicate_mask(rgb, PIL_image, data, verbose):
       
    if mask is not None:
       if verbose:
-         print "    indicate measurement mask "
+         print("    indicate measurement mask ")
 
       img = trollimage(mask, mode="L", fill_value=None) #fill_value,[1,1,1], None
       from trollimage.colormap import greys
@@ -964,7 +973,7 @@ def indicate_mask(rgb, PIL_image, data, verbose):
 def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, font_file, verbose, title_color=None, title_y_line_nr=1 ):
 
    if verbose:
-      print "*** add title to image "
+      print("*** add title to image ")
 
    if title_color is None:
       if PIL_image.mode == 'RGB' or PIL_image.mode == 'RGBA':    # color 
@@ -1003,7 +1012,7 @@ def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, font_file
       ## default title
       # if area is not Europe 
       if area.find("EuropeCanary") == -1:
-         print "... set default title for area: ", area
+         print("... set default title for area: ", area)
          if rgb=="CRR" or rgb=="CRPh" or rgb in products.CPP or rgb in products.HSAF:
             if rgb=="CRR":
                title= [' 2nd layer: '+rgb+", precip rate [mm/h]"]
@@ -1018,14 +1027,14 @@ def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, font_file
          else:
             title= ['%(msg)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s']  
       else:
-         print "... set default title (EuropeCanary) for area: ", area
+         print("... set default title (EuropeCanary) for area: ", area)
          if not (rgb in products.CPP or rgb in products.HSAF) : # normal case  
             title= ['%Y-%m-%d %H:%MUTC', rgb.replace("_","-")+" (%(msg)s SEVIRI)"]
          else:
             title = [' %(sat)s-%(sat_nr)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s']
    else:
       # backward compartibility: convert title to a list, if given as a string
-      if isinstance(title, basestring):
+      if isinstance(title, str):
          title=[title]
          
    # if area does not contain Europe 
@@ -1038,7 +1047,7 @@ def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, font_file
       x_pos_title = 10  # x1 = 10
       y_pos_title =  5  # y1 = 10
       dy = 1.11111 * font_size # dy = 20 dy = 50
-      print "font_size", font_size, ", dy=", dy
+      print("font_size", font_size, ", dy=", dy)
 
    # replace wildcards such as %Y-%m-%d with values
    for idx, title_line in enumerate(title):
@@ -1046,7 +1055,7 @@ def add_title(PIL_image, title, rgb, sat, sat_nr, time_slot, area, dc, font_file
       y_pos = y_pos_title + (idx+(title_y_line_nr-1)) * dy
       draw.text( (x_pos_title, y_pos), title_line1, title_color, font=font)
       if verbose:
-         print "    added title_line "+str(idx)+": "+title_line
+         print("    added title_line "+str(idx)+": "+title_line)
 
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
@@ -1062,24 +1071,24 @@ def add_colorscale(dc, rgb, in_msg, unit=None):
    minor_tick_marks=5   # general default
 
    # look if there are default tick marks for the rgb product specified in get_input.py 
-   if rgb in in_msg.tick_marks.keys():
+   if rgb in list(in_msg.tick_marks.keys()):
       tick_marks=in_msg.tick_marks[rgb]
-   if rgb in in_msg.minor_tick_marks.keys():
+   if rgb in list(in_msg.minor_tick_marks.keys()):
       minor_tick_marks=in_msg.minor_tick_marks[rgb]
    if rgb.find("-") != -1: # for channel differences use tickmarks of 1 
       tick_marks=1
       minor_tick_marks=1
 
-   print in_msg.colormap[rgb]
-   print tick_marks
-   print minor_tick_marks
-   print font_scale
-   print unit
-   print in_msg.colormap[rgb].values[0]
-   print in_msg.colormap[rgb].values[-1]
+   print(in_msg.colormap[rgb])
+   print(tick_marks)
+   print(minor_tick_marks)
+   print(font_scale)
+   print(unit)
+   print(in_msg.colormap[rgb].values[0])
+   print(in_msg.colormap[rgb].values[-1])
    
    if in_msg.verbose:
-      print '... add colorscale '
+      print('... add colorscale ')
    dc.add_scale(in_msg.colormap[rgb], extend=True, tick_marks=tick_marks, minor_tick_marks=minor_tick_marks, font=font_scale, line_opacity=100, unit=unit) #
 
 #----------------------------------------------------------------------------------------------------------------
@@ -1089,17 +1098,17 @@ def add_colorscale(dc, rgb, in_msg, unit=None):
 #----------------------------------------------------------------------------------------------------------------
 def print_usage():
    
-   print "***           "
-   print "*** Error, not enough command line arguments"
-   print "***        please specify at least an input file"
-   print "***        possible calls are:"
-   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG "
-   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 "
-   print "                                 date and time must be completely given"
-   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'IR_108'"
-   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'IR_108' 'ccs4'"
-   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ['HRoverview','fog'] ['ccs4','euro4']"
-   print "***           "
+   print("***           ")
+   print("*** Error, not enough command line arguments")
+   print("***        please specify at least an input file")
+   print("***        possible calls are:")
+   print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG ")
+   print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ")
+   print("                                 date and time must be completely given")
+   print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'IR_108'")
+   print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'IR_108' 'ccs4'")
+   print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ['HRoverview','fog'] ['ccs4','euro4']")
+   print("***           ")
    quit() # quit at this point
 #----------------------------------------------------------------------------------------------------------------
 
@@ -1122,5 +1131,5 @@ if __name__ == '__main__':
                in_msg.area = sys.argv[8]
 
    RGBs_done = plot_msg(in_msg)
-   print "*** Satellite pictures produced for ", RGBs_done 
-   print " "
+   print("*** Satellite pictures produced for ", RGBs_done) 
+   print(" ")

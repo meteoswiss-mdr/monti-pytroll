@@ -1,9 +1,12 @@
+from __future__ import division
+from __future__ import print_function
+
 
 def input(in_msg):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
-    print "*** read input from ", in_msg.input_file
+    print("*** read input from ", in_msg.input_file)
 
     # 8=MSG1, 9=MSG2, 10=MSG3
     in_msg.sat = "Meteosat"
@@ -216,7 +219,7 @@ def input(in_msg):
 
     #in_msg.postprocessing_areas=["ccs4"]
     #in_msg.postprocessing_areas=['EuropeCanaryS95']
-    #in_msg.postprocessing_composite=["h03-ir108"] 
+    #in_msg.postprocessing_composite=["h03b-ir108"] 
     #in_msg.postprocessing_composite=["hrwdp-ir108"] 
     #in_msg.postprocessing_composite=["CTT-ir108","CTH-ir108"] 
     #in_msg.postprocessing_composite=["hrwdp-ir108", "hrwdc-ir108","streamd-ir108","hrwdr-ir108", "hrwdcnwp-ir108", "hrwdcnnwp-ir108"]    

@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 from mpop.satellites import GeostationaryFactory
 from mpop.projector import get_area_def
 import datetime
@@ -9,8 +12,8 @@ from mpop.utils import debug_on
 debug_on()
 
 #time_slot = get_last_SEVIRI_date(False, delay=15)
-time_slot = datetime.datetime(2015, 12, 03, 3, 45)
-print str(time_slot)
+time_slot = datetime.datetime(2015, 12, 0o3, 3, 45)
+print(str(time_slot))
 
 global_data = GeostationaryFactory.create_scene("volc", "10", "seviri", time_slot)
 #europe = get_area_def("EuropeCanaryS95")
@@ -20,7 +23,7 @@ channels = ['ash_height']
 #channels = ['ash_effective_radius']
 chn=channels[0]
 global_data.load(channels)  # , area_extent=europe.area_extent
-print global_data
+print(global_data)
 
 #area="SeviriDiskFull00"
 #area="SeviriDiskFull00S4"
@@ -34,21 +37,21 @@ colormap = rainbow
 min_data = data[chn].data.min()
 #min_data = 0
 max_data = data[chn].data.max()
-print "set min/max to ", min_data, max_data
+print("set min/max to ", min_data, max_data)
 
 colormap.set_range(min_data, max_data)
 from trollimage.image import Image as trollimage
-print type(data[chn].data)
+print(type(data[chn].data))
 img = trollimage(data[chn].data, mode="L", fill_value=[1,1,1]) # fill_value=[0,0,0]
 img.colorize(colormap)
 PIL_image=img.pil_image()
 
 #obj_area = get_area_def(area)
 obj_area = get_area_def(data.area.area_id)
-print 'obj_area ', obj_area
+print('obj_area ', obj_area)
 proj4_string = obj_area.proj4_string     
 # e.g. proj4_string = '+proj=geos +lon_0=0.0 +a=6378169.00 +b=6356583.80 +h=35785831.0'
-print 'proj4_string ',proj4_string
+print('proj4_string ',proj4_string)
 area_extent = obj_area.area_extent              
 # e.g. area_extent = (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
 area_def = (proj4_string, area_extent)
@@ -75,7 +78,7 @@ if False:
     elif socket.gethostname()[0:7] == 'keschln' or socket.gethostname()[0:7]=="eschaln":
         font_file = "/usr/share/fonts/dejavu/DejaVuSansMono.ttf"
     else:
-        print "*** ERROR, unknown computer, unknown location of the ttf-file"
+        print("*** ERROR, unknown computer, unknown location of the ttf-file")
         quit()
 
     dc = DecoratorAGG(PIL_image)

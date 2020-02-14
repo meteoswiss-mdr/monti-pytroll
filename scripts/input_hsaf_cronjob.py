@@ -1,9 +1,12 @@
+from __future__ import division
+from __future__ import print_function
+
 
 def input(in_msg):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
-    print "*** read input from ", in_msg.input_file
+    print("*** read input from ", in_msg.input_file)
 
     # 8=MSG1, 9=MSG2, 10=MSG3
     #in_msg.sat_nr=8
@@ -169,7 +172,6 @@ def input(in_msg):
     #----------------
     #in_msg.areas.append('EuropeCanary')
     #in_msg.areas.append('EuropeCanary95')
-    #in_msg.areas.append('EuropeCanaryS95')
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
@@ -180,6 +182,7 @@ def input(in_msg):
     #in_msg.areas.append('met09globe')      # Cropped globe MSG image 3620x3620     # does not yet work
     #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
     in_msg.areas.append('odysseyS25')
+    in_msg.areas.append('SeviriDiskFull00S4')
     in_msg.check_RSS_coverage()
 
     # switch off Rapid scan, if large areas are wanted 
@@ -212,7 +215,7 @@ def input(in_msg):
     # please download the shape file 
     # in_msg.mapDir='/opt/users/common/shapes/'
 
-    in_msg.postprocessing_areas=['ccs4','odysseyS25'] # !!!!
+    in_msg.postprocessing_areas=['ccs4','odysseyS25','SeviriDiskFull00S4'] # !!!!
     in_msg.postprocessing_composite = ["h03b-HRVir108", "h03b-VIS006ir108"]
     #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03b-ir108"],["MSG_radar-HRV","MSG_h03b-HRV"]]
     #                                 only ccs4                           only ccs4                       only odyssey                      only odyssey

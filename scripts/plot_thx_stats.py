@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 import numpy as np
 
 def running_mean(x, N):
@@ -44,13 +47,13 @@ props = ['dens','densCG']
 
 if len(sys.argv) > 1:
     if len(sys.argv) < 4:
-        print "***           "
-        print "*** Warning, please specify date and time completely, e.g."
-        print "***          python plot_lightning.py 2014 07 23 16 10 "
-        print "***          arguments given by you:"
+        print("***           ")
+        print("*** Warning, please specify date and time completely, e.g.")
+        print("***          python plot_lightning.py 2014 07 23 16 10 ")
+        print("***          arguments given by you:")
         for i in range(len(sys.argv)):
-            print sys.argv[i]
-        print "***           "
+            print(sys.argv[i])
+        print("***           ")
         quit() # quit at this point
     else:
         year   = int(sys.argv[1])
@@ -84,7 +87,7 @@ time_slot = datetime.datetime(year, month, day, 0, 0)
 file_wildcards = "/data/lom/WOL/foudre/data/THX/THX%y%j0000.prd"
 file = time_slot.strftime(file_wildcards)
 
-print "... read", file
+print("... read", file)
 
 
 ni=640
@@ -102,7 +105,7 @@ ccs4 = ApproxSwissProj()
 # read data from file
 if file != "" and stat(file).st_size != 0:
 
-    print "... open file"
+    print("... open file")
     NEAR_REAL_TIME=False
 
     if NEAR_REAL_TIME:
@@ -156,8 +159,8 @@ if file != "" and stat(file).st_size != 0:
     sum_cg = np.zeros(nt)
 
 
-    print "start, end: ", str(t_loop), str(time_end)
-    print "... dt: ", dt, " min, nt: ", nt
+    print("start, end: ", str(t_loop), str(time_end))
+    print("... dt: ", dt, " min, nt: ", nt)
 
     tt=0
 
@@ -231,7 +234,7 @@ if file != "" and stat(file).st_size != 0:
 
         output_dir='./'+yearS+'-'+monthS+'-'+dayS+'/THX/'
         if not exists(output_dir):
-            print '... create output directory: ' + output_dir
+            print('... create output directory: ' + output_dir)
             makedirs(output_dir)
 
         #figuresize=(15,4)
@@ -275,7 +278,7 @@ if file != "" and stat(file).st_size != 0:
 
         grid(True)
         #file_basename2 = 'THX_dens2-'+'ccs4'+'_'+yearS[2:]+monthS+dayS+'_'+dt_str+'_'+dx_str
-        print "save plot: display "+output_dir+"/THX_dens_ccs4_"+date2+"_ALL.png"
-        print " "
+        print("save plot: display "+output_dir+"/THX_dens_ccs4_"+date2+"_ALL.png")
+        print(" ")
         savefig(output_dir+"/THX_dens_ccs4_"+date2+"_ALL.png")
 

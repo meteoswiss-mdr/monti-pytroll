@@ -1,9 +1,12 @@
+from __future__ import division
+from __future__ import print_function
+
 
 def input(in_msg):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
-    print "*** read input from ", in_msg.input_file
+    print("*** read input from ", in_msg.input_file)
 
     # 8=MSG1, 9=MSG2, 10=MSG3
     #in_msg.sat_nr=0
@@ -211,5 +214,5 @@ def input(in_msg):
 
     #in_msg.postprocessing_areas=['odysseyS25']
     #in_msg.postprocessing_composite=["RATE-ir108","RATE-HRV"]    
-    #in_msg.postprocessing_montage=[["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]]
+    #in_msg.postprocessing_montage=[["MSG_RATE-ir108","MSG_h03b-ir108"],["MSG_RATE-HRV","MSG_h03b-HRV"]]
     

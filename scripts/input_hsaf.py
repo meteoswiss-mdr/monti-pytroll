@@ -1,9 +1,12 @@
+from __future__ import division
+from __future__ import print_function
+
 
 def input(in_msg):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
-    print "*** read input from ", in_msg.input_file
+    print("*** read input from ", in_msg.input_file)
 
     # 8=MSG1, 9=MSG2, 10=MSG3
     #in_msg.sat_nr=8
@@ -156,7 +159,7 @@ def input(in_msg):
     in_msg.sat = "Hsaf"
     in_msg.sat_nr = 10
     in_msg.RSS = False 
-    in_msg.RGBs.append('h03')
+    in_msg.RGBs.append('h03b')
     #-------------------
     # experimental
     #in_msg.RGBs.append('clouddepth')     # test according to Mecikalski, 2010
@@ -223,15 +226,15 @@ def input(in_msg):
     
     in_msg.postprocessing_areas=["ccs4"]
     #in_msg.postprocessing=False
-    #in_msg.postprocessing_composite=["h03-ir108"] 
+    #in_msg.postprocessing_composite=["h03b-ir108"] 
     #in_msg.postprocessing_composite=["THX-IR_108","radar-convection","THX-radar-convection"]    
-    #in_msg.postprocessing_montage = [["MSG_h03-ir108","MSG_HRV"]]
+    #in_msg.postprocessing_montage = [["MSG_h03b-ir108","MSG_HRV"]]
 
     in_msg.scpID2="-i /opt/users/cinesat/monti-pytroll/scripts/id_rsa_las"
     in_msg.scpOutputDir2='las@zueub241:/srn/las/www/satellite/DATA/MSG_%(rgb)s-%(area)s_'
     #in_msg.scpProducts2 = ['airmass','convection','HRoverview','natural']
-    in_msg.scpProducts2 = ["h03-ir108"]
+    in_msg.scpProducts2 = ["h03b-ir108"]
 
     #in_msg.postprocessing_areas=["ccs4"]
     in_msg.postprocessing_areas=['EuropeCanaryS95']
-    in_msg.postprocessing_composite=["h03-VIS006ir108"] 
+    in_msg.postprocessing_composite=["h03b-VIS006ir108"] 

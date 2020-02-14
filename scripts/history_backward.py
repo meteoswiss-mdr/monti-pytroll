@@ -1,4 +1,7 @@
+from __future__ import division
 from __future__ import print_function
+
+
 from datetime import datetime
 import sys, string, os
 import logging
@@ -403,7 +406,7 @@ def find_ancestors(cell, t, data_container,labels_dir):
             
         except KeyError: 
             print("current cells", cell_curr)
-            print("all cells available:, ",data_container['all_cell_properties'][string_id].keys()) #myShelve['cells'].keys())
+            print("all cells available:, ",list(data_container['all_cell_properties'][string_id].keys())) #myShelve['cells'].keys())
             print("key error in line 382 of history_backward")
             quit()
         
@@ -535,7 +538,7 @@ def get_info_current_time(time, data_container, labels_dir): # all_connections =
     string_id = yearS+monthS+dayS+hourS+minS
     
     # if information of current time "string_id" is not yet saved in data_container
-    if string_id not in data_container['all_connections'].keys():
+    if string_id not in list(data_container['all_connections'].keys()):
         
         # read/get information from the shelve 
         filename = labels_dir+'/Labels_%s.shelve'%(yearS+monthS+dayS+hourS+minS)

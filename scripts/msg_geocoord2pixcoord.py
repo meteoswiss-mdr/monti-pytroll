@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 from numpy import cos
 from numpy import sin
 from numpy import pi as PI
@@ -64,7 +67,7 @@ def msg_geocoord2pixcoord( longitude, latitude, HRVis,  SUB_LON_DEG):
   if (lati < -90.0 or lati > 90.0 or longi < -180.0 or longi > 180.0 ): 
       row = -999
       column = -999
-      print "*** ERROR latitude ", lati , "or longitude", longi, "outside range"
+      print("*** ERROR latitude ", lati , "or longitude", longi, "outside range")
       return column, row
 
   # convert them to radiants */
@@ -105,7 +108,7 @@ def msg_geocoord2pixcoord( longitude, latitude, HRVis,  SUB_LON_DEG):
   if (dotprod <= 0 ):
       column = -999
       row = -999
-      print "*** ERROR dotproduct <= 0"
+      print("*** ERROR dotproduct <= 0")
       return column, row
   
 
@@ -130,17 +133,17 @@ def msg_geocoord2pixcoord( longitude, latitude, HRVis,  SUB_LON_DEG):
 # ------------------------------------------------------------------------------
 
 def print_usage():
-         print "***           "
-         print "*** Error, not enough command line arguments"
-         print "***        please specify at least "
-         print "***        possible calls are:"
-         print "*** python msg_pixcoord2geocoord.py  <LON> <LAT> [<HRVis>] [<SUB_LON_DEG>] [<qiet>] "
-         print "           e.g."
-         print "    python msg_pixcoord2geocoord.py   1.2  46.3                             "
-         print "    python msg_pixcoord2geocoord.py   1.2  46.3     vis                     # default "
-         print "    python msg_pixcoord2geocoord.py   1.2  46.3     hrv                     # hrv resolution"
-         print "    python msg_pixcoord2geocoord.py   1.2  46.3     vis         9.5         # subsatellite longitude 9.5 deg East == MSG2"
-         print "    python msg_pixcoord2geocoord.py   1.2  46.3     vis         9.5   q     # quiet" 
+         print("***           ")
+         print("*** Error, not enough command line arguments")
+         print("***        please specify at least ")
+         print("***        possible calls are:")
+         print("*** python msg_pixcoord2geocoord.py  <LON> <LAT> [<HRVis>] [<SUB_LON_DEG>] [<qiet>] ")
+         print("           e.g.")
+         print("    python msg_pixcoord2geocoord.py   1.2  46.3                             ")
+         print("    python msg_pixcoord2geocoord.py   1.2  46.3     vis                     # default ")
+         print("    python msg_pixcoord2geocoord.py   1.2  46.3     hrv                     # hrv resolution")
+         print("    python msg_pixcoord2geocoord.py   1.2  46.3     vis         9.5         # subsatellite longitude 9.5 deg East == MSG2")
+         print("    python msg_pixcoord2geocoord.py   1.2  46.3     vis         9.5   q     # quiet") 
          quit() # quit at this point
 
 # ------------------------------------------------------------------------------
@@ -172,7 +175,7 @@ if __name__ == '__main__':
             elif sys.argv[3]=="0" or sys.argv[3]=="vis" or sys.argv[3]=="VIS" or sys.argv[3]=="ir" or sys.argv[3]=="IR":
                 HRVis="vis"
             else: 
-                print "\n*** Error, unkown 3rd command line argument: ", sys.argv[3], "\n"
+                print("\n*** Error, unkown 3rd command line argument: ", sys.argv[3], "\n")
                 exit ()
 
             if len(sys.argv) > 4:
@@ -183,16 +186,16 @@ if __name__ == '__main__':
 
     if quiet != 1:
 
-        print " "
-        print "... search longitude latitude for MSG SEVIRI longitude: ", LONGITUDE, ", and latitude: ", LATITUDE 
+        print(" ")
+        print("... search longitude latitude for MSG SEVIRI longitude: ", LONGITUDE, ", and latitude: ", LATITUDE) 
         if HRVis=="hrv":
-            print "... use HRV coordinates!"
+            print("... use HRV coordinates!")
         else:
-            print "... use VIS-IR (non-HRV) coordinates!"
-        print "... use subsatellite longitude:", SUB_LON_DEG
-        print "  column     row "
+            print("... use VIS-IR (non-HRV) coordinates!")
+        print("... use subsatellite longitude:", SUB_LON_DEG)
+        print("  column     row ")
 
     COLUMN, LINE = msg_geocoord2pixcoord(LONGITUDE, LATITUDE, HRVis, SUB_LON_DEG)
-    print " ", COLUMN, "      ", LINE
+    print(" ", COLUMN, "      ", LINE)
     if quiet != 1:
-        print ""
+        print("")

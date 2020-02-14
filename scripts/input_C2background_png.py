@@ -1,9 +1,12 @@
+from __future__ import division
+from __future__ import print_function
+
 
 def input(in_msg):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
-    print "*** read input from ", in_msg.input_file
+    print("*** read input from ", in_msg.input_file)
 
     # 8=MSG1, 9=MSG2, 10=MSG3
     #in_msg.sat_nr=8
@@ -155,7 +158,7 @@ def input(in_msg):
     #in_msg.sat = "HSAF"
     #in_msg.sat_nr=""
     #in_msg.RSS=False 
-    #in_msg.RGBs.append('h03')
+    #in_msg.RGBs.append('h03b')
     #-------------------
     # experimental
     #in_msg.RGBs.append('clouddepth')     # test according to Mecikalski, 2010
@@ -183,10 +186,10 @@ def input(in_msg):
     
     # Warning, if large areas are wanted and RSS is specified
     if in_msg.RSS and (('fullearth' in in_msg.areas) or ('met09globe' in in_msg.areas) or ('met09globeFull' in in_msg.areas)): 
-        print        "*** WARNING, large areas are requested: ", in_msg.areas
-        print        "    as well as rapid scan service is specified, which covers only the uppermost 1/3 of the disk"
-        print        "    (1) continue with enter"
-        junk = input("    (2) abort with Ctrl+c")
+        print("*** WARNING, large areas are requested: ", in_msg.areas)
+        print("    as well as rapid scan service is specified, which covers only the uppermost 1/3 of the disk")
+        print("    (1) continue with enter")
+        junk = eval(input("    (2) abort with Ctrl+c"))
 
     in_msg.check_input = False
     #in_msg.reader_level="seviri-level4" 
@@ -221,7 +224,7 @@ def input(in_msg):
 
     in_msg.postprocessing_areas=["ccs4","EuropeCanaryS95"]
     #in_msg.postprocessing_areas=['EuropeCanaryS95']
-    #in_msg.postprocessing_composite=["h03-ir108"] 
+    #in_msg.postprocessing_composite=["h03b-ir108"] 
     in_msg.postprocessing_composite=['C2rgb-IR_108']
     #in_msg.postprocessing_composite=["CTT-ir108","CTH-ir108"] 
     #in_msg.postprocessing_composite=["hrwdp-ir108", "hrwdc-ir108","streamd-ir108","hrwdr-ir108", "hrwdcnwp-ir108", "hrwdcnnwp-ir108"]    

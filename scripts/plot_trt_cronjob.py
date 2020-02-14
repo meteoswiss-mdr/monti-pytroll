@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 from datetime import datetime
 import sys, string, os
 import logging
@@ -34,10 +37,10 @@ add_borders=False
 
 if len(sys.argv) > 1:
     if len(sys.argv) < 6:
-        print "***           "
-        print "*** Warning, please specify date and time completely, e.g."
-        print "***          python plot_trt_cronjob.py 2014 07 23 16 10 "
-        print "***           "
+        print("***           ")
+        print("*** Warning, please specify date and time completely, e.g.")
+        print("***          python plot_trt_cronjob.py 2014 07 23 16 10 ")
+        print("***           ")
         quit() # quit at this point
     else:
         year   = int(sys.argv[1])
@@ -71,13 +74,13 @@ global_data = GeostationaryFactory.create_scene("swisstrt", "04", "radar", time_
 if 'cell' in locals():
     cell_ID='_'+cell[8:]
     cell_dir='/ID'+cell[8:]+'/'
-    print "search cell id", cell_ID
-    global_data.load(['TRTcells'], cell=cell)
+    print("search cell id", cell_ID)
+    global_data.load(['TRT'], cell=cell)
 else:
     cell_ID=''
     cell_dir=''
-    global_data.load(['TRTcells']) # ,min_rank=8
-    print "... plot all cells"
+    global_data.load(['TRT']) # ,min_rank=8
+    print("... plot all cells")
 
 #if hasattr(global_data, 'traj_IDs'):
 #    print ""
@@ -85,7 +88,7 @@ else:
 #    print ""
 #    if len(global_data.traj_IDs) > 0:
 #           traj = global_data.traj_IDs[0]
-#           print traj, global_data.TRTcells[traj].date, global_data.TRTcells[traj].lon, global_data.TRTcells[traj].lat
+#           print traj, global_data.TRT[traj].date, global_data.TRT[traj].lon, global_data.TRT[traj].lat
 
 #print "global_data ", global_data
 area="ccs4"
@@ -100,9 +103,9 @@ obj_area = get_area_def(area)
 #plot.show_quicklook(obj_area, global_data['precip'].data )
 #print "global_data['precip'].data", global_data['precip'].data
 #print "global_data['precip'].data", global_data['precip'].data[355,:]
-#print "shape: ", global_data['TRTcells'].data.shape
+#print "shape: ", global_data['TRT'].data.shape
 
-prop = np.ma.asarray(global_data['TRTcells'].data)
+prop = np.ma.asarray(global_data['TRT'].data)
 prop.mask = (prop == 9999.9) | (prop <= 0.0001) 
 
 #print "prop.shape ", prop.shape
@@ -123,7 +126,7 @@ timeS = hourS+':'+minS+" UTC"
 output_dir='/data/cinesat/out/'
 
 if not exists(output_dir+cell_dir):
-    print '... create output directory: ' + output_dir+cell_dir
+    print('... create output directory: ' + output_dir+cell_dir)
     makedirs(output_dir+cell_dir)
 
 # calculate statistics (number of cells, area with precipitation)
@@ -132,7 +135,7 @@ if save_statistics:
     statisticFile = output_dir + 'TRT_'+'cells'+'-'+area+'_'+yearS[2:]+monthS+dayS+cell_ID+'.txt'
     f1 = open(statisticFile,'a')   # mode append 
     ind = (prop > 0.0001) &  (prop < 500.0)
-    print "prop.data[ind]"
+    print("prop.data[ind]")
     #for pp in prop.data[ind]:
     #    print pp
     n_cells = len(global_data.traj_IDs)
@@ -142,12 +145,12 @@ if save_statistics:
     str2write = str2write+' '+ "%7.4f" % n_cells
     str2write = str2write+' '+ "%8.0f" % area_km2
     str2write = str2write+"\n"
-    print  "date       HH : MM UTC    n_cells   area"
+    print("date       HH : MM UTC    n_cells   area")
     #      "2014-07-23 18 : 00 UTC    2.1661    54868"
-    print str2write
+    print(str2write)
     f1.write(str2write) 
     f1.close()
-    print "wrote statistics file: emacs "+ statisticFile +" &"
+    print("wrote statistics file: emacs "+ statisticFile +" &")
 
 
 #outputFile = "./pics/radar.png"
@@ -167,7 +170,7 @@ minor_tick_marks=1   # default
 old_style=False
 
 if old_style: 
-    print '... use trollimage to ', method,' plot data (min,max)=',min_data, max_data
+    print('... use trollimage to ', method,' plot data (min,max)=',min_data, max_data)
     img = trollimage(prop, mode="L") # , fill_value=(0,0,0)  add black background color 
     #colormap   = rainbow
     #colormap_r = rainbow.reverse()
@@ -191,7 +194,7 @@ else:
     colorscale=False
     black_vel=True
 
-    PIL_image = TRTimage( global_data.traj_IDs, global_data.TRTcells, obj_area) # minRank=8, alpha_max=1.0, plot_vel=True
+    PIL_image = TRTimage( global_data.traj_IDs, global_data.TRT, obj_area) # minRank=8, alpha_max=1.0, plot_vel=True
 
 # create decorator 
 dc = DecoratorAGG(PIL_image)
@@ -199,7 +202,7 @@ draw = ImageDraw.Draw(PIL_image)
 
 
 if colorscale:
-    print '... add colorscale ranging from min_data (',min_data,') to max_data (',max_data,')'
+    print('... add colorscale ranging from min_data (',min_data,') to max_data (',max_data,')')
     dc.align_right()
     dc.write_vertically()
     font_scale = aggdraw.Font("black","/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerif-Bold.ttf",size=16)
@@ -222,21 +225,21 @@ if add_borders:
     cw.add_borders(PIL_image, area_def, outline=(255, 0, 0), resolution=resolution, width=1)       #, outline_opacity=0
     
 if False:
-    print '... add cell velocities'
+    print('... add cell velocities')
     from math import isnan
 
-    print "traj_ID             Rank    x0     y0     vx      vy"
+    print("traj_ID             Rank    x0     y0     vx      vy")
 
     for traj in global_data.traj_IDs:
         
-        if global_data.TRTcells[traj].RANKr > min_rank:
+        if global_data.TRT[traj].RANKr > min_rank:
 
-            x0=global_data.TRTcells[traj].jCH
-            y0=global_data.TRTcells[traj].iCH
-            vx=global_data.TRTcells[traj].vel_x
-            vy=global_data.TRTcells[traj].vel_y
-            RANKr=global_data.TRTcells[traj].RANKr
-            print traj, ("%6.0f,%6.0f,%6.0f,%6.0f,%6.0f  " % (RANKr, x0, y0, vx, vy))
+            x0=global_data.TRT[traj].jCH
+            y0=global_data.TRT[traj].iCH
+            vx=global_data.TRT[traj].vel_x
+            vy=global_data.TRT[traj].vel_y
+            RANKr=global_data.TRT[traj].RANKr
+            print(traj, ("%6.0f,%6.0f,%6.0f,%6.0f,%6.0f  " % (RANKr, x0, y0, vx, vy)))
 
             if isnan(x0) or isnan(y0) or isnan(vx) or isnan(vy) or isnan(RANKr):
                 pass
@@ -283,7 +286,7 @@ if add_title:
 #    #draw.text((0, 20), title, title_color, font=font)
 #    draw.text((0, 40), title, title_color, font=font)
 
-print '... save image as ', outputFile+image_type
+print('... save image as ', outputFile+image_type)
 PIL_image.save(outputFile+image_type)
 
 # copy to another place
@@ -291,7 +294,7 @@ if False:
     import subprocess
 #    if in_msg.verbose:
 #        print "... secure copy "+outputFile+ " to "+in_msg.scpOutputDir
-    print "scp "+scpID+" "+outputFile+image_type +" "+" "+scpOutputDir+" 2>&1 &"
+    print("scp "+scpID+" "+outputFile+image_type +" "+" "+scpOutputDir+" 2>&1 &")
     subprocess.call("scp "+scpID+" "+outputFile+image_type +" "+" "+scpOutputDir+" 2>&1 &", shell=True)
 #    if in_msg.compress_to_8bit:
 #        if in_msg.verbose:

@@ -4,6 +4,9 @@
         - THREE: implemented option to not always derive forecast from observation at t0 but from previous forecast
 """
 
+from __future__ import division
+from __future__ import print_function
+
 from datetime import datetime
 import sys, string, os
 import logging
@@ -113,7 +116,7 @@ def check_cosmo_area (nc_cosmo, nx, ny, area):
     dy_cosmo = y[1]-y[0]       
     
     if dy_cosmo != area_wanted.pixel_size_y or dx_cosmo != area_wanted.pixel_size_x:
-        print "Error: the pixel size of the wind data doesn't match with the chosen area definition"
+        print("Error: the pixel size of the wind data doesn't match with the chosen area definition")
         quit()
     
     if x_min_cosmo <= x_min_wanted and x_max_cosmo >= x_max_wanted and y_min_cosmo <= y_min_wanted and y_max_cosmo >= y_max_wanted:
@@ -122,7 +125,7 @@ def check_cosmo_area (nc_cosmo, nx, ny, area):
         y_min_cut = abs(y_min_cosmo - y_min_wanted)/1000
         y_max_cut = abs(y_max_cosmo - y_max_wanted)/1000
     else:
-        print "Error: the area chosen ("+area+") is larger than the wind data (cosmo) area available"
+        print("Error: the area chosen ("+area+") is larger than the wind data (cosmo) area available")
  
     return int(x_min_cut), int(x_max_cut), int(y_min_cut), int(y_max_cut)
 
@@ -133,7 +136,7 @@ def get_cosmo_filenames (t_sat, nrt=True, runs_before = 0 ):
     t_run = datetime(t_sat.year, t_sat.month, t_sat.day, hour_run, 0)
 
     if runs_before != 0:
-        print "    try ", runs_before ," model start(s) before "
+        print("    try ", runs_before ," model start(s) before ")
         t_run -= runs_before * timedelta(hours = 3) 
 
     dt = t_sat - t_run
@@ -142,7 +145,7 @@ def get_cosmo_filenames (t_sat, nrt=True, runs_before = 0 ):
 
     yearS, monthS, dayS, hourS, minS = string_date(t_run)
 
-    print "***get_cosmo_filenames***** nrt *******", nrt 
+    print("***get_cosmo_filenames***** nrt *******", nrt) 
 
     ### !!! NEED A PROPER FIX !!!!
     #if nrt:          
@@ -164,35 +167,35 @@ def get_cosmo_filenames (t_sat, nrt=True, runs_before = 0 ):
 
 def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure', area='ccs4', cosmo = None, nrt = False, rapid_scan_mode_satellite = True):
 
-    print "interpolate_cosmo nrt", nrt 
+    print("interpolate_cosmo nrt", nrt) 
     file1, file2 = get_cosmo_filenames ( datetime(year,month,day,hour,minute), nrt=nrt )
 
-    print "... search for ", file1, " and ", file2
+    print("... search for ", file1, " and ", file2)
     filename1 = glob.glob(file1)
     filename2 = glob.glob(file2)
 
     if len(filename1)>1 or len(filename2)>1:
-        print "Warning, more than one cosmo file available!!"
-        print "Files t1", filename1
-        print "Files t2", filename2
+        print("Warning, more than one cosmo file available!!")
+        print("Files t1", filename1)
+        print("Files t2", filename2)
             
     if len(filename1)<1 or len(filename2)<1:
-        print "*** Warning, found no cosmo wind data "
+        print("*** Warning, found no cosmo wind data ")
         file1, file2 = get_cosmo_filenames ( datetime(year,month,day,hour,minute), runs_before = 1 )
-        print file1, file2
+        print(file1, file2)
 
-        print "... search for ", file1, " and ", file2
+        print("... search for ", file1, " and ", file2)
         filename1 = glob.glob(file1)
         filename2 = glob.glob(file2)
         
         if len(filename1)>1 or len(filename2)>1:
-            print "Warning, more than one cosmo file available!!"
-            print "Files t1", filename1
-            print "Files t2", filename2
+            print("Warning, more than one cosmo file available!!")
+            print("Files t1", filename1)
+            print("Files t2", filename2)
         elif len(filename1)<1 or len(filename2)<1:
-            print "*** Error, no cosmo wind data for time: ", str(datetime(year,month,day,hour,minute))
-            print file1
-            print file2
+            print("*** Error, no cosmo wind data for time: ", str(datetime(year,month,day,hour,minute)))
+            print(file1)
+            print(file2)
             quit()
     
     file_cosmo_1 = filename1[0]
@@ -200,8 +203,8 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     
     #cosmoDir='/data/cinesat/in/cosmo' #2016052400_03_cosmo-1_UV_swissXXL.nc
 
-    print '... read ', file_cosmo_1  
-    print '... read ', file_cosmo_2
+    print('... read ', file_cosmo_1)  
+    print('... read ', file_cosmo_2)
     
     nc_cosmo_1 = netCDF4.Dataset(file_cosmo_1,'r',format='NETCDF4') 
     nc_cosmo_2 = netCDF4.Dataset(file_cosmo_2,'r',format='NETCDF4') 
@@ -212,7 +215,7 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     elif nc_cosmo_1.variables['z_1'].units=='Pa':
         fpress1 = 1
     else:
-        print "*** Warning, unknown unit for wind in ", file_cosmo_1
+        print("*** Warning, unknown unit for wind in ", file_cosmo_1)
         fpress1 = 1
     pressure1 = pressure1.astype(int) * fpress1
     
@@ -222,12 +225,12 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     elif nc_cosmo_2.variables['z_1'].units=='Pa':
         fpress2 = 1
     else:
-        print "*** Warning, unknown unit for wind in ", file_cosmo_2
+        print("*** Warning, unknown unit for wind in ", file_cosmo_2)
         fpress2 = 1
     pressure2 = pressure2.astype(int) * fpress2
     
-    print "    pressure levels in file1: ", pressure1
-    print "    pressure levels in file2: ", pressure2
+    print("    pressure levels in file1: ", pressure1)
+    print("    pressure levels in file2: ", pressure2)
 
     u_all1 = nc_cosmo_1.variables['U'][:] 
     v_all1 = nc_cosmo_1.variables['V'][:]
@@ -257,7 +260,7 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     previous   = 1-(1./12*position_t)
 
     for g in range(len(p_chosen)):
-        print "... temporal interpolation for wind field at", p_chosen[g], "(",p_chosen,")"
+        print("... temporal interpolation for wind field at", p_chosen[g], "(",p_chosen,")")
         i1 = np.where(pressure1==p_chosen[g])[0][0]
         i2 = np.where(pressure2==p_chosen[g])[0][0]
 
@@ -274,8 +277,8 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
 def calculate_displacement(u_d,v_d,n_levels,size_x,size_y,ForecastTime,NumComputationSteps):
 
 
-    print "***"
-    print "*** calculate displacement"
+    print("***")
+    print("*** calculate displacement")
 
     dx_d = np.zeros(u_d.shape)
     dy_d = np.zeros(v_d.shape)
@@ -283,7 +286,7 @@ def calculate_displacement(u_d,v_d,n_levels,size_x,size_y,ForecastTime,NumComput
     for level in range(n_levels):   # !!!!!!!
     #for level in [0]:
 
-          print "... calculate displacement for level ", level
+          print("... calculate displacement for level ", level)
           u = u_d[level,:,:]
           v = v_d[level,:,:]
 
@@ -328,10 +331,10 @@ def add_points_outside(forecast,x_matrix,y_matrix, xy_inside):
     y_new = np.reshape(y_new,y_new.size)        
     xy_new = np.column_stack((x_new,y_new))  
     xy_new = xy_new[~np.isnan(xy_new).any(axis=1)]                      
-    print "*** add new particles for empty pixels"
+    print("*** add new particles for empty pixels")
     #store tracking coordinates for next step of this level
     xy_new = np.vstack((xy2, xy_new))
-    print "... number of particles for next step (xy_new.shape)", xy_new.shape
+    print("... number of particles for next step (xy_new.shape)", xy_new.shape)
     xy_levels = deepcopy(xy_new)
     return xy_levels    
 
@@ -365,7 +368,7 @@ def load_rgb(satellite, satellite_nr, satellites_name, time_slot, rgb, area, in_
       area_loaded = get_area_def("EuropeCanary95")#(in_windshift.areaExtraction)  
       # load product, global_data is changed in this step!
       area_loaded = load_products(global_data_RGBforecast, [rgb], in_msg, area_loaded)
-      print '... project data to desired area ', area
+      print('... project data to desired area ', area)
       fns = global_data_RGBforecast.project(area, precompute=True)
 
     else:
@@ -390,14 +393,14 @@ def compute_new_xy(xy1, dx_ds, dy_ds,  max_x_m, max_y_m):
     xy1_px[:,0] = m_to_pixel(xy1[:,0],size_x,'to_pixel')
     xy1_px[:,1] = m_to_pixel(xy1[:,1],size_y,'to_pixel')
     
-    print '... calculate new particle positions'
+    print('... calculate new particle positions')
     
     xy2 = np.zeros(xy1.shape)
     xy2[:,0] = xy1[:,0] + dx_ds[level, xy1_px[:,0], xy1_px[:,1] ]
     xy2[:,1] = xy1[:,1] + dy_ds[level, xy1_px[:,0], xy1_px[:,1] ]
     
     # remove particles outside the domain 
-    print "... limits before removing: ", xy2.min(), xy2.max(),  
+    print("... limits before removing: ", xy2.min(), xy2.max(), end=' ')  
 
 
     ind_inside = np.where( np.logical_and( np.logical_and(0<=xy2[:,0],xy2[:,0]<max_x_m), np.logical_and(0<=xy2[:,1],xy2[:,1]<max_y_m) ) )
@@ -405,8 +408,8 @@ def compute_new_xy(xy1, dx_ds, dy_ds,  max_x_m, max_y_m):
     xy2    = np.squeeze(xy2[ind_inside,:])
     xy1_px = np.squeeze(xy1_px[ind_inside,:])
     
-    print "... limits after removing: ", xy2.min(), xy2.max(),  
-    print "... number of particles after removing those outside (xy2_px.shape)", xy2.shape
+    print("... limits after removing: ", xy2.min(), xy2.max(), end=' ')  
+    print("... number of particles after removing those outside (xy2_px.shape)", xy2.shape)
     
     #convert xy2 in pixel to do the shift for each channel
     xy2_px = np.zeros(xy2.shape, dtype=np.int)   ### initialize as integer ###
@@ -443,7 +446,7 @@ if __name__ == '__main__':
     legend=True
 
     ntimes=2 #in_windshift.ntimes
-    print "... aggregate winddata for ", ntimes, " timesteps" 
+    print("... aggregate winddata for ", ntimes, " timesteps") 
     min_correlation = 85 #in_windshift.min_correlation
     min_conf_nwp = 80 #in_windshift.min_conf_nwp
     min_conf_no_nwp = 80 #in_windshift.min_conf_no_nwp
@@ -487,16 +490,16 @@ if __name__ == '__main__':
             dt_forecast1 = 5
             dt_forecast2 = 10
     if rapid_scan_mode == True:
-        print "... RAPID SCAN MODE"
+        print("... RAPID SCAN MODE")
     else:
-        print "... NOT RAPID SCAN MODE"
+        print("... NOT RAPID SCAN MODE")
     
     dt_forecast1S = "%02d" % dt_forecast1
     dt_forecast2S = "%02d" % dt_forecast2
     
-    ForecastTime=5 #time in minutes from observation at t=0 when you want each observation (first forecast after ForecastTime, second after 2*ForecastTime...)
-    NumComputationSteps=1 #number of computation time steps: the number of steps when the velocity should be updated within each ForecastTime
-    NumForecast=dt_forecast2/ForecastTime #6number of forecasts you want to produce from observation at t=0
+    ForecastTime = 5 #time in minutes from observation at t=0 when you want each observation (first forecast after ForecastTime, second after 2*ForecastTime...)
+    NumComputationSteps = 1 #number of computation time steps: the number of steps when the velocity should be updated within each ForecastTime
+    NumForecast = int(dt_forecast2/ForecastTime) #6number of forecasts you want to produce from observation at t=0
 
     downscaling_data = True
     mode_downscaling = 'gaussian_225_125'
@@ -533,8 +536,8 @@ if __name__ == '__main__':
         elif zlevel == 'modellevel':
             layers=[36,24,16] #cosmo model layers
         else:
-            print "*** Error in main ("+current_file+")"
-            print "    unknown zlevel", zlevel
+            print("*** Error in main ("+current_file+")")
+            print("    unknown zlevel", zlevel)
             quit()
         
     # ------------------------------------------
@@ -549,10 +552,10 @@ if __name__ == '__main__':
     
     if len(sys.argv) > 1:
         if len(sys.argv) < 6:
-            print "***           "
-            print "*** Warning, please specify date and time completely, e.g."
-            print "***          python "+current_file+" 2014 07 23 16 10 "
-            print "***           "
+            print("***           ")
+            print("*** Warning, please specify date and time completely, e.g.")
+            print("***          python "+current_file+" 2014 07 23 16 10 ")
+            print("***           ")
             quit() # quit at this point
         else:
             year   = int(sys.argv[1])
@@ -575,7 +578,7 @@ if __name__ == '__main__':
         if True:  # automatic choise of last 5min 
             in_msg.get_last_SEVIRI_date()
             time_slotSTOP = in_msg.datetime 
-            print "... choose time (automatically): ", str(time_slotSTOP)
+            print("... choose time (automatically): ", str(time_slotSTOP))
         else: # fixed date for text reasons
             year=2014          # 2014 09 15 21 35
             month= 7           # 2014 07 23 18 30
@@ -586,7 +589,7 @@ if __name__ == '__main__':
     
     # second argument is tolerance in minutes for near real time processing
     in_msg.nrt = check_near_real_time(in_msg.datetime, 120)
-    print "... in_msg.nrt", in_msg.nrt
+    print("... in_msg.nrt", in_msg.nrt)
     time_slot = in_msg.datetime
     
     if in_msg.nrt:
@@ -600,7 +603,7 @@ if __name__ == '__main__':
 
     while time_slot <= time_slotSTOP:
     
-          print str(time_slot)
+          print(str(time_slot))
           in_msg.datetime = time_slot
 
           year = time_slot.year
@@ -624,14 +627,14 @@ if __name__ == '__main__':
           size_y = obj_area.pixel_size_y  
           
           #print obj_area
-          print "area extent:\n",obj_area.area_extent
+          print("area extent:\n",obj_area.area_extent)
           
-          print "x min ", obj_area.area_extent[0]
-          print "x size ", obj_area.pixel_size_x
+          print("x min ", obj_area.area_extent[0])
+          print("x size ", obj_area.pixel_size_x)
           
           # check if input data is complete 
           if in_msg.verbose:
-              print "*** check input data", in_msg.RGBs, " for ", in_msg.sat_str()+in_msg.sat_nr_str()
+              print("*** check input data", in_msg.RGBs, " for ", in_msg.sat_str()+in_msg.sat_nr_str())
           RGBs = check_input(in_msg, in_msg.sat_str()+in_msg.sat_nr_str(), in_msg.datetime)  
           # in_msg.sat_nr might be changed to backup satellite
 
@@ -653,7 +656,7 @@ if __name__ == '__main__':
                   import time
                   time.sleep(25)
 
-          print "*** read CTP for ", in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", str(time_slot)
+          print("*** read CTP for ", in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", str(time_slot))
           global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", time_slot)
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, in_msg.sat_nr_str(), "seviri", time_slot)
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
@@ -664,7 +667,7 @@ if __name__ == '__main__':
           [nx,ny]=data_CTP['CTP'].data.shape
 
           # read all rgbs
-          print "*** read all other channels for ", in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", str(time_slot)
+          print("*** read all other channels for ", in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", str(time_slot))
           global_data = GeostationaryFactory.create_scene(in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", time_slot)
           #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
           area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
@@ -674,8 +677,8 @@ if __name__ == '__main__':
           # check if all needed channels are loaded
           #for rgb in rgbs:
           if not check_loaded_channels(rgbs, data):
-              print "*** Error in produce_forecast_nrt ("+current_file+")"
-              print "    missing data"
+              print("*** Error in produce_forecast_nrt ("+current_file+")")
+              print("    missing data")
               quit()
 
           if False:
@@ -714,21 +717,21 @@ if __name__ == '__main__':
       
                      # choose basic or detailed (and get a fresh copy) 
                   if detailed:
-                      print '... calculate gridded 2d wind field High' 
+                      print('... calculate gridded 2d wind field High') 
                       hrw_detbas = hrw_data['HRW'].HRW_detailed                   
                   else:
-                      print '... calculate gridded 2d wind field High' 
+                      print('... calculate gridded 2d wind field High') 
                       hrw_detbas =  hrw_data['HRW'].HRW_basic       
       
                   u_d[level,:,:], v_d[level,:,:] = HRW_2dfield( hrw_detbas, obj_area )
       
           elif wind_source=="cosmo":
-              print "********** in_msg.nrt *******", in_msg.nrt
-              print "year, month, day, hour, minute", year, month, day, hour, minute
+              print("********** in_msg.nrt *******", in_msg.nrt)
+              print("year, month, day, hour, minute", year, month, day, hour, minute)
               u_d, v_d = interpolate_cosmo(year, month, day, hour, minute, layers, zlevel, area, nrt=in_msg.nrt, rapid_scan_mode_satellite=True)
           else:
-              print "*** Error in main ("+current_file+")"
-              print "    unknown wind source ", wind_source
+              print("*** Error in main ("+current_file+")")
+              print("    unknown wind source ", wind_source)
               quit()
       
       
@@ -754,7 +757,7 @@ if __name__ == '__main__':
        
           for level in range(n_levels):
           
-              print "... calculation for level ", level
+              print("... calculation for level ", level)
       
               p_max = p_min
               
@@ -767,7 +770,7 @@ if __name__ == '__main__':
               v = v_d[level,:,:]  
       
               for t in range(1,NumForecast+1):
-                  print "*** timestep ",t," of ",NumForecast
+                  print("*** timestep ",t," of ",NumForecast)
                   if t==1: #if first timestep create x and y matrices covering entire image
                       xy_levels = initial_xy(x_matrixs,y_matrixs)
       
@@ -787,7 +790,7 @@ if __name__ == '__main__':
                               continue
                       
                       forecast1 = forecasts_NextStep[channel_nr[rgb],level,:,:]
-                      print "*** calculating the nowcasted values of ", rgb
+                      print("*** calculating the nowcasted values of ", rgb)
                       forecast2 = nowcastRGB(forecast1,xy1_px,xy2_px)
       
                   
@@ -818,7 +821,7 @@ if __name__ == '__main__':
                             outputFile = outputDir +"/"+ "%s_%s_%s_t%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime))
                             #outputFile = "/opt/users/lel/PyTroll/scripts/channels/%s_%s_%s_t%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime))
                             
-                            print "... pickle data to file: ", outputFile
+                            print("... pickle data to file: ", outputFile)
                             
                             PIK = []
                             if area == "ccs4":
@@ -826,15 +829,15 @@ if __name__ == '__main__':
                             elif area == "ccs4c2": 
                                     PIK.append( forecasts_out[channel_nr[rgb],ind_time,20:nx-40,85:ny-135])
                             else:
-                                    print "unknown area, saving entire domain"
+                                    print("unknown area, saving entire domain")
                                     PIK.append( forecasts_out[channel_nr[rgb],ind_time,:,:])
                                 
                             PIK.append(mode_downscaling)
-                            print "mode_downscaling: ", mode_downscaling
+                            print("mode_downscaling: ", mode_downscaling)
                             path = dirname(outputFile)
                             if not exists(path):
                                 if in_msg.verbose:
-                                    print '... create output directory: ' + path
+                                    print('... create output directory: ' + path)
                                 makedirs(path)
                             pickle.dump(PIK, open(outputFile,"wb"))
                             
@@ -863,7 +866,7 @@ if __name__ == '__main__':
                                 fig.savefig(outputFig) 
                                 plt.close(fig)
       
-          print "TOTAL TIME: ", time.time()-time_start_TOT
+          print("TOTAL TIME: ", time.time()-time_start_TOT)
           
           time_slot = time_slot + timedelta(minutes=5)
 

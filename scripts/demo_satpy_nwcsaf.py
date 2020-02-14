@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 
 from satpy.utils import debug_on
 debug_on()
@@ -52,24 +55,24 @@ for p_ in product_list:
     #else:
     #    print ("NWCSAF data product " + product + " is missing or is not readable")
     
-    print "... search files in "+ base_dir
+    print ("... search files in "+ base_dir)
     files_nwc = find_files_and_readers(sensor='seviri',
                                        start_time=start_time,
                                        end_time=end_time,
                                        base_dir=base_dir,
                                        reader='nwcsaf-geo')
-    #print files_nwc
+    #print (files_nwc)
     #files = dict(files_sat.items() + files_nwc.items())
-    files = dict(files_nwc.items())
+    files = dict(list(files_nwc.items()))
 
     global_scene = Scene(filenames=files)
 
     global_scene.available_dataset_names()
     #!!# print(global_scene['overview']) ### this one does only work in the develop version
-    print ""
-    print "available_composite_names"
-    print global_scene.available_composite_names()
-    
+    print ("")
+    print ("available_composite_names")
+    print (global_scene.available_composite_names())
+
     if make_images:
     
         # this will load RGBs ready to plot
@@ -77,12 +80,13 @@ for p_ in product_list:
         #global_scene.load([ 'cloud_top_height', 'cloud_top_pressure', 'cloud_top_temperature'])
         #global_scene.load(['cloudtype'])
 
-        print "global_scene.keys()", global_scene.keys()
+        print("global_scene.keys()", global_scene.keys())
         #[DatasetID(name='cloud_top_height', wavelength=None, resolution=None, polarization=None, calibration=None, level=None, modifiers=None)]
 
         # 'cloud_top_height' is loaded in RGB mode already 
-        # print(global_scene['cloud_top_height'].data.shape)
+        #print(global_scene['cloud_top_height'].data.shape)
         #print(global_scene['cloud_top_height'].data.compute())
+        #print(global_scene['cloud_top_height'].values)
 
     else:
         # work with scientific data
@@ -90,41 +94,39 @@ for p_ in product_list:
         global_scene.load(product_ids["CTTH"])
         #global_scene.load(['ctth_alti'])
 
-        
-    print "global_scene"
-    print global_scene
-    print global_scene['cloudtype'].comment
-    quit()
+    print("")
+    print("global_scene")
+    print(global_scene)
+    #print(global_scene['cloudtype'].comment)
 
-    
+    global_scene.available_dataset_names()
+         
     # resample to another projection
+    print("resample")
     area="ccs4"
     area="EuropeCanaryS95"
     local_scene = global_scene.resample(area)
 
+    print("dir(local_scene)", dir(local_scene))
+    
     if make_images:
 
         for p_name in nwcsaf.product[p_]:
             
-            print "p_name, type(local_scene[p_name]), type(local_scene[p_name].data)"
-            print p_name, type(local_scene[p_name]), type(local_scene[p_name].data)
-            #local_scene.show('cloudtype')
-            #local_scene.save_dataset('cloudtype', './local_cloudtype.png')
-            #print "display ./local_cloudtype.png &"
-            
-            print "dir(local_scene)", dir(local_scene)
+            print ("p_name, type(local_scene[p_name]), type(local_scene[p_name].data)")
+            print (p_name, type(local_scene[p_name]), type(local_scene[p_name].data))
 
             filename="./local_"+p_name+"_"+area+".png"
             #local_scene.show(p_name)
             #local_scene.show(p_name, overlay={'coast_dir': '/data/OWARNA/hau/maps_pytroll/', 'color': (255, 0, 0), 'resolution': 'i'})
             local_scene.save_dataset(p_name, filename, overlay={'coast_dir': '/data/OWARNA/hau/maps_pytroll/', 'color': (255, 255, 255), 'resolution': 'i'})
-            print "display "+filename+" &"
+            print ("display "+filename+" &")
     else:
 
         for p_name in product_ids[p_]:
-            print type(local_scene[p_name].values)
-            print local_scene[p_name].values.shape
-            print nanmin(local_scene[p_name].values)
-            print nanmax(local_scene[p_name].values)
+            print (type(local_scene[p_name].values))
+            print (local_scene[p_name].values.shape)
+            print (nanmin(local_scene[p_name].values))
+            print (nanmax(local_scene[p_name].values))
                 
 

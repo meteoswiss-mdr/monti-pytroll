@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
+
 from mpop.satellites import GeostationaryFactory
 from mpop.projector import get_area_def
 from mpop.imageo import palettes
@@ -30,7 +32,7 @@ global_data = GeostationaryFactory.create_scene("meteosat", "09", "seviri", time
 
 global_data.load(["CloudType"], calibrate=False)
 
-print global_data
+print (global_data)
 
 prod = "CloudType"
 

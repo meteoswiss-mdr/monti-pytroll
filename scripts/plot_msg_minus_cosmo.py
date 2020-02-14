@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 #!/usr/bin/python
 
 # program to plot SEVIRI observations   
@@ -69,9 +72,9 @@ from mpop.utils import debug_on
 debug_on() 
 
 try:
-  basestring
+  str
 except NameError:
-  basestring = str
+  str = str
 
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
@@ -91,19 +94,19 @@ def plot_msg_minus_cosmo(in_msg):
 
    # check if input data is complete 
    if in_msg.verbose:
-      print "*** check input data for ", in_msg.sat_str()
+      print("*** check input data for ", in_msg.sat_str())
    RGBs = check_input(in_msg, in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str(), in_msg.datetime)  
    # in_msg.sat_nr might be changed to backup satellite
 
    if in_msg.verbose:
-      print '*** Create plots for '
-      print '    Satellite/Sensor: ' + in_msg.sat_str() 
-      print '    Satellite number: ' + in_msg.sat_nr_str() +' // ' +str(in_msg.sat_nr)
-      print '    Satellite instrument: ' + in_msg.instrument
-      print '    Date/Time:        '+ str(in_msg.datetime)
-      print '    RGBs:            ', in_msg.RGBs
-      print '    Area:            ', in_msg.areas
-      print '    reader level:    ', in_msg.reader_level
+      print('*** Create plots for ')
+      print('    Satellite/Sensor: ' + in_msg.sat_str()) 
+      print('    Satellite number: ' + in_msg.sat_nr_str() +' // ' +str(in_msg.sat_nr))
+      print('    Satellite instrument: ' + in_msg.instrument)
+      print('    Date/Time:        '+ str(in_msg.datetime))
+      print('    RGBs:            ', in_msg.RGBs)
+      print('    Area:            ', in_msg.areas)
+      print('    reader level:    ', in_msg.reader_level)
 
    # define satellite data object
    #global_data = GeostationaryFactory.create_scene(in_msg.sat, in_msg.sat_nr_str(), "seviri", in_msg.datetime)
@@ -114,7 +117,7 @@ def plot_msg_minus_cosmo(in_msg):
       return RGBs
 
    if in_msg.verbose:
-      print "*** load satellite channels for " + in_msg.sat_str()+in_msg.sat_nr_str()+" ", global_data.fullname
+      print("*** load satellite channels for " + in_msg.sat_str()+in_msg.sat_nr_str()+" ", global_data.fullname)
 
    # initialize processed RGBs
    RGBs_done=[]
@@ -125,7 +128,7 @@ def plot_msg_minus_cosmo(in_msg):
    area_loaded = load_products(global_data, RGBs, in_msg, area_loaded)
 
    cosmo_input_file="input_cosmo_cronjob.py"
-   print "... read COSMO input file: ", cosmo_input_file
+   print("... read COSMO input file: ", cosmo_input_file)
    in_cosmo = parse_commandline_and_read_inputfile(input_file=cosmo_input_file)
 
    # add composite
@@ -144,25 +147,25 @@ def plot_msg_minus_cosmo(in_msg):
    # --------------------------------------
    if len(RGBs) > 0:
       for area in in_msg.areas:
-         print ""
+         print("")
          obj_area = get_area_def(area) 
 
          if area != 'ccs4':
-           print "*** WARNING, diff MSG-COSMO only implemented for ccs4"
+           print("*** WARNING, diff MSG-COSMO only implemented for ccs4")
            continue 
          
          # reproject data to new area
-         print  area_loaded
+         print(area_loaded)
  
          if obj_area == area_loaded: 
             if in_msg.verbose:
-               print "*** Use data for the area loaded: ", area
+               print("*** Use data for the area loaded: ", area)
             #obj_area = area_loaded
             data = global_data
             resolution='l'
          else:
             if in_msg.verbose:    
-               print "*** Reproject data to area: ", area, "(org projection: ",  area_loaded.name, ")"     
+               print("*** Reproject data to area: ", area, "(org projection: ",  area_loaded.name, ")")     
             obj_area = get_area_def(area)
             # PROJECT data to new area 
             data = global_data.project(area, precompute=True)
@@ -172,13 +175,13 @@ def plot_msg_minus_cosmo(in_msg):
             loaded_products = [chn.name for chn in data.loaded_channels()]
 
             if 'CTH' not in loaded_products:
-               print "*** Error in plot_msg ("+inspect.getfile(inspect.currentframe())+")"
-               print "    Cloud Top Height is needed for parallax correction "
-               print "    either load CTH or specify the estimation of the CTH in the input file (load 10.8 in this case)"
+               print("*** Error in plot_msg ("+inspect.getfile(inspect.currentframe())+")")
+               print("    Cloud Top Height is needed for parallax correction ")
+               print("    either load CTH or specify the estimation of the CTH in the input file (load 10.8 in this case)")
                quit()
 
             if in_msg.verbose:
-               print "    perform parallax correction for loaded channels: ", loaded_products
+               print("    perform parallax correction for loaded channels: ", loaded_products)
 
             data = data.parallax_corr(fill=in_msg.parallax_gapfilling, estimate_cth=in_msg.estimate_cth, replace=True)
  
@@ -197,7 +200,7 @@ def plot_msg_minus_cosmo(in_msg):
             #statisticFile = '/data/COALITION2/database/meteosat/ccs4/'+yearS+'/'+monthS+'/'+dayS+'/MSG_'+area+'_'+yearS[2:]+monthS+dayS+'.txt'
             statisticFile = './'+yearS+'-'+monthS+'-'+dayS+'/MSG_'+area+'_'+yearS[2:]+monthS+dayS+'.txt'
             if in_msg.verbose:
-               print "*** write statistics (average values) to "+statisticFile
+               print("*** write statistics (average values) to "+statisticFile)
             f1 = open(statisticFile,'a')   # mode append
             i_rgb=0
             for rgb in RGBs:
@@ -228,8 +231,8 @@ def plot_msg_minus_cosmo(in_msg):
 
             RGBs=['IR_108-COSMO-minus-MSG']
 
-            print data['IR_108'].data.shape
-            print cosmo_data['SYNMSG_BT_CL_IR10.8'].data.shape
+            print(data['IR_108'].data.shape)
+            print(cosmo_data['SYNMSG_BT_CL_IR10.8'].data.shape)
             diff_MSG_COSMO = cosmo_data['SYNMSG_BT_CL_IR10.8'].data - data['IR_108'].data
             HRV_enhance_str=''
             
@@ -267,7 +270,7 @@ def plot_msg_minus_cosmo(in_msg):
                # add MeteoSwiss and Pytroll logo
                if in_msg.add_logos:
                   if in_msg.verbose:
-                     print '... add logos'
+                     print('... add logos')
                   dc.align_right()
                   if in_msg.add_colorscale:
                      dc.write_vertically()
@@ -288,11 +291,11 @@ def plot_msg_minus_cosmo(in_msg):
                      loaded_channels = [chn.name for chn in data.loaded_channels()]
                      if rgb in loaded_channels:
                        if hasattr(data[rgb], 'info'):
-                         print "    hasattr(data[rgb], 'info')", data[rgb].info.keys()
-                         if 'units' in data[rgb].info.keys():
-                           print "'units' in data[rgb].info.keys()"
+                         print("    hasattr(data[rgb], 'info')", list(data[rgb].info.keys()))
+                         if 'units' in list(data[rgb].info.keys()):
+                           print("'units' in data[rgb].info.keys()")
                            unit = data[rgb].info['units']
-                  print "... units = ", unit
+                  print("... units = ", unit)
                   add_colorscale(dc, rgb, in_msg, unit=unit)
 
                if in_msg.parallax_correction:
@@ -309,26 +312,26 @@ def plot_msg_minus_cosmo(in_msg):
                path= dirname(outputFile)
                if not exists(path):
                   if in_msg.verbose:
-                     print '... create output directory: ' + path
+                     print('... create output directory: ' + path)
                   makedirs(path)
 
                # save file
                if exists(outputFile) and not in_msg.overwrite:
                   if stat(outputFile).st_size > 0:
-                     print '... outputFile '+outputFile+' already exists (keep old file)'
+                     print('... outputFile '+outputFile+' already exists (keep old file)')
                   else: 
-                     print '*** Warning, outputFile'+outputFile+' already exists, but is empty (overwrite file)'
+                     print('*** Warning, outputFile'+outputFile+' already exists, but is empty (overwrite file)')
                      PIL_image.save(outputFile, optimize=True)  # optimize -> minimize file size
-                     chmod(outputFile, 0777)  ## FOR PYTHON3: 0o664  # give access read/write access to group members
+                     chmod(outputFile, 0o777)  ## FOR PYTHON3: 0o664  # give access read/write access to group members
                else:
                   if in_msg.verbose:
-                     print '... save final file: ' + outputFile
+                     print('... save final file: ' + outputFile)
                   PIL_image.save(outputFile, optimize=True)  # optimize -> minimize file size
-                  chmod(outputFile, 0777)  ## FOR PYTHON3: 0o664  # give access read/write access to group members
+                  chmod(outputFile, 0o777)  ## FOR PYTHON3: 0o664  # give access read/write access to group members
 
                if in_msg.compress_to_8bit:
                   if in_msg.verbose:
-                     print '... compress to 8 bit image: display '+outputFile.replace(".png","-fs8.png")+' &'
+                     print('... compress to 8 bit image: display '+outputFile.replace(".png","-fs8.png")+' &')
                   subprocess.call("/usr/bin/pngquant -force 256 "+outputFile+" 2>&1 &", shell=True) # 256 == "number of colors"
 
                #if in_msg.verbose:
@@ -344,11 +347,11 @@ def plot_msg_minus_cosmo(in_msg):
                      scpOutputDir = format_name (in_msg.scpOutputDir, data.time_slot, area=area, rgb=rgb, sat=data.satname, sat_nr=data.sat_nr() )
                      if in_msg.compress_to_8bit:
                         if in_msg.verbose:
-                           print "... secure copy "+outputFile.replace(".png","-fs8.png")+ " to "+scpOutputDir
+                           print("... secure copy "+outputFile.replace(".png","-fs8.png")+ " to "+scpOutputDir)
                         subprocess.call("scp "+in_msg.scpID+" "+outputFile.replace(".png","-fs8.png")+" "+scpOutputDir+" 2>&1 &", shell=True)
                      else:
                         if in_msg.verbose:
-                           print "... secure copy "+outputFile+ " to "+scpOutputDir
+                           print("... secure copy "+outputFile+ " to "+scpOutputDir)
                         subprocess.call("scp "+in_msg.scpID+" "+outputFile+" "+scpOutputDir+" 2>&1 &", shell=True)
 
                if in_msg.scpOutput and in_msg.scpID2 != None and in_msg.scpOutputDir2 != None:
@@ -356,11 +359,11 @@ def plot_msg_minus_cosmo(in_msg):
                      scpOutputDir2 = format_name (in_msg.scpOutputDir2, data.time_slot, area=area, rgb=rgb, sat=data.satname, sat_nr=data.sat_nr() )
                      if in_msg.compress_to_8bit:
                         if in_msg.verbose:
-                           print "... secure copy "+outputFile.replace(".png","-fs8.png")+ " to "+scpOutputDir2
+                           print("... secure copy "+outputFile.replace(".png","-fs8.png")+ " to "+scpOutputDir2)
                         subprocess.call("scp "+in_msg.scpID2+" "+outputFile.replace(".png","-fs8.png")+" "+scpOutputDir2+" 2>&1 &", shell=True)
                      else:
                         if in_msg.verbose:
-                           print "... secure copy "+outputFile+ " to "+scpOutputDir2
+                           print("... secure copy "+outputFile+ " to "+scpOutputDir2)
                         subprocess.call("scp "+in_msg.scpID2+" "+outputFile+" "+scpOutputDir2+" 2>&1 &", shell=True)
 
                            
@@ -372,8 +375,8 @@ def plot_msg_minus_cosmo(in_msg):
                                 fformat='mpop.imageo.formats.ninjotiff',
                                 ninjo_product_name=rgb, chan_id = products.ninjo_chan_id[rgb.replace("_","-")+"_"+area],
                                 nbits=8)
-                  chmod(ninjotif_file, 0777)
-                  print ("... save ninjotif image: display ", ninjotif_file, " &")
+                  chmod(ninjotif_file, 0o777)
+                  print(("... save ninjotif image: display ", ninjotif_file, " &"))
 
                if rgb not in RGBs_done:
                   RGBs_done.append(rgb)
@@ -383,7 +386,7 @@ def plot_msg_minus_cosmo(in_msg):
          postprocessing(in_msg, global_data.time_slot, int(data.sat_nr()), area)
 
    if in_msg.verbose:
-      print " "
+      print(" ")
 
    return RGBs_done
 
@@ -394,17 +397,17 @@ def plot_msg_minus_cosmo(in_msg):
 #----------------------------------------------------------------------------------------------------------------
 def print_usage():
    
-   print "***           "
-   print "*** Error, not enough command line arguments"
-   print "***        please specify at least an input file"
-   print "***        possible calls are:"
-   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG "
-   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 "
-   print "                                 date and time must be completely given"
-   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'IR_108'"
-   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'IR_108' 'ccs4'"
-   print "*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ['HRoverview','fog'] ['ccs4','euro4']"
-   print "***           "
+   print("***           ")
+   print("*** Error, not enough command line arguments")
+   print("***        please specify at least an input file")
+   print("***        possible calls are:")
+   print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG ")
+   print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ")
+   print("                                 date and time must be completely given")
+   print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'IR_108'")
+   print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'IR_108' 'ccs4'")
+   print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ['HRoverview','fog'] ['ccs4','euro4']")
+   print("***           ")
    quit() # quit at this point
 #----------------------------------------------------------------------------------------------------------------
 
@@ -413,5 +416,5 @@ if __name__ == '__main__':
    in_msg = parse_commandline_and_read_inputfile(input_file="input_msg_cosmo_cronjob.py")
 
    RGBs_done = plot_msg_minus_cosmo(in_msg)
-   print "*** Satellite pictures produced for ", RGBs_done 
-   print " "
+   print("*** Satellite pictures produced for ", RGBs_done) 
+   print(" ")

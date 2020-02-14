@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 from mpop.imageo.geo_image import GeoImage
 from copy import deepcopy
 from trollimage.colormap import rdbu, greys, rainbow, spectral
@@ -188,7 +191,7 @@ def HRVFog(self, downscale=False, return_data=False):
 
     # this area exception is not nice!
     if downscale or (self["HRV"].area.name=='ccs4' or self["HRV"].area.name=='Switzerland_stereographic_500m'):
-        print '... downscale NIR1.6'
+        print('... downscale NIR1.6')
         from plot_coalition2 import downscale_array
         ch1 = downscale_array(ch1)
 
@@ -224,7 +227,7 @@ def get_box_mask(self, lon_min=-180, lon_max=180, lat_min=-90, lat_max=90):
     # calculate longitude/latitude and solar zenith angle 
     from pyorbital.astronomy import sun_zenith_angle
     lonlats = self.area.get_lonlats()
-    print dir(self.area)
+    print(dir(self.area))
 
     mask = np.array(lonlats[0] > lon_min)
     mask[lon_max < lonlats[0]] = False
@@ -255,7 +258,7 @@ def DayNightFog(self, downscale=False, sza_max=88):
 
     # this area exception is not nice!
     if downscale or (self["HRV"].area.name=='ccs4' or self["HRV"].area.name=='Switzerland_stereographic_500m'):
-        print '... downscale NIR1.6'
+        print('... downscale NIR1.6')
         from plot_coalition2 import downscale_array
         ch1a = downscale_array(ch1a)
 
@@ -267,7 +270,7 @@ def DayNightFog(self, downscale=False, sza_max=88):
 
     # this area exception is not nice!
     if downscale or (self["HRV"].area.name=='ccs4' or self["HRV"].area.name=='Switzerland_stereographic_500m'):
-        print '... downscale night microphysics - red/green/blue'
+        print('... downscale night microphysics - red/green/blue')
         ch1b = downscale_array(ch1b)
         ch2b = downscale_array(ch2b)
         ch3b = downscale_array(ch3b)
@@ -404,7 +407,7 @@ def daynight_background(self, cos_scaled=True, use_HRV=False, smooth=False, stre
         
     img = GeoImage(vis + ir108, self.area, self.time_slot, fill_value=(0,0,0), mode="L")
 
-    print colorscale, white_clouds
+    print(colorscale, white_clouds)
     if colorscale=='rainbow':
         from trollimage.colormap import rainbow
         cm = deepcopy(rainbow)
@@ -419,7 +422,7 @@ def daynight_background(self, cos_scaled=True, use_HRV=False, smooth=False, stre
     img.colorize(cm)
 
     if stretch:
-        print "... use streching ", stretch
+        print("... use streching ", stretch)
         img.enhance(stretch=stretch)
         
     return img
@@ -596,7 +599,7 @@ def IR_039_minus_IR_108(self):
 
     min_data = ch_diff.data.min()
     max_data = ch_diff.data.max()
-    print "min/max", min_data, max_data
+    print("min/max", min_data, max_data)
 
     img = trollimage(ch_diff.data, mode="L", fill_value=(0,0,0))
 
@@ -634,7 +637,7 @@ def WV_062_minus_WV_073(self):
 
     min_data = ch_diff.data.min()
     max_data = ch_diff.data.max()
-    print "min/max", min_data, max_data
+    print("min/max", min_data, max_data)
 
     img = trollimage(ch_diff.data, mode="L", fill_value=(0,0,0))
 
@@ -668,7 +671,7 @@ def WV_062_minus_IR_108(self):
 
     min_data = ch_diff.data.min()
     max_data = ch_diff.data.max()
-    print "min/max", min_data, max_data
+    print("min/max", min_data, max_data)
 
     img = trollimage(ch_diff.data, mode="L", fill_value=(0,0,0))
 
@@ -702,7 +705,7 @@ def WV_073_minus_IR_134(self):
 
     min_data = ch_diff.data.min()
     max_data = ch_diff.data.max()
-    print "min/max", min_data, max_data
+    print("min/max", min_data, max_data)
 
     img = trollimage(ch_diff.data, mode="L", fill_value=(0,0,0))
 
@@ -738,7 +741,7 @@ def IR_087_minus_IR_108(self):
   
     min_data = ch_diff.data.min()
     max_data = ch_diff.data.max()
-    print "min/max", min_data, max_data
+    print("min/max", min_data, max_data)
 
     img = trollimage(ch_diff.data, mode="L", fill_value=(0,0,0))
 
@@ -773,7 +776,7 @@ def IR_087_minus_IR_120(self):
   
     min_data = ch_diff.data.min()
     max_data = ch_diff.data.max()
-    print "min/max", min_data, max_data
+    print("min/max", min_data, max_data)
 
     img = trollimage(ch_diff.data, mode="L", fill_value=(0,0,0))
 
@@ -809,7 +812,7 @@ def IR_120_minus_IR_108(self):
 
     min_data = ch_diff.data.min()
     max_data = ch_diff.data.max()
-    print "min/max", min_data, max_data
+    print("min/max", min_data, max_data)
 
     img = trollimage(ch_diff.data, mode="L", fill_value=(0,0,0))
 
@@ -851,7 +854,7 @@ def trichannel(self):
 
     min_data = ch_diff.data.min()
     max_data = ch_diff.data.max()
-    print "min/max", min_data, max_data
+    print("min/max", min_data, max_data)
 
     img = trollimage(ch_diff.data, mode="L", fill_value=(0,0,0))
 
@@ -924,7 +927,7 @@ def clouddepth(self):
     min_data= mask.min()
     max_data= mask.max()
 
-    print "    use trollimage.image.image for colorized pictures (min="+str(min_data)+", max="+str(max_data)+")"
+    print("    use trollimage.image.image for colorized pictures (min="+str(min_data)+", max="+str(max_data)+")")
     cm2 = deepcopy(rainbow)
     cm2.set_range(min_data, max_data)
     img.colorize(cm2)
@@ -944,25 +947,30 @@ def fls(self):
     # threshold for liquid clouds 
     th_liquid_cloud = 1.8 # K 
     # cloud_confidence_range
-    ccr  = 1 # K
-    ch_diff = (th_liquid_cloud - (self['IR_120']-self['IR_087']) - ccr) / (2 * ccr) 
+    ccr  = 1.0 # K
+    ch_diff = (th_liquid_cloud - (self['IR_120']-self['IR_087']) - ccr) / (-2. * ccr) 
 
+    #print "min/max", self['IR_108'].data.min(), self['IR_108'].data.max()
+    ## Filter for cold clouds 
+    #print type(self['IR_108'].data),type(ch_diff), 
+    #ch_diff.data[self['IR_108'].data<265.] = float('nan')
+    
     min_data = ch_diff.data.min()
     max_data = ch_diff.data.max()
-    print "min/max", min_data, max_data
+    print("min/max", min_data, max_data)
 
     from trollimage.image import Image as trollimage
     img = trollimage(ch_diff.data, mode="L", fill_value=(0,0,0))
 
-    colormap = deepcopy(rainbow)
+    colormap = deepcopy(rainbow.reverse())
     #colormap.set_range(min_data, max_data)
     colormap.set_range(0, 1)
-    colormap.reverse()
+    print(colormap.values)
     img.colorize(colormap)
 
     return img
 
-fls.prerequisites = set(['IR_087','IR_120'])
+fls.prerequisites = set(['IR_087','IR_120','IR_108'])
 
 def streamplot(self):
     """Create streamplot images with U and V wind components 
@@ -1217,8 +1225,8 @@ def get_image(data, rgb):
     elif rgb == 'CT' or rgb == 'CTTH' or rgb == 'ctt' or rgb == 'cph' or rgb == 'cot':
         obj_image = 0
     else:
-        print "*** ERROR, undefined rgb mode"
-        print "*** ERROR, undefined rgb mode"
+        print("*** ERROR, undefined rgb mode")
+        print("*** ERROR, undefined rgb mode")
         #quit()
 
     return obj_image

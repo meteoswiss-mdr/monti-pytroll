@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 
 year="2013"
 y2="13"
@@ -17,7 +20,7 @@ def running_mean(x, N):
     cumsum = np.cumsum(np.insert(x, 0, 0)) 
     return (cumsum[N:] - cumsum[:-N]) / N 
 
-print '... read file ', in_file
+print('... read file ', in_file)
 d = np.loadtxt(in_file) #, skiprows=2
 
 year   = d[:, 0]
@@ -78,7 +81,7 @@ if solar:
     ylabel('solar channels')
     title('temporal evolution solar channels, ')
     grid(True)
-    print "save figure: display "+folder+"/"+out_file+"t_solar.png &"
+    print("save figure: display "+folder+"/"+out_file+"t_solar.png &")
     savefig(folder+"/"+out_file+"t_solar.png")
     #show()
 
@@ -109,7 +112,7 @@ if thermal:
     ylabel('brightness temperature / K')
     title('thermal channels')
     grid(True)
-    print "save figure: display "+folder+"/"+out_file+"t_thermal.png &"
+    print("save figure: display "+folder+"/"+out_file+"t_thermal.png &")
     savefig(folder+"/"+out_file+"t_thermal.png")
 
 if dthermal_K:
@@ -137,7 +140,7 @@ if dthermal_K:
     ylabel('brightness temperature / K')
     title('thermal channel differences')
     grid(True)
-    print "save figure: display "+folder+"/"+out_file+"/t_thermal_diff_K.png &"
+    print("save figure: display "+folder+"/"+out_file+"/t_thermal_diff_K.png &")
     savefig(folder+"/"+out_file+"/t_thermal_diff_K.png")
 
 if dthermal_2:
@@ -173,7 +176,7 @@ if dthermal_2:
     title('thermal channel differences')
     xlim(t_start, t_end)
     grid(True)
-    print "save figure: display "+folder+"/"+out_file+"/t_thermal_diff_2.png &"
+    print("save figure: display "+folder+"/"+out_file+"/t_thermal_diff_2.png &")
     savefig(folder+"/"+out_file+"/t_thermal_diff_2.png")
     #plt.show()
 
@@ -191,7 +194,7 @@ if dthermal_N:
     s = (s-s[ind].min())/(s[ind].max()-s[ind].min())
     if n != 1:
         s=running_mean(s, n)
-    print s.size, t.size
+    print(s.size, t.size)
     if lll==1:
         plot(t, s,'r', label="WV_062-IR_108 (cloud depth)")
     else:
@@ -253,5 +256,5 @@ if dthermal_N:
     ylabel(' d brightness temperature [0,1]')
     title('thermal channel differences')
     grid(True)
-    print "save figure: display "+folder+"/"+out_file+"t_thermal_diff_N.png &"
+    print("save figure: display "+folder+"/"+out_file+"t_thermal_diff_N.png &")
     savefig(folder+"/"+out_file+"t_thermal_diff_N.png")

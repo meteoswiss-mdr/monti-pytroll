@@ -1,9 +1,12 @@
+from __future__ import division
+from __future__ import print_function
+
 
 def input(in_msg):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
-    print "*** read input from ", in_msg.input_file
+    print("*** read input from ", in_msg.input_file)
 
     # 8=MSG1, 9=MSG2, 10=MSG3
     in_msg.sat    = "swissradar"
@@ -34,9 +37,9 @@ def input(in_msg):
     # chose radar product 
     #-------------------    
     ## satellite channels
-    ##in_msg.RGBs.append('PRECIP')     # RZC
+    in_msg.RGBs.append('PRECIP')     # RZC
     #in_msg.RGBs.append('POH')         # BZC
-    in_msg.RGBs.append('MESHS')       # MZC
+    #in_msg.RGBs.append('MESHS')       # MZC
     #in_msg.RGBs.append('VIL')         # LZC
     ##in_msg.RGBs.append('MaxEcho')    # CZC
     #in_msg.RGBs.append('EchoTOP15')   # EZC
@@ -93,7 +96,7 @@ def input(in_msg):
     in_msg.make_plots=True
     #in_msg.fill_value=(0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
     in_msg.fill_value=None  # black (0,0,0) / white (1,1,1) / transparent None  
-    in_msg.add_title = False
+    in_msg.add_title = True
     in_msg.title = ["%(sat)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s"]
     in_msg.title_y_line_nr = 2  # (INT) at which line should the title start
     in_msg.add_borders = False
@@ -122,7 +125,7 @@ def input(in_msg):
     #in_msg.postprocessing_areas=['EuropeCanaryS95']
     #in_msg.postprocessing_areas=["EuroMercator"]
 
-    #in_msg.postprocessing_composite=["h03-ir108"]
+    #in_msg.postprocessing_composite=["h03b-ir108"]
     #in_msg.postprocessing_composite=["hrwdp-ir108"]
     #in_msg.postprocessing_composite=["CTT-ir108","CTH-ir108"]
     #in_msg.postprocessing_composite=["hrwdp-ir108", "hrwdc-ir108","streamd-ir108","hrwdr-ir108", "hrwdcnwp-ir108", "hrwdcnnwp-ir108"]
@@ -146,8 +149,8 @@ def input(in_msg):
     #in_msg.postprocessing_composite=["TRT-radar-convection"] # "radar-convection",
     in_msg.postprocessing_composite = ["VIL-HRVir108pc","POH-HRVir108pc","MESHS-HRVir108pc","EchoTOP15-HRVir108pc","EchoTOP20-HRVir108pc","EchoTOP45-HRVir108pc","EchoTOP50-HRVir108pc"]
     
-    #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03-ir108"],["MSG_radar-HRV","MSG_h03-HRV"],["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]]
-    #in_msg.postprocessing_montage = [["MSG_h03-ir108","MSG_HRV"],["MSG_h03-ir108","MSG_test"]]
+    #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03b-ir108"],["MSG_radar-HRV","MSG_h03b-HRV"],["MSG_RATE-ir108","MSG_h03b-ir108"],["MSG_RATE-HRV","MSG_h03b-HRV"]]
+    #in_msg.postprocessing_montage = [["MSG_h03b-ir108","MSG_HRV"],["MSG_h03b-ir108","MSG_test"]]
     #in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-radar-convection"]]
     #in_msg.postprocessing_montage = [["MSG_C2rgb-Forecast-IR_108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-radar-convection"]]
     #in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-ir108","MSG_radar-ir108","MSG_THX-ir108"]]

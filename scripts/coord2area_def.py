@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 # Copyright (c) 2012
 #
 
@@ -22,7 +25,7 @@ import sys
 from pyproj import Proj
 
 if len(sys.argv) != 7:
-    print "Usage: ", sys.argv[0], "name proj min_lat max_lat min_lon max_lon"
+    print("Usage: ", sys.argv[0], "name proj min_lat max_lat min_lon max_lon")
     exit(1)
     
 name = sys.argv[1]
@@ -51,16 +54,16 @@ area_extent = (min(left_ex1, left_ex2),
                max(right_ex1, right_ex2),
                max(down_ex1, down_ex2))
 
-print "REGION:", name, "{"
-print "\tNAME:\t", name
-print "\tPCS_ID:\t", proj + "_" + str(lon_0) + "_" + str(lat_0)
-print ("\tPCS_DEF:\tproj=" + proj +
+print("REGION:", name, "{")
+print("\tNAME:\t", name)
+print("\tPCS_ID:\t", proj + "_" + str(lon_0) + "_" + str(lat_0))
+print(("\tPCS_DEF:\tproj=" + proj +
        ",lat_0=" + str(lat_0) +
        ",lon_0=" + str(lon_0) +
-       ",ellps=WGS84")
-print "\tXSIZE:\t"
-print "\tYSIZE:\t"
-print "\tAREA_EXTENT:\t", area_extent
-print "};"
+       ",ellps=WGS84"))
+print("\tXSIZE:\t")
+print("\tYSIZE:\t")
+print("\tAREA_EXTENT:\t", area_extent)
+print("};")
 
 

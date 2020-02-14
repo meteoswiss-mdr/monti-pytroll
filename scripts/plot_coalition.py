@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 from datetime import datetime
 import sys, string, os
 import logging
@@ -43,7 +46,7 @@ def create_dir(outputFile):
     path = dirname(outputFile)
     if not exists(path):
         if in_msg.verbose:
-            print '... create output directory: ' + path
+            print('... create output directory: ' + path)
         makedirs(path)
     return outputFile
 
@@ -51,13 +54,13 @@ def create_dir(outputFile):
 
 def force_to_observed_cloud_mask(mod, obs):
     if np.any(mod.mask == True) == False:
-        print "NO MASK ACTIVE!!!!!!!!!"
+        print("NO MASK ACTIVE!!!!!!!!!")
         if np.any(np.isnan(mod)):
             mod = ma.masked_where(np.isnan(mod), mod)
-            print "the invalid are NAN"
+            print("the invalid are NAN")
         else:
             mod = ma.masked_where(mod <= 0, mod)
-            print "the invalid are <= 0"
+            print("the invalid are <= 0")
     mod[mod.mask==True] = np.nan
     mod = fill_with_closest_pixel(mod) 
     mod[obs.mask==True] = np.nan
@@ -67,7 +70,7 @@ def force_to_observed_cloud_mask(mod, obs):
     #
     #force observed mask on forecast
     #mod[obs.mask==True] = no_data 
-    #print type(mod), type(obs)
+    #print (type(mod), type(obs))
     #
     #mod[mod.mask==True] = np.nan
     #mod = fill_with_closest_pixel(mod)    
@@ -97,7 +100,7 @@ if __name__ == '__main__':
     legend = True
 
     ntimes = 2 #in_windshift.ntimes
-    print "... aggregate winddata for ", ntimes, " timesteps" 
+    print("... aggregate winddata for ", ntimes, " timesteps") 
     min_correlation = 85 #in_windshift.min_correlation
     min_conf_nwp = 80 #in_windshift.min_conf_nwp
     min_conf_no_nwp = 80 #in_windshift.min_conf_no_nwp
@@ -196,8 +199,8 @@ if __name__ == '__main__':
     elif forth_mask == 'no_mask':
         name_4Mask = 'none'
     else:
-        print "*** Error in main (Mecikalski_test.py)"
-        print "    unknown 4th mask", forced_mask 
+        print("*** Error in main (Mecikalski_test.py)")
+        print("    unknown 4th mask", forced_mask) 
         quit()        
     
     
@@ -219,7 +222,7 @@ if __name__ == '__main__':
     elif forced_mask == 'no_mask':
         name_ForcedMask = 'no'
     else:
-        print "    unknown forcing mask -> applying no forcing mask", forced_mask 
+        print("    unknown forcing mask -> applying no forcing mask", forced_mask) 
         name_ForcedMask = 'no'    
     
     #mask that removed the thin cirrus
@@ -266,10 +269,10 @@ if __name__ == '__main__':
     
     if len(sys.argv) > 1:
         if len(sys.argv) < 6:
-            print "***           "
-            print "*** Warning, please specify date and time completely, e.g."
-            print "***          python plot_radar.py 2014 07 23 16 10 "
-            print "***           "
+            print("***           ")
+            print("*** Warning, please specify date and time completely, e.g.")
+            print("***          python plot_radar.py 2014 07 23 16 10 ")
+            print("***           ")
             quit() # quit at this point
         else:
             year   = int(sys.argv[1])
@@ -308,7 +311,7 @@ if __name__ == '__main__':
 
     while time_slot <= time_slotSTOP:
     
-          print time_slot
+          print(time_slot)
           year = time_slot.year
           month = time_slot.month
           day = time_slot.day
@@ -350,7 +353,7 @@ if __name__ == '__main__':
           # e.g. area_extent = (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
           area_tuple = (proj4_string, area_extent)
           
-          print in_msg.sat, str(in_msg.sat_nr).zfill(2), "seviri", time_slot
+          print(in_msg.sat, str(in_msg.sat_nr).zfill(2), "seviri", time_slot)
           
           # now read the data we would like to forecast
           global_data = GeostationaryFactory.create_scene(in_msg.sat, str(in_msg.sat_nr).zfill(2), "seviri", time_slot)
@@ -363,7 +366,7 @@ if __name__ == '__main__':
           area_loaded = load_products(global_data, channels, in_msg, area_loaded)
           
       
-          print '... project data to desired area ', area
+          print('... project data to desired area ', area)
           
           data = global_data.project(area)
       
@@ -380,9 +383,9 @@ if __name__ == '__main__':
               plt.close(fig)
           
           
-          print "mask ", sum(sum(data['CTP'].data.mask))
-          print data['CTP'].data.shape
-          print data['CTP'].data.size
+          print("mask ", sum(sum(data['CTP'].data.mask)))
+          print(data['CTP'].data.shape)
+          print(data['CTP'].data.size)
           
           #out_dir = "/data/COALITION2/PicturesSatellite//LEL_results_wind/"+yearS+"-"+monthS+"-"+dayS+"/"
           #out_dir = "/data/COALITION2/PicturesSatellite//"+yearS+"-"+monthS+"-"+dayS+"/Mecikalski2/"
@@ -459,7 +462,7 @@ if __name__ == '__main__':
           # create a mask where CTP can be derived 
           # -------------------
       
-          #print type(data['CTP'].data)
+          #print (type(data['CTP'].data))
           #mask_CTP = np.where(data['CTP'].data > 0.0)
           mask_CTP = data['CTP'].data.mask
           #if True:
@@ -468,7 +471,7 @@ if __name__ == '__main__':
           #      mask_CTP[mask1>0] = 1
           #else:
           #      mask_CTP = pickle.load( open( "mask_obs%s.p"%(yearS+monthS+dayS+hours+minS),"rb") )   
-          #print mask_CTP   
+          #print (mask_CTP)   
       
           ir_120_t15 = force_to_observed_cloud_mask(ma.masked_array(ir_120_t15), data['CTP'].data)
       
@@ -549,7 +552,7 @@ if __name__ == '__main__':
                     outputFile = out_dir +"/cosmo/Channels/indicators_in_time/all_indicators/%s_%s_Cloud_depth%s.png"%(yearS+monthS+dayS,hourS+minS,str(i+1))
                     fig.savefig( create_dir(outputFile) ) 
                     plt.close( fig)
-                    print "... display ", outputFile, " &" 
+                    print("... display ", outputFile, " &") 
               item = cloud_depth[5,:,:]
               #item.data[mask_CTP==0] = np.nan
               item[data['CTP'].data.mask == True ] = np.nan
@@ -561,7 +564,7 @@ if __name__ == '__main__':
               outputFile = out_dir +"/cosmo/Channels/indicators_in_time/all_indicators/%s_%s_Cloud_depth%s_cirrus.png"%(yearS+monthS+dayS,hourS+minS,str(i+1))
               fig.savefig( create_dir(outputFile) ) 
               plt.close( fig)
-              print "... display ", outputFile, " &"               
+              print("... display ", outputFile, " &")               
           if plot_indicator_optical_thickness:
               fig = plt.figure()
               plt.imshow( cd, vmin=0, vmax=5)
@@ -616,7 +619,7 @@ if __name__ == '__main__':
                   outputFile = out_dir +"/cosmo/Channels/indicators_in_time/all_indicators/%s_%s_Glaciation_Indicators%s.png"%(yearS+monthS+dayS,hourS+minS,str(i+1))
                   fig.savefig( create_dir(outputFile) ) 
                   plt.close(fig)
-                  print "... display ", outputFile, " &" 
+                  print("... display ", outputFile, " &") 
       
           if plot_indicator_glationation:
               fig = plt.figure()
@@ -654,7 +657,7 @@ if __name__ == '__main__':
           
           count_null = np.zeros( (nx,ny))
           count_null = np.where( mask_CTP==1,1,0)
-          print sum( sum( count_null))
+          print(sum( sum( count_null)))
           
           us = np.where(mask_CTP == True, 0, us)
           #us = us*mask_CTP
@@ -673,7 +676,7 @@ if __name__ == '__main__':
                   outputFile = out_dir +"/cosmo/Channels/indicators_in_time/all_indicators/%s_%s_Updraft_strength%s.png"%(yearS+monthS+dayS,hourS+minS,str(i+1))
                   fig.savefig( create_dir(outputFile)) 
                   plt.close(fig)       
-                  print "... display ", outputFile, " &" 
+                  print("... display ", outputFile, " &") 
       
           if plot_indicator_updraft:
               fig = plt.figure()
@@ -796,7 +799,7 @@ if __name__ == '__main__':
                         
           cw = ContourWriterAGG( in_msg.mapDir)
       
-          print "... create the false color composite (r-g-b) = (", rgb_display,")"
+          print("... create the false color composite (r-g-b) = (", rgb_display,")")
 
           if rgb_display == 'us-cd-gi':
               r = cmin_us + (us/n_tests_us) * (cmax_us - cmin_us)
@@ -807,8 +810,8 @@ if __name__ == '__main__':
               g = cmin_us + (us/n_tests_us) * (cmax_us - cmin_us)
               b = cmin_gi + (gi/n_tests_gi) * (cmax_gi - cmin_gi)
           else: 
-              print "*** Error in main (Mecikalski_test.py)"
-              print "    unknown rgb illustration", rgb_display
+              print("*** Error in main (Mecikalski_test.py)")
+              print("    unknown rgb illustration", rgb_display)
               quit()
 
           # fix upper and lower limit of the color, if scaled beyond the range
@@ -830,8 +833,8 @@ if __name__ == '__main__':
           elif forced_mask == 'IR_039_minus_IR_108':  
                   force_mask = np.where(IR_039_minus_IR_108 >= force_th_chDiff,1,0)
           elif forced_mask !='no_mask': 
-              print "*** Error in main (Mecikalski_test.py)"
-              print "    unknown forcing mask -> applying no forcing mask", forced_mask     
+              print("*** Error in main (Mecikalski_test.py)")
+              print("    unknown forcing mask -> applying no forcing mask", forced_mask)     
       
           if plot_forced_mask:
               fig = plt.figure()
@@ -856,8 +859,8 @@ if __name__ == '__main__':
               mask  = np.logical_or(mature_mask==1,developing_mask==1)
               maskS = '_dam'
           else:
-              print "*** Error in main (Mecikalski.py)"
-              print "    unknown show_clouds: ", show_clouds
+              print("*** Error in main (Mecikalski.py)")
+              print("    unknown show_clouds: ", show_clouds)
               quit()
           
           mask = np.logical_or(mask==1,forced_mask==1)
@@ -898,8 +901,8 @@ if __name__ == '__main__':
                   # Remove small black hole
                   mask = ndimage.binary_closing(mask) 
           elif clean_mask != 'no_cleaning':
-              print "*** Error in main (Mecikalski.py)"
-              print "    unknown clean_mask: ", clean_mask
+              print("*** Error in main (Mecikalski.py)")
+              print("    unknown clean_mask: ", clean_mask)
               quit()          
           
           if plot_final_mask:
@@ -948,7 +951,7 @@ if __name__ == '__main__':
               #                        add_borders=in_msg.add_borders, border_color=in_msg.border_color,
               #                        add_rivers=in_msg.add_rivers, river_color=in_msg.river_color, 
               #                        resolution=in_msg.resolution, verbose=in_msg.verbose)
-              print "... save image: display ", c2File, " &"
+              print("... save image: display ", c2File, " &")
               img1.save( create_dir(c2File) ) 
               
               #pickle.dump( img1, open("RGB"+yearS+monthS+dayS+hourS+minS+".p", "wb" ) )
@@ -957,9 +960,9 @@ if __name__ == '__main__':
               hrvFile = "/data/COALITION2/PicturesSatellite//"+yearS+"-"+monthS+"-"+dayS+"/"+yearS+"-"+monthS+"-"+dayS+"_HRV_ccs4/MSG_HRV-ccs4_15"+monthS+dayS+hourS+minS+".png" 
               out_file = create_dir( out_dir +"/cosmo/Channels/indicators_in_time/RGB-HRV"+maskS+"/"+yearS+monthS+dayS+"_"+hourS+minS+"_C2rgb-HRV_"+"4th"+name_4Mask+"_"+name_ForcedMask+"AdditionalMask.png" )
       
-              print "... create composite "+c2File+" "+hrvFile+" "+out_file
+              print("... create composite "+c2File+" "+hrvFile+" "+out_file)
               subprocess.call("/usr/bin/composite "+c2File+" "+hrvFile+" "+out_file, shell=True)
-              print "... saved composite: display ", out_file, " &"
+              print("... saved composite: display ", out_file, " &")
       
           if detect_objects == True:
               
@@ -1029,10 +1032,10 @@ if __name__ == '__main__':
     rgbArray[..., 3] = 200
     sum_array = rgbArray[...,0]+rgbArray[..., 1]+rgbArray[..., 2]
     #count = np.zeros(sum_array.shape)
-    #print count.shape
-    #print rgbArray[...,0].shape
+    #print (count.shape)
+    #print (rgbArray[...,0].shape)
     #count[sum_array<=0] = 1
-    #print sum(sum(count))
+    #print (sum(sum(count)))
     rgbArray[sum_array<=0,0] = 255 #np.where( sum_array<=0,1,rgbArray[..., 0])
     rgbArray[sum_array<=0,1] = 255 #np.where( sum_array<=0,1,rgbArray[..., 1])
     rgbArray[sum_array<=0,2] = 255 #np.where( sum_array<=0,1,rgbArray[..., 2])
@@ -1046,7 +1049,7 @@ if __name__ == '__main__':
         #                        resolution=in_msg.resolution, verbose=in_msg.verbose)
 
         outputFile = out_dir+"/cosmo/Channels/indicators_in_time/RGBs/%s_%s_RGB.png"%(yearS+monthS+dayS,hourS+minS)
-        print "... save image: ", outputFile
+        print ("... save image: ", outputFile)
         img1.save( create_dir(outputFile) ) 
 
     if plot_RGB_HRV:
@@ -1067,10 +1070,10 @@ if __name__ == '__main__':
     rgbArray[..., 3] = 200
     sum_array = rgbArray[...,0]+rgbArray[..., 1]+rgbArray[..., 2]
     #count = np.zeros( sum_array.shape)
-    #print count.shape
-    #print rgbArray[...,0].shape
+    #print (count.shape)
+    #print (rgbArray[...,0].shape)
     #count[sum_array<=0] = 1
-    #print sum( sum(count))
+    #print (sum( sum(count)))
     rgbArray[sum_array<=0,0] = 255 #np.where( sum_array<=0,1,rgbArray[..., 0])
     rgbArray[sum_array<=0,1] = 255 #np.where( sum_array<=0,1,rgbArray[..., 1])
     rgbArray[sum_array<=0,2] = 255 #np.where( sum_array<=0,1,rgbArray[..., 2])
@@ -1082,7 +1085,7 @@ if __name__ == '__main__':
         #                        add_borders=in_msg.add_borders, border_color=in_msg.border_color,
         #                        add_rivers=in_msg.add_rivers, river_color=in_msg.river_color, 
         #                        resolution=in_msg.resolution, verbose=in_msg.verbose)
-        print out_dir +"/cosmo/Channels/indicators_in_time/RGBs/%s_%s_RGBmature.png"%(yearS+monthS+dayS,hourS+minS)
+        print (out_dir +"/cosmo/Channels/indicators_in_time/RGBs/%s_%s_RGBmature.png"%(yearS+monthS+dayS,hourS+minS))
         img1.save(out_dir +"/cosmo/Channels/indicators_in_time/RGBs/%s_%s_RGBmature.png"%(yearS+monthS+dayS,hourS+minS))
 
     if plot_RGB_HRV_mature:
@@ -1104,10 +1107,10 @@ if __name__ == '__main__':
     rgbArray[..., 3] = 200
     sum_array = rgbArray[...,0]+rgbArray[..., 1]+rgbArray[..., 2]
     #count = np.zeros(sum_array.shape)
-    #print count.shape
-    #print rgbArray[...,0].shape
+    #print (count.shape)
+    #print (rgbArray[...,0].shape)
     #count[sum_array<=0]=1
-    #print sum( sum(count))
+    #print (sum( sum(count)))
     rgbArray[sum_array<=0,0] = 255 #np.where( sum_array<=0,1,rgbArray[..., 0])
     rgbArray[sum_array<=0,1] = 255 #np.where( sum_array<=0,1,rgbArray[..., 1])
     rgbArray[sum_array<=0,2] = 255 #np.where( sum_array<=0,1,rgbArray[..., 2])
@@ -1118,7 +1121,7 @@ if __name__ == '__main__':
         #                        add_borders=in_msg.add_borders, border_color=in_msg.border_color,
         #                        add_rivers=in_msg.add_rivers, river_color=in_msg.river_color, 
         #                        resolution=in_msg.resolution, verbose=in_msg.verbose)
-        print out_dir +"/cosmo/Channels/indicators_in_time/RGBs/%s_%s_RGBdeveloping.png"%(yearS+monthS+dayS,hourS+minS)
+        print (out_dir +"/cosmo/Channels/indicators_in_time/RGBs/%s_%s_RGBdeveloping.png"%(yearS+monthS+dayS,hourS+minS))
         img1.save( out_dir +"/cosmo/Channels/indicators_in_time/RGBs/%s_%s_RGBdeveloping.png"%(yearS+monthS+dayS,hourS+minS))
     
     if plot_RGB_HRV_develop:
@@ -1139,10 +1142,10 @@ if __name__ == '__main__':
     rgbArray[..., 3] = 200
     sum_array = rgbArray[...,0]+rgbArray[..., 1]+rgbArray[..., 2]
     #count = np.zeros( sum_array.shape)
-    #print count.shape
-    #print rgbArray[...,0].shape
+    #print (count.shape)
+    #print (rgbArray[...,0].shape)
     #count[sum_array<=0] = 1
-    #print sum( sum(count))
+    #print (sum( sum(count)))
     rgbArray[sum_array<=0,0] = 255 #np.where( sum_array<=0,1,rgbArray[..., 0])
     rgbArray[sum_array<=0,1] = 255 #np.where( sum_array<=0,1,rgbArray[..., 1])
     rgbArray[sum_array<=0,2] = 255 #np.where( sum_array<=0,1,rgbArray[..., 2])
@@ -1165,7 +1168,7 @@ if __name__ == '__main__':
         file2 = out_dir +"/cosmo/Channels/indicators_in_time/RGB-all/"+yearS+monthS+dayS+"_"+hourS+minS+"_RGBallb.png" 
         outputFile = create_dir( out_dir +"/cosmo/Channels/indicators_in_time/RGB-HRV-all/"+yearS+monthS+dayS+"_"+hourS+minS+"_RGBallCombined_BWb.png" )
         subprocess.call("/usr/bin/composite "+file2+" "+file1+" "+outputFile, shell=True)
-        print outputFile
+        print (outputFile)
     
 
     """
@@ -1175,12 +1178,12 @@ if __name__ == '__main__':
     # http://www.scipy-lectures.org/advanced/image_processing/auto_examples/plot_find_edges.html#example-plot-find-edges-py
     img[np.isnan(img)] = 0
     img[img>0] = 1
-    print img
+    print (img)
     from scipy import ndimage
     sx = ndimage.sobel(img, axis=0, mode='constant')
     sy = ndimage.sobel(img, axis=1, mode='constant')
     sob=np.hypot(sx,sy)
-    print sob
+    print (sob)
     sob=np.ma.masked_where(sob==0)
     """
     #file1="/data/COALITION2/PicturesSatellite//"+yearS+"-"+monthS+"-"+dayS+"/"+yearS+"-"+monthS+"-"+dayS+"_HRV_ccs4/MSG_HRV-ccs4_15"+monthS+dayS+hourS+minS+".png" #2015-07-07_HRV_ccs4"_HRoverview_ccs4/MSG_HRoverview-ccs4_15"+monthS+dayS+hourS+minS+".png"
@@ -1220,7 +1223,7 @@ if __name__ == '__main__':
 
     dc.add_scale(rainbow,extend=True)
     
-    print type(img_cd)
+    print (type(img_cd))
 """
 
 #####################th1#####################

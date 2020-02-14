@@ -1,7 +1,12 @@
+from __future__ import division
+from __future__ import print_function
+
+
+
+
 from datetime import datetime
 import sys, string, os
 import logging
-sys.path.insert(0, "/home/lom/users/cll/pytroll/install/lib/python2.6/site-packages")
 from mpop.satellites import GeostationaryFactory
 from mpop.projector import get_area_def
 from mpop.utils import debug_on
@@ -55,9 +60,9 @@ def read_HRW(sat, sat_nr, instrument, time_slot, ntimes, dt=5, read_basic_or_det
 
 def wind_shift(data, u, v, dt, area):
 
-    print type(u), u.shape
-    print type(dt), dt
-    print type(area.pixel_size_x), area.pixel_size_x
+    print(type(u), u.shape)
+    print(type(dt), dt)
+    print(type(area.pixel_size_x), area.pixel_size_x)
 
     dx = (np.round ( u * (dt*60.) / area.pixel_size_x ) ) # u in m/s, t in min -> s, pixel_size in m
     dy = (np.round ( v * (dt*60.) / area.pixel_size_y ) )
@@ -65,8 +70,8 @@ def wind_shift(data, u, v, dt, area):
     dy = dy.astype(int)
     #dy = np.flipud(dy)
 
-    print 'dx.min() ', dx.min()
-    print 'dx.max() ', dx.max()
+    print('dx.min() ', dx.min())
+    print('dx.max() ', dx.max())
 
     (nx,ny) = data.shape
 
@@ -85,8 +90,8 @@ def wind_shift(data, u, v, dt, area):
         plt.imshow(dd, vmin=vmin, vmax=vmax)
         plt.colorbar()
         fig.savefig("ws_dy.png")
-        print "... display ws_dy.png &"
-        print "dx[ii,jj]", dx[ii,jj]
+        print("... display ws_dy.png &")
+        print("dx[ii,jj]", dx[ii,jj])
         #plt.show()
         #quit()
 
@@ -98,7 +103,7 @@ def wind_nowcast (data, dx, dy):
     (nx,ny) = data.shape
     data_s = np.empty(data.shape)
     data_s[:,:] = np.nan
-    print data_s.shape
+    print(data_s.shape)
 
     for i in range(0,nx):       # starting upper right going down
         for j in range(0,ny):   # starting lower right going right
@@ -122,7 +127,7 @@ def wind_nowcast (data, dx, dy):
         plt.imshow(dd)
         plt.colorbar()
         fig.savefig("ws_data_s.png")
-        print "... display ws_data_s.png &"
+        print("... display ws_data_s.png &")
         #plt.show()
         quit()
 
@@ -137,7 +142,7 @@ def wind_nowcast (data, dx, dy):
         plt.imshow(dd)
         plt.colorbar()
         fig.savefig("ws_data.png")
-        print "... display ws_data.png &"
+        print("... display ws_data.png &")
         #plt.show()
         quit()
 
@@ -165,7 +170,7 @@ if __name__ == '__main__':
     legend=True
 
     ntimes = 4
-    print "... aggregate winddata for ", ntimes, " timesteps" 
+    print("... aggregate winddata for ", ntimes, " timesteps") 
     min_correlation = 85
     min_conf_nwp    = 80
     min_conf_no_nwp = 80
@@ -209,10 +214,10 @@ if __name__ == '__main__':
 
     if len(sys.argv) > 1:
         if len(sys.argv) < 6:
-            print "***           "
-            print "*** Warning, please specify date and time completely, e.g."
-            print "***          python plot_radar.py 2014 07 23 16 10 "
-            print "***           "
+            print("***           ")
+            print("*** Warning, please specify date and time completely, e.g.")
+            print("***          python plot_radar.py 2014 07 23 16 10 ")
+            print("***           ")
             quit() # quit at this point
         else:
             year   = int(sys.argv[1])
@@ -313,11 +318,11 @@ if __name__ == '__main__':
 
     area='ccs4'
 
-    print '... project data to desired area ', area
+    print('... project data to desired area ', area)
     data = global_data.project(area, precompute=True)
     data2 = deepcopy(data)
 
-    print '... calculate gridded 2d wind field' 
+    print('... calculate gridded 2d wind field') 
     u2d, v2d = HRW_2dfield( hrw_data['HRW'].HRW_detailed, obj_area )
 
     ##print "u2d.shape B", u2d.shape
@@ -337,7 +342,7 @@ if __name__ == '__main__':
 
     for it in range(12):
 
-        print '... shift sat observation with wind field, it = ',it
+        print('... shift sat observation with wind field, it = ',it)
         data2[channel].data[:,:] = np.nan
 
         dx, dy = wind_shift(data[channel].data, u2d, v2d, it*delta_t, obj_area)
@@ -375,12 +380,12 @@ if __name__ == '__main__':
         outputFile = outputDir + format_name(in_msg.outputFile+'p'+str(it*delta_t).zfill(2)+'.png', data.time_slot, area=area, rgb=rgb, sat_nr=data.number)
 
         if not exists(outputDir):
-            print '... create output directory: ' + outputDir
+            print('... create output directory: ' + outputDir)
             makedirs(outputDir)
 
         # save file
         if in_msg.verbose:
-            print '... save final file :' + outputFile
+            print('... save final file :' + outputFile)
         PIL_image.save(outputFile, optimize=True)  # optimize -> minimize file size
 
     quit()
@@ -412,18 +417,18 @@ if __name__ == '__main__':
             layer=layer+':'
 
         if detailed:
-            print "*** plot detailed winds"
+            print("*** plot detailed winds")
             detailed_str = 'detailed'      # hrw_channels=None, min_correlation=None, cloud_type=None, style='barbs'
             detailed_char = 'd'                    
         else:
-            print "*** plot basic winds"
+            print("*** plot basic winds")
             detailed_str = 'basic'
             detailed_char = 'b'
 
 
     for plot_mode in plot_modes:
 
-        print "    create HRW plot, plot mode = ", plot_mode
+        print("    create HRW plot, plot mode = ", plot_mode)
 
         if plot_mode in HRWimages:
             if detailed:
@@ -458,8 +463,8 @@ if __name__ == '__main__':
 
 
         else:
-            print "*** Error in plot_hrw.py"
-            print "    unknown plot_mode"
+            print("*** Error in plot_hrw.py")
+            print("    unknown plot_mode")
             quit()
 
 
@@ -486,7 +491,7 @@ if __name__ == '__main__':
             draw = ImageDraw.Draw(PIL_image)
             draw.text((0, y_pos_title),title, title_color, font=font)
 
-        print '... save image as ', outputFile+image_type
+        print('... save image as ', outputFile+image_type)
         PIL_image.save(outputFile+image_type)
 
         # copy to another place
@@ -494,7 +499,7 @@ if __name__ == '__main__':
             import subprocess
         #    if in_msg.verbose:
         #        print "... secure copy "+outputFile+ " to "+in_msg.scpOutputDir
-            print "scp "+scpID+" "+outputFile+image_type +" "+" "+scpOutputDir+" 2>&1 &"
+            print("scp "+scpID+" "+outputFile+image_type +" "+" "+scpOutputDir+" 2>&1 &")
             subprocess.call("scp "+scpID+" "+outputFile+image_type +" "+" "+scpOutputDir+" 2>&1 &", shell=True)
         #    if in_msg.compress_to_8bit:
         #        if in_msg.verbose:
@@ -513,13 +518,13 @@ if __name__ == '__main__':
             hrv_file   = output_dir+'/MSG_HRV-'  +area+'_'+yearS[2:]+monthS+dayS+hourS+minS+".png"
             ir_outfile  = output_dir+'/MSG_'+product+'-ir108-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS+".png"
             hrv_outfile = output_dir+'/MSG_'+product+'-HRV-'  +area+'_'+yearS[2:]+monthS+dayS+hourS+minS+".png"
-            print "/usr/bin/composite "+outputFile+image_type+" "+ir_file+" "+" "+ir_outfile+" && sleep 1"
+            print("/usr/bin/composite "+outputFile+image_type+" "+ir_file+" "+" "+ir_outfile+" && sleep 1")
             subprocess.call("/usr/bin/composite "+outputFile+image_type+" "+ir_file +" "+" "+ir_outfile +" 2>&1 && sleep 1 ", shell=True)
-            print "/usr/bin/composite "+outputFile+image_type+" "+hrv_file+" "+" "+hrv_outfile+" && sleep 1"
+            print("/usr/bin/composite "+outputFile+image_type+" "+hrv_file+" "+" "+hrv_outfile+" && sleep 1")
             subprocess.call("/usr/bin/composite "+outputFile+image_type+" "+hrv_file+" "+" "+hrv_outfile+" 2>&1 && sleep 1 ", shell=True)
 
             if True:
-                print "scp "+scpID+" "+ir_outfile  +" "+" "+scpOutputDir+" 2>&1 &"
+                print("scp "+scpID+" "+ir_outfile  +" "+" "+scpOutputDir+" 2>&1 &")
                 subprocess.call("scp "+scpID+" "+ir_outfile  +" "+" "+scpOutputDir+" 2>&1 && sleep 1", shell=True)
-                print "scp "+scpID+" "+hrv_outfile +" "+" "+scpOutputDir+" 2>&1 &"
+                print("scp "+scpID+" "+hrv_outfile +" "+" "+scpOutputDir+" 2>&1 &")
                 subprocess.call("scp "+scpID+" "+hrv_outfile +" "+" "+scpOutputDir+" 2>&1 && sleep 1", shell=True)

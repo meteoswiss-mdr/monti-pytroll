@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 """Loader for DEM (topography) in netcdf format.
 """
 from mpop import CONFIG_PATH
@@ -13,13 +16,13 @@ def read_dem():
 
     filename = "/data/COALITION2/database/topography/GTOPO30/dtm_acquire_ccs4_float_v3.nc" 
 
-    print "... read from file: ", filename
+    print("... read from file: ", filename)
 
     # Load data from netCDF file
     ds = Dataset(filename, 'r')
 
     data = ds.variables[chn_name][:,:]
-    print type(data)
-    print type(ma.asarray(data))
+    print(type(data))
+    print(type(ma.asarray(data)))
 
     area_def = get_area_def("ccs4")

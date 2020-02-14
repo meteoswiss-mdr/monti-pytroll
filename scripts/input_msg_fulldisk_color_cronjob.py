@@ -1,10 +1,13 @@
+from __future__ import division
+from __future__ import print_function
+
 
 def input(in_msg):
 
     import inspect
     #from my_msg_module import check_RSS
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
-    print "*** read input from ", in_msg.input_file
+    print("*** read input from ", in_msg.input_file)
 
     # 8=MSG1, 9=MSG2, 10=MSG3
     in_msg.sat = "Meteosat"
@@ -314,9 +317,9 @@ def input(in_msg):
     in_msg.ninjotifFilename = 'MET%(sat_nr)s_%(RSS)s_%(rgb)s_%(area)s_%Y%m%d%H%M.tif' 
     in_msg.upload_ninjotif = False
 
-    #in_msg.postprocessing_areas=['ccs4']
-    in_msg.postprocessing_composite=["THX-IR_108","radar-convection","THX-radar-convection"]    
-
+    in_msg.postprocessing_areas=['SeviriDiskFull00S4']
+    in_msg.postprocessing_composite=["h03b-VIS006ir108"] 
+    
     in_msg.scpOutput = True   
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages/SeviriDiskFull00S4"

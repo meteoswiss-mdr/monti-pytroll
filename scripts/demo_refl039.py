@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
@@ -45,25 +48,25 @@ elif len(sys.argv) == 6:
     minute = int(sys.argv[5])
     tslot = datetime(year, month, day, hour, minute)
 else:
-    print "\n*** Error, wrong number of input arguments"
-    print "    usage:"
-    print "    python demo_refl039.py"
-    print "    or"
-    print "    python demo_refl039.py 2017 2 17 14 35\n"
+    print("\n*** Error, wrong number of input arguments")
+    print("    usage:")
+    print("    python demo_refl039.py")
+    print("    or")
+    print("    python demo_refl039.py 2017 2 17 14 35\n")
     quit()
 
-print "*** plot day microphysics RGB for ", str(tslot)
+print("*** plot day microphysics RGB for ", str(tslot))
 
 #glbd = GeostationaryFactory.create_scene("meteosat", "09", "seviri", tslot)
 glbd = GeostationaryFactory.create_scene("Meteosat-9", "", "seviri", tslot)
 
-print "... load sat data"
+print("... load sat data")
 glbd.load(['VIS006','VIS008','IR_016','IR_039','IR_108','IR_134'], area_extent=europe.area_extent)
 #area="EuropeCanaryS95"
 area="EuroMercator" # blitzortung projection
 local_data = glbd.project(area, precompute=True)
 
-print "... read responce functions"
+print("... read responce functions")
 from pyspectral.near_infrared_reflectance import Calculator
 from pyspectral.solar import (SolarIrradianceSpectrum, TOTAL_IRRADIANCE_SPECTRUM_2000ASTM)
 
@@ -88,20 +91,20 @@ lonlats = ch39.area.get_lonlats()
 from pyorbital.astronomy import sun_zenith_angle
 sunz = sun_zenith_angle(tslot, lonlats[0], lonlats[1])
 
-print "... create look-up-table"
+print("... create look-up-table")
 #refl37 = Calculator(rsr)
 refl37 = Calculator('Meteosat-9', 'seviri', 'IR3.9', solar_flux=sflux)
 #refl37.make_tb2rad_lut('/tmp/seviri_37_tb2rad_lut.npz')
 # new syntax -> 
 #refl37.make_tb2rad_lut('IR3.9','/data/COALITION2/database/meteosat/SEVIRI/seviri_tb2rad_lut/')
 
-print "... calculate reflectance"
+print("... calculate reflectance")
 r39 = refl37.reflectance_from_tbs(sunz, ch39.data, ch11.data, ch13.data) # , lookuptable='/tmp/seviri_37_tb2rad_lut.npz'
 
 import numpy as np
 r39 = np.ma.masked_array(r39, mask = np.logical_or(np.less(r39, -0.1), 
                                                    np.greater(r39, 3.0)))
-print "... show new RGB image"
+print("... show new RGB image")
 from mpop.imageo.geo_image import GeoImage
 img = GeoImage((local_data[0.8].data, local_data[1.6].data, r39 * 100), area, 
                tslot, crange=((0, 100), (0, 70), (0, 30)), 

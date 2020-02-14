@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 #!/usr/bin/python
 
 # program to plot SEVIRI observations   
@@ -27,6 +30,9 @@
 #         2015-02-25 U. Hamann, added the ability to plot 
 #                               NWC-SAF cloud mask and SPhR products
 #
+
+
+
 
 from mpop.satellites import GeostationaryFactory
 from mpop.imageo.geo_image import GeoImage
@@ -110,7 +116,7 @@ def scatter_rad_rcz(in_msg):
          #area_loaded = get_area_def("EuropeCanary")
          #area_loaded = get_area_def("alps")  # new projection of SAM
       else:
-         print "*** Error, unknown satellite number ", in_msg.sat_nr
+         print("*** Error, unknown satellite number ", in_msg.sat_nr)
          area_loaded = get_area_def("hsaf")  # 
    else:
       if in_msg.sat_nr == 8:
@@ -126,24 +132,24 @@ def scatter_rad_rcz(in_msg):
    elif type(in_msg.sat_nr) is str:
       sat_nr_str = in_msg.sat_nr
    else:
-      print "*** Waring, unknown type of sat_nr", type(in_msg.sat_nr)
+      print("*** Waring, unknown type of sat_nr", type(in_msg.sat_nr))
       sat_nr_str = in_msg.sat_nr
 
    if in_msg.verbose:
-      print '*** Create plots for '
-      print '    Satellite/Sensor: '+in_msg.sat + '  ' + sat_nr_str
-      print '    Date/Time:        '+dateS +' '+hourS+':'+minS+'UTC'
-      print '    RGBs:            ', in_msg.RGBs
-      print '    Area:            ', in_msg.areas
+      print('*** Create plots for ')
+      print('    Satellite/Sensor: '+in_msg.sat + '  ' + sat_nr_str)
+      print('    Date/Time:        '+dateS +' '+hourS+':'+minS+'UTC')
+      print('    RGBs:            ', in_msg.RGBs)
+      print('    Area:            ', in_msg.areas)
 
 
    # check if input data is complete 
    if in_msg.verbose:
-      print "*** check input data"
+      print("*** check input data")
    RGBs = check_input(in_msg, in_msg.sat+sat_nr_str, in_msg.datetime)
    if len(RGBs) != len(in_msg.RGBs):
-      print "*** Warning, input not complete."
-      print "*** Warning, process only: ", RGBs
+      print("*** Warning, input not complete.")
+      print("*** Warning, process only: ", RGBs)
 
    # define time and data object
    global_data = GeostationaryFactory.create_scene(in_msg.sat, sat_nr_str, "seviri", in_msg.datetime)
@@ -159,7 +165,7 @@ def scatter_rad_rcz(in_msg):
       return RGBs
 
    if in_msg.verbose:
-      print "*** load satellite channels for "+in_msg.sat+sat_nr_str+" ", global_data.fullname
+      print("*** load satellite channels for "+in_msg.sat+sat_nr_str+" ", global_data.fullname)
 
    # initialize processed RGBs
    RGBs_done=[]
@@ -167,13 +173,13 @@ def scatter_rad_rcz(in_msg):
    # load all channels / information 
    for rgb in RGBs:
       if in_msg.verbose:
-         print "    load prerequisites for: ", rgb
+         print("    load prerequisites for: ", rgb)
 
       if rgb in products.MSG or rgb in products.MSG_color: 
          for channel in products.MSG:
             if rgb.find(channel) != -1:                   # if a channel name (IR_108) is in the rgb name (IR_108c)
                if in_msg.verbose:
-                  print "    load prerequisites by name: ", channel
+                  print("    load prerequisites by name: ", channel)
                if in_msg.reader_level is None:
                   global_data.load([channel], area_extent=area_loaded.area_extent)   # try all reader levels  load the corresponding data
                else:
@@ -182,7 +188,7 @@ def scatter_rad_rcz(in_msg):
       if rgb in products.RGBs_buildin or rgb in products.RGBs_user:
          obj_image = get_image(global_data, rgb)          # find corresponding RGB image object
          if in_msg.verbose:
-            print "    load prerequisites by function: ", obj_image.prerequisites
+            print("    load prerequisites by function: ", obj_image.prerequisites)
          global_data.load(obj_image.prerequisites, area_extent=area_loaded.area_extent) # load prerequisites
 
       if  rgb in products.CMa or rgb in products.CT or rgb in products.CTTH or rgb in products.SPhR:
@@ -195,31 +201,31 @@ def scatter_rad_rcz(in_msg):
          elif rgb in products.SPhR:
             pge = "SPhR"
          else:
-            print "*** Error in scatter_rad_rcz ("+inspect.getfile(inspect.currentframe())+")"
-            print "    unknown NWC-SAF PGE ", rgb
+            print("*** Error in scatter_rad_rcz ("+inspect.getfile(inspect.currentframe())+")")
+            print("    unknown NWC-SAF PGE ", rgb)
             quit()
          if in_msg.verbose:
-            print "    load NWC-SAF product: "+pge 
+            print("    load NWC-SAF product: "+pge) 
          global_data.load([pge], calibrate=in_msg.nwcsaf_calibrate, reader_level="seviri-level3") # False, area_extent=area_loaded.area_extent (difficulties to find correct h5 input file)
          #print global_data.loaded_channels()
          #loaded_channels = [chn.name for chn in global_data.loaded_channels()]
          #if pge not in loaded_channels:
          #   return []
          if area_loaded != global_data[pge].area:
-            print "*** Warning: NWC-SAF input file on a differnt grid ("+global_data[pge].area.name+") than suggested input area ("+area_loaded.name+")"
-            print "    use "+global_data[pge].area.name+" as standard grid"
+            print("*** Warning: NWC-SAF input file on a differnt grid ("+global_data[pge].area.name+") than suggested input area ("+area_loaded.name+")")
+            print("    use "+global_data[pge].area.name+" as standard grid")
             area_loaded = global_data[pge].area
          convert_NWCSAF_to_radiance_format(global_data, area_loaded, rgb, IS_PYRESAMPLE_LOADED)
 
       if rgb in products.HSAF: 
          if in_msg.verbose:
-            print "    load hsaf product by name: ", rgb
+            print("    load hsaf product by name: ", rgb)
          global_data.load([rgb])   # , area_extent=area_loaded.area_extent load the corresponding data
 
       if in_msg.HRV_enhancement:
          # load also the HRV channel (there is a check inside in the load function, if the channel is already loaded)
          if in_msg.verbose:
-            print "    load additionally the HRV channel for HR enhancement"
+            print("    load additionally the HRV channel for HR enhancement")
          global_data.load(["HRV"], area_extent=area_loaded.area_extent)
 
 
@@ -248,17 +254,17 @@ def scatter_rad_rcz(in_msg):
    # preprojecting the data to another area 
    # --------------------------------------
    for area in in_msg.areas:
-      print ""
+      print("")
       obj_area = get_area_def(area)
       if obj_area == area_loaded: 
          if in_msg.verbose:
-            print "*** Use data for the area loaded: ", area
+            print("*** Use data for the area loaded: ", area)
          #obj_area = area_loaded
          data = global_data
          resolution='l'
       else:
          if in_msg.verbose:    
-            print "*** Reproject data to area: ", area, "(org projection: ",  area_loaded.name, ")"     
+            print("*** Reproject data to area: ", area, "(org projection: ",  area_loaded.name, ")")     
          obj_area = get_area_def(area)
          # PROJECT data to new area 
          data = global_data.project(area)
@@ -295,17 +301,17 @@ def scatter_rad_rcz(in_msg):
          path= dirname(ncOutputFile)
          if not exists(path):
             if in_msg.verbose:
-               print '... create output directory: ' + path
+               print('... create output directory: ' + path)
             makedirs(path)
          if in_msg.verbose:
-            print "... save reprojected data: ncview "+ ncOutputFile+ " &" 
+            print("... save reprojected data: ncview "+ ncOutputFile+ " &") 
          #data.save(ncOutputFile, to_format="netcdf4", compression=False)
          data.save(ncOutputFile, band_axis=0, concatenate_bands=False)
 
       # mask for the cloud depths tests (masked data)
       #if area == 'ccs4':
       if area == False:
-         print '... apply convective mask'
+         print('... apply convective mask')
          mask_depth = data.image.mask_clouddepth()
          #print type(mask_depth.max)
          #print dir(mask_depth.max)
@@ -329,7 +335,7 @@ def scatter_rad_rcz(in_msg):
          #statisticFile = '/data/COALITION2/database/meteosat/ccs4/'+yearS+'/'+monthS+'/'+dayS+'/MSG_'+area+'_'+yearS[2:]+monthS+dayS+'.txt'
          statisticFile = './'+yearS+'-'+monthS+'-'+dayS+'/MSG_'+area+'_'+yearS[2:]+monthS+dayS+'.txt'
          if in_msg.verbose:
-            print "*** write statistics (average values) to "+statisticFile
+            print("*** write statistics (average values) to "+statisticFile)
          f1 = open(statisticFile,'a')   # mode append
          i_rgb=0
          for rgb in RGBs:
@@ -345,11 +351,11 @@ def scatter_rad_rcz(in_msg):
          f1.write(str2write)
          f1.close()
 
-      print "y.shape ", global_data_radar['precip'].data.shape
+      print("y.shape ", global_data_radar['precip'].data.shape)
       from numpy import copy 
       y = copy(global_data_radar['precip'].data)
       y = y.ravel()
-      print "y.shape ", y.shape
+      print("y.shape ", y.shape)
 
       if 1==0:
          if 'X' in locals():
@@ -367,10 +373,10 @@ def scatter_rad_rcz(in_msg):
                X = [X]
             else:
                concatenate((X, [x1]), axis=0)  
-            print "X.shape ", X.shape
+            print("X.shape ", X.shape)
          X = append(X,[[1]*len(x1)],axis=1)
         
-         print "y.shape ", y.shape
+         print("y.shape ", y.shape)
          #theta = np.linalg.lstsq(X,y)[0]
          return 
 
@@ -411,7 +417,7 @@ def scatter_rad_rcz(in_msg):
 
             # poor mans parallax correction
             if 1==0:
-               print "... poor mans parallax correction"
+               print("... poor mans parallax correction")
                data[rgb2].data[25:640,:] = data[rgb2].data[0:615,:] 
                #data[rgb2].data[15:640,:] = data[rgb2].data[0:625,:] 
                data[rgb2].data[:,0:700] = data[rgb2].data[:,10:710] 
@@ -428,7 +434,7 @@ def scatter_rad_rcz(in_msg):
                y[ind_gt_300]=0  
 
                y = y.ravel()
-               print "y.shape ", y.shape
+               print("y.shape ", y.shape)
 
                x = copy(data[rgb2].data)
                x = x.ravel()
@@ -458,9 +464,9 @@ def scatter_rad_rcz(in_msg):
                #plt.show()
                from numpy import arange 
                x_line = arange(x.min(), x.max(), 1)
-               print "*** display "+outputFileScatter+" &"
+               print("*** display "+outputFileScatter+" &")
                from numpy import ones, linalg, array
-               print x.min(), x.max(), y.min(), y.max()
+               print(x.min(), x.max(), y.min(), y.max())
                A = array([ x, ones(x.size)])
                w = linalg.lstsq(A.T,y)[0] # obtaining the parameters
                y_line = w[0]*x_line+w[1] # regression line
@@ -474,7 +480,7 @@ def scatter_rad_rcz(in_msg):
                plot(x_line,y_line,'r-')
                plt.savefig(outputFileScatter)
                y_hat = w[0]*data[rgb2].data + w[1]
-               print "y_hat.shape: ", y_hat.shape
+               print("y_hat.shape: ", y_hat.shape)
 
                # set clear sky to 0
                y_hat[ind_clear] = 0
@@ -507,17 +513,17 @@ def scatter_rad_rcz(in_msg):
             ## c  crude resolution: Another ~80 % reduction.   
             if in_msg.add_rivers:
                if in_msg.verbose:
-                  print "    add rivers to image (resolution="+resolution+")"
+                  print("    add rivers to image (resolution="+resolution+")")
                cw.add_rivers(PIL_image, area_tuple, outline='blue', resolution=resolution, outline_opacity=127, width=0.5, level=5) # 
                if in_msg.verbose:
-                  print "    add lakes to image (resolution="+resolution+")"
+                  print("    add lakes to image (resolution="+resolution+")")
                cw.add_coastlines(PIL_image, area_tuple, outline='blue', resolution=resolution, outline_opacity=127, width=0.5, level=2)  #, outline_opacity=0
             if in_msg.add_borders:
                if in_msg.verbose:
-                  print "    add coastlines to image (resolution="+resolution+")"
+                  print("    add coastlines to image (resolution="+resolution+")")
                cw.add_coastlines(PIL_image, area_tuple, outline=(255, 0, 0), resolution=resolution, width=1)  #, outline_opacity=0
                if in_msg.verbose:
-                  print "    add borders to image (resolution="+resolution+")"
+                  print("    add borders to image (resolution="+resolution+")")
                cw.add_borders(PIL_image, area_tuple, outline=(255, 0, 0), resolution=resolution, width=1)       #, outline_opacity=0 
    
             #if area.find("EuropeCanary") != -1 or area.find("ccs4") != -1:
@@ -530,7 +536,7 @@ def scatter_rad_rcz(in_msg):
             # add MeteoSwiss and Pytroll logo
             if in_msg.add_logos:
                if in_msg.verbose:
-                  print '... add logos'
+                  print('... add logos')
                dc.align_right()
                if in_msg.add_colorscale:
                   dc.write_vertically()
@@ -548,9 +554,9 @@ def scatter_rad_rcz(in_msg):
                # get tick marks 
                tick_marks=20        # default
                minor_tick_marks=5   # default
-               if rgb in in_msg.tick_marks.keys():
+               if rgb in list(in_msg.tick_marks.keys()):
                   tick_marks=in_msg.tick_marks[rgb]
-               if rgb in in_msg.minor_tick_marks.keys():
+               if rgb in list(in_msg.minor_tick_marks.keys()):
                   minor_tick_marks=in_msg.minor_tick_marks[rgb]
                if rgb.find("-") != -1: # for channel differences use tickmarks of 1 
                   tick_marks=1
@@ -560,7 +566,7 @@ def scatter_rad_rcz(in_msg):
                minor_tick_marks=1  # default    
 
                if in_msg.verbose:
-                  print '... add colorscale'
+                  print('... add colorscale')
                dc.add_scale(in_msg.colormap[rgb], extend=True, tick_marks=tick_marks, minor_tick_marks=minor_tick_marks, font=font_scale, line_opacity=100) #, unit='T / K'
 
             ## test to plot a wind barb
@@ -573,17 +579,17 @@ def scatter_rad_rcz(in_msg):
             path= dirname(outputFile)
             if not exists(path):
                if in_msg.verbose:
-                  print '... create output directory: ' + path
+                  print('... create output directory: ' + path)
                makedirs(path)
    
             # save file
             if in_msg.verbose:
-               print '... save final file :' + outputFile
+               print('... save final file :' + outputFile)
             PIL_image.save(outputFile, optimize=True)  # optimize -> minimize file size
    
             if in_msg.compress_to_8bit:
                if in_msg.verbose:
-                  print '... compress to 8 bit image: display '+outputFile.replace(".png","-fs8.png")+' &'
+                  print('... compress to 8 bit image: display '+outputFile.replace(".png","-fs8.png")+' &')
                subprocess.call("/usr/bin/pngquant -force 256 "+outputFile+" 2>&1 &", shell=True) # 256 == "number of colors"
    
             #if in_msg.verbose:
@@ -597,11 +603,11 @@ def scatter_rad_rcz(in_msg):
             # copy to another place
             if in_msg.scpOutput:
                if in_msg.verbose:
-                  print "... secure copy "+outputFile+ " to "+in_msg.scpOutputDir
+                  print("... secure copy "+outputFile+ " to "+in_msg.scpOutputDir)
                subprocess.call("scp "+in_msg.scpID+" "+outputFile+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
                if in_msg.compress_to_8bit:
                   if in_msg.verbose:
-                     print "... secure copy "+outputFile.replace(".png","-fs8.png")+ " to "+in_msg.scpOutputDir
+                     print("... secure copy "+outputFile.replace(".png","-fs8.png")+ " to "+in_msg.scpOutputDir)
                      subprocess.call("scp "+in_msg.scpID+" "+outputFile.replace(".png","-fs8.png")+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)
    
    
@@ -613,7 +619,7 @@ def scatter_rad_rcz(in_msg):
          postprocessing(in_msg, global_data.time_slot, data.number, area)
 
    if in_msg.verbose:
-      print " "
+      print(" ")
 
    return RGBs_done
 
@@ -624,7 +630,7 @@ def scatter_rad_rcz(in_msg):
 def create_PIL_image(rgb, data, in_msg):
 
    if in_msg.verbose:
-      print "*** make image for: ", rgb
+      print("*** make image for: ", rgb)
 
    # get the data array that you want to plot 
    if rgb in products.MSG:
@@ -668,18 +674,18 @@ def create_PIL_image(rgb, data, in_msg):
    # replace default with fixed min/max if specified 
 
    if in_msg.fixed_minmax:
-      if rgb in in_msg.rad_min.keys():
+      if rgb in list(in_msg.rad_min.keys()):
          min_data = in_msg.rad_min[rgb]
       else:
          if rgb not in products.RGBs_buildin:
-            print "*** Warning, no specified minimum for plotting in get_input_msg.py or input file"
-      if rgb in in_msg.rad_max.keys():
+            print("*** Warning, no specified minimum for plotting in get_input_msg.py or input file")
+      if rgb in list(in_msg.rad_max.keys()):
          max_data = in_msg.rad_max[rgb]
       else:
          if rgb not in products.RGBs_buildin:
-            print "*** Warning, no specified maximum for plotting in get_input_msg.py or input file"
+            print("*** Warning, no specified maximum for plotting in get_input_msg.py or input file")
    if in_msg.verbose and rgb not in products.RGBs_buildin:
-      print '... set value range from min_data (',min_data,') to max_data (',max_data,')'
+      print('... set value range from min_data (',min_data,') to max_data (',max_data,')')
 
 
    # specifies if a colorbar does make sense at all
@@ -688,12 +694,12 @@ def create_PIL_image(rgb, data, in_msg):
    # make the image
    if plot_type == 'channel_image':
       if in_msg.verbose:
-         print "    use data.image.channel_image for black and white pictures"
+         print("    use data.image.channel_image for black and white pictures")
       img = data.image.channel_image(rgb)
       in_msg.colormap[rgb] = None 
    elif plot_type == 'trollimage':
       if in_msg.verbose:
-         print "    use trollimage.image.image for colorized pictures (min="+str(min_data)+", max="+str(max_data)+")"
+         print("    use trollimage.image.image for colorized pictures (min="+str(min_data)+", max="+str(max_data)+")")
       img = trollimage(prop, mode="L", fill_value=in_msg.fill_value)
       rainbow.set_range(min_data, max_data)
       img.colorize(rainbow)
@@ -704,7 +710,7 @@ def create_PIL_image(rgb, data, in_msg):
       min_data = 0.
       max_data = float(len(data[rgb].palette)-1)
       if in_msg.verbose:
-         print "    use GeoImage and colorize with a palette (min="+str(min_data)+", max="+str(max_data)+")"
+         print("    use GeoImage and colorize with a palette (min="+str(min_data)+", max="+str(max_data)+")")
       img = GeoImage( prop, data.area, data.time_slot, mode="P", palette = data[rgb].palette, fill_value=in_msg.fill_value )
       colormap = convert_palette2colormap(data[rgb].palette)
       colormap.set_range(min_data, max_data)  # no return value!
@@ -712,20 +718,20 @@ def create_PIL_image(rgb, data, in_msg):
    elif plot_type == 'user_defined':
       obj_image = get_image(data, rgb)
       if in_msg.verbose:
-         print "    use image function defined by my_msg_module.py"
+         print("    use image function defined by my_msg_module.py")
       img = obj_image()
       in_msg.colormap[rgb] = None
       #if rgb == 'ndvi':
       #   in_msg.colormap[rgb] = rdylgn_r
    else:
-      print "*** Error in create_PIL_image ("+inspect.getfile(inspect.currentframe())+")"
-      print "    unknown plot_type ", plot_type
+      print("*** Error in create_PIL_image ("+inspect.getfile(inspect.currentframe())+")")
+      print("    unknown plot_type ", plot_type)
       quit()
 
 
    if in_msg.HRV_enhancement:
       if in_msg.verbose:
-         print "enhance the image with the HRV channel"
+         print("enhance the image with the HRV channel")
       luminance = GeoImage((data["HRV"].data), data.area, data.time_slot,
                            crange=(0, 100), mode="L")
       luminance.enhance(gamma=2.0)
@@ -741,11 +747,11 @@ def create_PIL_image(rgb, data, in_msg):
    # convert image to PIL image 
    if hasattr(img, 'pil_image'):
       if in_msg.verbose:
-         print "    convert to PIL_image by pil_image function"
+         print("    convert to PIL_image by pil_image function")
       PIL_image=img.pil_image()  
    else:
       if in_msg.verbose:
-         print "    convert to PIL_image by saving and reading"
+         print("    convert to PIL_image by saving and reading")
       tmp_file = outputDir +satS+'_'+dateS+'_'+timeS+'__'+area+'_'+rgb.replace("_","-")+'_tmp.png'  # in_msg.
       img.save(tmp_file)
       PIL_image = Image.open(tmp_file)
@@ -761,7 +767,7 @@ def create_PIL_image(rgb, data, in_msg):
 def add_title(PIL_image, rgb, sat_nr, dateS, hourS, minS, area, dc, font_file, verbose ):
 
    if verbose:
-      print "    add title to image "
+      print("    add title to image ")
 
    if True:
 
@@ -792,7 +798,7 @@ def add_title(PIL_image, rgb, sat_nr, dateS, hourS, minS, area, dc, font_file, v
          draw.text((0, 45),' '+rgb.replace("_","-"),           title_color, font=font)
 
       if verbose:
-         print "    added title: "+title
+         print("    added title: "+title)
 
    else:
       font=aggdraw.Font("blue","/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerif.ttf",size=16)
@@ -807,17 +813,17 @@ def add_title(PIL_image, rgb, sat_nr, dateS, hourS, minS, area, dc, font_file, v
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
 def print_usage():
-         print "***           "
-         print "*** Error, not enough command line arguments"
-         print "***        please specify at least an input file"
-         print "***        possible calls are:"
-         print "*** python "+inspect.getfile(inspect.currentframe())+".py input_MSG "
-         print "*** python "+inspect.getfile(inspect.currentframe())+".py input_MSG 2014 07 23 16 10 "
-         print "                                 date and time must be completely given"
-         print "*** python "+inspect.getfile(inspect.currentframe())+".py input_MSG 2014 07 23 16 10 'IR_108'"
-         print "*** python "+inspect.getfile(inspect.currentframe())+".py input_MSG 2014 07 23 16 10 'IR_108' 'ccs4'"
-         print "*** python "+inspect.getfile(inspect.currentframe())+".py input_MSG 2014 07 23 16 10 ['HRoverview','fog'] ['ccs4','euro4']"
-         print "***           "
+         print("***           ")
+         print("*** Error, not enough command line arguments")
+         print("***        please specify at least an input file")
+         print("***        possible calls are:")
+         print("*** python "+inspect.getfile(inspect.currentframe())+".py input_MSG ")
+         print("*** python "+inspect.getfile(inspect.currentframe())+".py input_MSG 2014 07 23 16 10 ")
+         print("                                 date and time must be completely given")
+         print("*** python "+inspect.getfile(inspect.currentframe())+".py input_MSG 2014 07 23 16 10 'IR_108'")
+         print("*** python "+inspect.getfile(inspect.currentframe())+".py input_MSG 2014 07 23 16 10 'IR_108' 'ccs4'")
+         print("*** python "+inspect.getfile(inspect.currentframe())+".py input_MSG 2014 07 23 16 10 ['HRoverview','fog'] ['ccs4','euro4']")
+         print("***           ")
          quit() # quit at this point
 #----------------------------------------------------------------------------------------------------------------
 
@@ -839,5 +845,5 @@ if __name__ == '__main__':
             in_msg.area = sys.argv[8]
 
    scatter_done = scatter_rad_rcz(in_msg)
-   print "*** Scatter plots produced for ", scatter_done 
-   print " "
+   print("*** Scatter plots produced for ", scatter_done) 
+   print(" ")

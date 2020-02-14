@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 
 #from satpy import Scene
 from satpy.utils import debug_on
@@ -27,11 +30,11 @@ files_sat = find_files_and_readers(sensor='seviri',
 
 #print files_sat
 #files = dict(files_sat.items() + files_nwc.items())
-files = dict(files_sat.items())
+files = dict(list(files_sat.items()))
 
 global_scene = Scene(reader="hrit_msg", filenames=files)
 
-print dir(global_scene)
+print(dir(global_scene))
 
 #global_scene.load([0.6, 0.8, 10.8])
 #global_scene.load(['IR_120', 'IR_134'])
@@ -53,15 +56,15 @@ global_scene["ndvi"] = (global_scene[0.8] - global_scene[0.6]) / (global_scene[0
 area="EuropeCanaryS95"
 local_scene = global_scene.resample(area)
 
-print global_scene.available_composite_names()
+print(global_scene.available_composite_names())
 
 #local_scene.show('overview')
 local_scene.save_dataset('overview', './overview_'+area+'.png')
-print 'display ./overview_'+area+'.png &'
+print('display ./overview_'+area+'.png &')
 
 local_scene["ndvi"] = (local_scene[0.8] - local_scene[0.6]) / (local_scene[0.8] + local_scene[0.6])
 local_scene.save_dataset('ndvi', './ndvi_'+area+'.png')
-print dir(local_scene.save_dataset)
+print(dir(local_scene.save_dataset))
 #from satpy.enhancements import colorize
 #colorize(img, **kwargs)
 #'ylgn'
@@ -69,7 +72,7 @@ print dir(local_scene.save_dataset)
 #nice NDVI colourbar here:
 #https://www.researchgate.net/figure/NDVI-maps-Vegetation-maps-created-by-measuring-the-Normalized-Vegetation-Difference_fig7_323885082
 
-print 'display ./ndvi_'+area+'.png &'
+print('display ./ndvi_'+area+'.png &')
 
 
 

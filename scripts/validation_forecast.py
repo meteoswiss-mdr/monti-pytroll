@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 import matplotlib.pyplot as plt
 import numpy
 import time
@@ -35,7 +38,7 @@ def validation_forecast(cell, t, t_end, in_msg, history_correction):####LEL#vali
     
     while t <= t_end + timedelta(hours = 1):
     
-        print("starting history backward ", t)
+        print(("starting history backward ", t))
         
         ind, area, displacement, time, center = history_backward(t, cell, True, in_msg, t-timedelta(hours=1), labels_dir=labels_dir,history_correction = history_correction)
         """
@@ -46,11 +49,11 @@ def validation_forecast(cell, t, t_end, in_msg, history_correction):####LEL#vali
         #ind_True, area_True, displacement_True, time_True, center_True = history_backward(t, cell, True, in_msg, t-timedelta(hours=1), labels_dir=labels_dir,history_correction = history_correction_opposite)
         
         if len(area_True)!=len(area):
-            print "BACKWARD"
-            print "cell: ", cell
-            print "time: ", t
-            print "len False: ", len(area)
-            print "len True: ", len(area_True)
+            print ("BACKWARD")
+            print ("cell: ", cell)
+            print ("time: ", t)
+            print ("len False: ", len(area))
+            print ("len True: ", len(area_True))
             quit()
         """    
         
@@ -69,8 +72,8 @@ def validation_forecast(cell, t, t_end, in_msg, history_correction):####LEL#vali
                 break
     
         if area is None or len(area)<=1:  
-            print "The cell is outside of the area of interest or the history is not long enough (less than 1 timestep)"
-        print "starting forecasts"    
+            print("The cell is outside of the area of interest or the history is not long enough (less than 1 timestep)")
+        print("starting forecasts")    
         if len(area)<=3:
             t_forecast, y_forecast = future_properties(time, area, 'area', "linear")
             t_forecast, forecast108 = future_properties(time, history108, 'IR_108', "linear")
@@ -78,25 +81,25 @@ def validation_forecast(cell, t, t_end, in_msg, history_correction):####LEL#vali
         else:
             t_forecast, y_forecast = future_properties(time, area, 'area', model)
             t_forecast, forecast108 = future_properties(time,history108,'IR_108',model)
-        print "starting history forward, ", t     
+        print("starting history forward, ", t)     
         ##LEL# t_temp_stop = min ((t+timedelta(hours = 1)+timedelta(minutes = 5)), (t_stop_history+timedelta(minutes = 5))) 
         t_temp_stop = t+timedelta(hours = 1)+timedelta(minutes = 5) 
         
         #history_correction = "follow_id" ##################### COMPARING ALL HISTORIES TO THE FOLLOW_ID VERSION!!!!!
         
         ind1, area1, displacement1, time1, center1 = history_backward(t, cell, False, in_msg, t_temp_stop, labels_dir=labels_dir,history_correction = history_correction)
-        print "history forward Done" 
+        print("history forward Done") 
         
         """
         ind1_True, area1_True, displacement1_True, time1_True, center1_True = history_backward(t, cell, False, in_msg, t_temp_stop, labels_dir=labels_dir,history_correction = history_correction_opposite)
                
         
         if len(area1_True)!=len(area1) or displacement1.shape != displacement1_True.shape:
-            print "FORWARD"
-            print "cell: ", cell
-            print "time: ", t
-            print "len False: ", len(area1)," displacement False", displacement1.shape
-            print "len True: ", len(area1_True)," displacement True", displacement1_True.shape
+            print ("FORWARD")
+            print ("cell: ", cell)
+            print ("time: ", t)
+            print ("len False: ", len(area1)," displacement False", displacement1.shape)
+            print ("len True: ", len(area1_True)," displacement True", displacement1_True.shape)
             quit()
         """        
         t2 = time1 #[::-1]
@@ -105,14 +108,14 @@ def validation_forecast(cell, t, t_end, in_msg, history_correction):####LEL#vali
  
  
         if t==datetime(2015,7,7,15,20) and False:
-                print "length history backward: ", len(time)
-                print "length history forward: ", len(time1)
-                print "length forecast: ", len(t_forecast)
-                print "length forecast - index : ", len(t_forecast)- np.where(t_forecast==t)[0]
-                print "length foreward - index : ", len(time1) - time1.index(t)
-                print time
-                print time1
-                print t_forecast
+                print("length history backward: ", len(time))
+                print("length history forward: ", len(time1))
+                print("length forecast: ", len(t_forecast))
+                print("length forecast - index : ", len(t_forecast)- np.where(t_forecast==t)[0])
+                print("length foreward - index : ", len(time1) - time1.index(t))
+                print(time)
+                print(time1)
+                print(t_forecast)
                 
                 quit()
         
@@ -171,7 +174,7 @@ def validation_forecast(cell, t, t_end, in_msg, history_correction):####LEL#vali
                 #    print("VALUE ERROR (line 168 in validation_forecast")
                 #    print(displacement)
                 #    quit()
-            print dx, dy
+            print(dx, dy)
     
         else:
             print("wrong displacement")
@@ -185,7 +188,7 @@ def validation_forecast(cell, t, t_end, in_msg, history_correction):####LEL#vali
     
           dt += 5
           if verbose:
-              print("... for time ", dt ,", index ", indx + i)
+              print(("... for time ", dt ,", index ", indx + i))
           if indx+i >= len(y_forecast):
               index_stop = deepcopy(i)
               break
@@ -193,11 +196,11 @@ def validation_forecast(cell, t, t_end, in_msg, history_correction):####LEL#vali
               area_new = y_forecast[indx+i]
               area_prev = y_forecast[indx+i-1]
           if verbose:
-              print("area px that will be grown ", area_current)
+              print(("area px that will be grown ", area_current))
       
-              print("area forecasted ", area_new)
+              print(("area forecasted ", area_new))
       
-              print("area forecasted prev ", area_prev)
+              print(("area forecasted prev ", area_prev))
           #growth = sqrt(float(area_new)/float(area_current))
       
           if area_new < 0 or len(area_new)==0 or len(area_prev)==0:
@@ -205,14 +208,14 @@ def validation_forecast(cell, t, t_end, in_msg, history_correction):####LEL#vali
                   print("the cell is predicted to disappear")
               index_stop = deepcopy(i)
               print("the cell is predicted to disappear")
-              print("stopping at: ", i, "instead of: ", range(max_forecast_time))
+              print(("stopping at: ", i, "instead of: ", list(range(max_forecast_time))))
               break
       
           growth = sqrt(float(area_new)/float(area_prev))
           if verbose:
-              print("growing by ", growth)
-              print("dx ", dx)
-              print("dy ", dy)
+              print(("growing by ", growth))
+              print(("dx ", dx))
+              print(("dy ", dy))
       
           #figure_labels(label_cell, outputFile, ttt, dt, area_plot="ccs4", add_name = "before")
       
@@ -221,7 +224,7 @@ def validation_forecast(cell, t, t_end, in_msg, history_correction):####LEL#vali
           #figure_labels(shifted_label, outputFile, ttt, dt, area_plot="ccs4", add_name = "before_shifted")
           #quit()
           if verbose:
-              print("   after shift ", sum(sum(shifted_label)))
+              print(("   after shift ", sum(sum(shifted_label))))
       
           if sum(sum(shifted_label))==0:#the cell is outside the domain
               break
@@ -233,7 +236,7 @@ def validation_forecast(cell, t, t_end, in_msg, history_correction):####LEL#vali
           forecasted_center.append(center_before)
               
           if verbose:
-              print("   after shift ", sum(sum(shifted_label)))
+              print(("   after shift ", sum(sum(shifted_label))))
           resized_label = scipy.misc.imresize(shifted_label,float(growth),'nearest')
       
           resized_label[resized_label >0] = 1
@@ -249,8 +252,8 @@ def validation_forecast(cell, t, t_end, in_msg, history_correction):####LEL#vali
               temp_label[0:min(nx,resized_label.shape[0]-x_start),0:min(ny,resized_label.shape[1]-y_start)] = deepcopy(resized_label[x_start:min(x_start+nx,resized_label.shape[0]),y_start:min(y_start+ny,resized_label.shape[1])])            
       
           if verbose:
-              print(np.unique(temp_label))
-              print("   after resize ", sum(sum(temp_label)))
+              print((np.unique(temp_label)))
+              print(("   after resize ", sum(sum(temp_label))))
           #figure_labels(resized_label, outputFile, ttt, dt, area_plot="ccs4", add_name = "before_shifted_resized")
       
           #center of mass after resizing
@@ -261,7 +264,7 @@ def validation_forecast(cell, t, t_end, in_msg, history_correction):####LEL#vali
       
           shifted_label = resize_array(temp_label,dx_new,dy_new, nx, ny)
           if verbose:
-              print("   after shift2 ", sum(sum(shifted_label)))
+              print(("   after shift2 ", sum(sum(shifted_label))))
           label_cell = np.zeros((nx,ny))
       
           label_cell[0:,0:] = shifted_label[0:nx,0:ny]
@@ -279,12 +282,12 @@ def validation_forecast(cell, t, t_end, in_msg, history_correction):####LEL#vali
       
           area_current = sum(sum(label_cell))
           if verbose:
-              print("end ", area_current)
+              print(("end ", area_current))
           forecasted_areas.append(area_current)
           #add check to make sure the area you produced is more or less correct
           if verbose:
-              print(len(area1))
-              print("indx1, i:",indx1,i)
+              print((len(area1)))
+              print(("indx1, i:",indx1,i))
           if indx1+i < len(area1): #if in reality the cell disappeared... not very nice that you just "kill" entire thing, but else what is distance centers??
               error_area.append((float((-area1[indx1+i] + area_current))/area1[indx1+i])*100)
               distance_centers = sqrt( (-center1[indx1+i][0]+center_before[0])*(-center1[indx1+i][0]+center_before[0]) + (-center1[indx1+i][1]+center_before[1])*(-center1[indx1+i][1]+center_before[1]) )
@@ -302,8 +305,8 @@ def validation_forecast(cell, t, t_end, in_msg, history_correction):####LEL#vali
         all_errors_dx.append(error_dx)
         all_errors_dy.append(error_dy)
         t += timedelta(minutes = 5)
-        print "updating index"
-    print "returning values"
+        print("updating index")
+    print("returning values")
     return all_errors_area,all_errors_center,all_errors_108,all_errors_dx, all_errors_dy, length_history
 
 def plot_histogram(errors, length_history, str_cells, variable, th_history, longer_than_th, history_correction):
@@ -347,8 +350,8 @@ def plot_histogram(errors, length_history, str_cells, variable, th_history, long
                                 all_errors['%s'%time_plot[ind]].append(errors[id_cell][ind_each_cell][ind])            
               if all_errors['%s'%time_plot[ind]]==[]:
                     del all_errors['%s'%time_plot[ind]]              
-        time_plot = all_errors.keys() 
-        time_plot = map(int,time_plot)
+        time_plot = list(all_errors.keys()) 
+        time_plot = list(map(int,time_plot))
         time_plot.sort()  
         xtick_lables = []
         for ttime in time_plot:
@@ -401,10 +404,10 @@ def plot_histogram(errors, length_history, str_cells, variable, th_history, long
         ax.set_ylabel(ylabel_name)
         
         for i in range(len(time_plot)):
-            #print hist_values
-            #print "i", i
-            #print len(hist_values)
-            #print "values", hist_values[i]
+            #print (hist_values)
+            #print ("i", i)
+            #print (len(hist_values))
+            #print ("values", hist_values[i])
             for j in range(0,len(hist_values[i])): 
                 colorVal = scalarMap.to_rgba(hist_values[i][j])
                 Er_min = hist_edges[i][j]
@@ -458,8 +461,8 @@ def plot_boxplot(errors, length_history, str_cells, variable, th_history, longer
                                 all_errors['%s'%time_plot[ind]].append(errors[id_cell][ind_each_cell][ind])            
               if all_errors['%s'%time_plot[ind]]==[]:
                     del all_errors['%s'%time_plot[ind]]              
-        time_plot = all_errors.keys() 
-        time_plot = map(int,time_plot)
+        time_plot = list(all_errors.keys()) 
+        time_plot = list(map(int,time_plot))
         time_plot.sort()  
         
         xtick_lables = []
@@ -578,10 +581,10 @@ def plot_Scatter(each_cell_separately, str_cells, length_history, errors_area, e
                 try:
                     axarr[0].scatter(x_axis[0:len(errors_area[id_cells][i])], errors_area[id_cells][i], color = color_current,marker='o')
                 except ValueError:
-                    print "shape_color_current", len(color_current)
-                    print "color_current \n", color_current
-                    print "errors_area: ", errors_area[id_cells][i]
-                    print "len errors_area: ", len(errors_area[id_cells][i])
+                    print("shape_color_current", len(color_current))
+                    print("color_current \n", color_current)
+                    print("errors_area: ", errors_area[id_cells][i])
+                    print("len errors_area: ", len(errors_area[id_cells][i]))
                     quit()
               for i in range(len(length_history[id_cells])):
                 colorVal = scalarMap0.to_rgba(length_history[id_cells][i]*5)
@@ -615,7 +618,7 @@ def plot_hexagonal2dHist(str_cell, errors_area, errors_dx, errors_dy, history_co
     else:
         add_name = "_NotCorrectHistFollowID"
     x_axis = [0,5,10,15,20,25,30,35,40,45,50,55,60]
-    print("plotting hexbin, history correction = ", history_correction)
+    print(("plotting hexbin, history correction = ", history_correction))
     all_dx = []
     all_dy = []
     for ind in range(1,len(x_axis)):
@@ -640,7 +643,7 @@ def plot_dx_dy(str_cells, errors_dx, errors_dy, errors_area, length_history, his
         add_name = "_NotCorrectHistFollowID"
     else:
         add_name = "_NotCorrectHist"
-    print("plotting dx dy history correction = ", history_correction)
+    print(("plotting dx dy history correction = ", history_correction))
     
     time_plot = [0,5,10,15,20,25,30,35,40,45,50,55,60]
     all_errors_dx_ShortHistory = {}
@@ -669,7 +672,7 @@ def plot_dx_dy(str_cells, errors_dx, errors_dy, errors_area, length_history, his
 
     f, axarr = plt.subplots(2, sharex=True, sharey=True) #fig = plt.figure()
     #plt.subplot(211)
-    #print "short history"
+    #"short history"
     for i in range(len(time_plot)-1,-1,-1):   
       colorVal = scalarMap.to_rgba(i*5)
       #plt.scatter(all_errors_dx_LongHistory ['%s'%time_plot[i]], all_errors_dy_LongHistory ['%s'%time_plot[i]], color = colorVal) 
@@ -683,7 +686,7 @@ def plot_dx_dy(str_cells, errors_dx, errors_dy, errors_area, length_history, his
     blues = plt.get_cmap('Blues_r')
     cNorm = mpl.colors.Normalize(vmin = 0, vmax = 60)
     scalarMap = mpl.cm.ScalarMappable(norm=cNorm, cmap = blues)            
-    #print "long history"                
+    #"long history"                
     #plt.subplot(212)
     for i in range(len(time_plot)-1,-1,-1):
       colorVal = scalarMap.to_rgba(i*5)
@@ -755,12 +758,12 @@ def plot_pdf(str_cells,errors_area,errors_dx, errors_dy, length_history, history
         color_lead.append(scalarMap.to_rgba(lead_t))
         distances00.append(sqrt(x*x+y*y))
     
-    print "20% percentile", np.percentile(distances00,20)
-    print "40% percentile", np.percentile(distances00,40)
-    print "60% percentile", np.percentile(distances00,60)
-    print "80% percentile", np.percentile(distances00,80)
-    print "100% percentile", np.percentile(distances00,100)
-    print "max: ", max(distances00)
+    print("20% percentile", np.percentile(distances00,20))
+    print("40% percentile", np.percentile(distances00,40))
+    print("60% percentile", np.percentile(distances00,60))
+    print("80% percentile", np.percentile(distances00,80))
+    print("100% percentile", np.percentile(distances00,100))
+    print("max: ", max(distances00))
     
     fig, ax = plt.subplots(nrows=1,ncols=1)
     
@@ -814,10 +817,10 @@ if __name__ == "__main__":
     if input_file[-3:] == '.py': 
         input_file=input_file[:-3]
     in_msg = get_input_msg(input_file)
-    print ("input imported: ", input_file)
+    print(("input imported: ", input_file))
 
     history_correction = True
-    print("history correction = ", history_correction)
+    print(("history correction = ", history_correction))
     size_bin = 2.5 #kilometers in x and y dimension corresponding to desired size of the bins (in pdf of SN and WE displacement error)
     interesting_cell = []
     t_start = []
@@ -903,12 +906,12 @@ if __name__ == "__main__":
     ####LEL# for cell,t,t_end,t_stop in zip(interesting_cell,t_start,t_end,t_stop_history):
     for cell,t,t_end in zip(interesting_cell,t_start,t_end):
         str_cell = "ID"+str(cell)
-        print("begin validation for:", False)
+        print(("begin validation for:", False))
         errors_area_False[str_cell],errors_COM_False[str_cell],errors_108_False[str_cell],errors_dx_False[str_cell], errors_dy_False[str_cell], length_history_False[str_cell] = validation_forecast(cell, t, t_end, in_msg, False)   ####LEL#(cell, t, t_end, t_stop, labels_dir)
         
-        print("begin validation for:", True)
+        print(("begin validation for:", True))
         errors_area_True[str_cell],errors_COM_True[str_cell],errors_108_True[str_cell],errors_dx_True[str_cell], errors_dy_True[str_cell], length_history_True[str_cell] = validation_forecast(cell, t, t_end, in_msg, True)
-        print("begin validation for:", "follow_id")
+        print(("begin validation for:", "follow_id"))
         errors_area_follow_id[str_cell],errors_COM_follow_id[str_cell],errors_108_follow_id[str_cell],errors_dx_follow_id[str_cell], errors_dy_follow_id[str_cell], length_history_follow_id[str_cell] = validation_forecast(cell, t, t_end, in_msg, "follow_id")
         
         if len(errors_area_False[str_cell])!=len(errors_area_True[str_cell]) or len(errors_area_False[str_cell])!=len(errors_area_follow_id[str_cell]):
@@ -922,21 +925,21 @@ if __name__ == "__main__":
             errors_True = errors_area_True[str_cell][ind_correct_length]
             errors_False = errors_area_False[str_cell][ind_correct_length]
             errors_follow_id = errors_area_follow_id[str_cell][ind_correct_length]
-            print("checking if ", len(errors_True), "is the same as ", len(errors_False), " and ", len(errors_follow_id))
+            print(("checking if ", len(errors_True), "is the same as ", len(errors_False), " and ", len(errors_follow_id)))
             if len(errors_True)!=len(errors_False) or len(errors_True)!=len(errors_follow_id):
-                #print "all errors True: \n",errors_area[str_cell]
-                #print "all errors False: \n",errors_area_True[str_cell]
+                #print ("all errors True: \n",errors_area[str_cell])
+                #print ("all errors False: \n",errors_area_True[str_cell])
                 print("WARNING: length of histories with and without correction are different!! Cutting the shorter")
                 if verbose:
-                    print "current errrors True: ", errors_True, "len: ", len(errors_True)
-                    print "current errrors False: ", errors_False, "len: ", len(errors_False)
-                    print "current errrors False: ", errors_follow_id, "len: ", len(errors_follow_id)
-                    print "index", errors_area[str_cell].index(errors_True)
-                    print "time", t+timedelta(minutes = 5*errors_area[str_cell].index(errors_True))
+                    print("current errrors True: ", errors_True, "len: ", len(errors_True))
+                    print("current errrors False: ", errors_False, "len: ", len(errors_False))
+                    print("current errrors False: ", errors_follow_id, "len: ", len(errors_follow_id))
+                    print("index", errors_area[str_cell].index(errors_True))
+                    print("time", t+timedelta(minutes = 5*errors_area[str_cell].index(errors_True)))
                 len_shorter = min(len(errors_True),len(errors_False),len(errors_follow_id))
                 if verbose:
-                    print "len shorter", len_shorter
-                    print "values: ", errors_area_False[str_cell][ind_correct_length][0:len_shorter]
+                    print("len shorter", len_shorter)
+                    print("values: ", errors_area_False[str_cell][ind_correct_length][0:len_shorter])
                 
                 errors_area_False[str_cell][ind_correct_length] = errors_area_False[str_cell][ind_correct_length][0:len_shorter]
                 errors_area_True[str_cell][ind_correct_length] = errors_area_True[str_cell][ind_correct_length][0:len_shorter]
@@ -960,7 +963,7 @@ if __name__ == "__main__":
 
     
     #quit()
-    str_cells = length_history_True.keys() #could add a check to make sure the keys of _True and _False versions are the same
+    str_cells = list(length_history_True.keys()) #could add a check to make sure the keys of _True and _False versions are the same
     
     #scatter plot of error on area (%), BT based on 10.8 (%) and position center for the forecast as a function of lead time. Colorscale dependent on length of history
     plot_scatter_errors = True

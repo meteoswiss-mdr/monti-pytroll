@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 ## does not work!!!
 #import subprocess
 #print "... set python path and config path" 
@@ -43,7 +46,7 @@ color_mode='RainRate'
 add_rivers=True
 add_borders=True 
 if len(layer) > 0:
-    print "*** No borders and rivers for an overlay"
+    print("*** No borders and rivers for an overlay")
     add_rivers  = False # no rivers if an overlay is needed
     add_borders = False # no map    if an overlay is needed
 add_title=True
@@ -60,10 +63,10 @@ title_color='white'
 
 if len(sys.argv) > 1:
     if len(sys.argv) < 6:
-        print "***           "
-        print "*** Warning, please specify date and time completely, e.g."
-        print "***          python plot_radar.py 2014 07 23 16 10 "
-        print "***           "
+        print("***           ")
+        print("*** Warning, please specify date and time completely, e.g.")
+        print("***          python plot_radar.py 2014 07 23 16 10 ")
+        print("***           ")
         quit() # quit at this point
     else:
         year   = int(sys.argv[1])
@@ -90,11 +93,11 @@ else:
         minute=35
 
 time_slot = datetime(year, month, day, hour, minute)
-print "*** "
-print "*** read radar data (plot_radar.py)"
+print("*** ")
+print("*** read radar data (plot_radar.py)")
 global_data = GeostationaryFactory.create_scene("swissradar", "", "radar", time_slot)
-#prop_str='PRECIP'                     # RZC
-prop_str='POH'    # does not work!!!  # BZC
+prop_str='PRECIP'                     # RZC
+#prop_str='POH'    # does not work!!!  # BZC
 #prop_str='MESHS' # does not work!!!  # MZC
 #prop_str='VIL'                       # LZC
 #prop_str='MaxEcho'                   # CZC
@@ -160,7 +163,7 @@ output_dir='/data/COALITION2/PicturesSatellite/'+yearS+'-'+monthS+'-'+dayS+'/'+y
 #output_dir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_RZC_%(area)s/'
 
 if not exists(output_dir):
-    print '... create output directory: ' + output_dir
+    print('... create output directory: ' + output_dir)
     makedirs(output_dir)
 
 # calculate statistics (area with precipitation, mean precipitation, total precipitation)
@@ -168,7 +171,7 @@ if save_statistics:
     statisticFile = output_dir + 'RAD_'+global_data[prop_str].product_name+'-'+area+'_'+yearS[2:]+monthS+dayS+'.txt'
     f1 = open(statisticFile,'a')   # mode append 
     ind = (prop > 0.0001) &  (prop < 500.0)
-    print "prop.data[ind]"
+    print("prop.data[ind]")
     #for pp in prop.data[ind]:
     #    print pp
     prop_mean=prop.data[ind].mean()
@@ -186,12 +189,12 @@ if save_statistics:
     str2write = str2write+' '+ "%7.2f" % prop_max
     str2write = str2write+' '+ "%8.0f" % area_km2
     str2write = str2write+"\n"
-    print  "date       HH : MM UTC    mean      p50     p75     p90   max      area"
+    print("date       HH : MM UTC    mean      p50     p75     p90   max      area")
     #      "2014-07-23 18 : 00 UTC    2.1661    1.00    2.00    5.05  118.05  54868"
-    print str2write
+    print(str2write)
     f1.write(str2write) 
     f1.close()
-    print "wrote statistics file: emacs "+ statisticFile +" &"
+    print("wrote statistics file: emacs "+ statisticFile +" &")
 
 
 #outputFile = "./pics/radar.png"
@@ -202,13 +205,13 @@ prop=global_data[prop_str].data
 #min_data=prop.min()
 min_data=0
 max_data = prop.max()
-print 'max_data: ', max_data
+print('max_data: ', max_data)
 if prop.max() < 10:
     max_data=max_data-(max_data%1)
-    print 'round(max_data): ', max_data
+    print('round(max_data): ', max_data)
 else:
     max_data=max_data-(max_data%10)
-    print 'round(max_data): ', max_data
+    print('round(max_data): ', max_data)
 
 if max_data >= 20:
     tick_marks=10        # default
@@ -237,13 +240,13 @@ elif prop_str=='POH':
 #elif prop_str=='maxecho':
 #    max_data=60
 
-print "*** min/max: ", min_data, max_data
+print("*** min/max: ", min_data, max_data)
 
 method='linear'
 method='logarithmic'
 units = '['+global_data[prop_str].units+']'
 
-print color_mode
+print(color_mode)
 if color_mode == 'rainbow':
 
     colormap = rainbow
@@ -311,9 +314,9 @@ elif color_mode == 'datalevels256':
     #print colorscale[1:,1:4]    
     
 else:
-    print "*** ERROR, unknown color mode"
+    print("*** ERROR, unknown color mode")
 
-print '... use trollimage to ', method,' plot data (min,max)=',min_data, max_data
+print('... use trollimage to ', method,' plot data (min,max)=',min_data, max_data)
 if 'fill_value' in locals():
     img = trollimage(prop, mode="L", fill_value=fill_value) 
 else:
@@ -336,35 +339,35 @@ if area.find("ticino") != -1:
     resolution='h'
 
 # define area
-print 'obj_area ', obj_area
+print('obj_area ', obj_area)
 proj4_string = obj_area.proj4_string     
 # e.g. proj4_string = '+proj=geos +lon_0=0.0 +a=6378169.00 +b=6356583.80 +h=35785831.0'
 area_extent = obj_area.area_extent              
 # e.g. area_extent = (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
 area_def = (proj4_string, area_extent)
-print 'area_def ', area_def
+print('area_def ', area_def)
 
 if add_rivers:
    if verbose:
-      print "    add rivers to image (resolution="+resolution+")"
+      print("    add rivers to image (resolution="+resolution+")")
    cw.add_rivers(PIL_image, area_def, outline='blue', resolution=resolution, outline_opacity=127, width=1, level=5) # 
    if verbose:
-      print "    add lakes to image (resolution="+resolution+")"
+      print("    add lakes to image (resolution="+resolution+")")
    cw.add_coastlines(PIL_image, area_def, outline='blue', resolution=resolution, outline_opacity=127, width=1, level=2)  #, outline_opacity=0
 if add_borders:
    outline = (255, 0, 0)
    outline = 'black'
    if verbose:
-      print "    add coastlines to image (resolution="+resolution+")"
+      print("    add coastlines to image (resolution="+resolution+")")
    cw.add_coastlines(PIL_image, area_def, outline=outline, resolution=resolution, width=2)  #, outline_opacity=0
    if verbose:
-      print "    add borders to image (resolution="+resolution+")"
+      print("    add borders to image (resolution="+resolution+")")
    cw.add_borders(PIL_image, area_def, outline=outline, resolution=resolution, width=2)       #, outline_opacity=0 
 
 # add MeteoSwiss and Pytroll logo
 if add_logos:
     if verbose:
-        print '... add logos'
+        print('... add logos')
     dc.align_right()
     if add_colorscale:
         dc.write_vertically()
@@ -373,7 +376,7 @@ if add_logos:
     dc.add_logo("/opt/users/common/logos/EUMETSAT_logo2_tiny_white.png",height=60.0)
 
 if add_colorscale:
-    print '... add colorscale ranging from min_data (',min_data,') to max_data (',max_data,')'
+    print('... add colorscale ranging from min_data (',min_data,') to max_data (',max_data,')')
     dc.align_right()
     dc.write_vertically()
     font_scale = aggdraw.Font("black","/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerif-Bold.ttf",size=16)
@@ -400,5 +403,5 @@ if add_title:
     #title = layer+' radar, '+'precipitation rate'+' ['+global_data[prop_str].units+']'
     draw.text((0, y_pos_title),title, title_color, font=font)
 
-print '... save image as ', outputFile
+print('... save image as ', outputFile)
 PIL_image.save(outputFile)

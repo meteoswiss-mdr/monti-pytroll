@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 from datetime import datetime
 import sys, string, os
 import logging
@@ -44,7 +47,7 @@ add_borders=False
 legend=False
 
 ntimes=1
-print "timesteps ", ntimes
+print("timesteps ", ntimes)
 min_correlation = 85
 min_conf_nwp    = 80
 min_conf_no_nwp = 80
@@ -69,10 +72,10 @@ HRWimages = ['channel','pressure','correlation','conf_nwp','conf_no_nwp']
 
 if len(sys.argv) > 1:
     if len(sys.argv) < 6:
-        print "***           "
-        print "*** Warning, please specify date and time completely, e.g."
-        print "***          python "+inspect.getfile(inspect.currentframe())+" 2014 07 23 16 10 "
-        print "***           "
+        print("***           ")
+        print("*** Warning, please specify date and time completely, e.g.")
+        print("***          python "+inspect.getfile(inspect.currentframe())+" 2014 07 23 16 10 ")
+        print("***           ")
         quit() # quit at this point
     else:
         year   = int(sys.argv[1])
@@ -125,7 +128,7 @@ timeS = hourS+':'+minS+" UTC"
 output_dir='./pics/'
 
 if not exists(output_dir):
-    print '... create output directory: ' + output_dir
+    print('... create output directory: ' + output_dir)
     makedirs(output_dir)
 
 image_type ='.png'
@@ -137,16 +140,16 @@ if add_title:
     font = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf", fontsize)
 
     if detailed:
-        print "*** plot detailed winds"
+        print("*** plot detailed winds")
         detailed_str = 'detailed'      # hrw_channels=None, min_correlation=None, cloud_type=None, style='barbs'
         detailed_char = 'd'                    
     else:
-        print "*** plot basic winds"
+        print("*** plot basic winds")
         detailed_str = 'basic'
         detailed_char = 'b'
 
 # read HRW wind vectors 
-print "... read HRW data"
+print("... read HRW data")
 sat_nr = 9
 global_data = read_HRW("meteosat", str(sat_nr).zfill(2), "seviri", time_slot, ntimes, \
                            min_correlation=min_correlation, min_conf_nwp=min_conf_nwp, \
@@ -167,9 +170,9 @@ for level in levels:
     if level=='H':
         level_str='high '
         vmax=60
-    print "... make plot for level " + level_str
+    print("... make plot for level " + level_str)
 
-    print "... filter "+detailed_str+" data for level ", level 
+    print("... filter "+detailed_str+" data for level ", level) 
     # choose basic or detailed (and get a fresh copy) 
     if detailed:
         HRW_data = global_data['HRW'].HRW_detailed.filter(level=level)                   
@@ -179,7 +182,7 @@ for level in levels:
 
     level = level.replace("A","")
     for plot_mode in plot_modes:
-        print "    create HRW plot, plot mode = ", plot_mode
+        print("    create HRW plot, plot mode = ", plot_mode)
 
         if plot_mode == 'stream':
             layer=' 3rd layer'
@@ -234,8 +237,8 @@ for level in levels:
             outputFile = output_dir+'/MSG_HRWscat'+detailed_char+level+'-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS 
 
         else:
-            print "*** Error in plot_hrw.py"
-            print "    unknown plot_mode"
+            print("*** Error in plot_hrw.py")
+            print("    unknown plot_mode")
             quit()
 
 
@@ -262,7 +265,7 @@ for level in levels:
             draw = ImageDraw.Draw(PIL_image)
             draw.text((0, y_pos_title),title, title_color, font=font)
 
-        print '... save image as ', outputFile+image_type
+        print('... save image as ', outputFile+image_type)
         PIL_image.save(outputFile+image_type)
 
         # copy to another place
@@ -270,7 +273,7 @@ for level in levels:
             import subprocess
         #    if in_msg.verbose:
         #        print "... secure copy "+outputFile+ " to "+in_msg.scpOutputDir
-            print "scp "+scpID+" "+outputFile+image_type +" "+" "+scpOutputDir+" 2>&1 &"
+            print("scp "+scpID+" "+outputFile+image_type +" "+" "+scpOutputDir+" 2>&1 &")
             subprocess.call("scp "+scpID+" "+outputFile+image_type +" "+" "+scpOutputDir+" 2>&1 &", shell=True)
         #    if in_msg.compress_to_8bit:
         #        if in_msg.verbose:
@@ -289,15 +292,15 @@ for level in levels:
             hrv_file   = output_dir+'/MSG_HRV-'  +area+'_'+yearS[2:]+monthS+dayS+hourS+minS+".png"
             ir_outfile  = output_dir+'/MSG_'+product+'-ir108-'+area+'_'+yearS[2:]+monthS+dayS+hourS+minS+".png"
             hrv_outfile = output_dir+'/MSG_'+product+'-HRV-'  +area+'_'+yearS[2:]+monthS+dayS+hourS+minS+".png"
-            print "/usr/bin/composite "+outputFile+image_type+" "+ir_file+" "+" "+ir_outfile+" && sleep 1"
+            print("/usr/bin/composite "+outputFile+image_type+" "+ir_file+" "+" "+ir_outfile+" && sleep 1")
             subprocess.call("/usr/bin/composite "+outputFile+image_type+" "+ir_file +" "+" "+ir_outfile +" 2>&1 && sleep 1 ", shell=True)
-            print "/usr/bin/composite "+outputFile+image_type+" "+hrv_file+" "+" "+hrv_outfile+" && sleep 1"
+            print("/usr/bin/composite "+outputFile+image_type+" "+hrv_file+" "+" "+hrv_outfile+" && sleep 1")
             subprocess.call("/usr/bin/composite "+outputFile+image_type+" "+hrv_file+" "+" "+hrv_outfile+" 2>&1 && sleep 1 ", shell=True)
 
             if True:
-                print "scp "+scpID+" "+ir_outfile  +" "+" "+scpOutputDir+" 2>&1 &"
+                print("scp "+scpID+" "+ir_outfile  +" "+" "+scpOutputDir+" 2>&1 &")
                 subprocess.call("scp "+scpID+" "+ir_outfile  +" "+" "+scpOutputDir+" 2>&1 && sleep 1", shell=True)
-                print "scp "+scpID+" "+hrv_outfile +" "+" "+scpOutputDir+" 2>&1 &"
+                print("scp "+scpID+" "+hrv_outfile +" "+" "+scpOutputDir+" 2>&1 &")
                 subprocess.call("scp "+scpID+" "+hrv_outfile +" "+" "+scpOutputDir+" 2>&1 && sleep 1", shell=True)
 
     # make composite and scp composite

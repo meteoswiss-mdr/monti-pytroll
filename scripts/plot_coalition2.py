@@ -406,6 +406,12 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
           # load product, global_data is changed in this step!
           area_loaded = load_products(global_data, in_msg.RGBs, in_msg, area_loaded, load_CTH=False) 
 
+          # create output file name (replace wildcards)
+          if in_msg.parallax_correction:
+              rgb_name='C2rgbPC'
+          else:
+              rgb_name='C2rgb'
+
           for area in in_msg.areas:
 
                 # see get_input_msg.py
@@ -471,7 +477,7 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 data = global_data.project(area, precompute=True)
                 
                 # fill placeholders in directory names with content
-                outputDir = format_name(in_msg.outputDir, time_slot, area=area, rgb='C2rgb', sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
+                outputDir = format_name(in_msg.outputDir, time_slot, area=area, rgb=rgb_name, sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
                 labelsDir = format_name(in_msg.labelsDir, time_slot, area=area, rgb='label', sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
                     
                 # determined 4th mask (small ice crystal or cloud type): get string for filename and load CloudType
@@ -1082,7 +1088,6 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     mask = np.logical_and( mask, not_cirrus )
 
                 
-                          
                 if chosen_settings['clean_mask'] == 'skimage':
                     if in_msg.show_clouds != 'all':
                         from skimage import morphology
@@ -1107,34 +1112,33 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 elif chosen_settings['clean_mask'] != 'no_cleaning':
                     print ("*** Error in main ("+inspect.getfile(inspect.currentframe())+")")
                     print ("    unknown clean_mask: ", chosen_settings['clean_mask'])
-                    quit()          
+                    quit()      
                 
-      
-                print ("-------------------     r min-max",(r.min(),r.max()))
-                
-              
+                #####  HERE IS A BUG, MASK and MASK_BLACK IS NOT PARALLAX CORRECTED ######
                 if in_msg.parallax_correction:
                     from mpop.channel import Channel
                         # add rgb array as channel to a GeostationaryFactory object
                     c2_data = GeostationaryFactory.create_scene(in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", time_slot)
-                    c2_data.channels.append(Channel(name='r',   wavelength_range=[0.,0.,0.], resolution=1000., data=r,                area=area))  
-                    c2_data.channels.append(Channel(name='g',   wavelength_range=[0.,0.,0.], resolution=1000., data=g,                area=area))
+                    c2_data.channels.append(Channel(name='r',    wavelength_range=[0.,0.,0.], resolution=1000., data=r,                area=area))  
+                    c2_data.channels.append(Channel(name='g',    wavelength_range=[0.,0.,0.], resolution=1000., data=g,                area=area))
                     #print ("type(g)",type(g), g.dtype, g.shape)
-                    c2_data.channels.append(Channel(name='b',   wavelength_range=[0.,0.,0.], resolution=1000., data=b,                area=area))
+                    c2_data.channels.append(Channel(name='b',    wavelength_range=[0.,0.,0.], resolution=1000., data=b,                area=area))
                     #print ("type(data['CTH'].data)",type(data['CTH'].data.data), data['CTH'].data.dtype, data['CTH'].data.shape )
                     #c2_data.channels.append(Channel(name='CTH', wavelength_range=[0.,0.,0.], resolution=1000., data=data['CTH'].data.data, area=area))
-
+                    ### c2_data.channels.append(Channel(name='mask', wavelength_range=[0.,0.,0.], resolution=1000., data=mask,             area=area))
+                    
                     loaded_products = [chn.name for chn in c2_data.loaded_channels()]
                     if in_msg.verbose:
                         print ("    perform parallax correction for loaded channels: ", loaded_products)
 
                     c2_data = c2_data.parallax_corr(cth=data['CTH'].data, fill=in_msg.parallax_gapfilling, estimate_cth=in_msg.estimate_cth, replace=True)
-                    r = c2_data['r'].data
-                    g = c2_data['g'].data
-                    b = c2_data['b'].data
+                    r    = c2_data['r'].data
+                    g    = c2_data['g'].data
+                    b    = c2_data['b'].data
+                    ### mask = c2_data['mask'].data
                     del c2_data
-
-
+                #####  HERE IS A BUG ######
+                    
                 # copy red, green, blue to the rgbArray and apply mask  
                 rgbArray = np.zeros( (nx,ny,4), 'uint8')
                 rgbArray[..., 0] = r * mask
@@ -1227,12 +1231,6 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 rgbArray[sum_array<=0,3] = background_alpha    # see coalition2_settings.py
                 
                 ############################################################################################################################################
-
-                # create output file name (replace wildcards)
-                if in_msg.parallax_correction:
-                    rgb_name='C2rgbPC'
-                else:
-                    rgb_name='C2rgb'
 
                 c2File = format_name(outputDir+'/'+in_msg.outputFile, data.time_slot, area=area, rgb=rgb_name, sat=data.satname, sat_nr=data.sat_nr())
                 print ("************"+c2File, in_msg.parallax_correction)

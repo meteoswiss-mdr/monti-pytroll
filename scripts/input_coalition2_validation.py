@@ -305,7 +305,7 @@ def input(in_msg):
         #in_msg.chosen_settings['reader_level']= None; check_overwriting+=1
         
         #if check_overwriting > 1:
-        #    print "you are overwriting your settings!!!! Check: ", current_setting
+        #    print("you are overwriting your settings!!!! Check: ", current_setting)
         #    quit()
             
     else:
@@ -351,7 +351,7 @@ def input(in_msg):
 
     #INPUT NEEDED FOR PRODUCE_FORECASTS!!!!!!!!!!!
     #in_msg.ntimes = 2 #in_windshift.ntimes
-    #print "... aggregate winddata for ", ntimes, " timesteps" 
+    #print ("... aggregate winddata for ", ntimes, " timesteps")
     #min_correlation = 85 #in_windshift.min_correlation
     #min_conf_nwp = 80 #in_windshift.min_conf_nwp
     #min_conf_no_nwp = 80 #in_windshift.min_conf_no_nwp
@@ -371,29 +371,29 @@ def input(in_msg):
     """
     if in_msg.area in broad_areas:
         if in_msg.use_TB_forecast == True:
-            print "*** Error in plot_coalition2.py"
-            print "    currently no brightness temperature forecast"
-            print "    implemented for areas outside Switzerland"
+            print ("*** Error in plot_coalition2.py")
+            print ("    currently no brightness temperature forecast")
+            print ("    implemented for areas outside Switzerland")
             quit()
 
     # -------------   
     # input checks 
     # -------------   
     if in_msg.verbose:
-        print "*** Given input:"
-        print "    in_msg.sat: ", in_msg.sat, in_msg.sat_nr
-        print "    in_msg.area: ", in_msg.area
-        print "    in_msg.delay: ", in_msg.delay
-        print "    in_msg.show_clouds: ", in_msg.show_clouds
-        print "    in_msg.use_TB_forecast: ", in_msg.use_TB_forecast
+        print ("*** Given input:")
+        print ("    in_msg.sat: ", in_msg.sat, in_msg.sat_nr)
+        print ("    in_msg.area: ", in_msg.area)
+        print ("    in_msg.delay: ", in_msg.delay)
+        print ("    in_msg.show_clouds: ", in_msg.show_clouds)
+        print ("    in_msg.use_TB_forecast: ", in_msg.use_TB_forecast)
         if in_msg.use_TB_forecast:
-            print "    in_msg.nowcastDir: ", in_msg.nowcastDir
-        print "    in_msg.rapid_scan_mode: ", in_msg.rapid_scan_mode
-        print "    in_msg.results: ", in_msg.results
-        print "    in_msg.aux_results: ", in_msg.aux_results
-        print "    in_msg.outputDir: ", in_msg.outputDir
-        print "    in_msg.postprocessing_areas: ", in_msg.postprocessing_areas
-        print "    in_msg.postprocessing_composite: ", in_msg.postprocessing_composite
+            print ("    in_msg.nowcastDir: ", in_msg.nowcastDir)
+        print ("    in_msg.rapid_scan_mode: ", in_msg.rapid_scan_mode)
+        print ("    in_msg.results: ", in_msg.results)
+        print ("    in_msg.aux_results: ", in_msg.aux_results)
+        print ("    in_msg.outputDir: ", in_msg.outputDir)
+        print ("    in_msg.postprocessing_areas: ", in_msg.postprocessing_areas)
+        print ("    in_msg.postprocessing_composite: ", in_msg.postprocessing_composite)
     """
     #in_msg.check_input = False
 

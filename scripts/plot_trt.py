@@ -83,32 +83,32 @@ else:
     #global_data.load(['TRT'],min_rank=28) # ,min_rank=8, cell="2018080710450054"
 
 #if hasattr(global_data, 'traj_IDs'):
-#    print ""
-#    print "Trajectory IDs: ", global_data.traj_IDs
-#    print ""
+#    print ("")
+#    print ("Trajectory IDs: ", global_data.traj_IDs)
+#    print ("")
 #    if len(global_data.traj_IDs) > 0:
 #           traj = global_data.traj_IDs[0]
-#           print traj, global_data.TRT[traj].date, global_data.TRT[traj].lon, global_data.TRT[traj].lat
+#           print (traj, global_data.TRT[traj].date, global_data.TRT[traj].lon, global_data.TRT[traj].lat)
 
-#print "global_data ", global_data
+#print ("global_data ", global_data)
 area="ccs4"
 #area="EuropeCanaryS95"
 #area="EuropeCanary95"
 #area="ticino"
 obj_area = get_area_def(area)
 
-#print "area_def.pixel_size_x", obj_area.pixel_size_x
-#print "area_def.pixel_size_y", obj_area.pixel_size_y
+#print ("area_def.pixel_size_x", obj_area.pixel_size_x)
+#print ("area_def.pixel_size_y", obj_area.pixel_size_y)
 
 #plot.show_quicklook(obj_area, global_data['precip'].data )
-#print "global_data['precip'].data", global_data['precip'].data
-#print "global_data['precip'].data", global_data['precip'].data[355,:]
-#print "shape: ", global_data['TRT'].data.shape
+#print ("global_data['precip'].data", global_data['precip'].data)
+#print ("global_data['precip'].data", global_data['precip'].data[355,:])
+#print ("shape: ", global_data['TRT'].data.shape)
 
 prop = np.ma.asarray(global_data['TRT'].data)
 prop.mask = (prop == 9999.9) | (prop <= 0.0001) 
 
-#print "prop.shape ", prop.shape
+#print ("prop.shape ", prop.shape)
 
 yearS = str(year)
 #yearS = yearS[2:]
@@ -137,7 +137,7 @@ if save_statistics:
     ind = (prop > 0.0001) &  (prop < 500.0)
     print("prop.data[ind]")
     #for pp in prop.data[ind]:
-    #    print pp
+    #    print (pp)
     n_cells = len(global_data.traj_IDs)
     area_km2 = prop.data[ind].size
 
@@ -187,7 +187,7 @@ if read_COALITION3:
         Rank_predicted=None
 else:
     Rank_predicted=None
-#print "Rank_predicted:", Rank_predicted
+#print ("Rank_predicted:", Rank_predicted)
 
 if old_style: 
     print('... use trollimage to ', method,' plot data (min,max)=',min_data, max_data)
@@ -320,10 +320,10 @@ PIL_image.save(outputFile+image_type)
 if False:
     import subprocess
 #    if in_msg.verbose:
-#        print "... secure copy "+outputFile+ " to "+in_msg.scpOutputDir
+#        print ("... secure copy "+outputFile+ " to "+in_msg.scpOutputDir)
     print("scp "+scpID+" "+outputFile+image_type +" "+" "+scpOutputDir+" 2>&1 &")
     subprocess.call("scp "+scpID+" "+outputFile+image_type +" "+" "+scpOutputDir+" 2>&1 &", shell=True)
 #    if in_msg.compress_to_8bit:
 #        if in_msg.verbose:
-#            print "... secure copy "+outputFile.replace(".png","-fs8.png")+ " to "+in_msg.scpOutputDir
+#            print ("... secure copy "+outputFile.replace(".png","-fs8.png")+ " to "+in_msg.scpOutputDir)
 #        subprocess.call("scp "+in_msg.scpID+" "+outputFile.replace(".png","-fs8.png")+" "+in_msg.scpOutputDir+" 2>&1 &", shell=True)

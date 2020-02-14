@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from mpop.satellites import GeostationaryFactory
 from mpop.projector import get_area_def
 import datetime
@@ -9,13 +11,13 @@ import datetime
 from my_msg_module import get_last_SEVIRI_date
 time_slot = get_last_SEVIRI_date(True, delay=5)
 #time_slot = datetime.datetime(2015, 11, 26, 19, 30)
-print str(time_slot)
+print (str(time_slot))
 
 global_data = GeostationaryFactory.create_scene("Meteosat-9", "", "seviri", time_slot)
 europe = get_area_def("EuropeCanaryS95")
 #global_data.load(['vza','vaa','lat','lon'])  # , area_extent=europe.area_extent
 global_data.load(['vza'])  # , area_extent=europe.area_extent
-print global_data
+print (global_data)
 
 area="EuropeCanaryS95"
 data = global_data.project(area, precompute=True)

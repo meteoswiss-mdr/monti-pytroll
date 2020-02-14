@@ -22,10 +22,10 @@ debug_on()
 #global_scene = Scene(platform_name="Meteosat-10", sensor="seviri", start_time=lastdate, base_dir="/data/cinesat/in/eumetcast1")
 #global_scene = Scene(platform_name="Meteosat-10", sensor="seviri", start_time=lastdate, reader="hrit_msg", basedir="/data/cinesat/in/eumetcast1/")  
 #global_scene = Scene(platform_name="Meteosat-10", sensor="seviri", start_time=datetime(2017, 1, 27, 13, 45))
-#print "hallo world", dir(global_scene), global_scene.info
-#print global_scene.available_composites()
-print global_scene.available_dataset_names()
-print global_scene.available_composite_names()
+#print ("hallo world", dir(global_scene), global_scene.info)
+#print (global_scene.available_composites())
+print (global_scene.available_dataset_names())
+print (global_scene.available_composite_names())
 
 from satpy import Scene
 
@@ -93,12 +93,12 @@ local_scene = global_scene.resample("ccs4")
 local_scene.save_dataset('overview', data_dir+'/overview_'+area+'.png')
 
 
-#print global_scene
-#print global_scene[0.6]
+#print (global_scene)
+#print (global_scene[0.6])
 
 #local_scene = global_scene.project("ccs4", precompute=True)
 
-# print global_scene.available_datasets()  ## does not work
+# print (global_scene.available_datasets())  ## does not work
 
 #global_scene.show(0.6)
 #global_scene.show('VIS006')

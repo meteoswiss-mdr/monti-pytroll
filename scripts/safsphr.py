@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 from mpop.satellites import GeostationaryFactory
 from mpop.projector import get_area_def
 from mpop.imageo import palettes
@@ -69,13 +70,13 @@ img = trollimage(global_data[prod].sphr_shw, mode="P",palette=global_data[prod].
 
 img.save('./SPHR_SHW_test.png')
 
-print type(global_data[prod].sphr_tpw)
+print (type(global_data[prod].sphr_tpw))
 
 img = trollimage(global_data[prod].sphr_tpw, mode="P",palette=global_data[prod].sphr_tpw_palette)
 
 img.save('./SPHR_TPW_test.png')
 
-print type(global_data[prod].sphr_cape)
+print (type(global_data[prod].sphr_cape))
 
 # no palette 
 img = trollimage(global_data[prod].sphr_cape, mode="L") 

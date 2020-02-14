@@ -1,3 +1,4 @@
+from __future__ import print_function
 
 from satpy import Scene
 from glob import glob
@@ -10,10 +11,10 @@ else:
     #kesch/CSCS
     filenames = glob("/store/msrad/sat/goes-16/2017/04/05/*s20170952100319_e20170952100377*")
 
-print filenames
+print (filenames)
 
 global_scene = Scene(reader="abi_l1b", filenames=filenames)
-print global_scene.available_composite_names()
+print (global_scene.available_composite_names())
 
 #['airmass', 'ash', 'dust', 'fog', 'green', 'green_crefl', 'green_raw', 'green_snow', 'ir108_3d', 'ir_cloud_day', 'natural', 'natural_color', 'natural_color_raw', 'natural_color_sun', 'natural_sun', 'night_microphysics', 'overview', 'overview_raw', 'true_color', 'true_color_crefl', 'true_color_raw']
 

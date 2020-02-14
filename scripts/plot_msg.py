@@ -849,13 +849,13 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
       if in_msg.verbose:
          print("    use mpop/satout/TRTimage.py")
       from mpop.imageo.TRTimage import TRTimage
-      img = TRTimage( data.traj_IDs, data.TRTcells, obj_area) # , fill=False, minRank=8, alpha_max=1.0, plot_vel=True
-      #img = TRTimage( data.traj_IDs, data.TRTcells, obj_area, minRank=15.01) # minRank=8, alpha_max=1.0, plot_vel=True
-      #img = TRTimage( data.traj_IDs, data.TRTcells, obj_area, TRTcell_ID="2018080113300129", minRank=3) # minRank=8, alpha_max=1.0, plot_vel=True
-      #img = TRTimage( data.traj_IDs, data.TRTcells, obj_area, TRTcell_ID="2018080721300099", minRank=3) # minRank=8, alpha_max=1.0, plot_vel=True
-      #img = TRTimage( data.traj_IDs, data.TRTcells, obj_area, TRTcell_ID="2018080710200036", minRank=-1, plot_nowcast=True, fill=True, Rank_predicted=Rank_predicted)
-      #img = TRTimage( data.traj_IDs, data.TRTcells, obj_area, fill=False) # minRank=8, alpha_max=1.0, plot_vel=True
-      #img = TRTimage( data.traj_IDs, data.TRTcells, obj_area, plot_nowcast=True) # minRank=8, alpha_max=1.0, plot_vel=True
+      img = TRTimage( data.traj_IDs, data.TRT, obj_area) # , fill=False, minRank=8, alpha_max=1.0, plot_vel=True
+      #img = TRTimage( data.traj_IDs, data.TRT, obj_area, minRank=15.01) # minRank=8, alpha_max=1.0, plot_vel=True
+      #img = TRTimage( data.traj_IDs, data.TRT, obj_area, TRTcell_ID="2018080113300129", minRank=3) # minRank=8, alpha_max=1.0, plot_vel=True
+      #img = TRTimage( data.traj_IDs, data.TRT, obj_area, TRTcell_ID="2018080721300099", minRank=3) # minRank=8, alpha_max=1.0, plot_vel=True
+      #img = TRTimage( data.traj_IDs, data.TRT, obj_area, TRTcell_ID="2018080710200036", minRank=-1, plot_nowcast=True, fill=True, Rank_predicted=Rank_predicted)
+      #img = TRTimage( data.traj_IDs, data.TRT, obj_area, fill=False) # minRank=8, alpha_max=1.0, plot_vel=True
+      #img = TRTimage( data.traj_IDs, data.TRT, obj_area, plot_nowcast=True) # minRank=8, alpha_max=1.0, plot_vel=True
    else:
       print("*** Error in create_PIL_image ("+inspect.getfile(inspect.currentframe())+")")
       print("    unknown plot_type ", plot_type)

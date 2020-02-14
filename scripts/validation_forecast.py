@@ -840,7 +840,7 @@ if __name__ == "__main__":
     
     #if False:
     #if True:
-            interesting_cell.append(39);  t_start.append(datetime(2015,6,6,11,15)); t_end.append(datetime(2015,6,6,12,0o5))
+            interesting_cell.append(39);  t_start.append(datetime(2015,6,6,11,15)); t_end.append(datetime(2015,6,6,12,05))
             interesting_cell.append(41);  t_start.append(datetime(2015,6,6,11,25)); t_end.append(datetime(2015,6,6,11,20))
             interesting_cell.append(57);  t_start.append(datetime(2015,6,6,11,40)); t_end.append(datetime(2015,6,6,14,10))
             interesting_cell.append(60);  t_start.append(datetime(2015,6,6,11,45)); t_end.append(datetime(2015,6,6,11,55))

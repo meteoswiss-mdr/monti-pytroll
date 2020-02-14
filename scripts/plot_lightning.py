@@ -21,7 +21,7 @@ from os.path import exists
 from os import makedirs
 from pycoast import ContourWriterAGG
 import subprocess
-from configparser import ConfigParser
+from ConfigParser import ConfigParser
 from mpop import CONFIG_PATH
 
 import scp_settings

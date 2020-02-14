@@ -312,8 +312,8 @@ def input(in_msg):
 
     in_msg.postprocessing_areas=['EuropeCanaryS95','odysseyS25']
     #in_msg.postprocessing_composite=["THX-IR_108","radar-convection","THX-radar-convection"]    
-    in_msg.postprocessing_composite=["MSG_rrMlp-HRVir108","RATE-HRVir108", "h03-HRVir108"]
-    in_msg.postprocessing_montage=[["MSG_rrMlp-HRVir108","MSG_RATE-HRVir108","MSG_h03-HRVir108"]]
+    in_msg.postprocessing_composite=["MSG_rrMlp-HRVir108","RATE-HRVir108", "h03b-HRVir108"]
+    in_msg.postprocessing_montage=[["MSG_rrMlp-HRVir108","MSG_RATE-HRVir108","MSG_h03b-HRVir108"]]
     in_msg.resize_montage = 70
         
     in_msg.scpOutput = True

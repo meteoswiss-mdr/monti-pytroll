@@ -220,7 +220,7 @@ def input(in_msg):
 
     #in_msg.postprocessing_areas=["ccs4"]
     #in_msg.postprocessing_areas=['EuropeCanaryS95']
-    #in_msg.postprocessing_composite=["h03-ir108"] 
+    #in_msg.postprocessing_composite=["h03b-ir108"] 
     #in_msg.postprocessing_composite=["hrwdp-ir108"] 
     #in_msg.postprocessing_composite=["CTT-ir108","CTH-ir108"] 
     #in_msg.postprocessing_composite=["hrwdp-ir108", "hrwdc-ir108","streamd-ir108","hrwdr-ir108", "hrwdcnwp-ir108", "hrwdcnnwp-ir108"]    

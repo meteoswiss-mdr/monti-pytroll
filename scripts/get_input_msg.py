@@ -378,13 +378,13 @@ class input_msg_class:
       #global_settings['forth_mask']             = 'CloudType'
       #global_settings['forth_mask']             = 'combined'
       global_settings['forced_mask']            = 'no_mask'
-      global_settings['mask_cirrus']            = True            
-      #global_settings['reader_level            = "seviri-level2"   
+      global_settings['mask_cirrus']            = True    
+      #global_settings['reader_level            = "seviri-level2"
 
       # FIXME: this is used in produce_forecasts_develop.py -> might be not consistent with local settings above
       self.settingsLocal={}
       self.settingsLocal['mode_downscaling'] = 'gaussian_225_125'
-
+      
       if self.settings == "default":
          if scale == "local":
             chosen_settings  = deepcopy(local_settings)
@@ -583,7 +583,7 @@ def parse_commandline():
    parser.add_option("-c","--composite",  type="string", action="extend_list", dest="postprocessing_composite",\
                      help="creates an image composite, such as 'THX-IR_108', argument repetition '-c comp1 -c comp2' possible, lists of composite possible '-c [comp1, comp2]'")
    parser.add_option("-m","--montage",    type="string", action="extend_lists", dest="postprocessing_montage",\
-                     help="creates a montage (two images side by side), such as [\"MSG_h03-ir108\",\"MSG_HRV\"], argument repetition  '-m mont1 -m mont2' possible, list of montages possible [[im1,im2],[im3,im4]]")
+                     help="creates a montage (two images side by side), such as [\"MSG_h03b-ir108\",\"MSG_HRV\"], argument repetition  '-m mont1 -m mont2' possible, list of montages possible [[im1,im2],[im3,im4]]")
 
    (options, args) = parser.parse_args()
    #print (options)

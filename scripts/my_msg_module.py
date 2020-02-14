@@ -681,22 +681,28 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                                     LOG.error("*** ERROR (B), unknown Meteosat satellite number", in_msg.sat_nr, "in check_input (my_msg_module)" )
                             #    after March 2018 MSG4 is prime, MSG3 is RSS, MSG2 is backup RSS
                             else:
-                                if in_msg.sat_nr == 10:
+                                if in_msg.sat_nr == 11:
+                                    #there_is_no_backup_satellite = True
+                                    in_msg.sat_nr = 10
+                                    fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
+                                    conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
+                                    if in_msg.verbose:
+                                        print ("... try backup satellite ", in_msg.sat_nr)
+                                elif in_msg.sat_nr == 10:
                                     in_msg.sat_nr = 9
                                     fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
                                     conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
                                     if in_msg.verbose:
                                         print ("... try backup satellite ", in_msg.sat_nr)
                                 elif in_msg.sat_nr == 9:
-                                    in_msg.sat_nr = 11
-                                    # change RSS
-                                    # change processing time 
-                                    fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
-                                    conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
-                                    if in_msg.verbose:
-                                        print ("... try backup satellite ", in_msg.sat_nr)
-                                elif in_msg.sat_nr == 11:
-                                    there_is_no_backup_satellite = True  
+                                    there_is_no_backup_satellite = True
+                                    #in_msg.sat_nr = 11
+                                    ## change RSS
+                                    ## change processing time 
+                                    #fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
+                                    #conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
+                                    #if in_msg.verbose:
+                                    #    print ("... try backup satellite ", in_msg.sat_nr)
                                 elif in_msg.sat_nr == 8:
                                     LOG.info("*** Warning, Meteosat satellite number", in_msg.sat_nr, " is Indian Ocean Data Coverage")
                                     there_is_no_backup_satellite = True  

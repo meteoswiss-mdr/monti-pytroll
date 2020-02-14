@@ -1,9 +1,6 @@
 from __future__ import division
 from __future__ import print_function
 
-
-
-
 from my_msg_module import format_name
 from os.path import isfile, join, exists, dirname
 from os import makedirs
@@ -13,7 +10,7 @@ from copy import deepcopy
 
 def get_THX_filename(time_slot, area, outDir, outFile):
     print("    get_THX_filename THX for ", area)
-    from configparser import ConfigParser
+    from ConfigParser import ConfigParser
     from mpop import CONFIG_PATH
     conf = ConfigParser()
     conf.read(join(CONFIG_PATH, "swisslightning.cfg"))
@@ -429,9 +426,9 @@ def print_usage():
          print("                                 date and time must be completely given")
          print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'ccs4'           (overwrite in_msg.postprocessing_areas)")
          print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ['ccs4','euro4'] (overwrite in_msg.postprocessing_areas)")
-         print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'ccs4' 'h03-ir108'                 (overwrite postprocessing_composite)")
-         print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'ccs4' ['h03-ir108','h03-airmass'] (overwrite postprocessing_composite)")
-         print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ['ccs4','euro4'] ['h03-ir108','h03-airmass'] (several composites and areas)")
+         print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'ccs4' 'h03b-ir108'                 (overwrite postprocessing_composite)")
+         print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 'ccs4' ['h03b-ir108','h03b-airmass'] (overwrite postprocessing_composite)")
+         print("*** python "+inspect.getfile(inspect.currentframe())+" input_MSG 2014 07 23 16 10 ['ccs4','euro4'] ['h03b-ir108','h03b-airmass'] (several composites and areas)")
          print("***           ")
          quit() # quit at this point
 #-----------------------------------------------------------------------------------------

@@ -214,5 +214,5 @@ def input(in_msg):
 
     #in_msg.postprocessing_areas=['odysseyS25']
     #in_msg.postprocessing_composite=["RATE-ir108","RATE-HRV"]    
-    #in_msg.postprocessing_montage=[["MSG_RATE-ir108","MSG_h03-ir108"],["MSG_RATE-HRV","MSG_h03-HRV"]]
+    #in_msg.postprocessing_montage=[["MSG_RATE-ir108","MSG_h03b-ir108"],["MSG_RATE-HRV","MSG_h03b-HRV"]]
     

@@ -188,6 +188,46 @@ SwitzerlandStereo500m:
     lower_left_xy: [-186905.148381, -125009.827279]
     upper_right_xy: [186905.148381, 130619.097935]
 
+swissLarge1600m:
+  description: swissLarge1600m
+  projection:
+    proj:  stere
+    lat_0:  60.0
+    lon_0:  10.0
+    ellps:  WGS84
+  shape:
+    height: 550
+    width:  600
+  area_extent:
+    lower_left_xy: [-724534.506579, -1959852.77823]
+    upper_right_xy: [156610.094431, -1134112.40551]
+
+nrMET3km:
+  description: nrMET3km
+  projection:
+    proj:  eqc
+    lon_0:  0.0
+    a:  6378137.0
+  shape:
+    height: 6666
+    width:  6666
+  area_extent:
+    lower_left_xy: [-10010271.4036, -10013274.4695]
+    upper_right_xy: [10013274.4695, 10010271.4036]
+
+nrIODC8km:
+  description: nrIODC8km
+  projection:
+    proj:  eqc
+    lon_0:  41.5
+    a:  6378137.0
+  shape:
+    height: 2500
+    width:  2500
+  area_extent:
+    lower_left_xy: [-10008769.8149, -10016778.6957]
+    upper_right_xy: [10016777.0259, 10008768.9244]
+
 nrEURO1km:
   description: nrEURO1km ninjo stereographic projection NPOL close to COALITION1 projection resolution 1056m
   projection:
@@ -237,31 +277,47 @@ nrEuro4km:
     lower_left_xy: [-1162298.31321, -3754578.05231]
     upper_right_xy: [1148655.67841, -1134810.94276]
 
-nrMET3km:
-  description: nrMET3km
+nqceur1km:
+  description: nqceur1km
   projection:
     proj:  eqc
     lon_0:  0.0
-    a:  6378137.0
+    ellps:  WGS84
   shape:
-    height: 6666
-    width:  6666
+    height: 2000
+    width:  4000
   area_extent:
-    lower_left_xy: [-10010271.4036, -10013274.4695]
-    upper_right_xy: [10013274.4695, 10010271.4036]
+    lower_left_xy: [-1446768.21487, 4564542.1741]
+    upper_right_xy: [2559963.12281, 6567405.79203]
 
-nrIODC8km:
-  description: nrIODC8km
+regionH:
+  description: regionH
   projection:
-    proj:  eqc
-    lon_0:  65.0
-    a:  6378137.0
+    proj:  stere
+    lat_0:  90.0
+    lon_0:  -45.0
+    ellps:  WGS84
   shape:
-    height: 2500
-    width:  2500
+    height: 634
+    width:  800
   area_extent:
-    lower_left_xy: [-10008769.8149, -10016778.6957]
-    upper_right_xy: [10016777.0259, 10008768.9244]
+    lower_left_xy: [-8752812.68712, -11023786.0787]
+    upper_right_xy: [8748955.8972, 2846474.58011]
+
+mpef-ceu:
+  description: Europe-1280x1024NPOLprojection, 5kmresolution
+  projection:
+    proj:  stere
+    lat_0:  60.0
+    lon_0:  10.0
+    a:  6370000.0
+    b:  6370000.0
+  shape:
+    height: 621
+    width:  801
+  area_extent:
+    lower_left_xy: [-1918021.22344, -2804257.97021]
+    upper_right_xy: [1814542.49737, 118271.991506]
 
 baltrad_lambert:
   description: Baltrad Lambert
@@ -1647,6 +1703,18 @@ worldeqc30km:
     lower_left_xy: [-20037508.3428, -10018754.1714]
     upper_right_xy: [20037508.3428, 10018754.1714]
 
+platecarree:
+  description: GlobCover2009
+  projection:
+    proj:  eqc
+    ellps:  WGS84
+  shape:
+    height: 1024
+    width:  2048
+  area_extent:
+    lower_left_xy: [-20037508.3428, -10018754.1714]
+    upper_right_xy: [20037508.3428, 10018754.1714]
+
 worldeqc3km70:
   description: World in 3km, platecarree
   projection:
@@ -1711,6 +1779,30 @@ worldeqc30km:
   area_extent:
     lower_left_xy: [-20037508.3428, -10018754.1714]
     upper_right_xy: [20037508.3428, 10018754.1714]
+
+world_plat_13500_6750:
+  description: world_plat_13500_6750
+  projection:
+    proj:  eqc
+    ellps:  WGS84
+  shape:
+    height: 6750
+    width:  13500
+  area_extent:
+    lower_left_xy: [-20037508.3428, -10018754.1714]
+    upper_right_xy: [20037508.3428, 10018754.1714]
+
+world_plat_C1_21600_21600:
+  description: world_plat_21600_21600
+  projection:
+    proj:  eqc
+    ellps:  WGS84
+  shape:
+    height: 21600
+    width:  21600
+  area_extent:
+    lower_left_xy: [0.0, 0.0]
+    upper_right_xy: [10018754.1714, 10018754.1714]
 
 world_plat_21600_10800:
   description: world_plat_21600_10800
@@ -2288,6 +2380,61 @@ south_america:
   area_extent:
     lower_left_xy: [-8126322.82791, -5009377.0857]
     upper_right_xy: [-556597.453966, 1335833.88952]
+
+GOES16:
+  description: North America
+  projection:
+    proj:  laea
+    lat_0:  20.0
+    lon_0:  -75.2
+    a:  6370997.0
+  shape:
+    height: 5424
+    width:  5424
+  area_extent:
+    lower_left_xy: [-2700000.0, -2400000.0]
+    upper_right_xy: [2100000.0, 2400000.0]
+
+GOES16_FULL:
+  description: GOES16_FULL
+  projection:
+    proj:  geos
+    lat_0:  0.0
+    lon_0:  -75.2
+    a:  6378137.0
+    h:  35786023.0
+  shape:
+    height: 5424
+    width:  5424
+  area_extent:
+    lower_left_xy: [-5570248.47734, -5567248.07417]
+    upper_right_xy: [5567248.07417, 5570248.47734]
+
+NinJoGOESEregion:
+  description: NinJoGOESEregion
+  projection:
+    proj:  eqc
+    lon_0:  -75.2
+    ellps:  WGS84
+  shape:
+    height: 2500
+    width:  2500
+  area_extent:
+    lower_left_xy: [-10008769.8149, -10016778.6957]
+    upper_right_xy: [10016778.6957, 10008768.9244]
+
+NinJoGOESWregion:
+  description: NinJoGOESWregion
+  projection:
+    proj:  eqc
+    lon_0:  -137.2
+    a:  6378137.0
+  shape:
+    height: 2500
+    width:  2500
+  area_extent:
+    lower_left_xy: [-10008769.8149, -10016778.6957]
+    upper_right_xy: [10016778.6957, 10008768.9244]
 
 northamerica:
   description: North America - Global 1km USGS Landuse database

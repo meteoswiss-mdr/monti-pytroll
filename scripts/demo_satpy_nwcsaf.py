@@ -1,37 +1,45 @@
 from __future__ import division
 from __future__ import print_function
 
-
-from satpy.utils import debug_on
-debug_on()
-
-from numpy import nanmin, nanmax
-
 # Marco Sassi's program
 # zueub428:/opt/pytroll/nwcsaf/nwcsaf-processing/bin/NWCSAF_processing.py
 # old version: zueub428:/opt/safnwc/bin/NWCSAF_processing.py
 # see also https://github.com/pytroll/pytroll-examples/blob/master/satpy/ears-nwc.ipynb
 
+from satpy.utils import debug_on
+debug_on()
+
 import nwcsaf
+import numpy as np
+
+from satpy import Scene, find_files_and_readers
+from datetime import datetime
+
+#product = {}
 #product_list = ['CMA']
 #product_list = ['CTTH']
+product_list = ['CTTH']
 product_list = ['CT']
-# product_list = ['ASII-NG', 'CI', 'CMA', 'CMIC', 'CRR', 'CRR-Ph', 'CT', 'CTTH', 'HRW', 'iSHAI', 'PC', 'PC-Ph', 'PLAX', 'RDT-CW']
-# product.keys() ['ASII-NG', 'CI', 'CMA', 'CMIC', 'CRR', 'CRR-Ph', 'CT', 'CTTH', 'HRW', 'iSHAI', 'PC', 'PC-Ph', 'RDT-CW']
 ## 'ASII-NG' and 'RDT-CW' do not work!!
 # sam's product_list = ['CMA', 'CT', 'CTTH', 'CMIC', 'PC', 'CRR', 'iSHAI', 'CI', 'RDT-CW', 'ASII-NG']
+## 'ASII-NG' and 'RDT-CW' do not work!!
+# product_list = ['ASII-NG', 'CI', 'CMA', 'CMIC', 'CRR', 'CRR-Ph', 'CT', 'CTTH', 'HRW', 'iSHAI', 'PC', 'PC-Ph', 'PLAX', 'RDT-CW']
+# product.keys() ['ASII-NG', 'CI', 'CMA', 'CMIC', 'CRR', 'CRR-Ph', 'CT', 'CTTH', 'HRW', 'iSHAI', 'PC', 'PC-Ph', 'RDT-CW']
+# sam's product_list = ['CMA', 'CT', 'CTTH', 'CMIC', 'PC', 'CRR', 'iSHAI', 'CI', 'RDT-CW', 'ASII-NG']
+
+make_images=True
 
 #product = {}
 #product['CMA']     = [ 'cloudmask']
 #product["CTTH"]    = [ 'cloud_top_height', 'cloud_top_pressure', 'cloud_top_temperature']
 product_ids = {}
 #product_ids["CTTH"] = ['ctth_alti','ctth_alti_pal','ctth_effectiv','ctth_effectiv_pal','ctth_pres','ctth_pres_pal','ch_tempe','ctth_tempe_pal']
-product_ids["CTTH"] = ['ctth_alti']
+product_ids["cloud_top_temperature"] = ['ctth_tempe', 'ctth_tempe_pal']
+product_ids["cloud_top_pressure"]    = ['ctth_pres', 'ctth_pres_pal']
+product_ids['cloud_top_height']      = ['ctth_alti', 'ctth_alti_pal']
+product_ids['cloudtype']             = ['ct', 'ct_pal']
+product_ids['cloudmask']             = ['cma', 'cma_pal']
 
-make_images=True
-
-from satpy import Scene, find_files_and_readers
-from datetime import datetime
 
 for p_ in product_list:
 
@@ -90,24 +98,85 @@ for p_ in product_list:
 
     else:
         # work with scientific data
-        
-        global_scene.load(product_ids["CTTH"])
-        #global_scene.load(['ctth_alti'])
+        for p__ in nwcsaf.product[p_]:
+            global_scene.load(product_ids[p__])
+            #global_scene.load(['ctth_alti'])
 
     print("")
     print("global_scene")
     print(global_scene)
-    #print(global_scene['cloudtype'].comment)
-
-    global_scene.available_dataset_names()
-         
+    #print(dir(global_scene))
+    """
+    ['__class__', '__contains__', '__delattr__', '__delitem__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getitem__',
+    '__gt__', '__hash__', '__init__', '__init_subclass__', '__iter__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__',
+     '__setattr__', '__setitem__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_check_known_composites', '_compare_areas', '_compute_metadata_from_readers',
+     '_generate_composite', '_get_prereq_datasets', '_get_sensor_names', '_ipython_key_completions_', '_read_composites', '_read_datasets', '_remove_failed_datasets',
+     '_resampled_scene', '_slice_area_from_bbox', '_slice_data', '_slice_datasets', 'aggregate', 'all_composite_ids', 'all_composite_names', 'all_dataset_ids',
+     'all_dataset_names', 'all_modifier_names', 'all_same_area', 'all_same_proj', 'attrs', 'available_composite_ids', 'available_composite_names', 'available_dataset_ids',
+     'available_dataset_names', 'copy', 'cpl', 'create_reader_instances', 'crop', 'datasets', 'dep_tree', 'end_time', 'generate_composites', 'get', 'get_writer_by_ext',
+     'id', 'images', 'iter_by_area', 'keys', 'load', 'max_area', 'min_area', 'missing_datasets', 'ppp_config_dir', 'read', 'readers', 'resample', 'resamplers',
+     'save_dataset', 'save_datasets', 'show', 'slice', 'start_time', 'to_geoviews', 'to_xarray_dataset', 'unload', 'values', 'wishlist']
+    """
+    
+    #!!# print(global_scene['overview']) ### this one does only work in the develop version
+    print("")
+    print("available_composite_names")
+    print(global_scene.available_composite_names())
+    print(global_scene.all_dataset_names())
+    print(global_scene.available_dataset_names())
+    print(global_scene.datasets)
+    
     # resample to another projection
     print("resample")
     area="ccs4"
     area="EuropeCanaryS95"
     local_scene = global_scene.resample(area)
-
     print("dir(local_scene)", dir(local_scene))
+    
+    for p_name in nwcsaf.product[p_]:
+        
+        #local_scene.show('cloudtype')
+        #local_scene.save_dataset('cloudtype', './local_cloudtype.png')
+        #print "display ./local_cloudtype.png &"
+        print("======================")
+        print("======================")        
+        print(global_scene['cloud_top_temperature'])
+        print(global_scene['cloud_top_temperature'].attrs['area'])
+        print(global_scene['cloud_top_temperature'].attrs["start_time"])
+        #long_name:               NWC GEO CTTH Cloud Top Altitude
+        #level:                   None
+        #end_time:                2017-07-07 12:03:32
+        #sensor:                  seviri
+        #valid_range:             [    0 27000]
+        #ancillary_variables:     [<xarray.DataArray 'ctth_status_flag' (y: 151, x...
+        #area:                    Area ID: some_area_name\nDescription: On-the-fly...
+        #resolution:              3000
+        #polarization:            None
+        #start_time:              2017-07-07 12:03:02
+        #comment:
+        #name:                    cloud_top_height
+        #standard_name:           cloud_top_height
+        #platform_name:           Meteosat-9
+        #wavelength:              None
+        #_FillValue:              nan
+        #units:                   m
+        #modifiers:               None
+        #prerequisites:           ['ctth_alti', 'ctth_alti_pal']
+        #optional_prerequisites:  []
+        #calibration:             None
+        #mode:                    RGB
+        
+        print(np.nanmin(global_scene['cloud_top_temperature'].values))
+        print(np.nanmax(global_scene['cloud_top_temperature'].values))
+        print("======================")
+        print("======================")        
+ 
+        
+        #local_scene.show(p_name)
+        #local_scene.show(p_name, overlay={'coast_dir': '/data/OWARNA/hau/maps_pytroll/', 'color': (255, 0, 0), 'resolution': 'i'})
+        local_scene.save_dataset(p_name, "./local_"+p_name+".png", overlay={'coast_dir': '/data/OWARNA/hau/maps_pytroll/', 'color': (255, 0, 0), 'resolution': 'i'})
+        print("display ./local_"+p_name+".png &")
+
     
     if make_images:
 
@@ -126,7 +195,7 @@ for p_ in product_list:
         for p_name in product_ids[p_]:
             print (type(local_scene[p_name].values))
             print (local_scene[p_name].values.shape)
-            print (nanmin(local_scene[p_name].values))
-            print (nanmax(local_scene[p_name].values))
+            print (np.nanmin(local_scene[p_name].values))
+            print (np.nanmax(local_scene[p_name].values))
                 
 

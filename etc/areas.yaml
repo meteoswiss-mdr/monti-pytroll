@@ -1728,6 +1728,19 @@ worldeqc3km70:
     lower_left_xy: [-20037508.3428, -7792364.35553]
     upper_right_xy: [20037508.3428, 7792364.35553]
 
+worldeqc4km21:
+  description: World 7200 x 3600, platecarree
+  projection:
+    proj:  eqc
+    ellps:  WGS84
+    units:  m
+  shape:
+    height: 3600
+    width:  7200
+  area_extent:
+    lower_left_xy: [-20037508.3428, -7792364.35553]
+    upper_right_xy: [20037508.3428, 7792364.35553]
+
 worldeqc30km70:
   description: World in 3km, platecarree
   projection:

@@ -263,6 +263,16 @@ REGION: mpef-ceu {
         AREA_EXTENT:   (-1918021.223441,-2804257.970205,1814542.497371,118271.991506)
 };
 
+#REGION: mpef-ceu {
+#        NAME:          Europe-1280x1024NPOLprojection,5kmresolution
+#        PCS_ID:        stere801x621
+#        PCS_DEF:       proj=stere, lat_0=60.0, lon_0=10, a=6370000 ,b=6370000
+#        XSIZE:         801
+#        YSIZE:         621
+#        AREA_EXTENT:   (-1918021.223441,-2804257.970205,1814542.497371,118271.991506)
+#};
+
+
 #################
 # Europe Europa
 #################
@@ -1243,6 +1253,15 @@ REGION: worldeqc3km70 {
         PCS_DEF:    units=m, proj=eqc, ellps=WGS84
         XSIZE:      8192
         YSIZE:      4096
+        AREA_EXTENT: (-20037508.3428, -7792364.3555333326, 20037508.3428, 7792364.3555333326)
+};
+
+REGION: worldeqc4km21 {
+        NAME:       World 7200 x 3600, platecarree
+        PCS_ID:     plate_carree
+        PCS_DEF:    units=m, proj=eqc, ellps=WGS84
+        XSIZE:      7200
+        YSIZE:      3600
         AREA_EXTENT: (-20037508.3428, -7792364.3555333326, 20037508.3428, 7792364.3555333326)
 };
 

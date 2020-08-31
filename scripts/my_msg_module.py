@@ -11,11 +11,11 @@ from __future__ import print_function
 
 import products 
 import inspect
-import logging
 import datetime
 from mpop.projector import get_area_def
 from copy import deepcopy 
 
+import logging
 LOG = logging.getLogger(__name__)
 LOG.setLevel(40)
 #CRITICAL 50 #ERROR 40 #WARNING 30 #INFO 20 #DEBUG 10 #NOTSET 0

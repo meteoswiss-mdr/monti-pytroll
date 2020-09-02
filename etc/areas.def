@@ -83,6 +83,15 @@ REGION: cosmo7 {
         AREA_EXTENT:    (-1812933.5656552943, -1003565.2518504434, 814056.0017955909, 1243448.9654948832)
 };
 
+REGION: cosmo1_150 {
+        NAME:           Swiss COSMO model area with 1km resolution
+        PCS_ID:         cosmo1
+        PCS_DEF:        proj=ob_tran, ellps=WGS84, lat_0=46.15, lon_0=8.435, o_proj=stere, o_lat_p=90, o_lon_p=-1.565
+        XSIZE:          876
+        YSIZE:          597
+        AREA_EXTENT:    (-754225.3130887491, -412056.2370343627, 531392.9480190033, 465627.48114979145)
+};
+
 REGION: ticino {
         NAME:   ticino
         PCS_ID: somerc_8.85_46.15
@@ -1262,7 +1271,7 @@ REGION: worldeqc4km21 {
         PCS_DEF:    units=m, proj=eqc, ellps=WGS84
         XSIZE:      7200
         YSIZE:      3600
-        AREA_EXTENT: (-20037508.3428, -7792364.3555333326, 20037508.3428, 7792364.3555333326)
+	AREA_EXTENT: (-20037508.3428, -10018754.1714, 20037508.3428, 10018754.1714)
 };
 
 REGION: worldeqc30km70 {

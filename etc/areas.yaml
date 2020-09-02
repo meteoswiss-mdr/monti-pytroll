@@ -113,6 +113,23 @@ cosmo7:
     lower_left_xy: [-1812933.56566, -1003565.25185]
     upper_right_xy: [814056.001796, 1243448.96549]
 
+cosmo1_150:
+  description: Swiss COSMO model area with 1km resolution
+  projection:
+    proj:  ob_tran
+    lat_0:  46.15
+    lon_0:  8.435
+    ellps:  WGS84
+    o_proj:  stere
+    o_lat_p:  90.0
+    o_lon_p:  -1.565
+  shape:
+    height: 597
+    width:  876
+  area_extent:
+    lower_left_xy: [-754225.313089, -412056.237034]
+    upper_right_xy: [531392.948019, 465627.48115]
+
 ticino:
   description: ticino
   projection:
@@ -1738,8 +1755,8 @@ worldeqc4km21:
     height: 3600
     width:  7200
   area_extent:
-    lower_left_xy: [-20037508.3428, -7792364.35553]
-    upper_right_xy: [20037508.3428, 7792364.35553]
+    lower_left_xy: [-20037508.3428, -10018754.1714]
+    upper_right_xy: [20037508.3428, 10018754.1714]
 
 worldeqc30km70:
   description: World in 3km, platecarree

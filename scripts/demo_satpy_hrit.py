@@ -21,6 +21,7 @@ debug_on()
 #################################
 from satpy import Scene, find_files_and_readers
 from datetime import datetime
+from copy import deepcopy
 sat="MSG2"
 
 files_sat = find_files_and_readers(sensor='seviri',
@@ -31,21 +32,30 @@ files_sat = find_files_and_readers(sensor='seviri',
                                reader='seviri_l1b_hrit')                                   
 #                               reader='hrit_msg')
 
-#print files_sat
+#for f in files_sat['seviri_l1b_hrit']:
+#    print(f)
 #files = dict(files_sat.items() + files_nwc.items())
-files = dict(list(files_sat.items()))
+#files = dict(list(files_sat.items()))
 
-if sat=="MSG3":
-    #remove MSG2 files
-    for f in files['seviri_l1b_hrit']:
-        if "MSG2" in f: files['seviri_l1b_hrit'].remove(f)
-else:
-    #remove MSG3 files
-    for f in files['seviri_l1b_hrit']:
-        if "MSG3" in f: files['seviri_l1b_hrit'].remove(f)
+print("=============================")
+print("remove all other MSG satellites (except MSG4) and unused channels")
+files = deepcopy(files_sat['seviri_l1b_hrit'])
+for f in files:
+    if not (sat in f):
+        files_sat['seviri_l1b_hrit'].remove(f)
+        continue
+    if ("HRV" in f) or ("IR_016" in f) or ("IR_039" in f):  # or ("VIS006" in f) or ("VIS008" in f) 
+        files_sat['seviri_l1b_hrit'].remove(f)
+        continue
+    if  ("WV_062" in f) or ("WV_073" in f)  or ("IR_087" in f) or ("IR_097" in f)  or ("IR_120" in f) or ("IR_134" in f): # or ("IR_108" in f)
+        files_sat['seviri_l1b_hrit'].remove(f)
+        continue
+for f in files_sat['seviri_l1b_hrit']:
+    print(f)
 
+    
 #global_scene = Scene(reader="hrit_msg", filenames=files)
-global_scene = Scene(reader="seviri_l1b_hrit", filenames=files)
+global_scene = Scene(reader="seviri_l1b_hrit", filenames=files_sat)
 
 print("")
 print("=======================")
@@ -86,12 +96,18 @@ local_scene = global_scene.resample(area)
 
 print("=======================")
 print("")
-
+print("global_scene.available_composite_names()")
 print(global_scene.available_composite_names())
 
+print("")
+print("=======================")
+print("global_scene.save_dataset('overview', pngfile)")
 pngfile='./'+sat+'_overview_global.png'
 global_scene.save_dataset('overview', pngfile)
 print('display '+pngfile+' &')
+
+print("")
+print("=======================")
 
 #local_scene.show('overview')
 pngfile='./'+sat+'_overview_'+area+'.png'

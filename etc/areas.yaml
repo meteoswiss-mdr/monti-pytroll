@@ -113,6 +113,37 @@ cosmo7:
     lower_left_xy: [-1812933.56566, -1003565.25185]
     upper_right_xy: [814056.001796, 1243448.96549]
 
+cosmo1_150:
+  description: Swiss COSMO model area with 1km resolution
+  projection:
+    proj:  ob_tran
+    lat_0:  46.15
+    lon_0:  8.435
+    ellps:  WGS84
+    o_proj:  stere
+    o_lat_p:  90.0
+    o_lon_p:  -1.565
+  shape:
+    height: 597
+    width:  876
+  area_extent:
+    lower_left_xy: [-754225.313089, -412056.237034]
+    upper_right_xy: [531392.948019, 465627.48115]
+
+Cosmo1Mercator:
+  description: Cosmo1Mercator
+  projection:
+    proj:  merc
+    lat_0:  0.0
+    lon_0:  9.125
+    ellps:  WGS84
+  shape:
+    height: 443
+    width:  628
+  area_extent:
+    lower_left_xy: [-1597434.69288, 5117468.35353]
+    upper_right_xy: [289430.676063, 6448137.40441]
+
 ticino:
   description: ticino
   projection:
@@ -1542,6 +1573,21 @@ SeviriDiskFull00S5:
     lower_left_xy: [-5570248.47734, -5567248.07417]
     upper_right_xy: [5567248.07417, 5570248.47734]
 
+SeviriDisk00Cosmo:
+  description: MSG image SEVIRI 0 degrees covering COSMO2 COSMO1 COSMO1E
+  projection:
+    proj:  geos
+    lon_0:  0.0
+    a:  6378169.0
+    b:  6356583.8
+    h:  35785831.0
+  shape:
+    height: 179
+    width:  435
+  area_extent:
+    lower_left_xy: [50388.9034343, 4016792.8627]
+    upper_right_xy: [1356630.57145, 4556223.82132]
+
 SeviriDisk35:
   description: Cropped globe MSG image 3.5 degrees
   projection:
@@ -1738,8 +1784,8 @@ worldeqc4km21:
     height: 3600
     width:  7200
   area_extent:
-    lower_left_xy: [-20037508.3428, -7792364.35553]
-    upper_right_xy: [20037508.3428, 7792364.35553]
+    lower_left_xy: [-20037508.3428, -10018754.1714]
+    upper_right_xy: [20037508.3428, 10018754.1714]
 
 worldeqc30km70:
   description: World in 3km, platecarree

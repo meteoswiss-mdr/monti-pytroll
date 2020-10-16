@@ -83,6 +83,24 @@ REGION: cosmo7 {
         AREA_EXTENT:    (-1812933.5656552943, -1003565.2518504434, 814056.0017955909, 1243448.9654948832)
 };
 
+REGION: cosmo1_150 {
+        NAME:           Swiss COSMO model area with 1km resolution
+        PCS_ID:         cosmo1
+        PCS_DEF:        proj=ob_tran, ellps=WGS84, lat_0=46.15, lon_0=8.435, o_proj=stere, o_lat_p=90, o_lon_p=-1.565
+        XSIZE:          876
+        YSIZE:          597
+        AREA_EXTENT:    (-754225.3130887491, -412056.2370343627, 531392.9480190033, 465627.48114979145)
+};
+
+REGION: Cosmo1Mercator {
+        NAME:    Cosmo1Mercator
+        PCS_ID:  merc_9.125_0
+        PCS_DEF:        proj=merc,lat_0=0,lon_0=9.125,ellps=WGS84
+        XSIZE:   628
+        YSIZE:   443
+        AREA_EXTENT:     (-1597434.6928834755, 5117468.353525541, 289430.6760625117, 6448137.4044123385)
+};
+
 REGION: ticino {
         NAME:   ticino
         PCS_ID: somerc_8.85_46.15
@@ -131,7 +149,6 @@ REGION: SwitzerlandStereo500m {
         YSIZE:  511
         AREA_EXTENT:    (-186905.1483814532, -125009.82727901157, 186905.14838145344, 130619.09793495211)
 };
-
 
 #####################
 # Ninjo compartible #
@@ -451,6 +468,15 @@ REGION: europe_center {
         XSIZE:  944
         YSIZE:  740
         AREA_EXTENT:    (-1889030.7325620402, -1291641.717409139, 1889030.7325620402, 1669202.6041898835)
+};
+
+REGION: EuropeCenter {
+        NAME:   Europe Center, 4km resolution
+        PCS_ID: stere_5.0_46.5
+        PCS_DEF:        proj=stere,lat_0=46.5,lon_0=5.0,ellps=WGS84
+        XSIZE:  1319
+        YSIZE:   740
+        AREA_EXTENT:    (-2889030.7325620402, -1291641.717409139, 2389030.7325620402, 1669202.6041898835)
 };
 
 REGION: euro_north {
@@ -1124,6 +1150,17 @@ REGION: SeviriDiskFull00S5 {
         AREA_EXTENT:   (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
 };
 
+# python coord2area_def_geos.py SeviriDisk00Cosmo 0 42 50.15 0.75 17.5 3
+REGION: SeviriDisk00Cosmo {
+        NAME:    MSG image SEVIRI 0 degrees covering COSMO2 COSMO1 COSMO1E
+        PCS_ID:  geos_0.0_0.0
+        PCS_DEF:        proj=geos, lon_0=0.0, a=6378169.00, b=6356583.80, h=35785831.0
+        XSIZE:   435
+        YSIZE:   179
+        AREA_EXTENT:   (50388.9034342657, 4016792.862704246, 1356630.5714465084, 4556223.8213154785)
+};
+
+
 REGION: SeviriDisk35 {
         NAME:          Cropped globe MSG image 3.5 degrees
         PCS_ID:        geos3
@@ -1262,7 +1299,7 @@ REGION: worldeqc4km21 {
         PCS_DEF:    units=m, proj=eqc, ellps=WGS84
         XSIZE:      7200
         YSIZE:      3600
-        AREA_EXTENT: (-20037508.3428, -7792364.3555333326, 20037508.3428, 7792364.3555333326)
+	AREA_EXTENT: (-20037508.3428, -10018754.1714, 20037508.3428, 10018754.1714)
 };
 
 REGION: worldeqc30km70 {
@@ -1344,6 +1381,15 @@ REGION: world_plat_8192_4096 {
         XSIZE:          8192
         YSIZE:          4096
         AREA_EXTENT:    (-20037508.342789244, -10018754.171394622, 20037508.342789244, 10018754.171394622)
+};
+
+REGION: pc_world {
+   NAME:    Plate Carree world map
+   PCS_ID:  pc_world
+   PCS_DEF: proj=eqc
+   XSIZE: 640
+   YSIZE: 480
+   AREA_EXTENT:  (-20037508.34, -10018754.17, 20037508.34, 10018754.17)
 };
 
 #########################

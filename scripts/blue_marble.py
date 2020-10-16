@@ -1,10 +1,16 @@
+from __future__ import print_function
+
 from PIL import Image
-from mpop.projector import Projector, get_area_def
-from mpop.utils import debug_on
+from mpop.projector import Projector
+from mpop.projector import get_area_def # python2 version
+#from satpy.resample import get_area_def  # python3 version
+
+#from mpop.utils import debug_on
 import numpy as np
 from pycoast import ContourWriterAGG
 
-debug_on()
+# Image.MAX_IMAGE_PIXELS = 500000000
+#debug_on()
 
 #Which projection do you need?
 #=============================
@@ -13,7 +19,7 @@ area='ccs4'
 #area='EuropeCanaryS95'
 #area='SeviriDiskFull00'
 #area='SeviriDiskFull95'
-
+#area='nrEURO3km'
 
 # specify input file
 # ==================
@@ -24,7 +30,7 @@ area='ccs4'
 # C2 tile (very high resolution) -> only to CCS4 possible
 bkg_file = "/data/COALITION2/database/Land/blue_marble/high resolution tiles/world.topo.bathy.200408.3x21600x21600.C1.png"
 area_bkg = get_area_def('world_plat_C1_21600_21600')
-outfile = 'blue_marble_bathy_C1_'+area+'.jpg'
+outfile = 'blue_marble_bathy_C1_'+area+'.png'
 
 # C2 tile (very high resolution) -> only to CCS4 possible
 #bkg_file = "/data/COALITION2/database/Land/blue_marble/BlackMarble_2012_C1.jpg"
@@ -58,8 +64,8 @@ pil_b = Image.fromarray(b)
 background = Image.merge("RGB", (pil_r, pil_g, pil_b))
 
 background.save(outfile)
+print("display "+outfile+" &")
 
 cw = ContourWriterAGG('/data/OWARNA/hau/pytroll/shapes')
 #cw.add_coastlines_to_file(outfile, area_target, resolution='i', level=3)
 #cw.add_borders_to_file(outfile, area_target, outline="red", resolution='i',level=3)
-

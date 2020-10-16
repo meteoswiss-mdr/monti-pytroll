@@ -425,7 +425,7 @@ def format_name (folder, time_slot, rgb=None, sat=None, sat_nr=None, RSS=None, a
 
     if area is not None:
         #new_folder = (new_folder % {"area": area})
-        new_folder = new_folder.replace("%(area)s", area)
+        new_folder = new_folder.replace("%(area)s", area.replace("_", "-"))
 
     if sat is not None:
         #new_folder = (new_folder % {"msg": "MSG"+str(int(sat_nr)-7)})

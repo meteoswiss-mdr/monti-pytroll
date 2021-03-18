@@ -84,7 +84,7 @@ pep8==1.6.2
 pexpect==3.3
 pickleshare==0.5
 PIL==1.1.7
-Pillow==3.1.0
+Pillow==8.1.1
 ply==3.8
 #-e git+https://github.com/pytroll/posttroll.git@7726dd6731b86b0a6be6da4dea60786dd73066c0#egg=posttroll&subdirectory=../../../packages/posttroll
 psutil==3.3.0

@@ -62,7 +62,7 @@ python-geotiepoints==1.1.7
 -e git+https://github.com/pytroll/pytroll-schedule.git@9b594a35c74a12c895a7957565929b994f15f8fd#egg=pytroll_schedule&subdirectory=../../../packages/pytroll-schedule
 pytz==2018.9
 PyWavelets==1.0.2
-PyYAML==5.1
+PyYAML==5.4
 pyzmq==18.0.1
 requests==2.21.0
 -e git+https://github.com/pytroll/satpy.git@3e3505984ead2944e848b46be2960462b3db6f43#egg=satpy&subdirectory=../../../packages/satpy

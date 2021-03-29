@@ -99,7 +99,7 @@ pycrypto==2.6.1
 pycurl==7.19.5.1
 #-e git+https://code.google.com/p/pydecorate/@dd1930a0817b4c6d7cb5e20e79538825b1202746#egg=pydecorate&subdirectory=../../../packages/pydecorate
 pyflakes==1.0.0
-Pygments==2.0.2
+Pygments==2.7.4
 #pygrib==2.0.1
 pyinotify==0.9.6
 pykdtree==1.0

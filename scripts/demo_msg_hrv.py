@@ -1,3 +1,4 @@
+from __future__ import print_function
 from mpop.satellites import GeostationaryFactory
 from mpop.projector import get_area_def
 import datetime
@@ -22,12 +23,12 @@ else:
         minute = int(sys.argv[5])
         timeslot = datetime.datetime(year, month, day, hour, minute)
 
-print str(time_slot)
+print (str(time_slot))
 
 global_data = GeostationaryFactory.create_scene("Meteosat-10", "", "seviri", time_slot)
 #europe = get_area_def("EuropeCanaryS95")
 global_data.load(['HRV'], reader_level='')  # , area_extent=europe.area_extent
-print global_data
+print (global_data)
 
 #area="EuropeCanaryS95"
 area="ccs4"

@@ -70,7 +70,7 @@ def force_to_observed_cloud_mask(mod, obs):
     #
     #force observed mask on forecast
     #mod[obs.mask==True] = no_data 
-    #print type(mod), type(obs)
+    #print (type(mod), type(obs))
     #
     #mod[mod.mask==True] = np.nan
     #mod = fill_with_closest_pixel(mod)    
@@ -462,7 +462,7 @@ if __name__ == '__main__':
           # create a mask where CTP can be derived 
           # -------------------
       
-          #print type(data['CTP'].data)
+          #print (type(data['CTP'].data))
           #mask_CTP = np.where(data['CTP'].data > 0.0)
           mask_CTP = data['CTP'].data.mask
           #if True:
@@ -471,7 +471,7 @@ if __name__ == '__main__':
           #      mask_CTP[mask1>0] = 1
           #else:
           #      mask_CTP = pickle.load( open( "mask_obs%s.p"%(yearS+monthS+dayS+hours+minS),"rb") )   
-          #print mask_CTP   
+          #print (mask_CTP)   
       
           ir_120_t15 = force_to_observed_cloud_mask(ma.masked_array(ir_120_t15), data['CTP'].data)
       
@@ -1032,10 +1032,10 @@ if __name__ == '__main__':
     rgbArray[..., 3] = 200
     sum_array = rgbArray[...,0]+rgbArray[..., 1]+rgbArray[..., 2]
     #count = np.zeros(sum_array.shape)
-    #print count.shape
-    #print rgbArray[...,0].shape
+    #print (count.shape)
+    #print (rgbArray[...,0].shape)
     #count[sum_array<=0] = 1
-    #print sum(sum(count))
+    #print (sum(sum(count)))
     rgbArray[sum_array<=0,0] = 255 #np.where( sum_array<=0,1,rgbArray[..., 0])
     rgbArray[sum_array<=0,1] = 255 #np.where( sum_array<=0,1,rgbArray[..., 1])
     rgbArray[sum_array<=0,2] = 255 #np.where( sum_array<=0,1,rgbArray[..., 2])
@@ -1049,7 +1049,7 @@ if __name__ == '__main__':
         #                        resolution=in_msg.resolution, verbose=in_msg.verbose)
 
         outputFile = out_dir+"/cosmo/Channels/indicators_in_time/RGBs/%s_%s_RGB.png"%(yearS+monthS+dayS,hourS+minS)
-        print "... save image: ", outputFile
+        print ("... save image: ", outputFile)
         img1.save( create_dir(outputFile) ) 
 
     if plot_RGB_HRV:
@@ -1070,10 +1070,10 @@ if __name__ == '__main__':
     rgbArray[..., 3] = 200
     sum_array = rgbArray[...,0]+rgbArray[..., 1]+rgbArray[..., 2]
     #count = np.zeros( sum_array.shape)
-    #print count.shape
-    #print rgbArray[...,0].shape
+    #print (count.shape)
+    #print (rgbArray[...,0].shape)
     #count[sum_array<=0] = 1
-    #print sum( sum(count))
+    #print (sum( sum(count)))
     rgbArray[sum_array<=0,0] = 255 #np.where( sum_array<=0,1,rgbArray[..., 0])
     rgbArray[sum_array<=0,1] = 255 #np.where( sum_array<=0,1,rgbArray[..., 1])
     rgbArray[sum_array<=0,2] = 255 #np.where( sum_array<=0,1,rgbArray[..., 2])
@@ -1085,7 +1085,7 @@ if __name__ == '__main__':
         #                        add_borders=in_msg.add_borders, border_color=in_msg.border_color,
         #                        add_rivers=in_msg.add_rivers, river_color=in_msg.river_color, 
         #                        resolution=in_msg.resolution, verbose=in_msg.verbose)
-        print out_dir +"/cosmo/Channels/indicators_in_time/RGBs/%s_%s_RGBmature.png"%(yearS+monthS+dayS,hourS+minS)
+        print (out_dir +"/cosmo/Channels/indicators_in_time/RGBs/%s_%s_RGBmature.png"%(yearS+monthS+dayS,hourS+minS))
         img1.save(out_dir +"/cosmo/Channels/indicators_in_time/RGBs/%s_%s_RGBmature.png"%(yearS+monthS+dayS,hourS+minS))
 
     if plot_RGB_HRV_mature:
@@ -1107,10 +1107,10 @@ if __name__ == '__main__':
     rgbArray[..., 3] = 200
     sum_array = rgbArray[...,0]+rgbArray[..., 1]+rgbArray[..., 2]
     #count = np.zeros(sum_array.shape)
-    #print count.shape
-    #print rgbArray[...,0].shape
+    #print (count.shape)
+    #print (rgbArray[...,0].shape)
     #count[sum_array<=0]=1
-    #print sum( sum(count))
+    #print (sum( sum(count)))
     rgbArray[sum_array<=0,0] = 255 #np.where( sum_array<=0,1,rgbArray[..., 0])
     rgbArray[sum_array<=0,1] = 255 #np.where( sum_array<=0,1,rgbArray[..., 1])
     rgbArray[sum_array<=0,2] = 255 #np.where( sum_array<=0,1,rgbArray[..., 2])
@@ -1121,7 +1121,7 @@ if __name__ == '__main__':
         #                        add_borders=in_msg.add_borders, border_color=in_msg.border_color,
         #                        add_rivers=in_msg.add_rivers, river_color=in_msg.river_color, 
         #                        resolution=in_msg.resolution, verbose=in_msg.verbose)
-        print out_dir +"/cosmo/Channels/indicators_in_time/RGBs/%s_%s_RGBdeveloping.png"%(yearS+monthS+dayS,hourS+minS)
+        print (out_dir +"/cosmo/Channels/indicators_in_time/RGBs/%s_%s_RGBdeveloping.png"%(yearS+monthS+dayS,hourS+minS))
         img1.save( out_dir +"/cosmo/Channels/indicators_in_time/RGBs/%s_%s_RGBdeveloping.png"%(yearS+monthS+dayS,hourS+minS))
     
     if plot_RGB_HRV_develop:
@@ -1142,10 +1142,10 @@ if __name__ == '__main__':
     rgbArray[..., 3] = 200
     sum_array = rgbArray[...,0]+rgbArray[..., 1]+rgbArray[..., 2]
     #count = np.zeros( sum_array.shape)
-    #print count.shape
-    #print rgbArray[...,0].shape
+    #print (count.shape)
+    #print (rgbArray[...,0].shape)
     #count[sum_array<=0] = 1
-    #print sum( sum(count))
+    #print (sum( sum(count)))
     rgbArray[sum_array<=0,0] = 255 #np.where( sum_array<=0,1,rgbArray[..., 0])
     rgbArray[sum_array<=0,1] = 255 #np.where( sum_array<=0,1,rgbArray[..., 1])
     rgbArray[sum_array<=0,2] = 255 #np.where( sum_array<=0,1,rgbArray[..., 2])
@@ -1168,7 +1168,7 @@ if __name__ == '__main__':
         file2 = out_dir +"/cosmo/Channels/indicators_in_time/RGB-all/"+yearS+monthS+dayS+"_"+hourS+minS+"_RGBallb.png" 
         outputFile = create_dir( out_dir +"/cosmo/Channels/indicators_in_time/RGB-HRV-all/"+yearS+monthS+dayS+"_"+hourS+minS+"_RGBallCombined_BWb.png" )
         subprocess.call("/usr/bin/composite "+file2+" "+file1+" "+outputFile, shell=True)
-        print outputFile
+        print (outputFile)
     
 
     """
@@ -1178,12 +1178,12 @@ if __name__ == '__main__':
     # http://www.scipy-lectures.org/advanced/image_processing/auto_examples/plot_find_edges.html#example-plot-find-edges-py
     img[np.isnan(img)] = 0
     img[img>0] = 1
-    print img
+    print (img)
     from scipy import ndimage
     sx = ndimage.sobel(img, axis=0, mode='constant')
     sy = ndimage.sobel(img, axis=1, mode='constant')
     sob=np.hypot(sx,sy)
-    print sob
+    print (sob)
     sob=np.ma.masked_where(sob==0)
     """
     #file1="/data/COALITION2/PicturesSatellite//"+yearS+"-"+monthS+"-"+dayS+"/"+yearS+"-"+monthS+"-"+dayS+"_HRV_ccs4/MSG_HRV-ccs4_15"+monthS+dayS+hourS+minS+".png" #2015-07-07_HRV_ccs4"_HRoverview_ccs4/MSG_HRoverview-ccs4_15"+monthS+dayS+hourS+minS+".png"
@@ -1223,7 +1223,7 @@ if __name__ == '__main__':
 
     dc.add_scale(rainbow,extend=True)
     
-    print type(img_cd)
+    print (type(img_cd))
 """
 
 #####################th1#####################

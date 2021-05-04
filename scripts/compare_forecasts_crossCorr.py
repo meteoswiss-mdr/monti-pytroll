@@ -186,7 +186,7 @@ if __name__ == "__main__":
             print("max: ", tmp.max())
             print("mean: ", tmp.mean())
             print("number points: ", tmp.size)
-            #print "median: ", tmp.median()
+            #print("median: ", tmp.median())
 
             tmp1 = []
             for err in tmp:
@@ -197,7 +197,7 @@ if __name__ == "__main__":
             print("max: ", tmp1.max())
             print("mean: ", tmp1.mean())
             print("number points: ", tmp1.size)
-            #print "median: ", tmp1.mmedian()        
+            #print("median: ", tmp1.mmedian())    
             
             diff.append(tmp1)    
             #diff.append(tmp[0]-img_obs) #diff.append((tmp[0]-img_obs).flatten()) #pickles/20151015_0500_CTT_t05_1layer.p
@@ -210,7 +210,7 @@ if __name__ == "__main__":
             print("max: ", tmp.max())
             print("mean: ", tmp.mean())
             print("number points: ", tmp.size)
-            #print "median: ", tmp.median()
+            #print("median: ", tmp.median())
             for err in tmp:
                 if abs(err) <= 50:
                     tmp1.append(err)
@@ -219,7 +219,7 @@ if __name__ == "__main__":
             print("max: ", tmp1.max())
             print("mean: ", tmp1.mean())
             print("number points: ", tmp1.size)
-            #print "median: ", tmp1.median() 
+            #print("median: ", tmp1.median())
             diff.append(tmp1) 
             #diff.append(tmp[0]-img_obs)
         tmp = pickle.load(open( "pickles/forced/"+year0S+month0S+day0S+"_"+hour0S+min0S+"_CTT_t"+leadS+"_1layerForced_mask.p","rb"))  #pickles/forced/20151015_0500_CTT_t05_1layerForced_mask.p
@@ -300,7 +300,7 @@ if __name__ == "__main__":
         if True:
             model_ind_plot = 0
             for diff_one in diff1:
-                #print diff_one
+                #print(diff_one)
                 #diff_one = np.reshape(diff_one, img_obs.shape)
                 #diff_one
                 fig = plt.figure()
@@ -334,11 +334,11 @@ if __name__ == "__main__":
     
     fig = plt.figure()
     plt.subplot(311)
-    print time1
+    print(time1)
     plt.scatter(time1, means1,color = "blue", label = '1 p layer, forced mask')
-    print time1
+    print(time1)
     plt.scatter(time1, means2, color = "red", label = '3 p layer, forced mask')
-    print time1
+    print(time1)
     plt.ylabel("Mean")
     plt.legend(loc="best")
     plt.subplot(312)

@@ -214,12 +214,12 @@ if __name__ == '__main__':
         #local_scene['lscl'].standard_name="low_stratus_confidence_level"
         #local_scene['lscl'].calibration="brightness_temperature_difference"
 
-        print(local_scene['IR_120'])
-        print(dir(local_scene['IR_120']))
-        print(local_scene['IR_120'].standard_name)
-        print(type(local_scene['IR_120'].standard_name))
+        #print(local_scene['IR_120'])
+        #print(dir(local_scene['IR_120']))
+        #print(local_scene['IR_120'].standard_name)
+        #print(type(local_scene['IR_120'].standard_name))
         #local_scene['lscl'].standard_name = "toa_brightness_temperature_difference"
-        print(local_scene['lscl']) 
+        #print(local_scene['lscl']) 
 
         ##############################################
         # calculate lscl "low stratus confidence level
@@ -245,7 +245,7 @@ if __name__ == '__main__':
         #               6:  Low clouds; 7:  Mid-level clouds;  8:  High opaque clouds; 9:  Very high opaque clouds;
         #              10:  Fractional clouds; 11:  High semitransparent thin clouds;  12:  High semitransparent meanly thick clouds;
         #              13:  High semitransparent thick clouds;  14:  High semitransparent above low or medium clouds;  15:  High semitransparent above snow/ice" ;
-        for _ct_ in [8,9,11,12,13,14,15]:
+        for _ct_ in [7,8,9,10,11,12,13,14,15]:
             print("replace cloud type",_ct_)
             local_scene['lscl'].values = np.where(local_nwc['ct'].values==_ct_, np.nan, local_scene['lscl'].values)
 
@@ -329,7 +329,8 @@ if __name__ == '__main__':
             rewrite_xy_axis(netCDF_file)
 
             scpID="-i ~/.ssh/id_rsa_tsa"
-            scpOutputDir="hamann@tsa.cscs.ch:/scratch/hamann/DayNightFog/"
+            #scpOutputDir="hamann@tsa.cscs.ch:/scratch/hamann/DayNightFog/"
+            scpOutputDir="hamann@tsa.cscs.ch:/scratch/hamann/DayNightFog_Filter-CT-7-15/"
             print("... scp "+netCDF_file+" to "+scpOutputDir)
             subprocess.call("/usr/bin/scp "+scpID+" "+netCDF_file+" "+scpOutputDir+" 2>&1 &", shell=True)
 

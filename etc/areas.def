@@ -380,6 +380,15 @@ REGION: europe_center {
         AREA_EXTENT:    (-1889030.7325620402, -1291641.717409139, 1889030.7325620402, 1669202.6041898835)
 };
 
+REGION: EuropeCenter {
+        NAME:   Europe Center, 4km resolution
+        PCS_ID: stere_5.0_46.5
+        PCS_DEF:        proj=stere,lat_0=46.5,lon_0=5.0,ellps=WGS84
+        XSIZE:  1319
+        YSIZE:   740
+        AREA_EXTENT:    (-2889030.7325620402, -1291641.717409139, 2389030.7325620402, 1669202.6041898835)
+};
+
 REGION: euro_north {
         NAME:          Europe 3km/pixel
         PCS_ID:        euro_north
@@ -1051,6 +1060,16 @@ REGION: SeviriDiskFull00S5 {
         AREA_EXTENT:   (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
 };
 
+# python coord2area_def_geos.py SeviriDisk00Cosmo 0 42 50.15 0.75 17.5 3
+REGION: SeviriDisk00Cosmo {
+        NAME:    MSG image SEVIRI 0 degrees covering COSMO2 COSMO1 COSMO1E
+        PCS_ID:  geos_0.0_0.0
+        PCS_DEF:        proj=geos, lon_0=0.0, a=6378169.00, b=6356583.80, h=35785831.0
+        XSIZE:   435
+        YSIZE:   179
+        AREA_EXTENT:   (50388.9034342657, 4016792.862704246, 1356630.5714465084, 4556223.8213154785)
+};
+
 REGION: SeviriDisk35 {
         NAME:          Cropped globe MSG image 3.5 degrees
         PCS_ID:        geos3
@@ -1207,6 +1226,15 @@ REGION: worldeqc30km {
         XSIZE:      820
         YSIZE:      410
         AREA_EXTENT: (-20037508.3428, -10018754.1714, 20037508.3428, 10018754.1714)
+};
+
+REGION: world_plat_13500_6750 { 
+        NAME:           world_plat_13500_6750
+        PCS_ID:         world_plat_13500_6750
+        PCS_DEF:        proj=eqc,ellps=WGS84
+        XSIZE:          13500
+        YSIZE:           6750
+        AREA_EXTENT:    (-20037508.342789244, -10018754.171394622, 20037508.342789244, 10018754.171394622)
 };
 
 REGION: world_plat_21600_10800 {

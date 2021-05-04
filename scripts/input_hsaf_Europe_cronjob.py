@@ -172,7 +172,8 @@ def input(in_msg):
     #----------------
     #in_msg.areas.append('EuropeCanary')
     #in_msg.areas.append('EuropeCanary95')
-    in_msg.areas.append('EuropeCanaryS95')
+    #in_msg.areas.append('EuropeCanaryS95')
+    in_msg.areas.append('EuropeCenter')
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     #in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
@@ -220,7 +221,7 @@ def input(in_msg):
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
     
-    in_msg.postprocessing_areas=['EuropeCanaryS95'] # !!!!
+    in_msg.postprocessing_areas=['EuropeCenter'] # !!!!
     in_msg.postprocessing_composite = ["h03b-ir108","h03b-HRVir108"]  # , "h03b-HRV"
     #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03b-ir108"],["MSG_radar-HRV","MSG_h03b-HRV"]]
     #                                 only ccs4                           only ccs4                       only odyssey                      only odyssey

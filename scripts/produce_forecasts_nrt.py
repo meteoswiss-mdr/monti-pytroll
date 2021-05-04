@@ -148,12 +148,14 @@ def get_cosmo_filenames (t_sat, nrt=True, runs_before = 0 ):
     print("***get_cosmo_filenames***** nrt *******", nrt) 
 
     ### !!! NEED A PROPER FIX !!!!
+    # before Oct 2020 ??? 
     #if nrt:          
     #    cosmo = "cosmo-1"
     #else:
     #    cosmo = "cosmo2"
-    cosmo = "cosmo-1"
-
+    # after Oct 2020 ??? 
+    cosmo = "cosmo-1e"
+    
     if nrt:          
         cosmoDir='/data/cinesat/in/cosmo/' #2016052515_05_cosmo-1_UV_swissXXL
     else:
@@ -237,6 +239,16 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     u_all2 = nc_cosmo_2.variables['U'][:] 
     v_all2 = nc_cosmo_2.variables['V'][:]
 
+    # remove the dimension for the COSMO ensemble 
+    if (u_all1.ndim == 5):
+        u_all1 = u_all1[0]
+    if (v_all1.ndim == 5):
+        v_all1 = v_all1[0]
+    if (u_all2.ndim == 5):
+        u_all2 = u_all2[0]
+    if (v_all2.ndim == 5):
+        v_all2 = v_all2[0]
+    
     nx1 = u_all1.shape[2]
     ny1 = u_all1.shape[3] 
     

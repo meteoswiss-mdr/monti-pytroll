@@ -89,7 +89,7 @@ ply==3.8
 #-e git+https://github.com/pytroll/posttroll.git@7726dd6731b86b0a6be6da4dea60786dd73066c0#egg=posttroll&subdirectory=../../../packages/posttroll
 psutil==3.3.0
 ptyprocess==0.5
-py==1.4.30
+py==1.10.0
 pyasn1==0.1.9
 pycairo==1.10.0
 #-e git+https://github.com/pytroll/pycoast.git@1393b4fc47d0c9adcf42beb85d03d33d9fefd187#egg=pycoast&subdirectory=../../../packages/pycoast

@@ -196,9 +196,9 @@ if __name__ == '__main__':
     # create png    file for area cosmo1_150 (50% more pixels)
     ############################################################
     #for area in ['SeviriDisk00Cosmo',"cosmo1x150"]:
-    #for area in ['cosmo1', 'cosmo1eqc3km']:
+    for area in ['cosmo1', 'cosmo1eqc3km']:
     #for area in ['cosmo1eqc3km']:
-    for area in ['cosmo1x150', 'cosmo1eqc3km']:
+    #for area in ['cosmo1x150', 'cosmo1eqc3km']:
 
         # resample MSG L2
         ##################
@@ -298,7 +298,8 @@ if __name__ == '__main__':
                 subprocess.call(scp_command, shell=True)
             elif area=="cosmo1":
                 scpID="-i ~/.ssh/id_rsa_tsa"
-                scpOutputDir="hamann@tsa.cscs.ch:/scratch/hamann/DayNightFog/"
+                #scpOutputDir="hamann@tsa.cscs.ch:/scratch/hamann/DayNightFog/"
+                scpOutputDir="hamann@tsa.cscs.ch:/scratch/hamann/DayNightFog_Filter-CT-7-15/"
                 print("... scp "+png_file+" to "+scpOutputDir)
                 subprocess.call("/usr/bin/scp "+scpID+" "+png_file+" "+scpOutputDir+" 2>&1 &", shell=True)
             

@@ -148,11 +148,13 @@ def get_cosmo_filenames (t_sat, nrt=True, runs_before = 0 ):
     print("***get_cosmo_filenames***** nrt *******", nrt) 
 
     ### !!! NEED A PROPER FIX !!!!
+    # before Oct 2020 ??? 
     #if nrt:          
     #    cosmo = "cosmo-1"
     #else:
     #    cosmo = "cosmo2"
-    cosmo = "cosmo-1"
+    # after Oct 2020 ??? 
+    cosmo = "cosmo-1e"
 
     if nrt:          
         cosmoDir='/data/cinesat/in/cosmo/' #2016052515_05_cosmo-1_UV_swissXXL
@@ -213,7 +215,7 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     if nc_cosmo_1.variables['z_1'].units=='hPa':
         fpress1 = 100
     elif nc_cosmo_1.variables['z_1'].units=='Pa':
-        fpress1 = 1
+        fpress1 = 1 
     else:
         print("*** Warning, unknown unit for wind in ", file_cosmo_1)
         fpress1 = 1

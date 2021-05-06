@@ -83,8 +83,8 @@ REGION: cosmo7 {
         AREA_EXTENT:    (-1812933.5656552943, -1003565.2518504434, 814056.0017955909, 1243448.9654948832)
 };
 
-REGION: cosmo1_150 {
-        NAME:           Swiss COSMO model area with 1km resolution
+REGION: cosmo1x150 {
+        NAME:           Swiss COSMO model area with 0.66km resolution (zoom 150 per cent)
         PCS_ID:         cosmo1
         PCS_DEF:        proj=ob_tran, ellps=WGS84, lat_0=46.15, lon_0=8.435, o_proj=stere, o_lat_p=90, o_lon_p=-1.565
         XSIZE:          876
@@ -92,13 +92,31 @@ REGION: cosmo1_150 {
         AREA_EXTENT:    (-754225.3130887491, -412056.2370343627, 531392.9480190033, 465627.48114979145)
 };
 
-REGION: Cosmo1Mercator {
-        NAME:    Cosmo1Mercator
+REGION: cosmo1merc1km {
+        NAME:    Roughly Swiss COSMO-1 model area as Mercator projection with 1km resolution
         PCS_ID:  merc_9.125_0
         PCS_DEF:        proj=merc,lat_0=0,lon_0=9.125,ellps=WGS84
-        XSIZE:   628
-        YSIZE:   443
-        AREA_EXTENT:     (-1597434.6928834755, 5117468.353525541, 289430.6760625117, 6448137.4044123385)
+        XSIZE:   1864
+        YSIZE:   1307
+        AREA_EXTENT:     (-932300.7353936662, 5132380.528242791, 932300.7353936661, 6439470.567170107)
+};
+
+REGION: cosmo1merc3km {
+        NAME:    Roughly Swiss COSMO-1 model area as Mercator projection with 3km resolution
+        PCS_ID:  merc_9.125_0
+        PCS_DEF:        proj=merc,lat_0=0,lon_0=9.125,ellps=WGS84
+        XSIZE:   621
+        YSIZE:   435
+        AREA_EXTENT:     (-932300.7353936662, 5132380.528242791, 932300.7353936661, 6439470.567170107)
+};
+
+REGION: cosmo1eqc3km {
+        NAME:    Roughly Swiss COSMO-1 model area as Equidistant Cylindrical projection with 3km resolution
+        PCS_ID:  eqc_8.25_46.5
+        PCS_DEF:        proj=eqc, lat_ts=46.0, ellps=WGS84, units=m, lon_0=8.25, lat_0=46.5
+        XSIZE:   482
+        YSIZE:   341
+        AREA_EXTENT:     (-723026.3002992002, -512069.65764905844, 723026.3002992002, 512069.65764905844)
 };
 
 REGION: ticino {
@@ -1151,13 +1169,23 @@ REGION: SeviriDiskFull00S5 {
 };
 
 # python coord2area_def_geos.py SeviriDisk00Cosmo 0 42 50.15 0.75 17.5 3
+#REGION: SeviriDisk00Cosmo {
+#        NAME:    MSG image SEVIRI 0 degrees covering COSMO2 COSMO1 COSMO1E
+#        PCS_ID:  geos_0.0_0.0
+#        PCS_DEF:        proj=geos, lon_0=0.0, a=6378169.00, b=6356583.80, h=35785831.0
+#        XSIZE:   435
+#        YSIZE:   179
+#        AREA_EXTENT:   (50388.9034342657, 4016792.862704246, 1356630.5714465084, 4556223.8213154785)
+#};
+
+#python coord2area_def_geos.py SeviriDisk00Cosmo 0 42 50.15 -0.2 17.5 3
 REGION: SeviriDisk00Cosmo {
-        NAME:    MSG image SEVIRI 0 degrees covering COSMO2 COSMO1 COSMO1E
+        NAME:    SeviriDisk00Cosmo
         PCS_ID:  geos_0.0_0.0
         PCS_DEF:        proj=geos, lon_0=0.0, a=6378169.00, b=6356583.80, h=35785831.0
-        XSIZE:   435
+        XSIZE:   457
         YSIZE:   179
-        AREA_EXTENT:   (50388.9034342657, 4016792.862704246, 1356630.5714465084, 4556223.8213154785)
+        AREA_EXTENT:     (-15848.0824889478, 4016792.862704246, 1356630.5714465084, 4556266.555680619)
 };
 
 

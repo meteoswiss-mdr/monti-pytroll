@@ -8,11 +8,11 @@ rgbs="[VIS006 VIS008 IR_016 IR_039 WV_062 WV_073 IR_087 IR_097 IR_108 IR_120 IR_
 echo ""
 
 echo "*** create dates"
-if [ 1 -eq 0 ]; then
+if [ 1 -eq 1 ]; then
     # check old dates from archive (offline modus)
-    date_start="2019-04-26 00:00"
+    date_start="2020-07-22 00:00"
     date_start_s=$(/bin/date --date "$date_start" +"%s")
-    date_end="2019-04-28 23:55"
+    date_end="2020-09-01 00:00"
     date_end_s=$(/bin/date --date "$date_end" +"%s")
     . /opt/users/cinesat/monti-pytroll/setup/bashrc_offline no_virtual_environment
     # check satellite in the input file (MSG2 or MSG3) depending on start/end time in line 105/106 and 109/110 
@@ -106,7 +106,7 @@ do
  	    python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles_MSG2.py $year $month $day $hour $minute
 	elif [[ "$1" = "PLAX" ]]; then
 	    echo "    "python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles_PLAX.py $year $month $day $hour $minute 
- 	    python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles_PLAX.py $year $month $day $hour $minute
+ 	    #python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles_PLAX.py $year $month $day $hour $minute
  	    python $PYTROLLHOME/scripts/plot_msg.py input_rad_ncfiles_PLAX_MSG2.py $year $month $day $hour $minute
 	else
 	    echo "unknown command line arguemnt" $1
@@ -114,7 +114,7 @@ do
     fi
 
     # clean temporary files
-    find /tmp/SEVIRI_DECOMPRESSED/H-000-MSG* -type f -mmin +5 -delete 2>&1
+    find /tmp/SEVIRI_DECOMPRESSED/H-000-MSG* -type f -mmin +3 -delete 2>&1
     
     # add 5min (dtime) to current date 
     currentdate_s=$(/bin/date --date "$currentdate $dtime" +"%s") 

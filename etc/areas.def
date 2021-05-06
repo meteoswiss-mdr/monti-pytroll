@@ -1188,7 +1188,6 @@ REGION: SeviriDisk00Cosmo {
         AREA_EXTENT:     (-15848.0824889478, 4016792.862704246, 1356630.5714465084, 4556266.555680619)
 };
 
-
 REGION: SeviriDisk35 {
         NAME:          Cropped globe MSG image 3.5 degrees
         PCS_ID:        geos3

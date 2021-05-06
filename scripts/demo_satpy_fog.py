@@ -131,7 +131,7 @@ if __name__ == '__main__':
     print("... processing time ", start_time)
 
     show_interactively=False
-    save_black_white_png=True
+    save_black_white_png=False
 
     print("")
     print("")
@@ -330,6 +330,7 @@ if __name__ == '__main__':
             rewrite_xy_axis(netCDF_file)
 
             scpID="-i ~/.ssh/id_rsa_tsa"
+            #scpOutputDir="hamann@tsa.cscs.ch:/scratch/hamann/DayNightFog/"
             scpOutputDir="hamann@tsa.cscs.ch:/scratch/hamann/DayNightFog_Filter-CT-7-15/"
             print("... scp "+netCDF_file+" to "+scpOutputDir)
             subprocess.call("/usr/bin/scp "+scpID+" "+netCDF_file+" "+scpOutputDir+" 2>&1 &", shell=True)

@@ -36,7 +36,7 @@ numpy==1.16.0
 pandas==0.24.2
 paramiko==2.4.2
 patsy==0.5.1
-Pillow==6.0.0
+Pillow==8.2.0
 -e git+https://github.com/pytroll/posttroll.git@8e811a0544b5182c4a72aed074b2ff8c4324e94d#egg=posttroll&subdirectory=../../../packages/posttroll
 -e git+https://github.com/pytroll/pytroll-pps-runner.git@b3973035aa77fbdef469e7bfcee7c1f7f615fdc8#egg=pps_runner&subdirectory=../../../packages/pytroll-pps-runner
 -e git+https://github.com/pytroll/pytroll-product-filter.git@4b6966619dfdeaeb95bae9ba3cbb36ca8f8d0dbd#egg=product_filter&subdirectory=../../../packages/pytroll-product-filter

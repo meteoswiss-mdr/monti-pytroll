@@ -113,8 +113,8 @@ cosmo7:
     lower_left_xy: [-1812933.56566, -1003565.25185]
     upper_right_xy: [814056.001796, 1243448.96549]
 
-cosmo1_150:
-  description: Swiss COSMO model area with 1km resolution
+cosmo1x150:
+  description: Swiss COSMO model area with 0.66km resolution
   projection:
     proj:  ob_tran
     lat_0:  46.15
@@ -130,19 +130,49 @@ cosmo1_150:
     lower_left_xy: [-754225.313089, -412056.237034]
     upper_right_xy: [531392.948019, 465627.48115]
 
-Cosmo1Mercator:
-  description: Cosmo1Mercator
+cosmo1merc1km:
+  description: cosmo1merc
   projection:
     proj:  merc
     lat_0:  0.0
     lon_0:  9.125
     ellps:  WGS84
   shape:
-    height: 443
-    width:  628
+    height: 1307
+    width:  1864
   area_extent:
-    lower_left_xy: [-1597434.69288, 5117468.35353]
-    upper_right_xy: [289430.676063, 6448137.40441]
+    lower_left_xy: [-932300.735394, 5132380.52824]
+    upper_right_xy: [932300.735394, 6439470.56717]
+
+cosmo1merc3km:
+  description: cosmo1merc
+  projection:
+    proj:  merc
+    lat_0:  0.0
+    lon_0:  9.125
+    ellps:  WGS84
+  shape:
+    height: 435
+    width:  621
+  area_extent:
+    lower_left_xy: [-932300.735394, 5132380.52824]
+    upper_right_xy: [932300.735394, 6439470.56717]
+    
+cosmo1eqc3km:
+  description: Roughly Swiss COSMO-1 model area as Equidistant Cylindrical projection with 3km resolution
+  projection:
+    proj:  eqc
+    lat_0:  46.5
+    lon_0:  8.25
+    lat_ts:  46.0
+    ellps:  WGS84
+    units:  m
+  shape:
+    height: 341
+    width:  482
+  area_extent:
+    lower_left_xy: [-723026.300299, -512069.657649]
+    upper_right_xy: [723026.300299, 512069.657649]
 
 ticino:
   description: ticino

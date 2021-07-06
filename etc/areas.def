@@ -101,6 +101,24 @@ REGION: Cosmo1Mercator {
         AREA_EXTENT:     (-1597434.6928834755, 5117468.353525541, 289430.6760625117, 6448137.4044123385)
 };
 
+REGION: Cosmo1Mercator {
+        NAME:    Cosmo1Mercator
+        PCS_ID:  merc_9.125_0
+        PCS_DEF:        proj=merc,lat_0=0,lon_0=9.125,ellps=WGS84
+        XSIZE:   628
+        YSIZE:   443
+        AREA_EXTENT:     (-1597434.6928834755, 5117468.353525541, 289430.6760625117, 6448137.4044123385)
+};
+
+REGION: cosmo1eqc3km {
+        NAME:    Roughly Swiss COSMO-1 model area as Equidistant Cylindrical projection with 3km resolution
+        PCS_ID:  eqc_46.5_8.25
+        PCS_DEF:        proj=eqc,lat_0=46.5,lon_0=8.25,lat_ts=46.0,ellps=WGS84,units=m
+        XSIZE:   482
+        YSIZE:   341
+        AREA_EXTENT:     (-723026.300299, -512069.657649, 723026.300299, 512069.657649)
+};
+
 REGION: ticino {
         NAME:   ticino
         PCS_ID: somerc_8.85_46.15

@@ -11,11 +11,11 @@ from __future__ import print_function
 
 import products 
 import inspect
-import logging
 import datetime
 from mpop.projector import get_area_def
 from copy import deepcopy 
 
+import logging
 LOG = logging.getLogger(__name__)
 LOG.setLevel(40)
 #CRITICAL 50 #ERROR 40 #WARNING 30 #INFO 20 #DEBUG 10 #NOTSET 0
@@ -425,7 +425,7 @@ def format_name (folder, time_slot, rgb=None, sat=None, sat_nr=None, RSS=None, a
 
     if area is not None:
         #new_folder = (new_folder % {"area": area})
-        new_folder = new_folder.replace("%(area)s", area)
+        new_folder = new_folder.replace("%(area)s", area.replace("_", "-"))
 
     if sat is not None:
         #new_folder = (new_folder % {"msg": "MSG"+str(int(sat_nr)-7)})
@@ -619,7 +619,8 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                 pro_file_checked=True
                 sat_nr_org = deepcopy(in_msg.sat_nr)
                 there_is_no_backup_satellite = False
-
+                tries_for_backup = 0
+                
                 while in_msg.sat_nr > 7:
 
                     # update pro_file with new sat_nr and search for prolog files
@@ -636,7 +637,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                         print ("    found prologue file ", pro_filename)
                         break  # prologue file found, break this loop and check if epilog is there
                     else:
-                        if there_is_no_backup_satellite:
+                        if there_is_no_backup_satellite or tries_for_backup > 3:
                             # reset sat_nr and return empty rgb_complete
                             in_msg.sat_nr = sat_nr_org 
                             if in_msg.verbose:
@@ -649,12 +650,14 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                             # before July 2016: Meteosat 8 is RSS backup for Meteosat 9, but also try Meteosat 10 if possible
                             if in_msg.datetime < datetime.datetime(2016, 7, 1, 0, 0): 
                                 if in_msg.sat_nr == 9:
+                                    tries_for_backup=tries_for_backup+1
                                     in_msg.sat_nr = 8
                                     fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
                                     conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
                                     if in_msg.verbose:
                                         print ("... try backup satellite ", in_msg.sat_nr)
                                 elif in_msg.sat_nr == 8:
+                                    tries_for_backup=tries_for_backup+1
                                     in_msg.sat_nr = 10
                                     fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
                                     conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
@@ -667,6 +670,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                             # after July 2016 there is no RSS backup, try if there is Meteosat 10 instead (available every 15min)
                             if in_msg.datetime < datetime.datetime(2018, 3, 3, 0, 0):
                                 if in_msg.sat_nr == 9:
+                                    tries_for_backup=tries_for_backup+1
                                     in_msg.sat_nr = 10
                                     fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
                                     conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
@@ -682,6 +686,7 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                             #    after March 2018 MSG4 is prime, MSG3 is RSS, MSG2 is backup RSS
                             else:
                                 if in_msg.sat_nr == 11:
+                                    tries_for_backup=tries_for_backup+1
                                     #there_is_no_backup_satellite = True
                                     in_msg.sat_nr = 10
                                     fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
@@ -689,20 +694,21 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                                     if in_msg.verbose:
                                         print ("... try backup satellite ", in_msg.sat_nr)
                                 elif in_msg.sat_nr == 10:
+                                    tries_for_backup=tries_for_backup+1
                                     in_msg.sat_nr = 9
                                     fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
                                     conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
                                     if in_msg.verbose:
                                         print ("... try backup satellite ", in_msg.sat_nr)
                                 elif in_msg.sat_nr == 9:
-                                    there_is_no_backup_satellite = True
-                                    #in_msg.sat_nr = 11
-                                    ## change RSS
-                                    ## change processing time 
-                                    #fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
-                                    #conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
-                                    #if in_msg.verbose:
-                                    #    print ("... try backup satellite ", in_msg.sat_nr)
+                                    tries_for_backup=tries_for_backup+1
+                                    #there_is_no_backup_satellite = True
+                                    # switch to full disk service 
+                                    in_msg.sat_nr = 11
+                                    fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
+                                    conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
+                                    if in_msg.verbose:
+                                        print ("... WARNING, no RSS available, switch from RSS to FDS satellite ", in_msg.sat_nr)
                                 elif in_msg.sat_nr == 8:
                                     LOG.info("*** Warning, Meteosat satellite number", in_msg.sat_nr, " is Indian Ocean Data Coverage")
                                     there_is_no_backup_satellite = True  

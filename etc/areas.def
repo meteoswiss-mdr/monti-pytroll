@@ -83,6 +83,24 @@ REGION: cosmo7 {
         AREA_EXTENT:    (-1812933.5656552943, -1003565.2518504434, 814056.0017955909, 1243448.9654948832)
 };
 
+REGION: cosmo1_150 {
+        NAME:           Swiss COSMO model area with 1km resolution
+        PCS_ID:         cosmo1
+        PCS_DEF:        proj=ob_tran, ellps=WGS84, lat_0=46.15, lon_0=8.435, o_proj=stere, o_lat_p=90, o_lon_p=-1.565
+        XSIZE:          876
+        YSIZE:          597
+        AREA_EXTENT:    (-754225.3130887491, -412056.2370343627, 531392.9480190033, 465627.48114979145)
+};
+
+REGION: Cosmo1Mercator {
+        NAME:    Cosmo1Mercator
+        PCS_ID:  merc_9.125_0
+        PCS_DEF:        proj=merc,lat_0=0,lon_0=9.125,ellps=WGS84
+        XSIZE:   628
+        YSIZE:   443
+        AREA_EXTENT:     (-1597434.6928834755, 5117468.353525541, 289430.6760625117, 6448137.4044123385)
+};
+
 REGION: ticino {
         NAME:   ticino
         PCS_ID: somerc_8.85_46.15
@@ -132,13 +150,42 @@ REGION: SwitzerlandStereo500m {
         AREA_EXTENT:    (-186905.1483814532, -125009.82727901157, 186905.14838145344, 130619.09793495211)
 };
 
-#################
-# Europe Europa
-#################
-
 #####################
 # Ninjo compartible #
 #####################
+
+REGION: swissLarge1600m {
+        NAME:          swissLarge1600m   # SwissLarge-2500x2000NPOLprojection,1600mresolution
+        PCS_ID:        swissLarge1600m
+        PCS_DEF:       proj=stere, lat_0=60.0, lon_0=10, ellps=WGS84
+      #  PCS_DEF:       proj=stere  +lat_0=60.0  +lon_0=10.0  +a=6370000.0 +b=6370000.0
+        XSIZE:         600
+        YSIZE:         550
+        AREA_EXTENT:   (-724534.506579,-1959852.778231,156610.094431,-1134112.405507)
+      #  AREA_EXTENT:   (-723185.492200,-1959500.261947,156185.982771,-1132946.936906)
+};
+
+REGION: nrMET3km {
+        NAME:          nrMET3km
+        PCS_ID:        nrMET3km
+        PCS_DEF:       proj=eqc, lon_0=0.0, a=6378137.00
+        XSIZE:         6666
+        YSIZE:         6666
+        AREA_EXTENT:   (-10010271.403557,-10013274.469460,10013274.469460,10010271.403557)
+
+};
+
+REGION: nrIODC8km {
+        NAME:          nrIODC8km
+        PCS_ID:        nrIODC8km
+        PCS_DEF:       proj=eqc, lon_0=41.5, a=6378137.00
+        XSIZE:         2500
+        YSIZE:         2500
+        AREA_EXTENT:   (-10008769.814946,-10016778.695711,10016777.025919,10008768.924390)
+};
+###        PCS_DEF:       proj=eqc, lon_0=65.0, a=6378137.00
+
+
 REGION: nrEURO1km {
         NAME:          nrEURO1km ninjo stereographic projection NPOL close to COALITION1 projection resolution 1056m
         PCS_ID:        nrEURO1km_NPOL_stere_10_90_0_60
@@ -158,9 +205,6 @@ REGION: nrEURO1km {
 #        AREA_EXTENT:    (191186.4513570518, -5594827.132697373, 1093278.016412308, -4365108.274999464)
 #};
 
-#####################
-# Ninjo compartible #
-#####################
 REGION: nrEURO3km {
         NAME:           nrEURO3km
         PCS_ID:         eqc_-1.02539_42.06787
@@ -179,30 +223,76 @@ REGION: nrEuro4km {
         AREA_EXTENT:   (-1162298.313205,-3754578.052310,1148655.678415,-1134810.942758)
 };
 
-#####################
-# Ninjo compartible #
-#####################
-REGION: nrMET3km {
-        NAME:          nrMET3km
-        PCS_ID:        nrMET3km
-        PCS_DEF:       proj=eqc, lon_0=0.0, a=6378137.00
-        XSIZE:         6666
-        YSIZE:         6666
-        AREA_EXTENT:   (-10010271.403557,-10013274.469460,10013274.469460,10010271.403557)
+REGION: nqceur1km{
+        NAME:   nqceur1km
+        PCS_ID: EQUIRECT_0.0_1000.0
+        PCS_DEF:        proj=eqc,lon_0=0.0,ellps=WGS84
+        XSIZE:  4000
+        YSIZE:  2000
+        AREA_EXTENT:    (-1446768.2148744117, 4564542.1740975734, 2559963.1228071474, 6567405.7920348747)
 };
 
-#####################
-# Ninjo compartible #
-#####################
-REGION: nrIODC8km {
-        NAME:          nrIODC8km
-        PCS_ID:        nrIODC8km
-        PCS_DEF:       proj=eqc, lon_0=65.0, a=6378137.00
-        XSIZE:         2500
-        YSIZE:         2500
-        AREA_EXTENT:   (-10008769.814946,-10016778.695711,10016777.025919,10008768.924390)
+#################
+# Skyguide product for original Cinesat r0287n.prj
+#################
+
+REGION: regionB {
+        NAME:          regionB
+        PCS_ID:        regionB
+        PCS_DEF:       proj=omerc, alpha=-45.0, lat_0=0.0, lonc=-34.0, a=6378137, b=6378137
+        XSIZE:         800
+        YSIZE:         548
+        AREA_EXTENT:   (-9761424.714818418, -4861746.639279127, 8136477.43264252, 10236799.845095873)
 };
 
+REGION: regionB2 {
+        NAME:          regionB2
+        PCS_ID:        regionB2
+        PCS_DEF:       proj=merc, lon_0=0.0, x_0=0, y_0=0, k_0=0, a=6378137, b=6378137
+        XSIZE:         800
+        YSIZE:         548
+        ROTATION:      -45.0
+        AREA_EXTENT:   (-20037508.342789244, -12018754.171394622, 20037508.342789244, 12018754.171394622)
+};
+
+#################
+# Skyguide product for original Cinesat r0282n.prj
+#################
+REGION: regionH {
+        NAME:          regionH
+        PCS_ID:        regionH
+        PCS_DEF:       proj=stere, lat_0=90.0, lon_0=-45.0, ellps=WGS84
+        XSIZE:         800
+        YSIZE:         634
+        AREA_EXTENT:   (-8752812.687121,-11023786.078709,8748955.897202,2846474.580111)
+};
+
+#################
+# Airforce MPEF product for original Cinesat r0287n.prj
+# not working after a GRIb error after MSG4 configurations
+#################
+REGION: mpef-ceu {
+        NAME:          Europe-1280x1024NPOLprojection,5kmresolution
+        PCS_ID:        stere801x621
+        PCS_DEF:       proj=stere, lat_0=60.0, lon_0=10, a=6370000 ,b=6370000
+        XSIZE:         801
+        YSIZE:         621
+        AREA_EXTENT:   (-1918021.223441,-2804257.970205,1814542.497371,118271.991506)
+};
+
+#REGION: mpef-ceu {
+#        NAME:          Europe-1280x1024NPOLprojection,5kmresolution
+#        PCS_ID:        stere801x621
+#        PCS_DEF:       proj=stere, lat_0=60.0, lon_0=10, a=6370000 ,b=6370000
+#        XSIZE:         801
+#        YSIZE:         621
+#        AREA_EXTENT:   (-1918021.223441,-2804257.970205,1814542.497371,118271.991506)
+#};
+
+
+#################
+# Europe Europa
+#################
 
 REGION: baltrad_lambert {
         NAME:           Baltrad Lambert
@@ -378,6 +468,15 @@ REGION: europe_center {
         XSIZE:  944
         YSIZE:  740
         AREA_EXTENT:    (-1889030.7325620402, -1291641.717409139, 1889030.7325620402, 1669202.6041898835)
+};
+
+REGION: EuropeCenter {
+        NAME:   Europe Center, 4km resolution
+        PCS_ID: stere_5.0_46.5
+        PCS_DEF:        proj=stere,lat_0=46.5,lon_0=5.0,ellps=WGS84
+        XSIZE:  1319
+        YSIZE:   740
+        AREA_EXTENT:    (-2889030.7325620402, -1291641.717409139, 2389030.7325620402, 1669202.6041898835)
 };
 
 REGION: euro_north {
@@ -1051,6 +1150,16 @@ REGION: SeviriDiskFull00S5 {
         AREA_EXTENT:   (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
 };
 
+# python coord2area_def_geos.py SeviriDisk00Cosmo 0 42 50.15 0.75 17.5 3
+REGION: SeviriDisk00Cosmo {
+        NAME:    MSG image SEVIRI 0 degrees covering COSMO2 COSMO1 COSMO1E
+        PCS_ID:  geos_0.0_0.0
+        PCS_DEF:        proj=geos, lon_0=0.0, a=6378169.00, b=6356583.80, h=35785831.0
+        XSIZE:   435
+        YSIZE:   179
+        AREA_EXTENT:   (50388.9034342657, 4016792.862704246, 1356630.5714465084, 4556223.8213154785)
+};
+
 REGION: SeviriDisk35 {
         NAME:          Cropped globe MSG image 3.5 degrees
         PCS_ID:        geos3
@@ -1164,6 +1273,16 @@ REGION: worldeqc30km {
         AREA_EXTENT: (-20037508.3428, -10018754.1714, 20037508.3428, 10018754.1714)
 };
 
+REGION: platecarree  {
+        NAME:           GlobCover2009
+        PCS_ID:         globalcover
+        PCS_DEF:        proj=eqc,ellps=WGS84
+        XSIZE:          2048
+        YSIZE:          1024
+        AREA_EXTENT:    (-20037508.342789244, -10018754.171394622, 20037508.342789244, 10018754.171394622)
+};
+
+
 REGION: worldeqc3km70 {
         NAME:       World in 3km, platecarree
         PCS_ID:     plate_carree
@@ -1171,6 +1290,15 @@ REGION: worldeqc3km70 {
         XSIZE:      8192
         YSIZE:      4096
         AREA_EXTENT: (-20037508.3428, -7792364.3555333326, 20037508.3428, 7792364.3555333326)
+};
+
+REGION: worldeqc4km21 {
+        NAME:       World 7200 x 3600, platecarree
+        PCS_ID:     plate_carree
+        PCS_DEF:    units=m, proj=eqc, ellps=WGS84
+        XSIZE:      7200
+        YSIZE:      3600
+	AREA_EXTENT: (-20037508.3428, -10018754.1714, 20037508.3428, 10018754.1714)
 };
 
 REGION: worldeqc30km70 {
@@ -1252,6 +1380,15 @@ REGION: world_plat_8192_4096 {
         XSIZE:          8192
         YSIZE:          4096
         AREA_EXTENT:    (-20037508.342789244, -10018754.171394622, 20037508.342789244, 10018754.171394622)
+};
+
+REGION: pc_world {
+   NAME:    Plate Carree world map
+   PCS_ID:  pc_world
+   PCS_DEF: proj=eqc
+   XSIZE: 640
+   YSIZE: 480
+   AREA_EXTENT:  (-20037508.34, -10018754.17, 20037508.34, 10018754.17)
 };
 
 #########################
@@ -1623,6 +1760,43 @@ REGION: south_america {
 ####################################
 # North America                    #
 ####################################
+
+REGION: GOES16 {
+        NAME:           North America 
+        PCS_ID:         GOES16
+        PCS_DEF:        proj=laea,a=6370997.0,lat_0=20.0,lon_0=-75.2
+        XSIZE:          5424
+        YSIZE:          5424
+        AREA_EXTENT:    (-2700000, -2400000, 2100000, 2400000)
+};
+
+REGION: GOES16_FULL {
+        NAME:           GOES16_FULL
+        PCS_ID:         GOES16_FULL
+        PCS_DEF:        proj=geos +lon_0=-75.2 +lat_0=0.000 +a=6378137.0 +h=35786023.0  
+        XSIZE:          5424
+        YSIZE:          5424
+        AREA_EXTENT:   (-5570248.4773392612, -5567248.074173444, 5567248.074173444, 5570248.4773392612)
+};
+
+REGION: NinJoGOESEregion {
+        NAME:          NinJoGOESEregion
+        PCS_ID:        NinJoGOESEregion
+        #PCS_DEF:       proj=eqc, lon_0=-75.2, a=6378137.0
+        PCS_DEF:       proj=eqc, lon_0=-75.2, ellps=WGS84
+        XSIZE:         2500
+        YSIZE:         2500
+        AREA_EXTENT:   (-10008769.814946,-10016778.695711,10016778.695711,10008768.924390)
+};
+
+REGION: NinJoGOESWregion {
+        NAME:          NinJoGOESWregion
+        PCS_ID:        NinJoGOESWregion 
+        PCS_DEF:       proj=eqc, lon_0=-137.2, a=6378137.00
+        XSIZE:         2500
+        YSIZE:         2500
+        AREA_EXTENT:   (-10008769.814946,-10016778.695711,10016778.695711,10008768.924390)
+};
 
 REGION: northamerica {
 	NAME:		North America - Global 1km USGS Landuse database

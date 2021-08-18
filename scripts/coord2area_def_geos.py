@@ -60,7 +60,7 @@ import sys
 from pyproj import Proj
   
 if len(sys.argv) != 8:
-    print("Usage: ", sys.argv[0], "name lon_0 min_lat max_lat min_lon max_lon resolution")
+    print("Usage: ", sys.argv[0], "name lon_0 min_lat max_lat min_lon max_lon resolution[km]")
     exit(1)
   
 name = sys.argv[1]
@@ -91,9 +91,9 @@ area_extent = (min(left_ex1,  left_ex2),
                min(up_ex1,    up_ex2),
                max(right_ex1, right_ex2),
                max(down_ex1,  down_ex2))
-  
-xsize = int((area_extent[2] - area_extent[0]) / res)
-ysize = int((area_extent[3] - area_extent[1]) / res)
+
+xsize = int((area_extent[2] - area_extent[0]) / float(res))
+ysize = int((area_extent[3] - area_extent[1]) / float(res))
   
 print("REGION:", name, "{")
 print("\tNAME:\t", name)

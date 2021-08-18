@@ -31,6 +31,7 @@ set_conda_path() {
 		echo "set_conda_path python3"
 		export CONDA_PATH="/opt/users/common/packages/anaconda3_$LOGNAME/"
 		#export CONDA_PATH="/opt/users/common/packages/anaconda351/"
+		#export CONDA_PATH="/opt/users/common/packages/anaconda3/"
 	    else
 		echo "unknown command line option: set_conda_path" $1
 		export CONDA_PATH=""

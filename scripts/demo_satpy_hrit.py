@@ -21,20 +21,53 @@ debug_on()
 #################################
 from satpy import Scene, find_files_and_readers
 from datetime import datetime
+from copy import deepcopy
+sat="MSG2"
 
 files_sat = find_files_and_readers(sensor='seviri',
-                               start_time=datetime(2015, 7, 7, 12, 0),
-                               end_time=datetime(2015, 7, 7, 12, 0),
-                               base_dir="/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/2015/07/07/",
-                               reader='hrit_msg')
+                               #start_time=datetime(2015, 7, 7, 12, 0), end_time=datetime(2015, 7, 7, 12, 0),
+                               #base_dir="/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/2015/07/07/",
+                               start_time=datetime(2015, 8, 7, 12, 0), end_time=datetime(2015, 8, 7, 12, 0),
+                               base_dir="/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/2015/08/07/",
+                               reader='seviri_l1b_hrit')                                   
+#                               reader='hrit_msg')
 
-#print files_sat
+#for f in files_sat['seviri_l1b_hrit']:
+#    print(f)
 #files = dict(files_sat.items() + files_nwc.items())
-files = dict(list(files_sat.items()))
+#files = dict(list(files_sat.items()))
 
-global_scene = Scene(reader="hrit_msg", filenames=files)
+print("=============================")
+print("remove all other MSG satellites (except MSG4) and unused channels")
+files = deepcopy(files_sat['seviri_l1b_hrit'])
+for f in files:
+    if not (sat in f):
+        files_sat['seviri_l1b_hrit'].remove(f)
+        continue
+    if ("HRV" in f) or ("IR_016" in f) or ("IR_039" in f):  # or ("VIS006" in f) or ("VIS008" in f) 
+        files_sat['seviri_l1b_hrit'].remove(f)
+        continue
+    if  ("WV_062" in f) or ("WV_073" in f)  or ("IR_087" in f) or ("IR_097" in f)  or ("IR_120" in f) or ("IR_134" in f): # or ("IR_108" in f)
+        files_sat['seviri_l1b_hrit'].remove(f)
+        continue
+for f in files_sat['seviri_l1b_hrit']:
+    print(f)
 
+    
+#global_scene = Scene(reader="hrit_msg", filenames=files)
+global_scene = Scene(reader="seviri_l1b_hrit", filenames=files_sat)
+
+print("")
+print("=======================")
 print(dir(global_scene))
+print("=======================")
+
+global_scene.load([0.6])
+print(global_scene[0.6])
+print(global_scene[0.6].orbital_parameters)
+print(global_scene[0.6].area)
+print("=======================")
+print("")
 
 #global_scene.load([0.6, 0.8, 10.8])
 #global_scene.load(['IR_120', 'IR_134'])
@@ -54,24 +87,52 @@ global_scene["ndvi"] = (global_scene[0.8] - global_scene[0.6]) / (global_scene[0
 
 #area="eurol"
 area="EuropeCanaryS95"
+#area="ccs4"
+
+print("")
+print("=======================")
+print("resample to "+area)
 local_scene = global_scene.resample(area)
 
+print("=======================")
+print("")
+print("global_scene.available_composite_names()")
 print(global_scene.available_composite_names())
 
-#local_scene.show('overview')
-local_scene.save_dataset('overview', './overview_'+area+'.png')
-print('display ./overview_'+area+'.png &')
+print("")
+print("=======================")
+print("global_scene.save_dataset('overview', pngfile)")
+pngfile='./'+sat+'_overview_global.png'
+global_scene.save_dataset('overview', pngfile)
+print('display '+pngfile+' &')
 
-local_scene["ndvi"] = (local_scene[0.8] - local_scene[0.6]) / (local_scene[0.8] + local_scene[0.6])
+print("")
+print("=======================")
+
+#local_scene.show('overview')
+pngfile='./'+sat+'_overview_'+area+'.png'
+local_scene.save_dataset('overview', pngfile)
+print('display '+pngfile+' &')
+
+new=False
+if new==False:
+    local_scene["ndvi"] = (local_scene[0.8] - local_scene[0.6]) / (local_scene[0.8] + local_scene[0.6])
+    #from satpy.enhancements import colorize
+    #colorize(img, **kwargs)
+    #'ylgn'
+    #https://satpy.readthedocs.io/en/latest/writers.html
+    #nice NDVI colourbar here:
+    #https://www.researchgate.net/figure/NDVI-maps-Vegetation-maps-created-by-measuring-the-Normalized-Vegetation-Difference_fig7_323885082
+else:
+    from satpy.dataset import combine_attrs  # does not work!!!
+    ndvi = (local_scene[0.8] - local_scene[0.6]) / (local_scene[0.8] + local_scene[0.6])
+    ndvi.attrs = combine_attrs(local_scene[0.8], local_scene[0.6])
+    local_scene['ndvi'] = ndvi
+
+#local_scene.show('ndvi')
+
 local_scene.save_dataset('ndvi', './ndvi_'+area+'.png')
 print(dir(local_scene.save_dataset))
-#from satpy.enhancements import colorize
-#colorize(img, **kwargs)
-#'ylgn'
-#https://satpy.readthedocs.io/en/latest/writers.html
-#nice NDVI colourbar here:
-#https://www.researchgate.net/figure/NDVI-maps-Vegetation-maps-created-by-measuring-the-Normalized-Vegetation-Difference_fig7_323885082
-
 print('display ./ndvi_'+area+'.png &')
 
 

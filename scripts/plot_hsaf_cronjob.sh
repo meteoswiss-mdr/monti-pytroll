@@ -11,7 +11,7 @@ cd $PYTROLLHOME/scripts
 echo "*** Start to make seviri pictures (loop until all data is there)"
 echo 
 python loop_msg.py input_hsaf_cronjob
-python loop_msg.py input_hsaf_EuropeCanaryS95_cronjob
+python loop_msg.py input_hsaf_Europe_cronjob
 
 
 # create composite 

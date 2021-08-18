@@ -5,12 +5,14 @@ packages/anacon*
 **/*.pyc
 **/*.swp
 **/*.[oa]
-**/*.png
 **/*.save
 **/*_save
 **/backup/*
 **/save/*
 **/id_dsa_las
 **/id_rsa_las
+**/*.nc
+**/*.png
+**/*.jpg
 ### ignore emacs backup files ### 
 **/*~

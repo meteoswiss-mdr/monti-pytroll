@@ -1079,13 +1079,13 @@ def add_colorscale(dc, rgb, in_msg, unit=None):
       tick_marks=1
       minor_tick_marks=1
 
-   print(in_msg.colormap[rgb])
-   print(tick_marks)
-   print(minor_tick_marks)
-   print(font_scale)
-   print(unit)
-   print(in_msg.colormap[rgb].values[0])
-   print(in_msg.colormap[rgb].values[-1])
+   #print("plot_msg.py (add_colorscale):", in_msg.colormap[rgb])
+   #print("plot_msg.py (add_colorscale):",tick_marks)
+   #print("plot_msg.py (add_colorscale):",minor_tick_marks)
+   #print("plot_msg.py (add_colorscale):",font_scale)
+   #print("plot_msg.py (add_colorscale):",unit)
+   #print("plot_msg.py (add_colorscale):",in_msg.colormap[rgb].values[0])
+   #print("plot_msg.py (add_colorscale):",in_msg.colormap[rgb].values[-1])
    
    if in_msg.verbose:
       print('... add colorscale ')

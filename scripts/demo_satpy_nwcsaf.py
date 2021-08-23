@@ -6,20 +6,22 @@ from __future__ import print_function
 # old version: zueub428:/opt/safnwc/bin/NWCSAF_processing.py
 # see also https://github.com/pytroll/pytroll-examples/blob/master/satpy/ears-nwc.ipynb
 
-from satpy.utils import debug_on
-debug_on()
+#from satpy.utils import debug_on
+#debug_on()
+
+map_dir="/opt/users/common/shapes/"
 
 import nwcsaf
 import numpy as np
+import sys
 
 from satpy import Scene, find_files_and_readers
 from datetime import datetime
 
 #product = {}
-#product_list = ['CMA']
+product_list = ['CMA']
 #product_list = ['CTTH']
-product_list = ['CTTH']
-product_list = ['CT']
+#product_list = ['CT']
 ## 'ASII-NG' and 'RDT-CW' do not work!!
 # sam's product_list = ['CMA', 'CT', 'CTTH', 'CMIC', 'PC', 'CRR', 'iSHAI', 'CI', 'RDT-CW', 'ASII-NG']
 ## 'ASII-NG' and 'RDT-CW' do not work!!
@@ -27,34 +29,33 @@ product_list = ['CT']
 # product.keys() ['ASII-NG', 'CI', 'CMA', 'CMIC', 'CRR', 'CRR-Ph', 'CT', 'CTTH', 'HRW', 'iSHAI', 'PC', 'PC-Ph', 'RDT-CW']
 # sam's product_list = ['CMA', 'CT', 'CTTH', 'CMIC', 'PC', 'CRR', 'iSHAI', 'CI', 'RDT-CW', 'ASII-NG']
 
-make_images=True
+read_RGBs = True
 
-#product = {}
-#product['CMA']     = [ 'cloudmask']
+product = {}
+product['CMA']     = [ 'cloudmask']
 #product["CTTH"]    = [ 'cloud_top_height', 'cloud_top_pressure', 'cloud_top_temperature']
 product_ids = {}
-#product_ids["CTTH"] = ['ctth_alti','ctth_alti_pal','ctth_effectiv','ctth_effectiv_pal','ctth_pres','ctth_pres_pal','ch_tempe','ctth_tempe_pal']
-product_ids["cloud_top_temperature"] = ['ctth_tempe', 'ctth_tempe_pal']
-product_ids["cloud_top_pressure"]    = ['ctth_pres', 'ctth_pres_pal']
-product_ids['cloud_top_height']      = ['ctth_alti', 'ctth_alti_pal']
-product_ids['cloudtype']             = ['ct', 'ct_pal']
-product_ids['cloudmask']             = ['cma', 'cma_pal']
+product_ids['CT'] = ['ct']
+product_ids['CTTH'] = ['cth']
 
+print(len(sys.argv))
+if len(sys.argv) == 6:
+    fixed_date=True
+    print(sys.argv[1],sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5])
+    start_time = datetime(int(sys.argv[1]),int(sys.argv[2]),int(sys.argv[3]),int(sys.argv[4]),int(sys.argv[5]))
+    end_time   = start_time
+else:
+    fixed_date=False
+    from my_msg_module import get_last_SEVIRI_date
+    start_time = get_last_SEVIRI_date(False, delay=10)
+    end_time   = start_time
+    base_dir="/data/cinesat/in/eumetcast1/"
+
+result_dir="./"
+result_dir=start_time.strftime("/data/COALITION2/PicturesSatellite/%Y-%m-%d/")
 
 for p_ in product_list:
-
-    fixed_date=False
-    if fixed_date:
-        start_time = datetime(2017, 7, 7, 12, 0)
-        end_time   = datetime(2017, 7, 7, 12, 0)
-        #base_dir="/data/COALITION2/database/meteosat/SAFNWC_v2013/2015/07/07/",
-        base_dir="/data/COALITION2/database/meteosat/SAFNWC_v2016/2017/07/07/"+p_+"/",
-    else:
-        from my_msg_module import get_last_SEVIRI_date
-        start_time = get_last_SEVIRI_date(False, delay=3)
-        end_time   = start_time
-        base_dir="/data/cinesat/in/eumetcast1/"
-        
+       
     #file_pattern='S_NWC_' + product + '_' + sat_id + '_*_' + timestamp_NWCSAF + extension
     #if glob.glob(file_pattern):
     #    print ("NWCSAF data product " + product + " exists and is readable")
@@ -62,7 +63,14 @@ for p_ in product_list:
     #    product_list_to_process.append(nwcsaf.product.get(product)[:])
     #else:
     #    print ("NWCSAF data product " + product + " is missing or is not readable")
+
+    if fixed_date:
+        #base_dir=start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2013/%Y/%m/%d/")
+        base_dir=start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/%Y/%m/%d/"+p_+"/")
+        #base_dir=start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/"+p_+"/")
     
+    print("======================")
+    print("======================")
     print ("... search files in "+ base_dir)
     files_nwc = find_files_and_readers(sensor='seviri',
                                        start_time=start_time,
@@ -71,9 +79,14 @@ for p_ in product_list:
                                        reader='nwcsaf-geo')
     #print (files_nwc)
     #files = dict(files_sat.items() + files_nwc.items())
-    files = dict(list(files_nwc.items()))
+    #files = dict(list(files_nwc.items()))
 
-    global_scene = Scene(filenames=files)
+
+        
+    print("======================")
+    print("======================")
+    print ("... define global scene ")
+    global_scene = Scene(filenames=files_nwc)
 
     global_scene.available_dataset_names()
     #!!# print(global_scene['overview']) ### this one does only work in the develop version
@@ -81,9 +94,12 @@ for p_ in product_list:
     print ("available_composite_names")
     print (global_scene.available_composite_names())
 
-    if make_images:
+    if read_RGBs:
     
         # this will load RGBs ready to plot
+        print("======================")
+        print("======================")
+        print("... load ", nwcsaf.product[p_])
         global_scene.load(nwcsaf.product[p_])
         #global_scene.load([ 'cloud_top_height', 'cloud_top_pressure', 'cloud_top_temperature'])
         #global_scene.load(['cloudtype'])
@@ -98,12 +114,15 @@ for p_ in product_list:
 
     else:
         # work with scientific data
-        for p__ in nwcsaf.product[p_]:
-            global_scene.load(product_ids[p__])
-            #global_scene.load(['ctth_alti'])
+        print("======================")
+        print("======================")
+        print("... load ", product_ids[p_])
+        global_scene.load(product_ids[p_])
+        #global_scene.load(['ctth_alti'])
 
-    print("")
-    print("global_scene")
+    print("======================")
+    print("======================")
+    print("... global_scene")
     print(global_scene)
     #print(dir(global_scene))
     """
@@ -120,16 +139,41 @@ for p_ in product_list:
     
     #!!# print(global_scene['overview']) ### this one does only work in the develop version
     print("")
+    print("======================")
+    print("======================")
     print("available_composite_names")
     print(global_scene.available_composite_names())
+    print("")
+    print("======================")
+    print("======================")
+    print("all_dataset_names")
     print(global_scene.all_dataset_names())
+    print("")
+    print("======================")
+    print("======================")
+    print("available_dataset_names")
     print(global_scene.available_dataset_names())
-    print(global_scene.datasets)
+    print("")
+    #print("datasets")
+    #print(global_scene.datasets)
+
+    if False:
+        global_scene.save_dataset('cloudmask', "cloudmask.png", overlay={'coast_dir': '/data/OWARNA/hau/maps_pytroll/', 'color': (255, 255, 255), 'resolution': 'i'})
+
+    if not read_RGBs:
+        import matplotlib.pyplot as plt
+        #global_scene["cma"].plot()
+        for p__ in product_ids[p_]: 
+            plt.imshow(global_scene[p__].values)
+            plt.show()
+
     
     # resample to another projection
     print("resample")
-    area="ccs4"
-    area="EuropeCanaryS95"
+    #area="ccs4"
+    #area="EuropeCanaryS95"
+    #area="europe_center"
+    area="cosmo1"
     local_scene = global_scene.resample(area)
     print("dir(local_scene)", dir(local_scene))
     
@@ -139,10 +183,11 @@ for p_ in product_list:
         #local_scene.save_dataset('cloudtype', './local_cloudtype.png')
         #print "display ./local_cloudtype.png &"
         print("======================")
-        print("======================")        
-        print(global_scene['cloud_top_temperature'])
-        print(global_scene['cloud_top_temperature'].attrs['area'])
-        print(global_scene['cloud_top_temperature'].attrs["start_time"])
+        print("======================")
+        print(p_name)
+        print(global_scene[p_name])
+        print(global_scene[p_name].attrs['area'])
+        print(global_scene[p_name].attrs["start_time"])
         #long_name:               NWC GEO CTTH Cloud Top Altitude
         #level:                   None
         #end_time:                2017-07-07 12:03:32
@@ -166,30 +211,70 @@ for p_ in product_list:
         #calibration:             None
         #mode:                    RGB
         
-        print(np.nanmin(global_scene['cloud_top_temperature'].values))
-        print(np.nanmax(global_scene['cloud_top_temperature'].values))
+        print(np.nanmin(global_scene[p_name].values))
+        print(np.nanmax(global_scene[p_name].values))
         print("======================")
-        print("======================")        
- 
-        
-        #local_scene.show(p_name)
-        #local_scene.show(p_name, overlay={'coast_dir': '/data/OWARNA/hau/maps_pytroll/', 'color': (255, 0, 0), 'resolution': 'i'})
-        local_scene.save_dataset(p_name, "./local_"+p_name+".png", overlay={'coast_dir': '/data/OWARNA/hau/maps_pytroll/', 'color': (255, 0, 0), 'resolution': 'i'})
-        print("display ./local_"+p_name+".png &")
-
+        print("======================")
     
-    if make_images:
+    if read_RGBs:
 
-        for p_name in nwcsaf.product[p_]:
+        for p_name in nwcsaf.product[p_]: 
             
-            print ("p_name, type(local_scene[p_name]), type(local_scene[p_name].data)")
-            print (p_name, type(local_scene[p_name]), type(local_scene[p_name].data))
+            #print ("p_name, type(local_scene[p_name]), type(local_scene[p_name].data)")
+            #print (p_name, type(local_scene[p_name]), type(local_scene[p_name].data))
 
-            filename="./local_"+p_name+"_"+area+".png"
+            png_file = start_time.strftime(result_dir+ "/MSG_"+p_name+"-"+area+"_%y%m%d%H%M.png")
+            #title = start_time.strftime(" "+local_scene[p_name].platform_name+', %y-%m-%d %H:%MUTC, '+p_name)
+            title=""
             #local_scene.show(p_name)
             #local_scene.show(p_name, overlay={'coast_dir': '/data/OWARNA/hau/maps_pytroll/', 'color': (255, 0, 0), 'resolution': 'i'})
-            local_scene.save_dataset(p_name, filename, overlay={'coast_dir': '/data/OWARNA/hau/maps_pytroll/', 'color': (255, 255, 255), 'resolution': 'i'})
-            print ("display "+filename+" &")
+
+
+            #def save_dataset(self, dataset_id, filename=None, writer=None,
+            #         overlay=None, decorate=None, compute=True, **kwargs):
+
+            decorate = {
+                'decorate': [
+                    {'text': {'txt': title,
+                              'align': {'top_bottom': 'top', 'left_right': 'left'},
+                              'font': "/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf",
+                              'font_size': 18,
+                              'height': 26,
+                              'bg': 'black',
+                              'bg_opacity': 255,
+                              'line': 'white'}}
+                ]
+            }
+            
+            
+            local_scene.save_dataset(p_name, png_file, fill_value=0,
+                                     overlay={'coast_dir': map_dir, 'color': (255, 255, 255), 'resolution': 'i', 'width':2},
+                                     decorate=decorate) 
+
+
+            ## local_scene.save_dataset( 'lscl', png_file )
+            #from pyresample.utils import load_area
+            #swiss = load_area("/opt/users/hau/monti-pytroll/etc/areas.def", area)
+            #
+            #from PIL import Image
+            #from PIL import ImageFont
+            #from PIL import ImageDraw
+            #
+            #from pycoast import ContourWriterAGG
+            #cw = ContourWriterAGG(map_dir)
+            #cw.add_borders_to_file(png_file, swiss, outline="green", resolution='i', level=3, width=2)
+            #
+            #img = Image.open(png_file)
+            #draw = ImageDraw.Draw(img)
+            #draw.rectangle([(0, 0), (img.size[0]*0.7, 25)], fill=(0,0,0,200))
+            #font = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf", 18)
+            #title = start_time.strftime(" "+local_scene[p_name].platform_name+', %y-%m-%d %H:%MUTC, '+p_name)
+            #draw.text( (1, 1), title, "black" , font=font)  # (255,255,255)
+            #img.save(png_file)
+
+
+            
+            print ("display "+png_file+" &")
     else:
 
         for p_name in product_ids[p_]:

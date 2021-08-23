@@ -1043,6 +1043,16 @@ REGION: sswe {
 	AREA_EXTENT:	(-400884.23045,-3946631.71387,623115.76955,-2922631.71387)
 };
 
+#python coord2area_def_stere.py sttropez stere 42.0 45.0 2.0 9.0 1
+REGION: sttropez {
+        NAME:    sttropez
+        PCS_ID:  stere_5.5_43.5
+        PCS_DEF:        proj=stere,lat_0=43.5,lon_0=5.5,ellps=WGS84
+        XSIZE:   579
+        YSIZE:   333
+        AREA_EXTENT:     (-289968.33375648496, -160641.58525200252, 289968.333756485, 172556.81191450756)
+};
+
 REGION: sve {
         NAME:          North half of the Iberian Peninsula and the Gulf of Biscay image 0 degrees
         PCS_ID:        utm0

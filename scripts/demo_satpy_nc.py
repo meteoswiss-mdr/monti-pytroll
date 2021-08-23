@@ -97,6 +97,7 @@ area="ccs4"
 local_scene = global_scene.resample(area)
 
 ncfile=start_time.strftime('/data/cinesat/out/MSG_'+area+'_%y%m%d%H%M_rad.nc')
+# see https://satpy.readthedocs.io/en/latest/api/satpy.writers.html
 local_scene.save_datasets(writer='cf', datasets=all_channels, filename=ncfile)
 print('ncview '+ncfile+' &')
 

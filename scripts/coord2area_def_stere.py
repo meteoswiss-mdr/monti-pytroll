@@ -22,7 +22,11 @@ from __future__ import print_function
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-  
+
+# https://pyresample.readthedocs.org/en/latest/geo_def.html#areadefinition and
+# https://proj.org/operations/projections/index.html
+
+
 """
 Convert human coordinates to an area definition.
   

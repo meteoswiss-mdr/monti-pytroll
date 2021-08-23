@@ -14,7 +14,8 @@ import inspect
 import datetime
 # from mpop.projector import get_area_def
 from satpy.resample import get_area_def
-from copy import deepcopy 
+from copy import deepcopy
+from satpy import find_files_and_readers
 
 import logging
 LOG = logging.getLogger(__name__)
@@ -519,17 +520,19 @@ output:
   rgb  -> rgbs where all segments are available 
 '''
 
-def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegments=[20,21,22,23]):
+def check_input(in_msg, fullname, inputDirectory, time_slot, RGBs=None, segments=[6,7,8], HRsegments=[20,21,22,23], CONFIG_PATH=None):
                 #rgb, RSS=True, date=None, sat_nr=None, segments=[6,7,8], HRsegments=[18,19,20,21,22,23,24],verbose=True):
 
     from time import strftime
-    from ConfigParser import ConfigParser
     import os
-    from satpy import CONFIG_PATH
     #from fnmatch import filter
     #from os import listdir  # , path, access, R_OK
     import glob
-
+    from satpy import find_files_and_readers
+    
+    if CONFIG_PATH=None:
+        CONFIG_PATH="/opt/users/hau/monti-pytroll/packages/satpy/satpy/etc/readers/"
+    
     # get date of the last SEVIRI observation
     if in_msg.datetime is None:
         in_msg.datetime = get_last_SEVIRI_date(in_msg.RSS)
@@ -595,9 +598,6 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
     channels_complete=[False,False,False,False,False,False,False,False,False,False,False,False]
     pro_file_checked=False
 
-    print ("... read config file ", os.path.join(CONFIG_PATH, fullname + ".cfg"))
-    print ("... use satellite "+in_msg.sat_str())
-
     for rgb in needed_input:
 
         if in_msg.verbose:
@@ -605,15 +605,15 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
 
         if rgb in products.MSG or rgb in products.MSG_color or rgb in products.RGBs_buildin or rgb in products.RGBs_user:
 
-            conf = ConfigParser()
-            conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
-            inputDirectory = time_slot.strftime(conf.get("seviri-level1", "dir"))
             #inputDirectory='/data/OWARNA/hau/database/meteosat/radiance/2014/11/04/'
             #inputDirectory="/data/cinesat/in/eumetcast1/"
 
             if in_msg.verbose:
                 print ('... check input in directory '+inputDirectory)
 
+                input_files = find_files_and_readers(base_dir='/data/cinesat/in/eumetcast1',reader='seviri_l1b_hrit',
+                                                  start_time=in_msg.datetime,end_time=in_msg.datetime)
+                
             if not pro_file_checked:
 
                 #check prologues file 
@@ -628,11 +628,10 @@ def check_input(in_msg, fullname, time_slot, RGBs=None, segments=[6,7,8], HRsegm
                     MSG = in_msg.msg_str(layout="%(msg)s%(msg_nr)s")
                     if in_msg.verbose:
                         print ("... check input files for ", MSG, str(in_msg.datetime), in_msg.RGBs)
+                        
                     #pro_file = "?-000-"+MSG+"__-"+MSG+"_"+RSSS+"_???-_________-PRO______-"+yearS+monthS+dayS+hourS+minuteS+"-__"
-                    inputDirectory = time_slot.strftime(conf.get("seviri-level1", "dir"))
-                    pro_file = time_slot.strftime(conf.get("seviri-level1", "filename_pro"))
                     #if len(filter(listdir(inputDirectory), pro_file)) == 0:
-                    pro_filename = glob.glob(inputDirectory+'/'+pro_file)
+                    pro_filename = fnmatch.filter(input_files['seviri_l1b_hrit'],'*'+MSG+'*PRO*')
 
                     if len(pro_filename) > 0:
                         print ("    found prologue file ", pro_filename)

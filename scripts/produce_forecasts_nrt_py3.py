@@ -35,13 +35,13 @@ from os import makedirs
 from datetime import timedelta
 from pycoast import ContourWriterAGG
 
-from my_msg_module3 import check_near_real_time
+from my_msg_module_py3 import check_near_real_time
 #from my_msg_module import format_name
-from my_msg_module3 import fill_with_closest_pixel
-from my_msg_module3 import check_loaded_channels
+from my_msg_module_py3 import fill_with_closest_pixel
+from my_msg_module_py3 import check_loaded_channels
 #from my_msg_module import convert_NWCSAF_to_radiance_format
 #from my_msg_module import get_NWC_pge_name
-from my_msg_module3 import check_input
+from my_msg_module_py3 import check_input
 
 from copy import deepcopy 
 import matplotlib.pyplot as plt
@@ -469,7 +469,8 @@ if __name__ == '__main__':
     #channel = rgb.replace("c","")
 
     # load a few standard things 
-    from get_input_msg import get_input_msg
+    from get_input_msg_py3 import get_input_msg
+    
     in_msg = get_input_msg('input_coalition2_cronjob')
     #in_msg = get_input_msg('input_coalition2')
 
@@ -555,11 +556,6 @@ if __name__ == '__main__':
 
     ############################################################################
 
-    base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
-    base_dir_nwc = start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/")
-    base_dir_ctth = start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/")
-    #base_dir_nwc = start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/CT/")
-    #base_dir_ctth = start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/CTTH/")
     
     
     if len(sys.argv) > 1:
@@ -585,7 +581,13 @@ if __name__ == '__main__':
                 minuteSTOP = int(sys.argv[10])
                 time_slotSTOP = datetime(yearSTOP, monthSTOP, daySTOP, hourSTOP, minuteSTOP) 
             else:
-                time_slotSTOP = in_msg.datetime 
+                time_slotSTOP = in_msg.datetime
+
+        base_dir_sat = in_msg.datetime.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
+        base_dir_nwc = in_msg.datetime.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/")
+        base_dir_ctth = in_msg.datetime.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/")
+        #base_dir_nwc = start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/CT/")
+        #base_dir_ctth = start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/CTTH/")
     else:
         if True:  # automatic choise of last 5min 
             in_msg.get_last_SEVIRI_date()
@@ -602,7 +604,10 @@ if __name__ == '__main__':
             hour= 18
             minute=00
             in_msg.update_datetime(year, month, day, hour, minute)
-
+        base_dir_sat = in_msg.datetime.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
+        base_dir_nwc = in_msg.datetime.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/")
+        base_dir_ctth = in_msg.datetime.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/")
+            
             
     # second argument is tolerance in minutes for near real time processing
     in_msg.nrt = check_near_real_time(in_msg.datetime, 120)

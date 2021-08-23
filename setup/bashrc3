@@ -68,6 +68,7 @@ fi
 set_pytroll_paths
 
 export PPP_CONFIG_DIR=$PYTROLLHOME/etc/
+export SATPY_CONFIG_PATH=$PYTROLLHOME/etc/
 echo "... set PPP_CONFIG_DIR to: "$PPP_CONFIG_DIR
 
 echo '... configure host dependent settings, HOSTNAME='$HOSTNAME

@@ -4,7 +4,7 @@ from __future__ import print_function
 #from __future__ import print_function
 
 from datetime import datetime, timedelta
-from my_msg_module import check_near_real_time
+from my_msg_module_py3 import check_near_real_time
 import sys
 import inspect
 import socket
@@ -226,7 +226,7 @@ class input_msg_class:
       return self.datetime
 
    def get_last_SEVIRI_date(self):
-      from my_msg_module import get_last_SEVIRI_date
+      from my_msg_module_py3 import get_last_SEVIRI_date
       print(("... initialize date: RSS mode = ", self.RSS, ", delay = ", self.delay))
       self.datetime = get_last_SEVIRI_date(self.RSS, delay=self.delay)
       # first 120min are saved in the near real time archive

@@ -235,10 +235,6 @@ def input(in_msg):
     in_msg.pressure_levels={}
     #in_msg.RGBs.append('lon_1')
     #in_msg.RGBs.append('lat_1')
-    #in_msg.RGBs.append('POT_VORTIC')
-    #in_msg.RGBs.append('THETAE')
-    #in_msg.RGBs.append('MCONV')
-    #in_msg.RGBs.append('geopotential_height')
     #in_msg.RGBs.append('TWATER')
     #in_msg.RGBs.append('tropopause_height')
     #in_msg.RGBs.append('tropopause_temperature')
@@ -257,23 +253,40 @@ def input(in_msg):
     #in_msg.RGBs.append('TD_2M')
     #in_msg.RGBs.append('GLOB')
     #in_msg.RGBs.append('PS')
-    #in_msg.RGBs.append('RELHUM')
     #in_msg.RGBs.append('PMSL')
     #in_msg.RGBs.append('PMSLr')
     #in_msg.RGBs.append('HZEROCL')
     #in_msg.RGBs.append('WSHEAR_0-3km')
     #in_msg.RGBs.append('WSHEAR_0-6km')
     #in_msg.RGBs.append('SYNMSG_BT_CL_IR10.8')
+    in_msg.RGBs.append('SDI_2')
+    #in_msg.RGBs.append('SWISS12')
+    in_msg.RGBs.append('SOILTYP')
+               
+    #in_msg.pressure_levels["POT_VORTIC"]=[700,500,300]    
+    #in_msg.RGBs.append('POT_VORTIC')
+    #in_msg.pressure_levels["THETAE"]=[700,500,300]    
+    #in_msg.RGBs.append('THETAE')
+    #in_msg.pressure_levels["MCONV"]=[700,500,300]
+    #in_msg.RGBs.append('MCONV')
+    #in_msg.pressure_levels["geopotential_height"]=[700,500,300]
+    #in_msg.RGBs.append('geopotential_height')
+    #in_msg.pressure_levels["RELHUM"]=[850,750]
+    #in_msg.RGBs.append('RELHUM')
+    in_msg.pressure_levels["OMEGA"]=[700]
+    in_msg.RGBs.append('OMEGA')
+    #in_msg.pressure_levels["W_SO"]=[0]
+    #in_msg.RGBs.append('W_SO')
+
     #in_msg.RGBs.append('U')
     #in_msg.RGBs.append('U-100hPa')
     #in_msg.pressure_levels["U"]=[800,500,300]
     #in_msg.RGBs.append('V')
     #in_msg.pressure_levels["V"]=[800,500,300]
     #in_msg.RGBs.append('streamplot')
-    in_msg.RGBs.append('streamplot-300hPa')
-    in_msg.RGBs.append('streamplot-500hPa')
-    in_msg.RGBs.append('streamplot-800hPa')
-
+    #in_msg.RGBs.append('streamplot-300hPa')
+    #in_msg.RGBs.append('streamplot-500hPa')
+    #in_msg.RGBs.append('streamplot-800hPa')
     
     # experimental
     #in_msg.RGBs.append('clouddepth')     # test according to Mecikalski, 2010
@@ -362,8 +375,8 @@ def input(in_msg):
     #in_msg.resize_composite = 100
 
     in_msg.scpOutput = False
-    #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
-    #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
+    #in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"  # default in scp_settings.py
+    #in_msg.scpID="-i /home/cinesat/.ssh/id_rsa_las"                     # default in scp_settings.py
     #default: in_msg.scpProducts = ['all']
     #in_msg.scpProducts = [["MSG_IR-108cpc","COSMO_SYNMSG-BT-CL-IR10.8"]]
     #in_msg.scpProducts = ["IR-108cpc-SYNMSG-BT-CL-IR10.8"]

@@ -156,7 +156,12 @@ class input_msg_class:
                         'sunz':10,'sza':10,'lat':10,'lon':10,'time_offset':100,
                         'ot_anvilmean_brightness_temperature_difference':1,\
                         'SYNMSG_BT_CL_IR10.8': 20,'MESHS':1,\
-                        'POH':10,'MESHS':0.5,'VIL':5,'MaxEcho':10,'EchoTOP15':2,'EchoTOP20':2,'EchoTOP45':2,'EchoTOP50':2,'TRT':1}
+                        'POH':10,'MESHS':0.5,'VIL':5,'MaxEcho':10,'EchoTOP15':2,'EchoTOP20':2,'EchoTOP45':2,'EchoTOP50':2,'TRT':1,
+                        "TWATER":5, "tropopause_height":1000, "tropopause_temperature":5, "tropopause_pressure":20, 
+                        "FF_10M":5, "VMAX_10M":5, "CAPE_MU":50, "CAPE_ML":50, "CAPE_3KM":50, "CIN_MU":20, "CIN_ML":20, 
+                        "SLI":2, "LCL_ML":500, "LFC_ML":1000, "T_SO":10, "T_2M":10, "TD_2M":10, "GLOB":100, "PS":10000, 
+                        "PMSL":10000, "PMSLr":50, "HZEROCL":1000, "WSHEAR_0-3km":5, "WSHEAR_0-6km":5, "SYNMSG_BT_CL_IR10.8": 20,
+                        "SDI_2":0.0001, "SWISS12":5, "OMEGA":10,"W_SO":1, "SOILTYP":2}
       self.minor_tick_marks = {'VIS006': 5, 'VIS008': 5, 'IR_016': 5, 'IR_039': 5, 'WV_062': 5, 'WV_073': 5,\
                         'IR_087': 5, 'IR_097': 5, 'IR_108': 5, 'IR_120': 5, 'IR_134': 5, 'HRV': 5,\
                         'vza': 1, 'vaa': 1, 'lat': 1, 'lon': 1,\
@@ -171,7 +176,12 @@ class input_msg_class:
                         'sunz':2,'sza':2,'lat':2,'lon':2,'time_offset':10,
                         'ot_anvilmean_brightness_temperature_difference':0.5,\
                         'SYNMSG_BT_CL_IR10.8': 5,'MESHS':0.5,\
-                        'POH':5,'MESHS':0.1,'VIL':1,'MaxEcho':5,'EchoTOP15':1,'EchoTOP20':1,'EchoTOP45':1,'EchoTOP50':1,'TRT':1}
+                        'POH':5,'MESHS':0.1,'VIL':1,'MaxEcho':5,'EchoTOP15':1,'EchoTOP20':1,'EchoTOP45':1,'EchoTOP50':1,'TRT':1,
+                        "TWATER":1, "tropopause_height":500, "tropopause_temperature":1, "tropopause_pressure":5, 
+                        "FF_10M":1, "VMAX_10M":1, "CAPE_MU":10, "CAPE_ML":10, "CAPE_3KM":10, "CIN_MU":5, "CIN_ML":5, 
+                        "SLI":0.5, "LCL_ML":100, "LFC_ML":100, "T_SO":2, "T_2M":2, "TD_2M":2, "GLOB":20, "PS":2000, 
+                        "PMSL":2000, "PMSLr":10, "HZEROCL":200, "WSHEAR_0-3km":1, "WSHEAR_0-6km":1, "SYNMSG_BT_CL_IR10.8": 5,
+                        "SDI_2":0.00002, "SWISS12":1, "OMEGA":2,"W_SO":0.2, "SOILTYP":1}
 
       self.postprocessing_areas     = []
       self.postprocessing_composite = []

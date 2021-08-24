@@ -94,8 +94,9 @@ cosmo_vars_2d=["lon_1", "lat_1",\
 cosmo_vars_3d=["POT_VORTIC", "THETAE", "MCONV", "geopotential_height", "RELHUM", "T_SO", "W_SO", "OMEGA",\
                "U", "U-100hPa", "U-200hPa", "U-300hPa", "U-400hPa", "U-500hPa", "U-600hPa", "U-700hPa", "U-800hPa", "U-900hPa", "U-1000hPa",\
                "V", "V-100hPa", "V-200hPa", "V-300hPa", "V-400hPa", "V-500hPa", "V-600hPa", "V-700hPa", "V-800hPa", "V-900hPa", "V-1000hPa"]
+cosmo_lightninghail=["LPI","DHAIL_AV","DHAIL_SD","DHAIL_MX"]
 
-cosmo = cosmo_vars_2d+cosmo_vars_3d
+cosmo = cosmo_vars_2d+cosmo_vars_3d+cosmo_lightninghail
 
 #################
 

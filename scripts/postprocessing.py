@@ -61,7 +61,19 @@ def get_TRT_filename(time_slot, area, outDir, outFile):
         makedirs(outputDir)
     filename =  format_name('RAD_TRT-'+area+'_%y%m%d%H%M.png', time_slot, area=area)
     return outputDir+filename
-    
+
+def get_cosmo_filename(rgb, time_slot, area, outDir, outFile):
+    print("    get_cosmo_filename radar for ", area)
+
+    outputDir = format_name(outDir, time_slot, area=area, rgb=rgb)
+    filename = format_name('COSMO_'+rgb+'-'+area+'_%y%m%d%H%M.png', time_slot, area=area)   
+    if not exists(outputDir):
+        print('... create output directory: ' + outputDir)
+        from os import makedirs
+        makedirs(outputDir)
+        
+    return outputDir+filename
+
 def get_OT_filename(rgb, time_slot, area, outDir, outFile):
     print("    get_OT_filename (overshooting top) for ", area) 
     outputDir = format_name(outDir, time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
@@ -113,6 +125,8 @@ def get_file_list(composite, sat, sat_nr, time_slot, area, outDir, outFile, n=No
             file_list.append (get_sat_filename(rgb, 'MSG', sat_nr, time_slot, area, outDir, 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'))
         elif (rgb == 'radar' or rgb in products.swissradar) and sat != 'cpp':
             file_list.append (get_radar_filename(rgb, time_slot, area, outDir, outFile))
+        elif (rgb in products.cosmo):
+            file_list.append (get_cosmo_filename(rgb, time_slot, area, outDir, outFile))
         elif rgb == 'RATE':
             file_list.append (get_odyssey_filename(time_slot, area, outDir, outFile))
         else:

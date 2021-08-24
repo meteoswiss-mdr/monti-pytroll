@@ -231,7 +231,7 @@ def input(in_msg):
     #-------------------
     in_msg.sat = "cosmo"
     in_msg.instrument = "cosmo"
-    in_msg.sat_nr="1"
+    in_msg.sat_nr="1e"
     in_msg.pressure_levels={}
     #in_msg.RGBs.append('lon_1')
     #in_msg.RGBs.append('lat_1')
@@ -270,10 +270,14 @@ def input(in_msg):
     #in_msg.RGBs.append('V')
     #in_msg.pressure_levels["V"]=[800,500,300]
     #in_msg.RGBs.append('streamplot')
-    in_msg.RGBs.append('streamplot-300hPa')
-    in_msg.RGBs.append('streamplot-500hPa')
-    in_msg.RGBs.append('streamplot-800hPa')
-
+    #in_msg.RGBs.append('streamplot-300hPa')
+    #in_msg.RGBs.append('streamplot-500hPa')
+    #in_msg.RGBs.append('streamplot-800hPa')
+    #in_msg.RGBs.append('T_2M')
+    in_msg.RGBs.append('LPI')
+    #in_msg.RGBs.append('DHAIL_AV')
+    #in_msg.RGBs.append('DHAIL_SD')
+    #in_msg.RGBs.append('DHAIL_MX')
     
     # experimental
     #in_msg.RGBs.append('clouddepth')     # test according to Mecikalski, 2010
@@ -325,7 +329,7 @@ def input(in_msg):
     in_msg.save_statistics=False
 
     in_msg.make_plots=True
-    in_msg.fill_value=(0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
+    in_msg.fill_value=None  # black (0,0,0) / white (1,1,1) / transparent None  
     in_msg.add_title = True
     in_msg.title = [" %(sat)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s"]
     in_msg.title_y_line_nr = 1  # (INT) at which line should the title start
@@ -343,8 +347,8 @@ def input(in_msg):
     in_msg.outputFile = 'COSMO_%(rgb)s-%(area)s_%y%m%d%H%M.png'
     in_msg.outputDir='./pics/'
     #in_msg.outputDir = "./%Y-%m-%d/%Y-%m-%d_%(rgb)s-%(area)s/"
-    in_msg.outputDir = '/data/cinesat/out/'
-    #in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
+    #in_msg.outputDir = '/data/cinesat/out/'
+    in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
     in_msg.compress_to_8bit=False
 
     

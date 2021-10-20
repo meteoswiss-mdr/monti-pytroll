@@ -120,8 +120,8 @@ if __name__ == '__main__':
         hour   = int(sys.argv[4])
         minute = int(sys.argv[5])
         start_time = datetime(year, month, day, hour, minute)
-        base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/%Y/%m/%d/")
-        #base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
+        #base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/%Y/%m/%d/")
+        base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
         base_dir_nwc = start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/CT/")
     else:        
         start_time = datetime(2020, 10, 7, 16, 0)
@@ -130,12 +130,31 @@ if __name__ == '__main__':
         
     print("... processing time ", start_time)
 
+    ##################################################################
+    # options that you may change manually according to your needs
+    areas=["cosmo1eqc3km"]            # equidistant projection covering cosmo-1/1e, asked by APN 
+    #areas=areas['cosmo1']            # original cosmo-1/cosmo-1e area
+    areas=areas+["cosmo1x150"]        # cosmo-1/cosmo-1e area (50% more pixels), required for SATLive
+    #areas=areas+['SeviriDisk00Cosmo'] # sub-area of geostationary MSG SEVIRI projection covering cosmo-1/cosmo-1e 
     show_interactively=False
     save_black_white_png=False
+    #save_png_areas=[]
+    save_png_areas=["cosmo1x150"]
+    scp_png_to_SATLive=["cosmo1x150"]
+    scpID_SATLive="-i ~/.ssh/id_rsa_las"
+    # scpOutputDir_SATLive see below 
+    scp_png_to_CSCS=[""]
+    save_netCDF_areas=["cosmo1eqc3km"]
+    scpID_CSCS="-i ~/.ssh/id_rsa_tsa"
+    scpOutputDir_CSCS="hamann@tsa.cscs.ch:/scratch/hamann/DayNightFog_Filter-CT-7-15/"
+    scp_netCDF_to_CSCS=["cosmo1eqc3km"]
+    ##################################################################
+    
 
     print("")
     print("")
     print("*** Creating LSCL (low stratus confidence level) product")
+    print("    for areas", areas)
     print("")
 
 
@@ -191,15 +210,9 @@ if __name__ == '__main__':
     global_nwc.load(['ct'])  # "CT"
 
 
-    # loop over areas, resample and create products
-    # create netCDF file for area cosmo1
-    # create png    file for area cosmo1_150 (50% more pixels)
+    # loop over areas, resample and create products    
     ############################################################
-    #for area in ['SeviriDisk00Cosmo',"cosmo1x150"]:
-    #for area in ['cosmo1', 'cosmo1eqc3km']:
-    for area in ['cosmo1eqc3km']:
-    #for area in ['cosmo1x150', 'cosmo1eqc3km']:
-
+    for area in areas:
         # resample MSG L2
         ##################
         print("")
@@ -263,7 +276,7 @@ if __name__ == '__main__':
 
         # save png file for SATLive
         ##############################
-        if area=="cosmo1x150" or area=="cosmo1":
+        if area in save_png_areas:
             png_file = start_time.strftime('/data/cinesat/out/MSG_lscl-'+area+'_%y%m%d%H%M.png')
             from trollimage.colormap import spectral, greys, ylorrd, rdgy 
             imgarr = np.array(local_scene['lscl'].data)
@@ -273,8 +286,10 @@ if __name__ == '__main__':
             img.save(png_file)
 
             # local_scene.save_dataset( 'lscl', png_file )
-            from pyresample.utils import load_area
-            swiss = load_area("/opt/users/hau/monti-pytroll/etc/areas.def", area)
+            #from pyresample.utils import load_area
+            #swiss = load_area("/opt/users/hau/monti-pytroll/etc/areas.def", area)
+            from pyresample import load_area
+            swiss = load_area("/opt/users/hau/monti-pytroll/etc/areas.yaml", area)
 
             from pycoast import ContourWriterAGG
             cw = ContourWriterAGG('/opt/users/common/shapes')
@@ -290,21 +305,20 @@ if __name__ == '__main__':
 
             print("display " + png_file +" &")
 
-            if area=="cosmo1x150":
-                scpID="-i ~/.ssh/id_rsa_las"
-                scpOutputDir="las@zueub241:/srn/las/www/satellite/DATA/MSG_"+"lscl"+"-"+area+"_/"
-                scp_command = "/usr/bin/scp "+scpID+" "+png_file+" "+scpOutputDir+" 2>&1 &"
-                print(scp_command)
+            if area in scp_png_to_SATLive:
+                scpOutputDir_SATLive="las@zueub241:/srn/las/www/satellite/DATA/MSG_lscl-"+area+"_/"
+                scp_command = "/usr/bin/scp "+scpID_SATLive+" "+png_file+" "+scpOutputDir_SATLive+" 2>&1 &"
+                print("... "+scp_command)
                 subprocess.call(scp_command, shell=True)
-            elif area=="cosmo1":
-                scpID="-i ~/.ssh/id_rsa_tsa"
-                scpOutputDir="hamann@tsa.cscs.ch:/scratch/hamann/DayNightFog/"
-                print("... scp "+png_file+" to "+scpOutputDir)
-                subprocess.call("/usr/bin/scp "+scpID+" "+png_file+" "+scpOutputDir+" 2>&1 &", shell=True)
+                
+            if area in scp_png_to_CSCS:
+                scp_command = "/usr/bin/scp "+scpID_CSCS+" "+png_file+" "+scpOutputDir_CSCS+" 2>&1 &"
+                print("... "+scp_command)
+                subprocess.call(scp_command, shell=True)
             
         # save netCDF file for APN
         ##############################
-        if area=='cosmo1eqc3km':
+        if area in save_netCDF_areas:
             netCDF_file = start_time.strftime('/data/cinesat/out/MSG_lscl-'+area+'_%y%m%d%H%M.nc')
             print("... save result in: "+ netCDF_file)
             print("include_lonlats=True")
@@ -327,10 +341,9 @@ if __name__ == '__main__':
             print("... ncview " + netCDF_file +" &")
 
             rewrite_xy_axis(netCDF_file)
-
-            scpID="-i ~/.ssh/id_rsa_tsa"
-            #scpOutputDir="hamann@tsa.cscs.ch:/scratch/hamann/DayNightFog/"
-            scpOutputDir="hamann@tsa.cscs.ch:/scratch/hamann/DayNightFog_Filter-CT-7-15/"
-            print("... scp "+netCDF_file+" to "+scpOutputDir)
-            subprocess.call("/usr/bin/scp "+scpID+" "+netCDF_file+" "+scpOutputDir+" 2>&1 &", shell=True)
+            
+            if area in scp_netCDF_to_CSCS:
+                scp_command = "/usr/bin/scp "+scpID_CSCS+" "+netCDF_file+" "+scpOutputDir_CSCS+" 2>&1 &"
+                print("... "+scp_command)
+                subprocess.call(scp_command, shell=True)
 

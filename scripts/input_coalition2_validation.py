@@ -189,8 +189,7 @@ def input(in_msg):
         in_msg.outputDirForecasts = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_forecasts_%(area)s/'
    
     in_msg.scpOutput = True
-    #in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
-    #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
+    # scpOutputDir and scpID are set in scp_settings.py
 
     in_msg.chosen_settings={}
     #settings: set to None for automatic choice

@@ -217,7 +217,7 @@ def input(in_msg):
 
     #in_msg.scpOutput = True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
-    #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
+    #default: in_msg.scpID="-i /home/cinesat/.ssh/id_rsa_las"
 
     # please download the shape file 
     #in_msg.mapDir='/opt/users/common/shapes/'

@@ -213,7 +213,7 @@ def input(in_msg):
    
     in_msg.scpOutput = False
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
-    #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
+    #default: in_msg.scpID="-i /home/cinesat/.ssh/id_rsa_las"
 
     #import ftp_DACH_MWO
     #in_msg.ftpUpload   = ftp_DACH_MWO.ftpUpload

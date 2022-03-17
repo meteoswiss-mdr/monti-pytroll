@@ -27,8 +27,8 @@ sat="MSG2"
 files_sat = find_files_and_readers(sensor='seviri',
                                #start_time=datetime(2015, 7, 7, 12, 0), end_time=datetime(2015, 7, 7, 12, 0),
                                #base_dir="/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/2015/07/07/",
-                               start_time=datetime(2015, 8, 7, 12, 0), end_time=datetime(2015, 8, 7, 12, 0),
-                               base_dir="/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/2015/08/07/",
+                               start_time=datetime(2017, 7, 7, 12, 0), end_time=datetime(2017, 7, 7, 12, 0),
+                               base_dir="/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/2017/07/07/",
                                reader='seviri_l1b_hrit')                                   
 #                               reader='hrit_msg')
 
@@ -63,6 +63,10 @@ print(dir(global_scene))
 print("=======================")
 
 global_scene.load([0.6])
+## loaded channels 
+#for chn in list(global_scene.keys()):
+#    print(chn["name"])
+
 print(global_scene[0.6])
 print(global_scene[0.6].orbital_parameters)
 print(global_scene[0.6].area)
@@ -86,8 +90,9 @@ global_scene["ndvi"] = (global_scene[0.8] - global_scene[0.6]) / (global_scene[0
 #print(scn['IR_016'])
 
 #area="eurol"
-area="EuropeCanaryS95"
+#area="EuropeCanaryS95"
 #area="ccs4"
+area="SeviriDisk00Cosmo"
 
 print("")
 print("=======================")

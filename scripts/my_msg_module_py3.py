@@ -12,11 +12,13 @@ from __future__ import print_function
 import products 
 import inspect
 import datetime
+import time
 # from mpop.projector import get_area_def
 from satpy.resample import get_area_def
 from copy import deepcopy
 from satpy import find_files_and_readers
 
+import warnings
 import logging
 LOG = logging.getLogger(__name__)
 LOG.setLevel(40)
@@ -466,13 +468,13 @@ output:
 
 def check_loaded_channels(rgbs, data):
 
-    from my_composites import get_image
+    from my_composites_py3 import get_image
 
     print ("... check if all needed channels are loaded for ", rgbs)
 
     # check if all prerequisites are loaded
     all_loaded = True
-    loaded_channels = [chn.name for chn in data.loaded_channels()]
+    loaded_channels = [chn["name"] for chn in list(data.keys())] 
 
     # replace string with one element string array
     if isinstance(rgbs, str):
@@ -525,12 +527,12 @@ def check_input(in_msg, fullname, inputDirectory, time_slot, RGBs=None, segments
 
     from time import strftime
     import os
-    #from fnmatch import filter
+    from fnmatch import filter
     #from os import listdir  # , path, access, R_OK
     import glob
     from satpy import find_files_and_readers
     
-    if CONFIG_PATH=None:
+    if CONFIG_PATH==None:
         CONFIG_PATH="/opt/users/hau/monti-pytroll/packages/satpy/satpy/etc/readers/"
     
     # get date of the last SEVIRI observation
@@ -554,7 +556,7 @@ def check_input(in_msg, fullname, inputDirectory, time_slot, RGBs=None, segments
     if in_msg.sat_nr is None:
         in_msg.sat_nr = choose_msg(in_msg.datetime, RSS=in_msg.RSS)
 
-    print ("in_msg.reader_level", in_msg.reader_level)
+    #print ("    in_msg.reader_level", in_msg.reader_level)
         
     ## currently no check for hdf data
     if in_msg.reader_level == "seviri-level4":
@@ -597,7 +599,7 @@ def check_input(in_msg, fullname, inputDirectory, time_slot, RGBs=None, segments
     rgb_complete=[]
     channels_complete=[False,False,False,False,False,False,False,False,False,False,False,False]
     pro_file_checked=False
-
+    
     for rgb in needed_input:
 
         if in_msg.verbose:
@@ -610,9 +612,6 @@ def check_input(in_msg, fullname, inputDirectory, time_slot, RGBs=None, segments
 
             if in_msg.verbose:
                 print ('... check input in directory '+inputDirectory)
-
-                input_files = find_files_and_readers(base_dir='/data/cinesat/in/eumetcast1',reader='seviri_l1b_hrit',
-                                                  start_time=in_msg.datetime,end_time=in_msg.datetime)
                 
             if not pro_file_checked:
 
@@ -629,9 +628,12 @@ def check_input(in_msg, fullname, inputDirectory, time_slot, RGBs=None, segments
                     if in_msg.verbose:
                         print ("... check input files for ", MSG, str(in_msg.datetime), in_msg.RGBs)
                         
+                    input_files = find_files_and_readers(base_dir=inputDirectory,reader='seviri_l1b_hrit',
+                                                         start_time=in_msg.datetime,end_time=in_msg.datetime)
+
                     #pro_file = "?-000-"+MSG+"__-"+MSG+"_"+RSSS+"_???-_________-PRO______-"+yearS+monthS+dayS+hourS+minuteS+"-__"
                     #if len(filter(listdir(inputDirectory), pro_file)) == 0:
-                    pro_filename = fnmatch.filter(input_files['seviri_l1b_hrit'],'*'+MSG+'*PRO*')
+                    pro_filename = filter(input_files['seviri_l1b_hrit'],'*'+MSG+'*PRO*')
 
                     if len(pro_filename) > 0:
                         print ("    found prologue file ", pro_filename)
@@ -646,21 +648,19 @@ def check_input(in_msg, fullname, inputDirectory, time_slot, RGBs=None, segments
                         else:
                             # try backup satellite
                             if in_msg.verbose:
-                                print ("*** Warning, no prologue file found for Meteosat ",in_msg.sat_nr ," : "+inputDirectory+'/'+pro_file)
+                                print ("*** Warning, no prologue file found for Meteosat ",in_msg.sat_nr ," : "+inputDirectory+'/*'+MSG+'*PRO*')
                             # before July 2016: Meteosat 8 is RSS backup for Meteosat 9, but also try Meteosat 10 if possible
                             if in_msg.datetime < datetime.datetime(2016, 7, 1, 0, 0): 
                                 if in_msg.sat_nr == 9:
                                     tries_for_backup=tries_for_backup+1
                                     in_msg.sat_nr = 8
                                     fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
-                                    conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
                                     if in_msg.verbose:
                                         print ("... try backup satellite ", in_msg.sat_nr)
                                 elif in_msg.sat_nr == 8:
                                     tries_for_backup=tries_for_backup+1
                                     in_msg.sat_nr = 10
                                     fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
-                                    conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
                                     if in_msg.verbose:
                                         print ("... try backup satellite ", in_msg.sat_nr)
                                 elif in_msg.sat_nr == 10:
@@ -673,7 +673,6 @@ def check_input(in_msg, fullname, inputDirectory, time_slot, RGBs=None, segments
                                     tries_for_backup=tries_for_backup+1
                                     in_msg.sat_nr = 10
                                     fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
-                                    conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
                                     if in_msg.verbose:
                                         print ("... try backup satellite ", in_msg.sat_nr)
                                 elif in_msg.sat_nr == 8:   # indian ocean data coverage, no backup
@@ -690,14 +689,12 @@ def check_input(in_msg, fullname, inputDirectory, time_slot, RGBs=None, segments
                                     #there_is_no_backup_satellite = True
                                     in_msg.sat_nr = 10
                                     fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
-                                    conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
                                     if in_msg.verbose:
                                         print ("... try backup satellite ", in_msg.sat_nr)
                                 elif in_msg.sat_nr == 10:
                                     tries_for_backup=tries_for_backup+1
                                     in_msg.sat_nr = 9
                                     fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
-                                    conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
                                     if in_msg.verbose:
                                         print ("... try backup satellite ", in_msg.sat_nr)
                                 elif in_msg.sat_nr == 9:
@@ -706,7 +703,6 @@ def check_input(in_msg, fullname, inputDirectory, time_slot, RGBs=None, segments
                                     # switch to full disk service 
                                     in_msg.sat_nr = 11
                                     fullname = in_msg.sat_str(layout="%(sat)s")+in_msg.sat_nr_str()
-                                    conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
                                     if in_msg.verbose:
                                         print ("... WARNING, no RSS available, switch from RSS to FDS satellite ", in_msg.sat_nr)
                                 elif in_msg.sat_nr == 8:
@@ -716,150 +712,152 @@ def check_input(in_msg, fullname, inputDirectory, time_slot, RGBs=None, segments
                                     LOG.error("*** ERROR (C), unknown Meteosat satellite number", in_msg.sat_nr, "in check_input (my_msg_module)" )
                 
                 #check epilogues file
-                #epi_file = "?-000-"+MSG+"__-"+MSG+"_???_???-_________-EPI______-"+yearS+monthS+dayS+hourS+minuteS+"-__"
-                epi_file = time_slot.strftime(conf.get("seviri-level1", "filename_epi"))
-                epi_filename = glob.glob(inputDirectory+'/'+epi_file)
-                #if len(filter(listdir(inputDirectory), epi_file)) == 0:
+                epi_filename = filter(input_files['seviri_l1b_hrit'],'*'+MSG+'*EPI*')
                 if len(epi_filename) == 0:
                     if in_msg.verbose:
-                        print ("*** Warning, no epilogue file found: "+inputDirectory+'/'+epi_file)
+                        print ("*** Warning, no epilogue file found: "+inputDirectory+'/*+MSG+*EPI*')
                     return rgb_complete
                 else:
                     print ("    found epilogue file", epi_filename)
 
-            # retrieve channels needed for specific rgb
-            channels_needed = rgb_prerequisites(rgb, sat=in_msg.sat_str(), sat_nr=in_msg.sat_nr_str(), verbose=False)
-        
-            if in_msg.verbose:
-                print ("    check input files for "+ rgb+ ', channels needed: ', list(channels_needed))
-        
-            fname1= "?-000-"+MSG+"__-"+MSG+"_???_???-"
-            # channel
-            fname2= "___-"
-            # segements
-            fname3= "___-"+yearS+monthS+dayS+hourS+minuteS+"-C_"
-        
+            
+#            # retrieve channels needed for specific rgb
+#            channels_needed = rgb_prerequisites(rgb, sat=in_msg.sat_str(), sat_nr=in_msg.sat_nr_str(), verbose=False)
+#        
+#            if in_msg.verbose:
+#                print ("    check input files for "+ rgb+ ', channels needed: ', list(channels_needed))
+#        
+#            fname1= "?-000-"+MSG+"__-"+MSG+"_???_???-"
+#            # channel
+#            fname2= "___-"
+#            # segements
+#            fname3= "___-"+yearS+monthS+dayS+hourS+minuteS+"-C_"
+#        
             input_complete = True
-            input_any = False
-            for channel in channels_needed:
-                if not channels_complete[channel_str2ind(channel)]:
-                    # print ("... search input files of ", channel)
-                    if channel != "HRV":
-                        all_segments=''
-                        for seg in segments:
-                            all_segments=all_segments+str(seg)
-                        all_segments='['+all_segments+']'
-                        search_pattern=fname1+channel+fname2+"00000"+all_segments+fname3
-                        #print ("    search pattern: ", search_pattern)
-                        #for this_file in filter(listdir(inputDirectory), search_pattern):
-                        #    print (this_file)
-                        #    print (path.isfile(inputDirectory+this_file), access(inputDirectory+this_file, R_OK))
-                        #n_files = len(filter(listdir(inputDirectory), search_pattern))
-                        n_files = len(glob.glob(inputDirectory+'/'+search_pattern))
-        
-                        if in_msg.check_input:
-                            if n_files != len(segments):     # we like to have all segments
-                                input_complete=False
-                        else:
-                            if n_files < 1:                  # we are happy with at least one segment
-                                input_complete=False
-        
-                        if in_msg.verbose:
-                            if input_complete==False:
-                                print ("*** Warning, input not complete for "+channel+ ' ('+rgb+')')
-                                print ("***          found only "+str(n_files)+" input segments (expected "+str(len(segments))+ " segments)")
-                            #else:
-                            #   print ('    input complete for '+channel+ ' ('+rgb+')'+' '+search_pattern)
-                    else:
-
-                        for seg in HRsegments:
-                            segS = "%02d" % seg
-                            search_pattern=fname1+"HRV___"+fname2+"0000"+segS+fname3
-                            #n_files = len(filter(listdir(inputDirectory), search_pattern))
-                            n_files = len(glob.glob(inputDirectory+'/'+search_pattern))
-                            if n_files == 0:
-                                input_complete=False
-                                if in_msg.verbose:
-                                    print ("*** Warning, missing file: " + search_pattern)
-    
-                            elif n_files == 1:
-                                input_any = True
-                            #    if in_msg.verbose:
-                            #        print ("    found file: ", fname1+"HRV___"+fname2+"0000"+segS+fname3)
-                
-                            if n_files != 0 and n_files != 1:
-                                print ("*** ERROR in check_input (my_msg_module.py)")
-                                print ("*** ERROR this should not happen, please contact the developers (Uli, Lorenzo)")
-                            search_pattern=''
-
-                        # if we are not checking (for all segments)
-                        if not in_msg.check_input:         # ... we are happy with at least one segment
-                            if input_any == True:
-                                input_complete=True
-
-                #else:
-                #    if in_msg.verbose:
-                #        print ("    input for channel "+channel+" is already checked and complete")
-        
-                # remember channels that are complete
-                if input_complete:
-                    channels_complete[channel_str2ind(channel)]=True
-        
-                if in_msg.verbose:
-                    if input_complete:
-                        print ('    input complete for '+channel+ ' ('+rgb+')') #+' '+search_pattern
-                    else:
-                        print ("*** Warning, input not complete for "+channel+ ' ('+rgb+')')
-        
-                if input_complete == False:
-                    break
+#            input_any = False
+#            for channel in channels_needed:
+#                if not channels_complete[channel_str2ind(channel)]:
+#                    # print ("... search input files of ", channel)
+#                    if channel != "HRV":
+#                        all_segments=''
+#                        for seg in segments:
+#                            all_segments=all_segments+str(seg)
+#                        all_segments='['+all_segments+']'
+#                        search_pattern=fname1+channel+fname2+"00000"+all_segments+fname3
+#                        #print ("    search pattern: ", search_pattern)
+#                        #for this_file in filter(listdir(inputDirectory), search_pattern):
+#                        #    print (this_file)
+#                        #    print (path.isfile(inputDirectory+this_file), access(inputDirectory+this_file, R_OK))
+#                        #n_files = len(filter(listdir(inputDirectory), search_pattern))
+#                        n_files = len(glob.glob(inputDirectory+'/'+search_pattern))
+#        
+#                        if in_msg.check_input:
+#                            if n_files != len(segments):     # we like to have all segments
+#                                input_complete=False
+#                        else:
+#                            if n_files < 1:                  # we are happy with at least one segment
+#                                input_complete=False
+#        
+#                        if in_msg.verbose:
+#                            if input_complete==False:
+#                                print ("*** Warning, input not complete for "+channel+ ' ('+rgb+')')
+#                                print ("***          found only "+str(n_files)+" input segments (expected "+str(len(segments))+ " segments)")
+#                            #else:
+#                            #   print ('    input complete for '+channel+ ' ('+rgb+')'+' '+search_pattern)
+#                    else:
+#
+#                        for seg in HRsegments:
+#                            segS = "%02d" % seg
+#                            search_pattern=fname1+"HRV___"+fname2+"0000"+segS+fname3
+#                            #n_files = len(filter(listdir(inputDirectory), search_pattern))
+#                            n_files = len(glob.glob(inputDirectory+'/'+search_pattern))
+#                            if n_files == 0:
+#                                input_complete=False
+#                                if in_msg.verbose:
+#                                    print ("*** Warning, missing file: " + search_pattern)
+#    
+#                            elif n_files == 1:
+#                                input_any = True
+#                            #    if in_msg.verbose:
+#                            #        print ("    found file: ", fname1+"HRV___"+fname2+"0000"+segS+fname3)
+#                
+#                            if n_files != 0 and n_files != 1:
+#                                print ("*** ERROR in check_input (my_msg_module.py)")
+#                                print ("*** ERROR this should not happen, please contact the developers (Uli, Lorenzo)")
+#                            search_pattern=''
+#
+#                        # if we are not checking (for all segments)
+#                        if not in_msg.check_input:         # ... we are happy with at least one segment
+#                            if input_any == True:
+#                                input_complete=True
+#
+#                #else:
+#                #    if in_msg.verbose:
+#                #        print ("    input for channel "+channel+" is already checked and complete")
+#        
+#                # remember channels that are complete
+#                if input_complete:
+#                    channels_complete[channel_str2ind(channel)]=True
+#        
+#                if in_msg.verbose:
+#                    if input_complete:
+#                        print ('    input complete for '+channel+ ' ('+rgb+')') #+' '+search_pattern
+#                    else:
+#                        print ("*** Warning, input not complete for "+channel+ ' ('+rgb+')')
+#        
+#                if input_complete == False:
+#                    break
         
             if input_complete:
                 rgb_complete.append(rgb)
 
         elif rgb in products.NWCSAF:
 
-            conf = ConfigParser()
-            conf.read(os.path.join(CONFIG_PATH, fullname + ".cfg"))
-            inputDirectory = time_slot.strftime(conf.get("seviri-level3", "dir"))
-
-            filename = time_slot.strftime(conf.get("seviri-level3", "filename", raw=True))
-            #    #e.g. SAFNWC_MSG?_%(product)s%Y%m%d%H%M_FES_*
-            pathname = os.path.join(inputDirectory, filename)
-
+            MSG = in_msg.msg_str(layout="%(msg)s%(msg_nr)s")
+            
+            for i_try in range(10):
+                print("... Try to find NWCSAF (", MSG ,") files for ", rgb, " in directory: ", inputDirectory, str(in_msg.datetime))
+                try:                  
+                    input_files = find_files_and_readers(base_dir=inputDirectory,reader='nwcsaf-geo',
+                                                         start_time=in_msg.datetime, end_time=in_msg.datetime+datetime.timedelta(minutes = 5)) #,
+                    break     # the loop only breaks if no exceptions were raised!
+                except ValueError as e:
+                    print(e)  # the loop will automatically continue and try again
+                    time.sleep(60)
+            
             if rgb in products.CMa:
-                filename = (pathname % {"number": "01", "product": "CMa__"})
+                filename = filter(input_files['nwcsaf-geo'],"*_CMA_*"+MSG+'*')
             elif rgb in products.CT:
-                filename = (pathname % {"number": "02", "product": "CT___"})
+                filename = filter(input_files['nwcsaf-geo'],"*_CT_*"+MSG+'*')
             elif rgb in products.CTTH:
-                filename = (pathname % {"number": "03", "product": "CTTH_"})
+                filename = filter(input_files['nwcsaf-geo'],"*_CTTH_*"+MSG+'*')
             elif rgb in products.PC:
-                filename = (pathname % {"number": "04", "product": "PC___"})
+                filename = filter(input_files['nwcsaf-geo'],"*_PC_*"+MSG+'*')
             elif rgb in products.CRR:
-                filename = (pathname % {"number": "05", "product": "CRR__"})
+                filename = filter(input_files['nwcsaf-geo'],"*_CRR_*"+MSG+'*')
             elif rgb in products.SPhR:
-                filename = (pathname % {"number": "13", "product": "SPhR_"})
+                filename = filter(input_files['nwcsaf-geo'],"*_iSHAI_*"+MSG+'*')
             elif rgb == 'PCPh':
-                filename = (pathname % {"number": "14", "product": "PCPh_"})
+                filename = filter(input_files['nwcsaf-geo'],"*_PC-Ph_*"+MSG+'*')
             elif rgb == 'CRPh':
-                filename = (pathname % {"number": "14", "product": "CRPh_"})
+                filename = filter(input_files['nwcsaf-geo'],"*_CRR-Ph_*"+MSG+'*')
             else:
-                print ("*** ERROR in check_input (my_msg_module.py)")
+                print ("*** ERROR in check_input (my_msg_module_py3.py)")
                 print ("    unknown NWC-SAF product ", rgb)
                 quit()
 
-            print ("... search for ", filename)
-
-            if len(glob.glob(filename)) == 0:
+            print ("... found ", filename)
+            
+            if len(filename) == 0:
                 if in_msg.verbose:
-                    print ("*** Warning, no NWC SAF file found: "+filename)
+                    print ("*** Warning, no NWCSAF file found ")
 
                 # if parallax correction is desired and there is not CTH,
                 # tell main program that no images can be produced
                 if in_msg.parallax_correction and rgb=='CTH':
                     return []
             else:
-                print ("    NWC SAF file found: "+glob.glob(filename)[0])
+                print ("    NWC SAF file found: "+filename[0])
                 rgb_complete.append(rgb)
 
         #elif rgb in products.HSAF:
@@ -883,6 +881,7 @@ def check_input(in_msg, fullname, inputDirectory, time_slot, RGBs=None, segments
                 
         else:
            # currently no check, just append rgb and try to process it
+           print("*** Warning, currently no check for", rgb)
            rgb_complete.append(rgb)
 
     return rgb_complete
@@ -1224,9 +1223,12 @@ def fill_with_closest_pixel(data, invalid=None):
     from numpy import isnan 
     from scipy.ndimage import distance_transform_edt
 
+    print("*** fill_with_closest_pixel")
     if invalid is None: invalid = isnan(data)
 
-    ind = distance_transform_edt(invalid, return_distances=False, return_indices=True)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        ind = distance_transform_edt(invalid, return_distances=False, return_indices=True)
 
     return data[tuple(ind)]
 

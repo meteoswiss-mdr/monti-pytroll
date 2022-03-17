@@ -7,7 +7,9 @@
 from __future__ import division
 from __future__ import print_function
 
+import time
 from datetime import datetime
+from datetime import timedelta
 import sys, string, os
 import logging
 
@@ -32,20 +34,18 @@ import aggdraw
 from PIL import ImageFont, ImageDraw
 from os.path import exists, dirname
 from os import makedirs
-from datetime import timedelta
 from pycoast import ContourWriterAGG
 
 from my_msg_module_py3 import check_near_real_time
 #from my_msg_module import format_name
 from my_msg_module_py3 import fill_with_closest_pixel
-from my_msg_module_py3 import check_loaded_channels
+#from my_msg_module_py3 import check_loaded_channels
 #from my_msg_module import convert_NWCSAF_to_radiance_format
 #from my_msg_module import get_NWC_pge_name
 from my_msg_module_py3 import check_input
 
 from copy import deepcopy 
 import matplotlib.pyplot as plt
-import time
 import copy
 from particles_displacement import particles_displacement
 import numpy.ma as ma
@@ -58,27 +58,218 @@ scpOutputDir = scp_settings.scpOutputDir
 scpID = scp_settings.scpID 
 import glob
 import inspect
+import warnings
+
+from dask.array.core import Array as daskarray
 
 current_file = inspect.getfile(inspect.currentframe())
 
 # debug_on()
 
 
+#----------------------------------------------------------------------------------------------------------------
+def print_usage():
+   
+   print("***           ")
+   print("*** Error, not enough command line arguments")
+   print("***        please specify at least an input file")
+   print("***        possible calls are:")
+   print("*** python "+inspect.getfile(inspect.currentframe())+" input_coalition2_cronjob ")
+   print("*** python "+inspect.getfile(inspect.currentframe())+" input_coalition2_cronjob 2020 07 23 16 10 ")
+   print("                                 date and time must be completely given")
+   print("***           ")
+   quit() # quit at this point
+#----------------------------------------------------------------------------------------------------------------
 
 # ------------------------------------------
-# ------------------------------------------
+
+def create_seviri_scene(time_slot, base_dir_sat, reader='seviri_l1b_hrit', sat="", file_filter=""):
+    print("*** read SEVIRI files for ", sat, "seviri", str(time_slot), ", reader="+reader)
+    print("    search for SEVIRI files in "+base_dir_sat)
+
+    files_sat = find_files_and_readers(sensor='seviri',
+                                       start_time=time_slot, end_time=time_slot,
+                                       base_dir=base_dir_sat, reader=reader)
+
+    if sat != "":
+        print("... filter for satellite: "+sat)
+        files = deepcopy(files_sat[reader])
+        for f in files:
+           if not (sat in f):
+              files_sat[reader].remove(f)
+    if file_filter != "":
+        print("... filter for satellite: "+file_filter)
+        files = deepcopy(files_sat[reader])
+        for f in files:
+           if not (file_filter in f):
+              files_sat[reader].remove(f)
+    print("    found "+reader+" files: ", files_sat)
+
+    global_data = Scene(filenames=files_sat)
+    return global_data 
+
+
+def read_HRW(sat, time_slot, ntimes, dt=5, read_basic_or_detailed='DS', 
+             min_correlation=85, min_conf_nwp=80, min_conf_no_nwp=80, cloud_type=None, level=None, p_limits=None):
+    """
+    read_basic_or_detailed:
+      "BS"  read HRW product with basic resolution
+      "DS"  read HRW product with detailed resolution
+    """
+
+    data = create_seviri_scene(time_slot, base_dir_ctth, sat=MSG_str, reader='nwcsaf-geo', file_filter=read_basic_or_detailed)  
+    data.load(['HRW'])
+    
+    # read data for previous time steps if needed
+    for it in range(1,ntimes):
+        time_slot_i = time_slot - timedelta( minutes = it*5 )
+
+        data_i = create_seviri_scene(time_slot_i, base_dir_ctth, sat=MSG_str, reader='nwcsaf-geo', file_filter=read_basic_or_detailed)  
+        data_i.load(['HRW'])
+        
+        # merge all datasets
+        data['HRW'].HRW_detailed = data['HRW'].HRW_detailed + data_i['HRW'].HRW_detailed
+        data['HRW'].HRW_basic    = data['HRW'].HRW_basic    + data_i['HRW'].HRW_basic
+
+    # apply quality filter
+    data['HRW'].HRW_detailed = data['HRW'].HRW_detailed.filter(min_correlation=min_correlation, \
+                    min_conf_nwp=min_conf_nwp, min_conf_no_nwp=min_conf_no_nwp, cloud_type=cloud_type, level=level, p_limits=p_limits)
+
+    return data
+
+
+# ===============================
+
+def downscale_array(array, mode='gaussian_225_125', mask=None):
+
+    print ("    downscale with mode: ", mode)
+
+    if not isinstance( array, (np.ndarray, np.generic, daskarray) ):
+        print ("*** Warning in downscale_array ("+inspect.getfile(inspect.currentframe())+")")
+        print ("    unexpected data format ", type(array), ", expected array format np.ndarray")
+        return array
+
+    # if no_downscaling return unmodified array
+    if mode == 'no_downscaling':
+        return array
+    # else define downscale function and weights 
+    elif mode == 'convolve_405_300': 
+        weights = np.ones([5,3])
+        weights = weights / weights.sum()   
+        downscale_func = ndimage.convolve
+    elif mode == 'gaussian_150_100':
+        weights = 1/3.*np.array([4.5,3.0])  # conserves a bit better the maxima
+        downscale_func = ndimage.filters.gaussian_filter
+    elif mode == 'gaussian_225_125':
+        weights = 1/2.*np.array([4.5,3.0])  # no artefacts more for shifted fields
+        downscale_func = ndimage.filters.gaussian_filter
+    else:
+        print ("*** Error in downscale_array ("+inspect.getfile(inspect.currentframe())+")")
+        print ("    unknown downscaling mode: "+mode)
+        quit()
+        
+    # get suitable no data flag depending on 
+    if (array.dtype == np.float) or (array.dtype == np.float32):
+        print ("    downscale float array, no_data = np.nan")
+        no_data = np.nan
+    elif (array.dtype == np.int):    # for int or uint np.nan does not exists 
+        print ("    downscale integer array, no_data = -1")
+        no_data = -1
+    elif (array.dtype == np.uint8):
+        print ("    downscale unsigned integer array, no_data = 0")
+        no_data = 0
+    else:
+        print ("*** Error in downscale_array ("+inspect.getfile(inspect.currentframe())+")")
+        print ("    unknown data type: ", array.dtype)
+        quit()
+
+    # force mask and fill the whole array with closest pixel
+    if mask is not None:
+        print("... replaced masked data with not a number (for floats)")
+        array[mask] = no_data
+        array = fill_with_closest_pixel(array)
+
+    # downscale array 
+    array_downscaled = downscale_func(array, weights, mode='nearest')
+
+    # restore mask
+    if mask is not None:
+        print("... mask out data in downscaled array")
+        array_downscaled[mask] = no_data
+
+    """
+    # convert to mask array and change array.mask 
+    if mask is not None:
+        np.ma.masked_array(array, mask)
+    """
+
+    return array_downscaled
+
+# ===============================
+    
+def downscale(data, mode='gaussian_225_125', mask=None):
+    
+    """ downscales the data to a finer grid
+
+    Parameters
+    ----------
+    data : data to downscale 
+           either np.ndarray (single array) or 
+           satpy.Scene.scene (all loaded channels of the scene)
+    mode : specific mode to downscale
+           'gaussian_150_100', 'gaussian_225_125' or 'convolve_405_300'
+    mask : optional, indices that should be masked
+    
+    Returns : 
+    ----------
+    data : downscaled version of the data
+        
+    Raises
+    ----------
+         """
+
+    # assymetric downscaling as SEVIRI pixel size is approx 3kmx4.5km for Europe
+
+    
+    print("========")
+    
+    if isinstance(data, np.ndarray):
+        downscale_array(data, mode=mode, mask=mask)
+        
+    #elif isinstance(data, Scene.Scene):    # TODO, how to identify Scene object? print(type(data)) -> <class 'satpy.scene.Scene'>
+    else:
+
+        #for chn in data.loaded_channels():   # mpop/python2 
+        for chn in list(data.keys()):
+    
+            # do not downscale cloud classes 
+            if chn["name"] == "CT":
+                continue 
+            # comment: Shoud we downscale chn.name != "CTP", "CTH", "CTT"?
+
+            if hasattr(data[chn["name"]], 'data'):
+                print ("... downscale "+chn["name"])
+                data[chn["name"]].data = downscale_array(data[chn["name"]].data, mode=mode, mask=mask)
+            else:
+                print ("*** Warning in downscale ("+inspect.getfile(inspect.currentframe())+")")
+                print ("    skip downscaling of ", chn.name, ", as this channel has no attribute: data" )
+
+    return data
+    
+# ===============================
+
 
 def m_to_pixel(value,size,conversion): #,coordinate):
             
-        if conversion=='to_pixel':
-            px =  np.round(value//size) 
-            px[np.where(value==np.nan)] = np.nan
-            px = px.astype(int)
-            return px
-        else:
-            m = (value*size)+size/2
-            m[value==np.nan] = np.nan
-            return ms
+    if conversion=='to_pixel':
+        px =  np.round(value//size) 
+        px[np.where(value==np.nan)] = np.nan
+        px = px.astype(int)
+        return px
+    else:
+        m = (value*size)+size/2
+        m[value==np.nan] = np.nan
+        return ms
 
 def string_date(t):
     yearS  = str(t.year)
@@ -90,28 +281,40 @@ def string_date(t):
     return yearS, monthS, dayS, hourS, minS
 
 def check_cosmo_area (nc_cosmo, nx, ny, area):
+
+    """ check dimensions of the COSMO file 
+        compare to the desired projection described by area
+        return how many pixels needs to be skiped at the beginning and the end of the x and y axis to cover the desired area "area"
+        (function assumes that the projection type of "area" and the cosmo file is the same)
+    """
+    
+    # determine lengths in x and y in meter of the COSMO data
     x = nc_cosmo.variables['y_1'][:]
     y = nc_cosmo.variables['x_1'][:]
-    x_min_cosmo = x.min()-500
-    x_max_cosmo = x.max()+500
-    y_min_cosmo = y.min()-500
-    y_max_cosmo = y.max()+500
-    
+    x_min_cosmo = x.min()-500            # substract 500m (half a pixel size)
+    x_max_cosmo = x.max()+500            # add       500m (half a pixel size)
+    y_min_cosmo = y.min()-500            # substract 500m (half a pixel size)
+    y_max_cosmo = y.max()+500            # add       500m (half a pixel size)
+
+    # determine size in meter of the desired area
     area_wanted = get_area_def(area)
     x_min_wanted = area_wanted.area_extent[1]
     x_max_wanted = area_wanted.area_extent[3]
     y_min_wanted = area_wanted.area_extent[0]
     y_max_wanted = area_wanted.area_extent[2]
-    
+
+    # determine grid spacing 
     x = np.sort(x)
     dx_cosmo = x[1]-x[0]
     y = np.sort(y)
     dy_cosmo = y[1]-y[0]       
-    
+
+    # compare grid spacing 
     if dy_cosmo != area_wanted.pixel_size_y or dx_cosmo != area_wanted.pixel_size_x:
         print("Error: the pixel size of the wind data doesn't match with the chosen area definition")
         quit()
-    
+
+    # if COSMO file is larger than the desired area, get sub-area of the COSMO data
     if x_min_cosmo <= x_min_wanted and x_max_cosmo >= x_max_wanted and y_min_cosmo <= y_min_wanted and y_max_cosmo >= y_max_wanted:
         x_min_cut = abs(x_min_cosmo - x_min_wanted)/1000
         x_max_cut = abs(x_max_cosmo - x_max_wanted)/1000
@@ -147,7 +350,8 @@ def get_cosmo_filenames (t_sat, nrt=True, runs_before = 0 ):
     #else:
     #    cosmo = "cosmo2"
     # after Oct 2020 ??? 
-    cosmo = "cosmo-1e"
+    #cosmo = "cosmo-1e"
+    cosmo = "cosmo-1*"   #accepts "cosmo-1" and "cosmo-1e"
     
     if nrt:          
         cosmoDir='/data/cinesat/in/cosmo/' #2016052515_05_cosmo-1_UV_swissXXL
@@ -160,9 +364,15 @@ def get_cosmo_filenames (t_sat, nrt=True, runs_before = 0 ):
 
     return cosmoDir+cosmo_file1, cosmoDir+cosmo_file2
 
+
 def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure', area='ccs4', cosmo = None, nrt = False, rapid_scan_mode_satellite = True):
 
-    print("interpolate_cosmo nrt", nrt) 
+    # given the date, search for two COSMO files adjacent in time
+    # containing wind data on pressure levels
+    # read two consecutive cosmo files and interpolate temporal
+    
+    
+    print("*** interpolate_cosmo nrt", nrt) 
     file1, file2 = get_cosmo_filenames ( datetime(year,month,day,hour,minute), nrt=nrt )
 
     print("... search for ", file1, " and ", file2)
@@ -175,7 +385,7 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
         print("Files t2", filename2)
             
     if len(filename1)<1 or len(filename2)<1:
-        print("*** Warning, found no cosmo wind data ")
+        print("*** Warning, found no cosmo wind data, search for preveous COSMO run... ")
         file1, file2 = get_cosmo_filenames ( datetime(year,month,day,hour,minute), runs_before = 1 )
         print(file1, file2)
 
@@ -247,15 +457,28 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     
     nx2 = u_all2.shape[2]
     ny2 = u_all2.shape[3]  
+
+    if (nx1 != nx2) or (ny1 != ny2):
+        print("*** ERROR in interpolate_cosmo ("+inspect.getfile(inspect.currentframe())+")")
+        print("    COSMO files have different sizes: (",nx1,",",ny1,"), (",nx2,",",ny2,")")
+        quit()
     
     x_min_cut1, x_max_cut1, y_min_cut1, y_max_cut1 = check_cosmo_area (nc_cosmo_1, nx1, ny1, area)
     x_min_cut2, x_max_cut2, y_min_cut2, y_max_cut2 = check_cosmo_area (nc_cosmo_2, nx2, ny2, area) 
     
     p_chosen = np.sort(layers)[::-1] * 100 # 100 == convert hPa to Pa
 
+    #print(nx1, ny1, nx2, ny2)
+    #print(x_min_cut1, x_max_cut1, y_min_cut1, y_max_cut1)
+    #print(x_min_cut2, x_max_cut2, y_min_cut2, y_max_cut2)
+    
+    nx = (nx1 - x_min_cut1) - x_max_cut1
+    ny = (ny1 - y_max_cut1) - y_min_cut1
     u_d = np.zeros((len(p_chosen),nx,ny))
     v_d = np.zeros((len(p_chosen),nx,ny))
 
+    # account for the time difference in minutes
+    # of scanning Switzerland compared to time stamp of SEVIRI files (end of scan)
     if rapid_scan_mode_satellite:
         dt = 2
     else:
@@ -264,17 +487,18 @@ def interpolate_cosmo(year, month, day, hour, minute, layers, zlevel='pressure',
     position_t = (minute+dt)/5
     previous   = 1-(1./12*position_t)
 
+    # loop over pressure levels and extract sub-region 
     for g in range(len(p_chosen)):
         print("... temporal interpolation for wind field at", p_chosen[g], "(",p_chosen,")")
         i1 = np.where(pressure1==p_chosen[g])[0][0]
         i2 = np.where(pressure2==p_chosen[g])[0][0]
 
-        u1 = u_all1[0, i1, x_max_cut1 : nx1-x_min_cut1, y_min_cut1 : ny1 - y_max_cut1] #20:nx-40,85:ny-135
-        u2 = u_all2[0, i2, x_max_cut2 : nx2-x_min_cut2, y_min_cut2 : ny2 - y_max_cut2]     #### UH index changed i1 -> i2 !!! ###
-        v1 = v_all1[0, i1, x_max_cut1 : nx1-x_min_cut1, y_min_cut1 : ny1 - y_max_cut1]     #### UH index changed i2 -> i1 !!! ###
-        v2 = v_all2[0, i2, x_max_cut2 : nx2-x_min_cut2, y_min_cut2 : ny2 - y_max_cut2]
+        u1 = u_all1[0, i1, x_max_cut1 : nx1 - x_min_cut1, y_min_cut1 : ny1 - y_max_cut1]     #20:nx-40,85:ny-135
+        u2 = u_all2[0, i2, x_max_cut2 : nx2 - x_min_cut2, y_min_cut2 : ny2 - y_max_cut2]     #### UH index changed i1 -> i2 !!! ###
+        v1 = v_all1[0, i1, x_max_cut1 : nx1 - x_min_cut1, y_min_cut1 : ny1 - y_max_cut1]     #### UH index changed i2 -> i1 !!! ###
+        v2 = v_all2[0, i2, x_max_cut2 : nx2 - x_min_cut2, y_min_cut2 : ny2 - y_max_cut2]
         u_d[g,:,:] = previous*u1 + (1-previous)*u2
-        v_d[g,:,:] = previous*v1 + (1-previous)*v2      
+        v_d[g,:,:] = previous*v1 + (1-previous)*v2 
 
     return u_d, v_d
     
@@ -362,25 +586,6 @@ def nowcastRGB(forecast1,xy1_py,xy2_px):
     
     return forecast2
 
-#def load_rgb(satellite, satellite_nr, satellites_name, time_slot, rgb, area, in_msg, data_CTP):
-#
-#    if rgb != 'CTP':
-#      # read the data we would like to forecast
-#      global_data_RGBforecast = GeostationaryFactory.create_scene(satellite, satellite_nr, satellites_name, time_slot)
-#      #global_data_RGBforecast = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
-#
-#      # area we would like to read
-#      area_loaded = get_area_def("EuropeCanary95")#(in_windshift.areaExtraction)  
-#      # load product, global_data is changed in this step!
-#      area_loaded = load_products(global_data_RGBforecast, [rgb], in_msg, area_loaded)
-#      print('... project data to desired area ', area)
-#      fns = global_data_RGBforecast.project(area, precompute=True)
-#
-#    else:
-#      fns = deepcopy(data_CTP["CTP"].data)  
-#    
-#    return fns[rgb].data
-
 def initial_xy(x_matrix,y_matrix):
       
       x = np.reshape(x_matrix,x_matrix.size)
@@ -407,7 +612,6 @@ def compute_new_xy(xy1, dx_ds, dy_ds,  max_x_m, max_y_m):
     # remove particles outside the domain 
     print("... limits before removing: ", xy2.min(), xy2.max(), end=' ')  
 
-
     ind_inside = np.where( np.logical_and( np.logical_and(0<=xy2[:,0],xy2[:,0]<max_x_m), np.logical_and(0<=xy2[:,1],xy2[:,1]<max_y_m) ) )
 
     xy2    = np.squeeze(xy2[ind_inside,:])
@@ -425,7 +629,7 @@ def compute_new_xy(xy1, dx_ds, dy_ds,  max_x_m, max_y_m):
 
 def mask_rgb_based_pressure(data,p_min,p_max,data_CTP):
     ####################################data[data.mask==True ] = no_data
-    data = np.where(np.logical_or(data_CTP['CTP'].data>=p_max,data_CTP['CTP'].data<p_min),no_data,data)
+    data = np.where(np.logical_or(data_CTP['ctth_pres'].data>=p_max,data_CTP['ctth_pres'].data<p_min),no_data,data)
     
     return data
 # ------------------------------------------
@@ -467,25 +671,6 @@ if __name__ == '__main__':
     rgbs = ['WV_062','WV_073','IR_039','IR_087','IR_097','IR_108','IR_120','IR_134']  #in_windshift.rgb
     rgbs_only15min = ['IR_039','IR_087','IR_120']
     #channel = rgb.replace("c","")
-
-    # load a few standard things 
-    from get_input_msg_py3 import get_input_msg
-    
-    in_msg = get_input_msg('input_coalition2_cronjob')
-    #in_msg = get_input_msg('input_coalition2')
-
-    in_msg.resolution = 'i'
-    in_msg.sat="Meteosat-"
-    #in_msg.sat_nr = 9
-    in_msg.add_title=False
-    in_msg.outputDir='./pics/'
-    in_msg.outputFile='WS_%(rgb)s-%(area)s_%y%m%d%H%M'
-    in_msg.fill_value = [0,0,0] # black
-    #in_msg.reader_level = "seviri-level2"
-    
-    #in_msg.fill_value = None    # transparent
-    #colormap='rainbow' 
-    colormap='greys'
 
     rapid_scan_mode = False
     
@@ -556,83 +741,69 @@ if __name__ == '__main__':
 
     ############################################################################
 
-    
-    
-    if len(sys.argv) > 1:
-        if len(sys.argv) < 6:
-            print("***           ")
-            print("*** Warning, please specify date and time completely, e.g.")
-            print("***          python "+current_file+" 2014 07 23 16 10 ")
-            print("***           ")
-            quit() # quit at this point
-        else:
-            year   = int(sys.argv[1])
-            month  = int(sys.argv[2])
-            day    = int(sys.argv[3])
-            hour   = int(sys.argv[4])
-            minute = int(sys.argv[5])
-            in_msg.update_datetime(year, month, day, hour, minute)
-            
-            if len(sys.argv) > 6:
-                yearSTOP   = int(sys.argv[6])
-                monthSTOP  = int(sys.argv[7])
-                daySTOP    = int(sys.argv[8])
-                hourSTOP   = int(sys.argv[9])
-                minuteSTOP = int(sys.argv[10])
-                time_slotSTOP = datetime(yearSTOP, monthSTOP, daySTOP, hourSTOP, minuteSTOP) 
-            else:
-                time_slotSTOP = in_msg.datetime
 
-        base_dir_sat = in_msg.datetime.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
-        base_dir_nwc = in_msg.datetime.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/")
-        base_dir_ctth = in_msg.datetime.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/")
-        #base_dir_nwc = start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/CT/")
-        #base_dir_ctth = start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/CTTH/")
-    else:
-        if True:  # automatic choise of last 5min 
-            in_msg.get_last_SEVIRI_date()
-            time_slotSTOP = in_msg.datetime 
-            print("... choose time (automatically): ", str(time_slotSTOP))
-            base_dir_sat = "/data/cinesat/in/eumetcast1/"
-            base_dir_nwc = "/data/cinesat/in/safnwc_v2016"
-            base_dir_ctth = "/data/cinesat/in/safnwc_v2016"
-            #base_dir_nwc = "/data/cinesat/in/safnwc_v2016/"
-        else: # fixed date for text reasons
-            year=2014          # 2014 09 15 21 35
-            month= 7           # 2014 07 23 18 30
-            day= 23
-            hour= 18
-            minute=00
-            in_msg.update_datetime(year, month, day, hour, minute)
-        base_dir_sat = in_msg.datetime.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
-        base_dir_nwc = in_msg.datetime.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/")
-        base_dir_ctth = in_msg.datetime.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/")
-            
+    from get_input_msg_py3 import get_date_and_inputfile_from_commandline
+    in_msg = get_date_and_inputfile_from_commandline(print_usage=print_usage)
+
+    # interpret additional command line arguments
+    if len(sys.argv) > 7:
+        if len(sys.argv) == 12:
+            yearSTOP   = int(sys.argv[7])
+            monthSTOP  = int(sys.argv[8])
+            daySTOP    = int(sys.argv[9])
+            hourSTOP   = int(sys.argv[10])
+            minuteSTOP = int(sys.argv[11])
+            time_slotSTOP = datetime(yearSTOP, monthSTOP, daySTOP, hourSTOP, minuteSTOP)
+        else:
+            print("*** ERROR in __main__ ("+current_file+")")
+            print("    wrong number of command line arguments: ", len(sys.argv))
+            quit()
+    else:            
+        time_slotSTOP = in_msg.datetime
+     
+    in_msg.resolution = 'i'
+    in_msg.sat="Meteosat-"
+    #in_msg.sat_nr = 9
+    in_msg.add_title=False
+    in_msg.outputDir='./pics/'
+    in_msg.outputFile='WS_%(rgb)s-%(area)s_%y%m%d%H%M'
+    in_msg.fill_value = [0,0,0] # black
+    #in_msg.reader_level = "seviri-level2"
+    
+    #in_msg.fill_value = None    # transparent
+    #colormap='rainbow' 
+    colormap='greys'      
             
     # second argument is tolerance in minutes for near real time processing
     in_msg.nrt = check_near_real_time(in_msg.datetime, 120)
     print("... in_msg.nrt", in_msg.nrt)
-    time_slot = in_msg.datetime
+    if in_msg.nrt:
+        base_dir_sat = "/data/cinesat/in/eumetcast1/"
+        base_dir_ctth = "/data/cinesat/in/safnwc/"        
+    else:
+        #base_dir_sat  = in_msg.datetime.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
+        base_dir_sat  = in_msg.datetime.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/%Y/%m/%d/")
+        base_dir_ctth = in_msg.datetime.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/%Y/%m/%d/CTTH/")   # NWCSAF produced by MeteoSwiss with RSS  
+        #base_dir_ctth = in_msg.datetime.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/CTTH/")        # NWCSAF produced by EUMETSAT   with FDS
     
     if in_msg.nrt:
         outputDir = in_msg.nowcastDir
     else:
         # old outputDir="/data/COALITION2/PicturesSatellite/LEL_results_wind/"
-        outputDir=time_slot.strftime("/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels/")
+        outputDir=in_msg.datetime.strftime("/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels/")
 
     if not exists(outputDir):
         makedirs(outputDir)
 
-    while time_slot <= time_slotSTOP:
+    while in_msg.datetime <= time_slotSTOP:
     
-          print(str(time_slot))
-          in_msg.datetime = time_slot
+          print(str(in_msg.datetime))
 
-          year = time_slot.year
-          month = time_slot.month
-          day = time_slot.day
-          hour = time_slot.hour
-          minute = time_slot.minute
+          year = in_msg.datetime.year
+          month = in_msg.datetime.month
+          day = in_msg.datetime.day
+          hour = in_msg.datetime.hour
+          minute = in_msg.datetime.minute
                     
           yearS = str(year)
           #yearS = yearS[2:]
@@ -648,18 +819,26 @@ if __name__ == '__main__':
           size_x = obj_area.pixel_size_x
           size_y = obj_area.pixel_size_y  
           
-          #print obj_area
-          print("area extent:\n",obj_area.area_extent)
-          
-          print("x min ", obj_area.area_extent[0])
-          print("x size ", obj_area.pixel_size_x)
-          
+          #print(obj_area)
+          #print("area extent:\n",obj_area.area_extent)
+          #print("x min ", obj_area.area_extent[0])
+          #print("x size ", obj_area.pixel_size_x)
+
+          print(in_msg.RGBs)
           # check if input data is complete 
           if in_msg.verbose:
               print("*** check input data", in_msg.RGBs, " for ", in_msg.sat_str()+in_msg.sat_nr_str())
-          RGBs = check_input(in_msg, in_msg.sat_str()+in_msg.sat_nr_str(), in_msg.datetime)  
+          for i_try in range(30):
+              RGBs = check_input(in_msg, in_msg.sat_str()+in_msg.sat_nr_str(), base_dir_sat, in_msg.datetime, RGBs=in_msg.RGBs)
+              if len(RGBs) > 0:
+                  # exit loop, if input is found
+                  break
+              else:
+                  # else wait 20s and try again
+                  import time
+                  time.sleep(25)             
           # in_msg.sat_nr might be changed to backup satellite
-
+          
           # define area
           proj4_string = obj_area.proj4_string            
           # e.g. proj4_string = '+proj=geos +lon_0=0.0 +a=6378169.00 +b=6356583.80 +h=35785831.0'
@@ -669,41 +848,39 @@ if __name__ == '__main__':
       
           # read CTP to distinguish high, medium and low clouds
           for i_try in range(30):
-              RGBs = check_input(in_msg, in_msg.sat_str()+in_msg.sat_nr_str(), in_msg.datetime, RGBs=['CTP'])
+              RGBs = check_input(in_msg, in_msg.sat_str()+in_msg.sat_nr_str(), base_dir_ctth, in_msg.datetime, RGBs=['CTH'])
               if len(RGBs) > 0:
                   # exit loop, if input is found
                   break
               else:
-                  # else wait 20s and try again
-                  import time
+                  # else wait 20s and try againf
+
                   time.sleep(25)
 
+          # global data for radiances
+          MSG_str = in_msg.msg_str(layout="%(msg)s%(msg_nr)s")
+          global_data = create_seviri_scene(in_msg.datetime, base_dir_sat, sat=MSG_str)
+          with warnings.catch_warnings():
+              warnings.simplefilter("ignore")
+              global_data.load(rgbs)
+          
+          global_data_CTP = create_seviri_scene(in_msg.datetime, base_dir_ctth, sat=MSG_str, reader='nwcsaf-geo')
+          with warnings.catch_warnings():
+              warnings.simplefilter("ignore")
+              global_data_CTP.load(['ctth_pres'])  # "Cloud Top Pressure"
 
-                  
-          print("*** read CTP for ", in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", str(time_slot))
-          global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", time_slot)
-          #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, in_msg.sat_nr_str(), "seviri", time_slot)
-          #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
-          #area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
-          area_loaded_CTP = load_products(global_data_CTP, ['CTP'], in_msg, get_area_def("alps95"))
-          data_CTP = global_data_CTP.project(area, precompute=True)
-              
-          [nx,ny]=data_CTP['CTP'].data.shape
-
-          # read all rgbs
-          print("*** read all other channels for ", in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", str(time_slot))
-          global_data = GeostationaryFactory.create_scene(in_msg.sat_str(), in_msg.sat_nr_str(), "seviri", time_slot)
-          #global_data_CTP = GeostationaryFactory.create_scene(in_msg.sat, str(10), "seviri", time_slot)
-          area_loaded = get_area_def("EuropeCanary95")  #(in_windshift.areaExtraction)  
-          area_loaded = load_products(global_data, rgbs, in_msg, area_loaded)
-          data = global_data.project(area, precompute=True)
-
-          # check if all needed channels are loaded
-          #for rgb in rgbs:
-          if not check_loaded_channels(rgbs, data):
-              print("*** Error in produce_forecast_nrt ("+current_file+")")
-              print("    missing data")
-              quit()
+          ## resample to area
+          data = global_data.resample(area, precompute=True)
+          data_CTP = global_data_CTP.resample(area, precompute=True)
+          # get the dimension of the target area "area": nx and ny (used later in the script) 
+          [nx,ny]=data_CTP['ctth_pres'].data.shape
+          
+          ## check if all needed channels are loaded
+          ##for rgb in rgbs:
+          #if not check_loaded_channels(rgbs, data):
+          #    print("*** Error in produce_forecast_nrt ("+current_file+")")
+          #    print("    missing data")
+          #    quit()
 
           if False:
               from trollimage.image import Image as trollimage
@@ -719,9 +896,7 @@ if __name__ == '__main__':
               quit()
 
           if downscaling_data == True:
-               from plot_coalition2 import downscale          
                data = downscale(data, mode = mode_downscaling)
-
    
           # read wind field
           if wind_source=="HRW":
@@ -734,7 +909,7 @@ if __name__ == '__main__':
                   else:
                       p_min=pressure_limits[len(pressure_limits)-1-level]  
       
-                  hrw_data = read_HRW(in_msg.sat, sat_nr, "seviri", time_slot, ntimes, \
+                  hrw_data = read_HRW(in_msg.msg_str(layout="%(msg)s%(msg_nr)s"), in_msg.datetime, ntimes, \
                                        min_correlation=min_correlation, min_conf_nwp=min_conf_nwp, \
                                        min_conf_no_nwp=min_conf_no_nwp, cloud_type=cloud_type, p_limits=[p_min,p_max])
       
@@ -806,22 +981,23 @@ if __name__ == '__main__':
                   for rgb_num in range(len(rgbs)):
                       rgb=rgbs[rgb_num]
                       if t==1:
-                          forecasts_NextStep[channel_nr[rgb],level,:,:] = mask_rgb_based_pressure(data[rgb].data,p_min,p_max, data_CTP)
-                      
+                          with warnings.catch_warnings():
+                              warnings.simplefilter("ignore")
+                              forecasts_NextStep[channel_nr[rgb],level,:,:] = mask_rgb_based_pressure(data[rgb].data,p_min,p_max, data_CTP)
+                          
                       #check if for current channel (rgb) you also need the 30 min forecast
                       if t*ForecastTime > dt_forecast1:
                           if any(rgb in s for s in rgbs_only15min):
                               continue
-                      
+                          
                       forecast1 = forecasts_NextStep[channel_nr[rgb],level,:,:]
                       print("*** calculating the nowcasted values of ", rgb)
                       forecast2 = nowcastRGB(forecast1,xy1_px,xy2_px)
-      
                   
                       #get coordinates of points that are nan before interpolation (are not in xy anymore because they went outside or come from outside)
                       if rgb_num == 0: #only need to do it once, same for all channels!!
                           xy_levels = add_points_outside(forecast2,x_matrixs,y_matrixs, xy2)
-      
+                          
                       forecast2 = fill_with_closest_pixel(forecast2)
                       forecasts_NextStep[channel_nr[rgb],level,:,:] = forecast2
                       
@@ -841,7 +1017,7 @@ if __name__ == '__main__':
                             forecasts_out[channel_nr[rgb],ind_time,forecasts_out[channel_nr[rgb],ind_time,:,:]==no_data] = np.nan
                             forecasts_out[channel_nr[rgb],ind_time,:,:] = ma.masked_invalid(forecasts_out[channel_nr[rgb],ind_time,:,:])
 
-                            # time_slot.strftime( outputDir )
+                            # in_msg.datetime.strftime( outputDir )
                             outputFile = outputDir +"/"+ "%s_%s_%s_t%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime))
                             #outputFile = "/opt/users/lel/PyTroll/scripts/channels/%s_%s_%s_t%s.p" % (yearS+monthS+dayS,hourS+minS,rgb,str(t*ForecastTime))
                             
@@ -892,5 +1068,5 @@ if __name__ == '__main__':
       
           print("TOTAL TIME: ", time.time()-time_start_TOT)
           
-          time_slot = time_slot + timedelta(minutes=5)
+          in_msg.datetime = in_msg.datetime + timedelta(minutes=5)
 

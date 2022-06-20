@@ -28,9 +28,9 @@ show_details=False
 save_overview=True
 
 files_sat = find_files_and_readers(sensor='seviri',
-                               start_time=datetime(2015, 7, 7, 12, 0),
-                               end_time=datetime(2015, 7, 7, 12, 0),
-                               base_dir="/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/2015/07/07/",
+                               start_time=datetime(2017, 6, 6, 12, 0),
+                               end_time=datetime(2017, 6, 6, 12, 0),
+                               base_dir="/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/2017/06/06/",
                                reader="seviri_l1b_hrit")
 
 #print (files_sat)
@@ -144,8 +144,9 @@ else:
     print("===============")
     print("plot colored version: display "+outfile)
     
-    # colorize with satpy compositor, BWCompositor does not exits any more
-    if False: 
+
+    use_compositor=True
+    if use_compositor: 
         # from satpy.composites import BWCompositor does not exist anymore
         from satpy.composites import GenericCompositor
         from satpy.enhancements import colorize
@@ -174,8 +175,41 @@ else:
 
         colorize(img, **kwargs)
 
-    # colorize with trollimage: does not produce correct type of image
-    if True:
+        from satpy.writers import add_decorate, add_overlay
+
+        decorate = {
+            'decorate': [
+                {'logo': {'logo_path': '/opt/users/common/logos/meteoSwiss.png', 'height': 60, 'bg': 'white','bg_opacity': 255, 'align': {'top_bottom': 'top', 'left_right': 'right'}}},
+                {'text': {'txt': ' MSG, '+local_scene.start_time.strftime('%Y-%m-%d %H:%MUTC')+', '+ area+', NDVI',
+                          'align': {'top_bottom': 'top', 'left_right': 'left'},
+                          'font': "/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf",
+                          'font_size': 19,
+                          'height': 25,
+                          'bg': 'white',
+                          'bg_opacity': 0,
+                          'line': 'white'}}
+            ]
+        }
+
+        print("############################")
+        print(type(img))
+        print("add_decorate")
+        img = add_decorate(img, **decorate) #, fill_value='black'
+        print("add_overlay")    
+        img = add_overlay(img, area, '/data/OWARNA/hau/maps_pytroll/', color='red', width=0.5, resolution='i', level_coast=1, level_borders=1, fill_value=None)
+        
+        #from satpy.writers import compute_writer_results
+        #res1 = scn.save_datasets(filename="/tmp/{name}.png",
+        #                         writer='simple_image',
+        #                         compute=False)
+        #res2 = scn.save_datasets(filename="/tmp/{name}.tif",
+        #                         writer='geotiff',
+        #                         compute=False)
+        #results = [res1, res2]
+        #compute_writer_results(results)
+        
+    else:
+        # colorize with trollimage: does not produce correct type of image
         from trollimage.image import Image as trollimage
         #from trollimage.colormap import rdylgn
         from trollimage.colormap import ndvi
@@ -189,40 +223,6 @@ else:
         from satpy.composites import PaletteCompositor
         compositor = PaletteCompositor("palcomp")
         composite = compositor([local_scene['ndvi'], local_scene['cma_pal']])
-
-        
-    from satpy.writers import add_decorate, add_overlay
-
-    decorate = {
-        'decorate': [
-            {'logo': {'logo_path': '/opt/users/common/logos/meteoSwiss.png', 'height': 60, 'bg': 'white','bg_opacity': 255, 'align': {'top_bottom': 'top', 'left_right': 'right'}}},
-            {'text': {'txt': ' MSG, '+local_scene.start_time.strftime('%Y-%m-%d %H:%MUTC')+', '+ area+', NDVI',
-                      'align': {'top_bottom': 'top', 'left_right': 'left'},
-                      'font': "/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf",
-                      'font_size': 19,
-                      'height': 25,
-                      'bg': 'white',
-                      'bg_opacity': 0,
-                      'line': 'white'}}
-        ]
-    }
-
-    print("############################")
-    print(type(img))
-    print("add_decorate")
-    #img = add_decorate(img, **decorate) #, fill_value='black'
-    print("add_overlay")    
-    #img = add_overlay(img, area, '/data/OWARNA/hau/maps_pytroll/', color='red', width=0.5, resolution='i', level_coast=1, level_borders=1, fill_value=None)
-
-    #from satpy.writers import compute_writer_results
-    #res1 = scn.save_datasets(filename="/tmp/{name}.png",
-    #                         writer='simple_image',
-    #                         compute=False)
-    #res2 = scn.save_datasets(filename="/tmp/{name}.tif",
-    #                         writer='geotiff',
-    #                         compute=False)
-    #results = [res1, res2]
-    #compute_writer_results(results)
 
     
     #img.show()

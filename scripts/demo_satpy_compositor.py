@@ -127,12 +127,14 @@ else:
     # nice NDVI colourbar here:
     # https://www.researchgate.net/figure/NDVI-maps-Vegetation-maps-created-by-measuring-the-Normalized-Vegetation-Difference_fig7_323885082
 
-    from satpy.composites import BWCompositor
+    #from satpy.composites import BWCompositor  # does not exist anymore 
+    from satpy.composites import GenericCompositor
+    
     from satpy.enhancements import colorize
     from satpy.writers import to_image
 
     if False:
-        compositor = BWCompositor("test", standard_name="ndvi")
+        compositor = GenericCompositor("test", standard_name="ndvi")
         composite = compositor((local_scene["ndvi"], ))
         img = to_image(composite)
         #from trollimage import colormap

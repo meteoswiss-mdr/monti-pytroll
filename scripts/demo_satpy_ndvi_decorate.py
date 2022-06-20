@@ -146,11 +146,12 @@ else:
     
     # colorize with satpy compositor, BWCompositor does not exits any more
     if False: 
-        from satpy.composites import BWCompositor
+        # from satpy.composites import BWCompositor does not exist anymore
+        from satpy.composites import GenericCompositor
         from satpy.enhancements import colorize
         from satpy.writers import to_image
 
-        compositor = BWCompositor("test", standard_name="ndvi")
+        compositor = GenericCompositor("test", standard_name="ndvi")
         composite = compositor((local_scene["ndvi"], ))
         img = to_image(composite)
         #from trollimage import colormap

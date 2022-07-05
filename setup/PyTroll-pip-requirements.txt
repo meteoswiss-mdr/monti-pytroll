@@ -143,7 +143,7 @@ traitlets==4.1.0
 #-e git+https://github.com/pytroll/trollduction.git@d2e31bc14ea3ae763863b4159318287a6a378572#egg=trollduction&subdirectory=../../../packages/trollduction
 #-e git+https://github.com/meteoswiss-mdr/trollimage.git@2066c4891e80c937e7c0e6ff71caa9db6694e27c#egg=trollimage&subdirectory=../../../packages/trollimage
 #-e git+https://github.com/pytroll/trollsift.git@0eec9cc8a743e2b7d1f374880213b18fea84ba23#egg=trollsift&subdirectory=../../../packages/trollsift
-ujson==1.33
+ujson==5.4.0
 unicodecsv==0.14.1
 watchdog==0.8.3
 Werkzeug==0.11.2

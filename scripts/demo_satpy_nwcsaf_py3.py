@@ -6,6 +6,8 @@ from __future__ import print_function
 # old version: zueub428:/opt/safnwc/bin/NWCSAF_processing.py
 # see also https://github.com/pytroll/pytroll-examples/blob/master/satpy/ears-nwc.ipynb
 
+# Known bugs: for RGB and ccs4, it does not produce national borders 
+
 #from satpy.utils import debug_on
 #debug_on()
 
@@ -19,9 +21,10 @@ from satpy import Scene, find_files_and_readers
 from datetime import datetime
 
 #product = {}
-product_list = ['CMA']
+#product_list = ['CMA']
 #product_list = ['CTTH']
 #product_list = ['CT']
+product_list = ['CRR']
 ## 'ASII-NG' and 'RDT-CW' do not work!!
 # sam's product_list = ['CMA', 'CT', 'CTTH', 'CMIC', 'PC', 'CRR', 'iSHAI', 'CI', 'RDT-CW', 'ASII-NG']
 ## 'ASII-NG' and 'RDT-CW' do not work!!
@@ -29,14 +32,21 @@ product_list = ['CMA']
 # product.keys() ['ASII-NG', 'CI', 'CMA', 'CMIC', 'CRR', 'CRR-Ph', 'CT', 'CTTH', 'HRW', 'iSHAI', 'PC', 'PC-Ph', 'RDT-CW']
 # sam's product_list = ['CMA', 'CT', 'CTTH', 'CMIC', 'PC', 'CRR', 'iSHAI', 'CI', 'RDT-CW', 'ASII-NG']
 
-read_RGBs = True
 
+#read_RGBs = True
+read_RGBs = False
+
+# see https://github.com/pytroll/satpy/blob/main/satpy/etc/readers/nwcsaf-geo.yaml
+#['asii_prob', 'cloud_drop_effective_radius', 'cloud_ice_water_path', 'cloud_liquid_water_path', 'cloud_optical_thickness', 'cloud_top_height', 'cloud_top_phase', 'cloud_top_pressure', 'cloud_top_temperature', 'cloudmask', 'cloudtype', 'convection_initiation_prob30', 'convection_initiation_prob60', 'convection_initiation_prob90', 'convective_precipitation_hourly_accumulation', 'convective_rain_rate', 'lifted_index', 'precipitation_probability', 'rdt_cell_type', 'showalter_index', 'total_precipitable_water']
 product = {}
-product['CMA']     = [ 'cloudmask']
-#product["CTTH"]    = [ 'cloud_top_height', 'cloud_top_pressure', 'cloud_top_temperature']
-product_ids = {}
-product_ids['CT'] = ['ct']
+product['CMA']   = [ 'cloudmask']
+product["CTTH"]  = [ 'cloud_top_height', 'cloud_top_pressure', 'cloud_top_temperature']
+product["CRR"]   = ['convective_rain_rate']
+product_ids         = {}
+product_ids['CT']   = ['ct']
 product_ids['CTTH'] = ['cth']
+#product_ids['CRR']  = ['crr', 'crr_accum', 'crr_conditions', 'crr_intensity', 'crr_intensity_pal', 'crr_pal', 'crr_quality', 'crr_status_flag']  
+product_ids['CRR']  = ['crr']  
 
 print(len(sys.argv))
 if len(sys.argv) == 6:
@@ -44,12 +54,16 @@ if len(sys.argv) == 6:
     print(sys.argv[1],sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5])
     start_time = datetime(int(sys.argv[1]),int(sys.argv[2]),int(sys.argv[3]),int(sys.argv[4]),int(sys.argv[5]))
     end_time   = start_time
+    #base_dir=start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2013/%Y/%m/%d/")
+    base_dir=start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/%Y/%m/%d/"+p_+"/")
+    #base_dir=start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/"+p_+"/")
 else:
     fixed_date=False
     from my_msg_module_py3 import get_last_SEVIRI_date
     start_time = get_last_SEVIRI_date(False, delay=10)
     end_time   = start_time
-    base_dir="/data/cinesat/in/eumetcast1/"
+    #base_dir="/data/cinesat/in/eumetcast1/"
+    base_dir=start_time.strftime("//data/cinesat/in/safnwc/")
 
 result_dir="./"
 result_dir=start_time.strftime("/data/COALITION2/PicturesSatellite/%Y-%m-%d/")
@@ -63,11 +77,6 @@ for p_ in product_list:
     #    product_list_to_process.append(nwcsaf.product.get(product)[:])
     #else:
     #    print ("NWCSAF data product " + product + " is missing or is not readable")
-
-    if fixed_date:
-        #base_dir=start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2013/%Y/%m/%d/")
-        base_dir=start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/%Y/%m/%d/"+p_+"/")
-        #base_dir=start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/"+p_+"/")
     
     print("======================")
     print("======================")
@@ -77,7 +86,7 @@ for p_ in product_list:
                                        end_time=end_time,
                                        base_dir=base_dir,
                                        reader='nwcsaf-geo')
-    #print (files_nwc)
+    print (files_nwc)
     #files = dict(files_sat.items() + files_nwc.items())
     #files = dict(list(files_nwc.items()))
 
@@ -160,72 +169,63 @@ for p_ in product_list:
     if False:
         global_scene.save_dataset('cloudmask', "cloudmask.png", overlay={'coast_dir': '/data/OWARNA/hau/maps_pytroll/', 'color': (255, 255, 255), 'resolution': 'i'})
 
-    if not read_RGBs:
-        import matplotlib.pyplot as plt
-        #global_scene["cma"].plot()
-        for p__ in product_ids[p_]: 
-            plt.imshow(global_scene[p__].values)
-            plt.show()
-
     
     # resample to another projection
     print("resample")
-    #area="ccs4"
+    area="ccs4"
     #area="EuropeCanaryS95"
     #area="europe_center"
-    area="cosmo1"
+    #area="cosmo1"
     local_scene = global_scene.resample(area)
     print("dir(local_scene)", dir(local_scene))
-    
-    for p_name in nwcsaf.product[p_]:
-        
-        #local_scene.show('cloudtype')
-        #local_scene.save_dataset('cloudtype', './local_cloudtype.png')
-        #print "display ./local_cloudtype.png &"
-        print("======================")
-        print("======================")
-        print(p_name)
-        print(global_scene[p_name])
-        print(global_scene[p_name].attrs['area'])
-        print(global_scene[p_name].attrs["start_time"])
-        #long_name:               NWC GEO CTTH Cloud Top Altitude
-        #level:                   None
-        #end_time:                2017-07-07 12:03:32
-        #sensor:                  seviri
-        #valid_range:             [    0 27000]
-        #ancillary_variables:     [<xarray.DataArray 'ctth_status_flag' (y: 151, x...
-        #area:                    Area ID: some_area_name\nDescription: On-the-fly...
-        #resolution:              3000
-        #polarization:            None
-        #start_time:              2017-07-07 12:03:02
-        #comment:
-        #name:                    cloud_top_height
-        #standard_name:           cloud_top_height
-        #platform_name:           Meteosat-9
-        #wavelength:              None
-        #_FillValue:              nan
-        #units:                   m
-        #modifiers:               None
-        #prerequisites:           ['ctth_alti', 'ctth_alti_pal']
-        #optional_prerequisites:  []
-        #calibration:             None
-        #mode:                    RGB
-        
-        print(np.nanmin(global_scene[p_name].values))
-        print(np.nanmax(global_scene[p_name].values))
-        print("======================")
-        print("======================")
-    
-    if read_RGBs:
 
+    if read_RGBs:
+    
         for p_name in nwcsaf.product[p_]: 
-            
+
+            #local_scene.show('cloudtype')
+            #local_scene.save_dataset('cloudtype', './local_cloudtype.png')
+            #print "display ./local_cloudtype.png &"
+            print("======================")
+            print("======================")
+            print(p_name)
+            print(global_scene[p_name])
+            print(global_scene[p_name].attrs['area'])
+            print(global_scene[p_name].attrs["start_time"])
+            #long_name:               NWC GEO CTTH Cloud Top Altitude
+            #level:                   None
+            #end_time:                2017-07-07 12:03:32
+            #sensor:                  seviri
+            #valid_range:             [    0 27000]
+            #ancillary_variables:     [<xarray.DataArray 'ctth_status_flag' (y: 151, x...
+            #area:                    Area ID: some_area_name\nDescription: On-the-fly...
+            #resolution:              3000
+            #polarization:            None
+            #start_time:              2017-07-07 12:03:02
+            #comment:
+            #name:                    cloud_top_height
+            #standard_name:           cloud_top_height
+            #platform_name:           Meteosat-9
+            #wavelength:              None
+            #_FillValue:              nan
+            #units:                   m
+            #modifiers:               None
+            #prerequisites:           ['ctth_alti', 'ctth_alti_pal']
+            #optional_prerequisites:  []
+            #calibration:             None
+            #mode:                    RGB
+        
+            print(np.nanmin(global_scene[p_name].values))
+            print(np.nanmax(global_scene[p_name].values))
+            print("======================")
+            print("======================")
+
             #print ("p_name, type(local_scene[p_name]), type(local_scene[p_name].data)")
             #print (p_name, type(local_scene[p_name]), type(local_scene[p_name].data))
 
             png_file = start_time.strftime(result_dir+ "/MSG_"+p_name+"-"+area+"_%y%m%d%H%M.png")
-            #title = start_time.strftime(" "+local_scene[p_name].platform_name+', %y-%m-%d %H:%MUTC, '+p_name)
-            title=""
+            title = start_time.strftime(" "+local_scene[p_name].platform_name+', %y-%m-%d %H:%MUTC, '+p_name)
+            #title=""
             #local_scene.show(p_name)
             #local_scene.show(p_name, overlay={'coast_dir': '/data/OWARNA/hau/maps_pytroll/', 'color': (255, 0, 0), 'resolution': 'i'})
 
@@ -235,10 +235,12 @@ for p_ in product_list:
 
             decorate = {
                 'decorate': [
+                    {'logo': {'logo_path': '/opt/users/common/logos/meteoSwiss.png', 'height': 60, 'bg': 'white',
+                              'bg_opacity': 255, 'align': {'top_bottom': 'top', 'left_right': 'right'}}},
                     {'text': {'txt': title,
                               'align': {'top_bottom': 'top', 'left_right': 'left'},
                               'font': "/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf",
-                              'font_size': 18,
+                              'font_size': 14,
                               'height': 26,
                               'bg': 'black',
                               'bg_opacity': 255,
@@ -248,7 +250,7 @@ for p_ in product_list:
             
             
             local_scene.save_dataset(p_name, png_file, fill_value=0,
-                                     overlay={'coast_dir': map_dir, 'color': (255, 255, 255), 'resolution': 'i', 'width':2},
+                                     overlay={'coast_dir': map_dir, 'color': (255, 255, 255), 'resolution': 'i', 'width':1, 'level_coast': 1, 'level_borders': 2},
                                      decorate=decorate) 
 
 
@@ -277,10 +279,48 @@ for p_ in product_list:
             print ("display "+png_file+" &")
     else:
 
-        for p_name in product_ids[p_]:
-            print (type(local_scene[p_name].values))
-            print (local_scene[p_name].values.shape)
-            print (np.nanmin(local_scene[p_name].values))
-            print (np.nanmax(local_scene[p_name].values))
-                
+        import matplotlib.pyplot as plt
+        #global_scene["cma"].plot()
+        for p__ in product_ids[p_]: 
+            print (type(local_scene[p__].values))
+            print (local_scene[p__].values.shape)
+            print (np.nanmin(local_scene[p__].values))
+            print (np.nanmax(local_scene[p__].values))
+
+            #plt.imshow(local_scene[p__].values)
+            #plt.title(p__)
+            #plt.show()
+            
+
+            crr = local_scene[p__].values.astype(np.float32)
+            print (np.nanmin(crr))
+            print (np.nanmax(crr))
+
+            crr[crr==0.0] = np.nan 
+            crr = np.where(crr==0.0, np.nan, crr)
+
+            print(crr[0:20,0:20])
+            
+            print (np.nanmin(crr))
+            print (np.nanmax(crr))
+
+            from trollimage.colormap import set3, rdbu, RainRate
+            from trollimage.image import Image as trollimage
+            
+            img = trollimage(crr, mode="L", fill_value=None)
+            #set3.set_range(0, 8)
+            #img.palettize(set3)
+            #rdbu.set_range(0, 15)
+            #img.colorize(rdbu)
+            img.colorize(RainRate)
+
+            #img.show()
+            print("display test.png &")
+            img.save("test.png")
+            
+            PIL_image=img.pil_image()
+            
+            #print("display test.png &")
+            #PIL_image.save("test.png")
+            
 

@@ -1,7 +1,7 @@
 [submodule "packages/pyresample"]
 	path = packages/pyresample
 	url = https://github.com/meteoswiss-mdr/pyresample.git
-	branch = master
+	branch = main
 [submodule "packages/pycoast"]
 	path = packages/pycoast
 	url = https://github.com/pytroll/pycoast.git
@@ -25,11 +25,11 @@
 [submodule "packages/trollimage"]
 	path = packages/trollimage
 	url = https://github.com/meteoswiss-mdr/trollimage.git
-	branch = master
+	branch = main
 [submodule "packages/mipp"]
 	path = packages/mipp
 	url = https://github.com/meteoswiss-mdr/mipp.git
-	branch = pre-master
+	branch = master
 [submodule "packages/mpop"]
 	path = packages/mpop
 	url = https://github.com/meteoswiss-mdr/mpop.git
@@ -49,7 +49,7 @@
 [submodule "packages/satpy"]
 	path = packages/satpy
 	url = https://github.com/pytroll/satpy.git
-	branch = master
+	branch = main
 [submodule "packages/pytroll-collectors"]
 	path = packages/pytroll-collectors
 	url = https://github.com/pytroll/pytroll-collectors.git

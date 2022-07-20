@@ -17,7 +17,16 @@ function test_virtual_env {
     echo "import PIL"
     echo "from __future__ import print_function"
     echo "import skimage"
+    echo "import cv2"
     echo ""
+
+    echo "how installation worked last time"
+    echo "pip install pygrib"
+    echo "conda install pillow"
+    echo "conda install matplotlib"
+    echo "conda install scikit-image"
+    echo "conda install opencv"
+    
 }
 
 test_virtual_env

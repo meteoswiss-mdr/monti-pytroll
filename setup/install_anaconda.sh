@@ -52,7 +52,9 @@ then
     #/opt/users/common/packages/Anaconda3-4.3.1-Linux-x86_64.sh
     #/opt/users/common/packages/Anaconda3-2018.12-Linux-x86_64.sh
     #/opt/users/common/packages/Anaconda3-2019.03-Linux-x86_64.sh
-    /opt/users/common/packages/Anaconda3-2019.10-Linux-x86_64.sh
+    #/opt/users/common/packages/Anaconda3-2019.10-Linux-x86_64.sh
+    /opt/users/common/packages/Anaconda3-2020.11-Linux-x86_64.sh
+    #/opt/users/common/packages/Anaconda3-2022.05-Linux-x86_64.sh  ###creates ProxyError 
     echo "the script changes your \$PATH and \$PYTHONPATH to avoid conflicts:"
     echo "\$PATH="$PATH
     export PYTHONPATH=$HOME/packages/anaconda3_${LOGNAME}/bin:$PYTROLLHOME/scripts

@@ -1,4 +1,5 @@
 from __future__ import print_function
+
 from datetime import datetime
 import sys, string, os
 import logging
@@ -441,9 +442,9 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                 min_forecast15S = "%02d" % (time_slot15.minute)
                 
                 hour_forecast30S = "%02d" % (time_slot30.hour)
-                min_forecast30S = "%02d" % (time_slot30.minute)  
+                min_forecast30S = "%02d" % (time_slot30.minute)
                 
-                dt_forecast1S = str(chosen_settings['dt_forecast1'])  
+                dt_forecast1S = str(chosen_settings['dt_forecast1'])
                 dt_forecast2S = str(chosen_settings['dt_forecast2'])
                                 
                 if chosen_settings['forced_mask'] == 'IR_039_minus_IR_108':
@@ -557,9 +558,9 @@ def plot_coalition2(in_msg, time_slot, time_slotSTOP):
                     mask_NoClouds = data['CTH'].data.mask
           
                 nowcastDir = format_name(in_msg.nowcastDir, time_slot, area=area, rgb='channels', sat=data.satname, sat_nr=data.sat_nr()) # !!! needs change
-
+                
                 # read old brightness temperatures (if possible shifted by lagrangian cell movement)
-                if chosen_settings['use_TB_forecast'] == True:
+                if chosen_settings['use_TB_forecast']:
       
                     print ("*** read forecasted brightness temperatures")
                     print ("    ", nowcastDir+"%s_%s_WV_062_t%s.p"%(yearS+monthS+dayS,hour_forecast15S+min_forecast15S, dt_forecast1S) )

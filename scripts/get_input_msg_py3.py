@@ -347,7 +347,7 @@ class input_msg_class:
 
    def choose_coalistion2_settings(self, area):
 
-      from plot_coalition2 import check_area
+      from plot_coalition2_py3 import check_area
       from copy import deepcopy
       scale = check_area(area)
 
@@ -446,7 +446,7 @@ class input_msg_class:
 # =====================================================================================================================
 
 
-def get_input_msg(input_file):
+def get_input_msg(input_file, timeslot=None):
 
    from os import getcwd
    from os import path
@@ -462,7 +462,7 @@ def get_input_msg(input_file):
          # Non empty file exists
          # get input from (user specified) file 
          input_module = __import__(input_file)
-         input_module.input(in_msg)
+         input_module.input(in_msg, timeslot=timeslot)
             
          return in_msg
       else:
@@ -489,6 +489,7 @@ def get_date_and_inputfile_from_commandline(print_usage=None):
    # $: python plot_msg.py input_MSG 2014 07 23 16 10 ['HRoverview','fog'] ['ccs4','euro4']
    # and overwrite arguments given in the initialization in get_input_msg
 
+   timeslot = None
    if len(sys.argv) < 2:
       print_usage()
    else:
@@ -516,7 +517,7 @@ def get_date_and_inputfile_from_commandline(print_usage=None):
             timeslot = datetime(year, month, day, hour, minute)
 
    # read input file and initialize in_msg
-   in_msg = get_input_msg(input_file)
+   in_msg = get_input_msg(input_file, timeslot=timeslot)
 
    # initialize datetime, if not yet done in the input file 
    if in_msg.datetime is None:

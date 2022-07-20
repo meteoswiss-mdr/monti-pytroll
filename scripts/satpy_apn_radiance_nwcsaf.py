@@ -184,7 +184,7 @@ if __name__ == '__main__':
         start_time = get_last_SEVIRI_date(False, delay=6)
         base_dir = "/data/cinesat/in/eumetcast1/"
         base_dir_nwc = "/data/cinesat/in/eumetcast1/"    # eumetsat product
-        #base_dir_nwc = "/data/cinesat/in/safnwc_v2016/" # our own NWCSAF products
+        #base_dir_nwc = "/data/cinesat/in/safnwc/" # our own NWCSAF products
     elif len(sys.argv) == 6:
         year    = int(sys.argv[1])
         month   = int(sys.argv[2])

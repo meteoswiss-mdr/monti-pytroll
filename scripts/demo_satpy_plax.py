@@ -158,7 +158,7 @@ if __name__ == '__main__':
         base_dir_sat = "/data/cinesat/in/eumetcast1/"
         base_dir_nwc = "/data/cinesat/in/eumetcast1/"
         base_dir_ctth = "/data/cinesat/in/eumetcast1/"
-        #base_dir_nwc = "/data/cinesat/in/safnwc_v2016/"
+        #base_dir_nwc = "/data/cinesat/in/safnwc/"
     elif len(sys.argv) == 6:
         year   = int(sys.argv[1])
         month  = int(sys.argv[2])

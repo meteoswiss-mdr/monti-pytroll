@@ -15,8 +15,10 @@ def input(in_msg):
     #in_msg.RSS=False 
     #in_msg.sat_nr=9
     #in_msg.RSS=True
-    in_msg.sat_nr=10
-    in_msg.RSS=True
+    #in_msg.sat_nr=10
+    #in_msg.RSS=True
+    in_msg.sat_nr=11
+    in_msg.RSS=False
 
     # specify an delay (in minutes), when you like to process a time some minutes ago
     # e.g. current time               2015-05-31 12:33 UTC
@@ -237,9 +239,10 @@ def input(in_msg):
     #----------------
     # chose area
     #----------------
-    in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
+    #in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
     #in_msg.areas.append('alps95')          # area around Switzerland processed by NWCSAF software 349x151 
     #in_msg.areas.append('ticino')          # stereographic proj of Ticino 342x311
+    in_msg.areas.append('SeviriDisk00Cosmo')# subregion of SEVIRI fulldisk prime satellite, covering COSMO1
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('EuropeCanary')    # upper third of MSG disk, satellite at 0.0 deg East, full resolution 
     #in_msg.areas.append('EuropeCanary95')  # upper third of MSG disk, satellite at 9.5 deg East, full resolution 

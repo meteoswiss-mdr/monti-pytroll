@@ -17,118 +17,43 @@ import nwcsaf
 import numpy as np
 import sys
 
+# Import the library OpenCV
+import cv2
+
+from my_msg_module_py3 import format_name
+
 from satpy import Scene, find_files_and_readers
 from datetime import datetime
 
-#product = {}
-#product_list = ['CMA']
-#product_list = ['CTTH']
-#product_list = ['CT']
-product_list = ['CRR']
-## 'ASII-NG' and 'RDT-CW' do not work!!
-# sam's product_list = ['CMA', 'CT', 'CTTH', 'CMIC', 'PC', 'CRR', 'iSHAI', 'CI', 'RDT-CW', 'ASII-NG']
-## 'ASII-NG' and 'RDT-CW' do not work!!
-# product_list = ['ASII-NG', 'CI', 'CMA', 'CMIC', 'CRR', 'CRR-Ph', 'CT', 'CTTH', 'HRW', 'iSHAI', 'PC', 'PC-Ph', 'PLAX', 'RDT-CW']
-# product.keys() ['ASII-NG', 'CI', 'CMA', 'CMIC', 'CRR', 'CRR-Ph', 'CT', 'CTTH', 'HRW', 'iSHAI', 'PC', 'PC-Ph', 'RDT-CW']
-# sam's product_list = ['CMA', 'CT', 'CTTH', 'CMIC', 'PC', 'CRR', 'iSHAI', 'CI', 'RDT-CW', 'ASII-NG']
-
-
-#read_RGBs = True
-read_RGBs = False
-
-# see https://github.com/pytroll/satpy/blob/main/satpy/etc/readers/nwcsaf-geo.yaml
-#['asii_prob', 'cloud_drop_effective_radius', 'cloud_ice_water_path', 'cloud_liquid_water_path', 'cloud_optical_thickness', 'cloud_top_height', 'cloud_top_phase', 'cloud_top_pressure', 'cloud_top_temperature', 'cloudmask', 'cloudtype', 'convection_initiation_prob30', 'convection_initiation_prob60', 'convection_initiation_prob90', 'convective_precipitation_hourly_accumulation', 'convective_rain_rate', 'lifted_index', 'precipitation_probability', 'rdt_cell_type', 'showalter_index', 'total_precipitable_water']
-product = {}
-product['CMA']   = [ 'cloudmask']
-product["CTTH"]  = [ 'cloud_top_height', 'cloud_top_pressure', 'cloud_top_temperature']
-product["CRR"]   = ['convective_rain_rate']
-product_ids         = {}
-product_ids['CT']   = ['ct']
-product_ids['CTTH'] = ['cth']
-#product_ids['CRR']  = ['crr', 'crr_accum', 'crr_conditions', 'crr_intensity', 'crr_intensity_pal', 'crr_pal', 'crr_quality', 'crr_status_flag']  
-product_ids['CRR']  = ['crr']  
-
-print(len(sys.argv))
-if len(sys.argv) == 6:
-    fixed_date=True
-    print(sys.argv[1],sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5])
-    start_time = datetime(int(sys.argv[1]),int(sys.argv[2]),int(sys.argv[3]),int(sys.argv[4]),int(sys.argv[5]))
-    end_time   = start_time
-    #base_dir=start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2013/%Y/%m/%d/")
-    base_dir=start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/%Y/%m/%d/"+p_+"/")
-    #base_dir=start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/"+p_+"/")
-else:
-    fixed_date=False
-    from my_msg_module_py3 import get_last_SEVIRI_date
-    start_time = get_last_SEVIRI_date(False, delay=10)
-    end_time   = start_time
-    #base_dir="/data/cinesat/in/eumetcast1/"
-    base_dir=start_time.strftime("//data/cinesat/in/safnwc/")
-
-result_dir="./"
-result_dir=start_time.strftime("/data/COALITION2/PicturesSatellite/%Y-%m-%d/")
-
-for p_ in product_list:
-       
-    #file_pattern='S_NWC_' + product + '_' + sat_id + '_*_' + timestamp_NWCSAF + extension
-    #if glob.glob(file_pattern):
-    #    print ("NWCSAF data product " + product + " exists and is readable")
-    #    # creates list of available products
-    #    product_list_to_process.append(nwcsaf.product.get(product)[:])
-    #else:
-    #    print ("NWCSAF data product " + product + " is missing or is not readable")
+def remove_background(file_name):
     
-    print("======================")
-    print("======================")
-    print ("... search files in "+ base_dir)
-    files_nwc = find_files_and_readers(sensor='seviri',
-                                       start_time=start_time,
-                                       end_time=end_time,
-                                       base_dir=base_dir,
-                                       reader='nwcsaf-geo')
-    print (files_nwc)
-    #files = dict(files_sat.items() + files_nwc.items())
-    #files = dict(list(files_nwc.items()))
-
-
-        
-    print("======================")
-    print("======================")
-    print ("... define global scene ")
-    global_scene = Scene(filenames=files_nwc)
-
-    global_scene.available_dataset_names()
-    #!!# print(global_scene['overview']) ### this one does only work in the develop version
-    print ("")
-    print ("available_composite_names")
-    print (global_scene.available_composite_names())
-
-    if read_RGBs:
+    # Read the image
+    src = cv2.imread(file_name, 1)
     
-        # this will load RGBs ready to plot
-        print("======================")
-        print("======================")
-        print("... load ", nwcsaf.product[p_])
-        global_scene.load(nwcsaf.product[p_])
-        #global_scene.load([ 'cloud_top_height', 'cloud_top_pressure', 'cloud_top_temperature'])
-        #global_scene.load(['cloudtype'])
+    # Convert image to image gray
+    tmp = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
+    
+    # Applying thresholding technique
+    _, alpha = cv2.threshold(tmp, 0, 255, cv2.THRESH_BINARY)
+    
+    # Using cv2.split() to split channels 
+    # of coloured image
+    b, g, r = cv2.split(src)
+    
+    # Making list of Red, Green, Blue
+    # Channels and alpha
+    rgba = [b, g, r, alpha]
+    
+    # Using cv2.merge() to merge rgba
+    # into a coloured/multi-channeled image
+    dst = cv2.merge(rgba, 4)
+    
+    # Writing and saving to a new image
+    cv2.imwrite(file_name, dst)
+    print("removed background in: display ", file_name, " &")
 
-        print("global_scene.keys()", global_scene.keys())
-        #[DatasetID(name='cloud_top_height', wavelength=None, resolution=None, polarization=None, calibration=None, level=None, modifiers=None)]
 
-        # 'cloud_top_height' is loaded in RGB mode already 
-        #print(global_scene['cloud_top_height'].data.shape)
-        #print(global_scene['cloud_top_height'].data.compute())
-        #print(global_scene['cloud_top_height'].values)
-
-    else:
-        # work with scientific data
-        print("======================")
-        print("======================")
-        print("... load ", product_ids[p_])
-        global_scene.load(product_ids[p_])
-        #global_scene.load(['ctth_alti'])
-
+def print_info(global_scene):
     print("======================")
     print("======================")
     print("... global_scene")
@@ -165,6 +90,125 @@ for p_ in product_list:
     print("")
     #print("datasets")
     #print(global_scene.datasets)
+
+
+#==========================================================
+
+
+
+#read_RGBs = True
+read_RGBs = False
+
+# see https://github.com/pytroll/satpy/blob/main/satpy/etc/readers/nwcsaf-geo.yaml
+#['asii_prob', 'cloud_drop_effective_radius', 'cloud_ice_water_path', 'cloud_liquid_water_path', 'cloud_optical_thickness', 'cloud_top_height', 'cloud_top_phase', 'cloud_top_pressure', 'cloud_top_temperature', 'cloudmask', 'cloudtype', 'convection_initiation_prob30', 'convection_initiation_prob60', 'convection_initiation_prob90', 'convective_precipitation_hourly_accumulation', 'convective_rain_rate', 'lifted_index', 'precipitation_probability', 'rdt_cell_type', 'showalter_index', 'total_precipitable_water']
+composite_names = {}
+composite_names['CMA']    = [ 'cloudmask']
+composite_names["CTTH"]   = [ 'cloud_top_height', 'cloud_top_pressure', 'cloud_top_temperature']
+composite_names["CRR"]    = ['convective_rain_rate']
+composite_names["CRR-Ph"] = ['convective_precipitation_hourly_accumulation', 'convective_rain_rate']
+dataset_names         = {}
+dataset_names['CT']   = ['ct']
+dataset_names['CTTH'] = ['cth']
+#dataset_names['CRR']  = ['crr', 'crr_accum', 'crr_conditions', 'crr_intensity', 'crr_intensity_pal', 'crr_pal', 'crr_quality', 'crr_status_flag']  
+dataset_names['CRR']  = ['crr']  
+#dataset_names['CRR-Ph']  = ['crr', 'crr_accum', 'crr_accum_pal', 'crr_conditions', 'crr_intensity', 'crr_intensity_pal', 'crr_pal', 'crr_quality', 'crr_status_flag'] 
+dataset_names['CRR-Ph']  = ['crr']   
+
+
+print(len(sys.argv))
+if len(sys.argv) == 2:
+    product_list=[sys.argv[1]]
+    from my_msg_module_py3 import get_last_SEVIRI_date
+    start_time = get_last_SEVIRI_date(False, delay=10)
+    end_time   = start_time
+    #base_dir="/data/cinesat/in/eumetcast1/"
+    base_dir=start_time.strftime("//data/cinesat/in/safnwc/")
+elif len(sys.argv) == 7:
+    product_list=[sys.argv[1]]
+    fixed_date=True
+    print(sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6],sys.argv[7])
+    start_time = datetime(int(sys.argv[2]),int(sys.argv[3]),int(sys.argv[4]),int(sys.argv[5]),int(sys.argv[6]))
+    end_time   = start_time
+    #base_dir=start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2013/%Y/%m/%d/")
+    base_dir=start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/%Y/%m/%d/"+p_+"/")
+    #base_dir=start_time.strftime("./data/")
+    #base_dir=start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/"+p_+"/")
+else:
+    print("Wrong number of arguments:")
+    print("python demo_satpy_nwcsaf_py3.py PROD [YYYY MM DD hh mm]")
+    print("where PROD might be: 'CMA', 'CT', 'CTTH', 'CMIC', 'PC', 'CRR', 'CRR-Ph', 'iSHAI', 'CI', 'RDT-CW', or 'ASII-NG'")
+    #product_list = ['CMA']
+    #product_list = ['CTTH']
+    #product_list = ['CT']
+    #product_list = ['CRR']
+    #product_list = ['CRR-Ph']
+    ## 'ASII-NG' and 'RDT-CW' do not work!!
+    # sam's product_list = ['CMA', 'CT', 'CTTH', 'CMIC', 'PC', 'CRR', 'iSHAI', 'CI', 'RDT-CW', 'ASII-NG']
+    ## 'ASII-NG' and 'RDT-CW' do not work!!
+    # product_list = ['ASII-NG', 'CI', 'CMA', 'CMIC', 'CRR', 'CRR-Ph', 'CT', 'CTTH', 'HRW', 'iSHAI', 'PC', 'PC-Ph', 'PLAX', 'RDT-CW']
+    # product.keys() ['ASII-NG', 'CI', 'CMA', 'CMIC', 'CRR', 'CRR-Ph', 'CT', 'CTTH', 'HRW', 'iSHAI', 'PC', 'PC-Ph', 'RDT-CW']
+    # sam's product_list = ['CMA', 'CT', 'CTTH', 'CMIC', 'PC', 'CRR', 'iSHAI', 'CI', 'RDT-CW', 'ASII-NG']
+    
+
+result_dir="./"
+result_dir=start_time.strftime("/data/COALITION2/PicturesSatellite/%Y-%m-%d/")
+
+for p_ in product_list:
+       
+    #file_pattern='S_NWC_' + product + '_' + sat_id + '_*_' + timestamp_NWCSAF + extension
+    #if glob.glob(file_pattern):
+    #    print ("NWCSAF data product " + product + " exists and is readable")
+    #    # creates list of available products
+    #    product_list_to_process.append(nwcsaf.product.get(product)[:])
+    #else:
+    #    print ("NWCSAF data product " + product + " is missing or is not readable")
+    
+    print("======================")
+    print("======================")
+    print ("... search files in "+ base_dir + " for "+ str(start_time))
+    files_nwc = find_files_and_readers(sensor='seviri',
+                                       start_time=start_time,
+                                       end_time=end_time,
+                                       base_dir=base_dir,
+                                       reader='nwcsaf-geo')
+    print (files_nwc)
+    #files = dict(files_sat.items() + files_nwc.items())
+    #files = dict(list(files_nwc.items()))
+
+    print("======================")
+    print("======================")
+    print ("... define global scene ")
+    global_scene = Scene(filenames=files_nwc)
+
+    print_info(global_scene)
+
+    if read_RGBs:
+    
+        # this will load RGBs ready to plot
+        print("======================")
+        print("======================")
+        print("... load ", nwcsaf.product[p_])
+        global_scene.load(nwcsaf.product[p_])
+        #global_scene.load([ 'cloud_top_height', 'cloud_top_pressure', 'cloud_top_temperature'])
+        #global_scene.load(['cloudtype'])
+
+        print("global_scene.keys()", global_scene.keys())
+        #[DatasetID(name='cloud_top_height', wavelength=None, resolution=None, polarization=None, calibration=None, level=None, modifiers=None)]
+
+        # 'cloud_top_height' is loaded in RGB mode already 
+        #print(global_scene['cloud_top_height'].data.shape)
+        #print(global_scene['cloud_top_height'].data.compute())
+        #print(global_scene['cloud_top_height'].values)
+
+    else:
+        # work with scientific data
+        print("======================")
+        print("======================")
+        print("... load ", dataset_names[p_])
+        global_scene.load(dataset_names[p_])
+        #global_scene.load(['ctth_alti'])
+
+
 
     if False:
         global_scene.save_dataset('cloudmask', "cloudmask.png", overlay={'coast_dir': '/data/OWARNA/hau/maps_pytroll/', 'color': (255, 255, 255), 'resolution': 'i'})
@@ -279,48 +323,40 @@ for p_ in product_list:
             print ("display "+png_file+" &")
     else:
 
-        import matplotlib.pyplot as plt
         #global_scene["cma"].plot()
-        for p__ in product_ids[p_]: 
-            print (type(local_scene[p__].values))
-            print (local_scene[p__].values.shape)
-            print (np.nanmin(local_scene[p__].values))
-            print (np.nanmax(local_scene[p__].values))
-
-            #plt.imshow(local_scene[p__].values)
-            #plt.title(p__)
-            #plt.show()
-            
+        for p__ in dataset_names[p_]: 
+            #print (type(local_scene[p__].values))
+            #print (local_scene[p__].values.shape)
+            #print (np.nanmin(local_scene[p__].values))
+            #print (np.nanmax(local_scene[p__].values))
 
             crr = local_scene[p__].values.astype(np.float32)
-            print (np.nanmin(crr))
-            print (np.nanmax(crr))
+            #print (np.nanmin(crr))
+            #print (np.nanmax(crr))
 
             crr[crr==0.0] = np.nan 
             crr = np.where(crr==0.0, np.nan, crr)
 
-            print(crr[0:20,0:20])
-            
-            print (np.nanmin(crr))
-            print (np.nanmax(crr))
-
-            from trollimage.colormap import set3, rdbu, RainRate
+            from trollimage.colormap import set3, rdbu #, RainRate
             from trollimage.image import Image as trollimage
             
             img = trollimage(crr, mode="L", fill_value=None)
             #set3.set_range(0, 8)
             #img.palettize(set3)
             #rdbu.set_range(0, 15)
-            #img.colorize(rdbu)
-            img.colorize(RainRate)
+            img.colorize(rdbu)
+            #img.colorize(RainRate)
 
-            #img.show()
-            print("display test.png &")
-            img.save("test.png")
-            
+            product_dict={}
+            product_dict['CRR']="CRR"
+            product_dict['CRR-Ph']="CRPh"
+
+            outFile='MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
+            outputFile = format_name(outFile, start_time, area=area, rgb=product_dict[p_])
+
+            print("display "+outputFile+" &")
+            #img.save(outputFile)
             PIL_image=img.pil_image()
+            PIL_image.save(outputFile)  
             
-            #print("display test.png &")
-            #PIL_image.save("test.png")
-            
-
+            remove_background(outputFile)

@@ -223,7 +223,6 @@ else:
         from satpy.composites import PaletteCompositor
         compositor = PaletteCompositor("palcomp")
         composite = compositor([local_scene['ndvi'], local_scene['cma_pal']])
-
     
     #img.show()
     img.save(outfile)

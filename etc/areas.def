@@ -633,6 +633,15 @@ REGION: eurol {
         AREA_EXTENT:    (-3780000.0, -7644000.0, 3900000.0, -1500000.0)
 };
 
+REGION: EuropeDust {
+        NAME:    EuropeDust
+        PCS_ID:  merc_7.5_0
+        PCS_DEF:        proj=merc,lat_0=0,lon_0=7.5,ellps=WGS84
+        XSIZE:   1669
+        YSIZE:   1915
+        AREA_EXTENT:     (-2504688.5428486555, 2615329.6406075573, 2504688.5428486555, 8362698.548500749)
+};
+
 REGION: eurol1 {
         NAME:           Euro 3.0km area - Europe
         PCS_ID:         ps60wgs84

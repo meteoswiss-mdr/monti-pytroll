@@ -157,6 +157,7 @@ def input(in_msg):
     #in_msg.areas.append('EuropeCanary')
     #in_msg.areas.append('EuropeCanary95')
     in_msg.areas.append('EuropeCanaryS95')
+    in_msg.areas.append('EuropeCenter')     
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784

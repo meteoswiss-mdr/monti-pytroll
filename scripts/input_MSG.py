@@ -1,8 +1,9 @@
 from __future__ import division
 from __future__ import print_function
 
+from my_msg_module_py3 import check_near_real_time
 
-def input(in_msg):
+def input(in_msg, timeslot=None):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -13,10 +14,10 @@ def input(in_msg):
     #in_msg.sat = "meteosat"
     #in_msg.sat_nr=8
     #in_msg.RSS=False 
-    #in_msg.sat_nr=9
-    #in_msg.RSS=True
-    in_msg.sat_nr=10
+    in_msg.sat_nr=9
     in_msg.RSS=True
+    #in_msg.sat_nr=10
+    #in_msg.RSS=True
     #in_msg.sat_nr=11
     #in_msg.RSS=False
     
@@ -37,6 +38,16 @@ def input(in_msg):
         in_msg.update_datetime(year, month, day, hour, minute)
         # !!!  if archive is used, adjust meteosat09.cfg accordingly !!!
 
+    if timeslot is not None:
+        in_msg.update_datetime(timeslot.year, timeslot.month, timeslot.day, timeslot.hour, timeslot.minute)
+        in_msg.nrt = check_near_real_time(in_msg.datetime, 120)
+
+    if in_msg.nrt:
+        in_msg.input_dir="/data/cinesat/in/eumetcast1/"
+    else:
+        in_msg.input_dir="/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/%Y/%m/%d/"
+        #in_msg.input_dir="/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/"
+        
     #----------------------
     # choose RGBs 
     #----------------------
@@ -52,7 +63,7 @@ def input(in_msg):
     ##in_msg.RGBs.append('WV_073')       # black and white
     ##in_msg.RGBs.append('IR_087')       # black and white
     ##in_msg.RGBs.append('IR_097')       # black and white
-    #in_msg.RGBs.append('IR_108')       # black and white
+    in_msg.RGBs.append('IR_108')       # black and white
     ##in_msg.RGBs.append('IR_120')       # black and white
     ##in_msg.RGBs.append('IR_134')       # black and white
     #in_msg.RGBs.append('HRV')          # black and white
@@ -121,7 +132,7 @@ def input(in_msg):
     ## NWC SAF
     ##-------------------
     ## NWC SAF PEG 1
-    in_msg.RGBs.append('CMa')
+    #in_msg.RGBs.append('CMa')
     #in_msg.RGBs.append('CMa_DUST')
     #in_msg.RGBs.append('CMa_VOLCANIC')
     #in_msg.RGBs.append('CMa_QUALITY')
@@ -182,7 +193,9 @@ def input(in_msg):
     #in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
     #in_msg.areas.append('EuroMercator')    # same projection as blitzortung.org
     #in_msg.areas.append('nrEURO1km')        # Ninjo Alps projection 
-    #in_msg.areas.append('nrEURO3km')        # Ninjo Europe projection 
+    #in_msg.areas.append('nrEURO3km')        # Ninjo Europe projection
+    #in_msg.areas.append('europe_center')    # Ninjo Europe projection
+    #in_msg.areas.append('EuropeCenter')    # Ninjo Europe projection
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     #in_msg.areas.append('eurotv4n')        # Europe TV4 -  4.1x4.1km 2048x1152
@@ -190,10 +203,12 @@ def input(in_msg):
     #in_msg.areas.append('euroHDready')      # Europe in HD resolution 1280 x 720
     #in_msg.areas.append('euroHDfull')      # Europe in full HD resolution 1920 x 1080
     #in_msg.areas.append('SwitzerlandStereo500m')
-    #in_msg.areas.append('ccs4')            # CCS4 Swiss projection 710x640
-    in_msg.areas.append('cosmo1')
+    in_msg.areas.append('ccs4')            # CCS4 Swiss projection 710x640
+    #in_msg.areas.append('cosmo1')
+    #in_msg.areas.append('cosmo1merc3km')
     #in_msg.areas.append('alps95')          # area around Switzerland processed by NWCSAF software 349x151 
     #in_msg.areas.append('ticino')          # stereographic proj of Ticino 342x311
+    #in_msg.areas.append('sttropez')         #
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
     #in_msg.areas.append('fullearth')       # full earth 600x300                    # does not yet work
     #in_msg.areas.append('SeviriDisk95')      # Cropped globe MSG image 3620x3620     # does not yet work
@@ -211,7 +226,7 @@ def input(in_msg):
     #in_msg.reader_level="seviri-level5"   # NWC SAF version 2013 HRW hdf5
     #in_msg.reader_level="seviri-level6"   # viewing geometry nc
     #in_msg.reader_level="seviri-level7"   # hsaf h03
-    #in_msg.reader_level="seviri-level8"   # msg radiance ccs4 nc
+    in_msg.reader_level="seviri-level8"   # msg radiance ccs4 nc
     #in_msg.reader_level="seviri-level9"   # msg radiance ccs4 nc parallax corrected
     #in_msg.reader_level="seviri-level10"  # new hsaf porduct h03b
     #in_msg.reader_level="seviri-level11"   # NWC SAF version 2016 (except HRW)

@@ -95,6 +95,7 @@ def input(in_msg):
 
     in_msg.make_plots=True
     #in_msg.fill_value=(0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
+    #in_msg.fill_value=(1,1,1)  # black (0,0,0) / white (1,1,1) / transparent None  
     in_msg.fill_value=None  # black (0,0,0) / white (1,1,1) / transparent None  
     in_msg.add_title = True
     in_msg.title = ["%(sat)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s"]
@@ -105,7 +106,7 @@ def input(in_msg):
     in_msg.river_color = 'blue'
     in_msg.add_logos = False
     in_msg.logos_dir = "/opt/users/common/logos/"
-    in_msg.add_colorscale = False
+    in_msg.add_colorscale = True
     in_msg.HRV_enhancement = False
 
     in_msg.outputFormats = ['png'] 
@@ -147,7 +148,8 @@ def input(in_msg):
     #in_msg.postprocessing_composite=["hrwdpH-streamdH-HRV","hrwdpH-streamdH-ir108"]
     #in_msg.postprocessing_composite=["hrwdp-streamd-ir108","TRT-streamd-ir108"]
     #in_msg.postprocessing_composite=["TRT-radar-convection"] # "radar-convection",
-    in_msg.postprocessing_composite = ["VIL-HRVir108pc","POH-HRVir108pc","MESHS-HRVir108pc","EchoTOP15-HRVir108pc","EchoTOP20-HRVir108pc","EchoTOP45-HRVir108pc","EchoTOP50-HRVir108pc"]
+    in_msg.postprocessing_composite=["PRECIP-convection"] # "radar-convection",
+    #in_msg.postprocessing_composite = ["VIL-HRVir108pc","POH-HRVir108pc","MESHS-HRVir108pc","EchoTOP15-HRVir108pc","EchoTOP20-HRVir108pc","EchoTOP45-HRVir108pc","EchoTOP50-HRVir108pc"]
     
     #in_msg.postprocessing_montage = [["MSG_radar-ir108","MSG_h03b-ir108"],["MSG_radar-HRV","MSG_h03b-HRV"],["MSG_RATE-ir108","MSG_h03b-ir108"],["MSG_RATE-HRV","MSG_h03b-HRV"]]
     #in_msg.postprocessing_montage = [["MSG_h03b-ir108","MSG_HRV"],["MSG_h03b-ir108","MSG_test"]]

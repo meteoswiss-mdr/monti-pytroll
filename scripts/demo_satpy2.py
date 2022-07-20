@@ -22,7 +22,7 @@ from __future__ import print_function
 from satpy import Scene, find_files_and_readers
 from datetime import datetime
 
-from my_msg_module import get_last_SEVIRI_date
+from my_msg_module_py3 import get_last_SEVIRI_date
 RSS=True
 starttime = get_last_SEVIRI_date(RSS, delay=3)
 
@@ -37,13 +37,13 @@ starttime = get_last_SEVIRI_date(RSS, delay=3)
 #                           reader=None, sensor=None, ppp_config_dir=get_environ_config_dir(),
 #                           filter_parameters=None, reader_kwargs=None):
 
-make_rgb=False
+make_rgb=True
 if make_rgb:
 
     files_sat = find_files_and_readers(sensor='seviri',  
-                                   start_time=datetime(2015, 7, 7, 12, 0),  
-                                   end_time=datetime(2015, 7, 7, 12, 0),  
-                                   base_dir="/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/2015/07/07/",  
+                                   start_time=datetime(2017, 7, 7, 12, 0),  
+                                   end_time=datetime(2017, 7, 7, 12, 0),  
+                                   base_dir="/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/2017/07/07/",  
                                    reader='seviri_l1b_hrit')
 
     global_scene = Scene(filenames=files_sat)
@@ -53,11 +53,21 @@ if make_rgb:
     
     #global_scene.load([0.6, 0.8, 10.8])
     #global_scene.load(['IR_120', 'IR_134'])
-    global_scene.load(['overview',0.6,0.8])
+    #print("==================")
+    #print(global_scene.available_dataset_names())
+    #global_scene.load(['overview',0.6,0.8])
     #print(global_scene.keys())
     #print(global_scene.datasets)
-    
-    global_scene.available_dataset_names()
+    #print("==================")
+    #print(global_scene.available_dataset_names())
+    #print(global_scene.available_dataset_ids())
+    #print("------------------")
+    #print(global_scene.missing_datasets)   # answer set() ???
+    #print(global_scene.values())
+    #print("++++++++++++++++++")    
+    #print(global_scene._datasets.keys())
+    #print(global_scene.keys())
+    #quit()
     #print(global_scene[0.6])            # works only if you load also the 0.6 channel, but not an RGB that contains the 0.6
     #!!# print(global_scene['overview']) ### this one does only work in the develop version
 
@@ -90,12 +100,12 @@ if make_rgb:
     print("display "+'./local_ndvi.png')
     local_scene.save_dataset('ndvi', './local_ndvi.png')
 
-plot_nwc=True
+plot_nwc=False
 if plot_nwc:
     files_nwc = find_files_and_readers(sensor='seviri',
-                                   start_time=datetime(2015, 7, 7, 12, 0),
-                                   end_time=datetime(2015, 7, 7, 12, 15),
-                                   base_dir="/data/COALITION2/database/meteosat/SAFNWC_v2013/2015/07/07/",
+                                   start_time=datetime(2017, 7, 7, 12, 0),
+                                   end_time=datetime(2017, 7, 7, 12, 15),
+                                   base_dir="/data/COALITION2/database/meteosat/SAFNWC_v2013/2017/07/07/",
                                    reader='nwcsaf-msg2013-hdf5')
     #                              reader='nwcsaf-geo')
 

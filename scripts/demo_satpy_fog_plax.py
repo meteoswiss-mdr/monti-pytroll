@@ -115,7 +115,7 @@ if __name__ == '__main__':
         start_time = get_last_SEVIRI_date(False, delay=6)
         base_dir_sat = "/data/cinesat/in/eumetcast1/"
         base_dir_nwc = "/data/cinesat/in/eumetcast1/"
-        #base_dir_nwc = "/data/cinesat/in/safnwc_v2016/"
+        #base_dir_nwc = "/data/cinesat/in/safnwc/"
     elif len(sys.argv) == 6:
         year   = int(sys.argv[1])
         month  = int(sys.argv[2])
@@ -123,8 +123,8 @@ if __name__ == '__main__':
         hour   = int(sys.argv[4])
         minute = int(sys.argv[5])
         start_time = datetime(year, month, day, hour, minute)
-        base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/%Y/%m/%d/")
-        #base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
+        #base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/%Y/%m/%d/")
+        base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
         base_dir_nwc = start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/CT/")
         base_dir_ctth = start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/CTTH/")
     else:        
@@ -197,7 +197,8 @@ if __name__ == '__main__':
         #    continue
 
     global_nwc = Scene(filenames=files_nwc)
-    global_nwc.load(['ct','ctth'])
+    global_nwc.load(['ct','ctth_alti'])
+    #global_nwc.load(['ctth_alti'])
 
     # loop over areas, resample and create products
     # create netCDF file for area cosmo1
@@ -205,18 +206,29 @@ if __name__ == '__main__':
     ############################################################
     #for area in ['SeviriDisk00Cosmo',"cosmo1x150"]:
     #for area in ['cosmo1', 'cosmo1eqc3km']:
-    #for area in ['cosmo1eqc3km']:
-    for area in ['cosmo1x150', 'cosmo1eqc3km']:        
+    for area in ['cosmo1eqc3km']:
+    #for area in ['cosmo1x150', 'cosmo1eqc3km']:
+        #print("**********************************")
+        #print("**********************************")
+        #print("**********************************")
+
         area_def = get_area_def(area)
-        parallax_correction = ParallaxCorrection(area)
-        plax_corr_area = parallax_correction(global_nwc["ctth"])
+        
+        parallax_correction = ParallaxCorrection(area_def)
+
+        print(global_scene['IR_087'].attrs.keys())
+        global_nwc["ctth_alti"].attrs['satellite_latitude']= global_scene['IR_087'].attrs['satellite_latitude']
+        global_nwc["ctth_alti"].attrs['satellite_altitude']=global_scene['IR_087'].attrs['satellite_altitude']
+        global_nwc["ctth_alti"].attrs['satellite_longitude']=global_scene['IR_087'].attrs['satellite_longitude']
+                
+        plax_corr_area = parallax_correction(global_nwc["ctth_alti"])
 
         # resample MSG L2
         ##################
         print("")
         print("=======================")
         print("resample to "+area)
-        local_scene = global_scene.resample(plaxcorr_area)
+        local_scene = global_scene.resample(plax_corr_area)
 
         # fake a new channel
         print("fake a new channel")
@@ -245,7 +257,7 @@ if __name__ == '__main__':
         #local_scene['lscl'].area_def = local_scene['IR_120'].area_def
 
         # print(global_nwc)
-        local_nwc = global_nwc.resample(plaxcorr_area)
+        local_nwc = global_nwc.resample(plax_corr_area)
 
 
         # delete values for high clouds
@@ -313,33 +325,4 @@ if __name__ == '__main__':
                 print("... scp "+png_file+" to "+scpOutputDir)
                 subprocess.call("/usr/bin/scp "+scpID+" "+png_file+" "+scpOutputDir+" 2>&1 &", shell=True)
             
-        # save netCDF file for APN
-        ##############################
-        if area=='cosmo1eqc3km':
-            netCDF_file = start_time.strftime('/data/cinesat/out/MSG_lscl-'+area+'_%y%m%d%H%M.nc')
-            print("... save result in: "+ netCDF_file)
-            print("include_lonlats=True")
-            local_scene.save_dataset('lscl', netCDF_file, include_lonlats=True, writer='cf',
-                                     exclude_attrs=['raw_metadata'], epoch='seconds since 1970-01-01 00:00:00')   #, writer='cf'
 
-            #import netCDF4 as nc
-            #file_input = nc.Dataset(netCDF_file, 'r+')
-            #print(file_input.variables.keys())
-
-            #lonlats = local_scene['lscl'].area.get_lonlats()
-
-            #lons = file_input.createVariable('longitues', 'single', ('y', 'x'))
-            #lats = file_input.createVariable('latitudes', 'single', ('y', 'x'))
-
-            #lons[:] = lonlats[0][:,:]
-            #lats[:] = lonlats[1][:,:]
-
-            #local_scene.save_datasets(['lscl'], filename=netCDF_file, include_lonlats=True)   #, writer='cf'
-            print("... ncview " + netCDF_file +" &")
-
-            rewrite_xy_axis(netCDF_file)
-
-            scpID="-i ~/.ssh/id_rsa_tsa"
-            scpOutputDir="hamann@tsa.cscs.ch:/scratch/hamann/DayNightFog_Filter-CT-7-15/"
-            print("... scp "+netCDF_file+" to "+scpOutputDir)
-            subprocess.call("/usr/bin/scp "+scpID+" "+netCDF_file+" "+scpOutputDir+" 2>&1 &", shell=True)

@@ -1,5 +1,8 @@
-from mpop.satellites import GeostationaryFactory
-from mpop.projector import get_area_def
+from __future__ import division
+from __future__ import print_function
+
+#from mpop.satellites import GeostationaryFactory
+#from mpop.projector import get_area_def
 import datetime
 import numpy as np
 from trollimage.colormap import rainbow, greys
@@ -12,7 +15,7 @@ import sys
 def show_or_save_image(img, save_png, name):
     if save_png:
         pngfile = 'parallax_demo_'+name+'.png'
-        print "saved file: "+pngfile
+        print("saved file: "+pngfile)
         img.save(pngfile)  
     else:
         img.show() 
@@ -63,9 +66,9 @@ if __name__ == '__main__':
     replace=True   # replace the channel with parallax corrected data
     #replace=False  # add a second channel CHN_PC
     
-    if verbose:
-        from mpop.utils import debug_on
-        debug_on()
+    #if verbose:
+    #    from mpop.utils import debug_on
+    #    debug_on()
     
     # some options to choose
     save_png = False
@@ -91,33 +94,26 @@ if __name__ == '__main__':
     colors="rainbow"
     #colors="greys"
 
-    if near_real_time:
-        from my_msg_module import get_last_SEVIRI_date
-        time_slot = get_last_SEVIRI_date(False, delay=3)
-    else:
-        if len(sys.argv) == 6:
-            yyyy  = int(sys.argv[1])
-            month = int(sys.argv[2])
-            dd    = int(sys.argv[3])
-            hh    = int(sys.argv[4])
-            mm    = int(sys.argv[5])
-        else:
-            yyyy  = int(sys.argv[1])
-            month = int(sys.argv[2])
-            dd    = int(sys.argv[3])
-            hh    = int(sys.argv[4])
-            mm    = int(sys.argv[5])            
-            
+    if len(sys.argv) == 6:
+        yyyy  = int(sys.argv[1])
+        month = int(sys.argv[2])
+        dd    = int(sys.argv[3])
+        hh    = int(sys.argv[4])
+        mm    = int(sys.argv[5])
         time_slot = datetime.datetime(yyyy, month, dd, hh, mm)
-        print "*** CHECK THAT YOU ACTIVATED OFFLINE ENVIRONMENT "
+
+        print ("*** CHECK THAT YOU ACTIVATED OFFLINE ENVIRONMENT ")
         import subprocess
         #subprocess.call(". ../setup/bashrc_offline ", shell=True)
         import os
         os.environ['PPP_CONFIG_DIR']=os.environ['PYTROLLHOME']+"/cfg_offline/"
-        print "... set PPP_CONFIG_DIR to: " + os.environ['PPP_CONFIG_DIR']
-
+        print ("... set PPP_CONFIG_DIR to: " + os.environ['PPP_CONFIG_DIR'])
+    else:       
+        from my_msg_module import get_last_SEVIRI_date
+        time_slot = get_last_SEVIRI_date(False, delay=3)
+            
     if verbose:
-        print str(time_slot)
+        print (str(time_slot))
 
     ## define the geostationary factory 
     ## --------------------------------
@@ -130,7 +126,7 @@ if __name__ == '__main__':
     global_data.load(channels)
     if verbose:
         loaded_channels = [c.name for c in global_data.loaded_channels()]
-        print loaded_channels
+        print (loaded_channels)
 
     
     # read CTH with satpy 
@@ -141,14 +137,14 @@ if __name__ == '__main__':
                                        #base_dir=time_slot.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2013/%Y/%m/%d/"),
                                        base_dir=time_slot.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/%Y/%m/%d/CTTH/"),
                                        reader='nc_nwcsaf_msg')
-    #print files_nwc
+    #print (files_nwc)
     #files = dict(files_sat.items() + files_nwc.items())
     files = dict(files_nwc.items())
     global_nwc = Scene(filenames=files)
     #global_nwc.load(nwcsaf.product['cloud_top_height']) # this will load a RGB representation
     global_nwc.load(['ctth_alti'])
     if verbose:
-        print type(global_nwc['ctth_alti'].values)
+        print(type(global_nwc['ctth_alti'].values))
 
     
     # reproject data to your desired projection
@@ -165,11 +161,11 @@ if __name__ == '__main__':
     # copy cloud top height (replace Not a Numbers with 0)
     cth = np.nan_to_num(local_scene['ctth_alti'].values)
     if verbose:
-        print type(cth)
-        print cth.shape
-        print global_data['IR_108'].data.shape
-        print "min cth:", np.nanmin(cth)
-        print "max cth:",np.nanmax(cth)
+        print( type(cth) )
+        print( cth.shape )
+        print( global_data['IR_108'].data.shape )
+        print( "min cth:", np.nanmin(cth) )
+        print( "max cth:",np.nanmax(cth) )
     
     if show_CTH and verbose:
         show_image(cth, 'CTH', save_png, colors=colors, title='cloud top height', add_colorscale=False)
@@ -187,15 +183,15 @@ if __name__ == '__main__':
 
         # get the orbital of the satellite
         ## -----------------------------------------
-        print "... data.get_orbital(use_NEAR_for_DEEP_space=True)"
+        print ("... data.get_orbital(use_NEAR_for_DEEP_space=True)")
         orbital = data.get_orbital(use_NEAR_for_DEEP_space=True)
 
         # calculate the viewing geometry of the SEVIRI sensor
         ## --------------------------------------------------
-        print "... calculate the viewing geometry of the SEVIRI sensor"
+        print ("... calculate the viewing geometry of the SEVIRI sensor")
         (azi, ele) = data['IR_108'].get_viewing_geometry(orbital, data.time_slot)
-        print "azi.min(), azi.max()", azi.min(), azi.max()
-        print "ele.min(), ele.max()", ele.min(), ele.max()
+        print ("azi.min(), azi.max()", azi.min(), azi.max())
+        print ("ele.min(), ele.max()", ele.min(), ele.max())
 
         if not estimate_CTH:
             # possible call of the parallax correction 
@@ -213,7 +209,7 @@ if __name__ == '__main__':
 
 
     loaded_channels = [c.name for c in data.loaded_channels()]
-    print loaded_channels
+    print (loaded_channels)
 
     if show_azimuth and verbose:
         show_image(azi, "azi", save_png, colors=colors, min_data=None, max_data=None, title='azimuth')
@@ -243,6 +239,6 @@ if __name__ == '__main__':
         ncOutputFile = data.time_slot.strftime("./test_rad_PLAX.nc")
         ncOutputFile = format_name('%(msg)s_%(area)s_%Y%m%d%H%M_rad_PLAX.nc', time_slot, area=area, sat_nr=data.sat_nr())
         ncOutputFile = "/data/COALITION2/tmp/nc_PLAX/"+ncOutputFile.replace("-","")
-        print "... save reprojected data: ncview "+ ncOutputFile+ " &" 
+        print ("... save reprojected data: ncview "+ ncOutputFile+ " &" )
         #data.save(ncOutputFile, to_format="netcdf4", compression=False)
         data.save(ncOutputFile, band_axis=2, concatenate_bands=False) # netCDF4 is default 

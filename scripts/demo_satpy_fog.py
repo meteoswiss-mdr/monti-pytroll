@@ -28,7 +28,7 @@ import matplotlib.pyplot as plt
 #from satpy.utils import debug_on
 #debug_on()
 
-##import warnings
+import warnings
 #warnings.filterwarnings("ignore")
 
 def get_last_SEVIRI_date(RSS, delay=0, time_slot=None):
@@ -99,67 +99,10 @@ def rewrite_xy_axis(netCDF_file):
     ds["x"][:] = lon.data
     ds["x"].units = 'Degrees East'
     ds.close()
+
     
+def find_msg_files(sat):
 
-###############################################################################################
-###############################################################################################
-
-if __name__ == '__main__':
-    
-    sat='MSG4'
-
-    if len(sys.argv) == 1:
-        start_time = get_last_SEVIRI_date(False, delay=6)
-        base_dir_sat = "/data/cinesat/in/eumetcast1/"
-        base_dir_nwc = "/data/cinesat/in/eumetcast1/"
-        #base_dir_nwc = "/data/cinesat/in/safnwc_v2016/"
-    elif len(sys.argv) == 6:
-        year   = int(sys.argv[1])
-        month  = int(sys.argv[2])
-        day    = int(sys.argv[3])
-        hour   = int(sys.argv[4])
-        minute = int(sys.argv[5])
-        start_time = datetime(year, month, day, hour, minute)
-        #base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/%Y/%m/%d/")
-        base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
-        base_dir_nwc = start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/CT/")
-    else:        
-        start_time = datetime(2020, 10, 7, 16, 0)
-        base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
-        base_dir_nwc = start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/%Y/%m/%d/CT/")
-        
-    print("... processing time ", start_time)
-
-    ##################################################################
-    # options that you may change manually according to your needs
-    areas=["cosmo1eqc3km"]            # equidistant projection covering cosmo-1/1e, asked by APN 
-    #areas=areas['cosmo1']            # original cosmo-1/cosmo-1e area
-    areas=areas+["cosmo1x150"]        # cosmo-1/cosmo-1e area (50% more pixels), required for SATLive
-    #areas=areas+['SeviriDisk00Cosmo'] # sub-area of geostationary MSG SEVIRI projection covering cosmo-1/cosmo-1e 
-    show_interactively=False
-    save_black_white_png=False
-    #save_png_areas=[]
-    save_png_areas=["cosmo1x150"]
-    scp_png_to_SATLive=["cosmo1x150"]
-    scpID_SATLive="-i ~/.ssh/id_rsa_las"
-    # scpOutputDir_SATLive see below 
-    scp_png_to_CSCS=[""]
-    save_netCDF_areas=["cosmo1eqc3km"]
-    scpID_CSCS="-i ~/.ssh/id_rsa_tsa"
-    scpOutputDir_CSCS="hamann@tsa.cscs.ch:/scratch/hamann/DayNightFog_Filter-CT-7-15/"
-    scp_netCDF_to_CSCS=["cosmo1eqc3km"]
-    ##################################################################
-    
-
-    print("")
-    print("")
-    print("*** Creating LSCL (low stratus confidence level) product")
-    print("    for areas", areas)
-    print("")
-
-
-    # read MSG (full disk service) L2
-    #################################
     print("... read "+sat+" L1.5 data")
     print("    search for HRIT files in "+base_dir_sat)
 
@@ -167,7 +110,7 @@ if __name__ == '__main__':
                                    start_time=start_time, end_time=start_time,
                                    base_dir=base_dir_sat,
                                    reader='seviri_l1b_hrit')
-
+    
     files = deepcopy(files_sat['seviri_l1b_hrit'])
     #print("    found SEVIRI files: ", files_sat)
     for f in files:
@@ -181,9 +124,81 @@ if __name__ == '__main__':
             files_sat['seviri_l1b_hrit'].remove(f)
             continue
 
-    global_scene = Scene(reader="seviri_l1b_hrit", filenames=files_sat)
-    global_scene.load(['IR_087','IR_120'])
+    return files_sat    
+    
+###############################################################################################
+###############################################################################################
 
+if __name__ == '__main__':
+    
+    if len(sys.argv) == 1:
+        nrt=True
+        start_time = get_last_SEVIRI_date(False, delay=6)
+        base_dir_sat = "/data/cinesat/in/eumetcast1/"
+        base_dir_nwc = "/data/cinesat/in/eumetcast1/"
+        #base_dir_nwc = "/data/cinesat/in/safnwc/"
+    elif len(sys.argv) == 6:
+        nrt=False
+        year   = int(sys.argv[1])
+        month  = int(sys.argv[2])
+        day    = int(sys.argv[3])
+        hour   = int(sys.argv[4])
+        minute = int(sys.argv[5])
+        start_time = datetime(year, month, day, hour, minute)
+        base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/%Y/%m/%d/")
+        #base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
+        base_dir_nwc = start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/CT/")
+    else:        
+        start_time = datetime(2020, 10, 7, 16, 0)
+        base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
+        base_dir_nwc = start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/%Y/%m/%d/CT/")
+        
+    print("... processing time ", start_time)
+
+    ##################################################################
+    # options that you may change manually according to your needs
+    areas=[]
+    areas=areas+["cosmo1eqc3km"]            # equidistant projection covering cosmo-1/1e, asked by APN 
+    #areas=areas+['cosmo1']            # original cosmo-1/cosmo-1e area
+    areas=areas+["cosmo1x150"]        # cosmo-1/cosmo-1e area (50% more pixels), required for SATLive
+    #areas=areas+['SeviriDisk00Cosmo'] # sub-area of geostationary MSG SEVIRI projection covering cosmo-1/cosmo-1e 
+    show_interactively=False
+    save_black_white_png=False
+    #save_png_areas=[]
+    save_png_areas=["cosmo1","cosmo1x150"]
+    scp_png_to_SATLive=["cosmo1x150"]
+    scpID_SATLive="-i ~/.ssh/id_rsa_las"
+    # scpOutputDir_SATLive see below 
+    scp_png_to_CSCS=["cosmo1"]
+    save_netCDF_areas=["cosmo1eqc3km"]
+    scpID_CSCS="-i ~/.ssh/id_rsa_tsa"
+    scpOutputDir_CSCS="hamann@tsa.cscs.ch:/scratch/hamann/DayNightFog_Filter-CT-7-15/"
+    scp_netCDF_to_CSCS=["cosmo1eqc3km"]
+    ##################################################################
+    
+
+    print("")
+    print("")
+    print("*** Creating LSCL (low stratus confidence level) product")
+    print("    for areas", areas)
+    print("")
+
+    sat="MSG4"
+    files_sat = find_msg_files(sat)
+    if (len(files_sat['seviri_l1b_hrit']) == 0):
+        sat="MSG2"
+        files_sat = find_msg_files(sat)
+        if (len(files_sat['seviri_l1b_hrit']) == 0):
+            sat="MSG3"
+            files_sat = find_msg_files(sat)
+
+    # read MSG (full disk service) L2
+    #################################
+        
+    global_scene = Scene(reader="seviri_l1b_hrit", filenames=files_sat)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        global_scene.load(['IR_087','IR_120'])
 
     # read NWCSAF files
     ########################
@@ -197,17 +212,19 @@ if __name__ == '__main__':
     
     files = deepcopy(files_nwc['nwcsaf-geo'])
     for f in files:
-        # remove files from other satellites 
-        if not (sat in f):
-            files_nwc['nwcsaf-geo'].remove(f)
-            continue
+        ## remove files from other satellites 
+        #if not (sat in f):
+        #    files_nwc['nwcsaf-geo'].remove(f)
+        #    continue
         # remove CTTH files 
         if ("CTTH" in f):
             files_nwc['nwcsaf-geo'].remove(f)
             continue
 
     global_nwc = Scene(filenames=files_nwc)
-    global_nwc.load(['ct'])  # "CT"
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        global_nwc.load(['ct'])  # "CT"
 
 
     # loop over areas, resample and create products    
@@ -217,8 +234,10 @@ if __name__ == '__main__':
         ##################
         print("")
         print("=======================")
-        print("resample to "+area)
-        local_scene = global_scene.resample(area)
+        print("resample satellite channels to "+area)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            local_scene = global_scene.resample(area)
 
         # fake a new channel
         print("fake a new channel")
@@ -246,9 +265,10 @@ if __name__ == '__main__':
 
         #local_scene['lscl'].area_def = local_scene['IR_120'].area_def
 
-        # print(global_nwc)
-        local_nwc = global_nwc.resample(area)
-
+        print("resample nwcsaf data to "+area)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            local_nwc = global_nwc.resample(area)
 
         # delete values for high clouds
         ###########################################
@@ -260,7 +280,7 @@ if __name__ == '__main__':
         #              13:  High semitransparent thick clouds;  14:  High semitransparent above low or medium clouds;  15:  High semitransparent above snow/ice" ;
         for _ct_ in [7,8,9,10,11,12,13,14,15]:
             print("replace cloud type",_ct_)
-            local_scene['lscl'].values = np.where(local_nwc['ct'].values==_ct_, np.nan, local_scene['lscl'].values)
+            local_scene['lscl'].values = np.where( local_nwc['ct'].values == _ct_, np.nan, local_scene['lscl'].values )
 
         if show_interactively:
             fig, ax = plt.subplots(figsize=(13, 7))
@@ -289,8 +309,10 @@ if __name__ == '__main__':
             #from pyresample.utils import load_area
             #swiss = load_area("/opt/users/hau/monti-pytroll/etc/areas.def", area)
             from pyresample import load_area
+            print("load area",area)
             swiss = load_area("/opt/users/hau/monti-pytroll/etc/areas.yaml", area)
 
+            print("add national borders to png")
             from pycoast import ContourWriterAGG
             cw = ContourWriterAGG('/opt/users/common/shapes')
             cw.add_borders_to_file(png_file, swiss, outline="green", resolution='i', level=3, width=2)
@@ -305,7 +327,7 @@ if __name__ == '__main__':
 
             print("display " + png_file +" &")
 
-            if area in scp_png_to_SATLive:
+            if area in scp_png_to_SATLive and nrt:
                 scpOutputDir_SATLive="las@zueub241:/srn/las/www/satellite/DATA/MSG_lscl-"+area+"_/"
                 scp_command = "/usr/bin/scp "+scpID_SATLive+" "+png_file+" "+scpOutputDir_SATLive+" 2>&1 &"
                 print("... "+scp_command)

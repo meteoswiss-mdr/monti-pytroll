@@ -25,6 +25,8 @@ from my_msg_module_py3 import format_name
 from satpy import Scene, find_files_and_readers
 from datetime import datetime
 
+cache_dir="/tmp/"
+
 def remove_background(file_name):
     
     # Read the image
@@ -96,8 +98,8 @@ def print_info(global_scene):
 
 
 
-#read_RGBs = True
-read_RGBs = False
+read_RGBs = True
+#read_RGBs = False
 
 # see https://github.com/pytroll/satpy/blob/main/satpy/etc/readers/nwcsaf-geo.yaml
 #['asii_prob', 'cloud_drop_effective_radius', 'cloud_ice_water_path', 'cloud_liquid_water_path', 'cloud_optical_thickness', 'cloud_top_height', 'cloud_top_phase', 'cloud_top_pressure', 'cloud_top_temperature', 'cloudmask', 'cloudtype', 'convection_initiation_prob30', 'convection_initiation_prob60', 'convection_initiation_prob90', 'convective_precipitation_hourly_accumulation', 'convective_rain_rate', 'lifted_index', 'precipitation_probability', 'rdt_cell_type', 'showalter_index', 'total_precipitable_water']
@@ -115,18 +117,16 @@ dataset_names['CRR']  = ['crr']
 dataset_names['CRR-Ph']  = ['crr']   
 
 
-print(len(sys.argv))
 if len(sys.argv) == 2:
     product_list=[sys.argv[1]]
     from my_msg_module_py3 import get_last_SEVIRI_date
     start_time = get_last_SEVIRI_date(False, delay=10)
     end_time   = start_time
     #base_dir="/data/cinesat/in/eumetcast1/"
-    base_dir=start_time.strftime("//data/cinesat/in/safnwc/")
+    base_dir=start_time.strftime("/data/cinesat/in/safnwc/")
 elif len(sys.argv) == 7:
     product_list=[sys.argv[1]]
     fixed_date=True
-    print(sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6],sys.argv[7])
     start_time = datetime(int(sys.argv[2]),int(sys.argv[3]),int(sys.argv[4]),int(sys.argv[5]),int(sys.argv[6]))
     end_time   = start_time
     #base_dir=start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2013/%Y/%m/%d/")
@@ -134,9 +134,9 @@ elif len(sys.argv) == 7:
     #base_dir=start_time.strftime("./data/")
     #base_dir=start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/"+p_+"/")
 else:
-    print("Wrong number of arguments:")
-    print("python demo_satpy_nwcsaf_py3.py PROD [YYYY MM DD hh mm]")
-    print("where PROD might be: 'CMA', 'CT', 'CTTH', 'CMIC', 'PC', 'CRR', 'CRR-Ph', 'iSHAI', 'CI', 'RDT-CW', or 'ASII-NG'")
+    print("Wrong number of arguments:", len(sys.argv))
+    print("Usage: python demo_satpy_nwcsaf_py3.py PROD [YYYY MM DD hh mm]")
+    print("       where PROD might be: 'CMA', 'CT', 'CTTH', 'CMIC', 'PC', 'CRR', 'CRR-Ph', 'iSHAI', 'CI', 'RDT-CW', or 'ASII-NG'")
     #product_list = ['CMA']
     #product_list = ['CTTH']
     #product_list = ['CT']
@@ -148,7 +148,7 @@ else:
     # product_list = ['ASII-NG', 'CI', 'CMA', 'CMIC', 'CRR', 'CRR-Ph', 'CT', 'CTTH', 'HRW', 'iSHAI', 'PC', 'PC-Ph', 'PLAX', 'RDT-CW']
     # product.keys() ['ASII-NG', 'CI', 'CMA', 'CMIC', 'CRR', 'CRR-Ph', 'CT', 'CTTH', 'HRW', 'iSHAI', 'PC', 'PC-Ph', 'RDT-CW']
     # sam's product_list = ['CMA', 'CT', 'CTTH', 'CMIC', 'PC', 'CRR', 'iSHAI', 'CI', 'RDT-CW', 'ASII-NG']
-    
+    quit()
 
 result_dir="./"
 result_dir=start_time.strftime("/data/COALITION2/PicturesSatellite/%Y-%m-%d/")
@@ -171,7 +171,7 @@ for p_ in product_list:
                                        end_time=end_time,
                                        base_dir=base_dir,
                                        reader='nwcsaf-geo')
-    print (files_nwc)
+    print ("*** found following NWCSAF files:", files_nwc)
     #files = dict(files_sat.items() + files_nwc.items())
     #files = dict(list(files_nwc.items()))
 
@@ -180,7 +180,7 @@ for p_ in product_list:
     print ("... define global scene ")
     global_scene = Scene(filenames=files_nwc)
 
-    print_info(global_scene)
+    #print_info(global_scene)
 
     if read_RGBs:
     
@@ -192,7 +192,7 @@ for p_ in product_list:
         #global_scene.load([ 'cloud_top_height', 'cloud_top_pressure', 'cloud_top_temperature'])
         #global_scene.load(['cloudtype'])
 
-        print("global_scene.keys()", global_scene.keys())
+        #print("global_scene.keys()", global_scene.keys())
         #[DatasetID(name='cloud_top_height', wavelength=None, resolution=None, polarization=None, calibration=None, level=None, modifiers=None)]
 
         # 'cloud_top_height' is loaded in RGB mode already 
@@ -206,22 +206,21 @@ for p_ in product_list:
         print("======================")
         print("... load ", dataset_names[p_])
         global_scene.load(dataset_names[p_])
-        #global_scene.load(['ctth_alti'])
-
-
 
     if False:
         global_scene.save_dataset('cloudmask', "cloudmask.png", overlay={'coast_dir': '/data/OWARNA/hau/maps_pytroll/', 'color': (255, 255, 255), 'resolution': 'i'})
 
     
     # resample to another projection
-    print("resample")
     area="ccs4"
     #area="EuropeCanaryS95"
     #area="europe_center"
     #area="cosmo1"
-    local_scene = global_scene.resample(area)
-    print("dir(local_scene)", dir(local_scene))
+    print("======================")
+    print("======================")
+    print("... resample to area: ", area)
+    local_scene = global_scene.resample(area, resampler='nearest', cache_dir=cache_dir, radius_of_influence=15000)
+    #print("dir(local_scene)", dir(local_scene))
 
     if read_RGBs:
     
@@ -233,9 +232,9 @@ for p_ in product_list:
             print("======================")
             print("======================")
             print(p_name)
-            print(global_scene[p_name])
-            print(global_scene[p_name].attrs['area'])
-            print(global_scene[p_name].attrs["start_time"])
+            ##print(global_scene[p_name])
+            ##print(global_scene[p_name].attrs['area'])
+            ##print(global_scene[p_name].attrs["start_time"])
             #long_name:               NWC GEO CTTH Cloud Top Altitude
             #level:                   None
             #end_time:                2017-07-07 12:03:32
@@ -331,27 +330,33 @@ for p_ in product_list:
             #print (np.nanmax(local_scene[p__].values))
 
             crr = local_scene[p__].values.astype(np.float32)
-            #print (np.nanmin(crr))
-            #print (np.nanmax(crr))
+            print (np.nanmin(crr))
+            print (np.nanmax(crr))
 
             crr[crr==0.0] = np.nan 
             crr = np.where(crr==0.0, np.nan, crr)
 
-            from trollimage.colormap import set3, rdbu #, RainRate
+            from trollimage.colormap import set3, rdbu, RainRate
             from trollimage.image import Image as trollimage
             
             img = trollimage(crr, mode="L", fill_value=None)
+            print("***********************")
+            #print(dir(RainRate))            
+            #print(RainRate.values)
+            #print(RainRate.colors)
+            print("***********************")
             #set3.set_range(0, 8)
             #img.palettize(set3)
             #rdbu.set_range(0, 15)
-            img.colorize(rdbu)
-            #img.colorize(RainRate)
+            #img.colorize(rdbu)
+            img.colorize(RainRate)
 
             product_dict={}
             product_dict['CRR']="CRR"
             product_dict['CRR-Ph']="CRPh"
-
-            outFile='MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
+            product_dict['CT']="CT"
+            
+            outFile='/data/cinesat/out/MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
             outputFile = format_name(outFile, start_time, area=area, rgb=product_dict[p_])
 
             print("display "+outputFile+" &")

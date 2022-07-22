@@ -16,6 +16,27 @@ map_dir="/opt/users/common/shapes/"
 import nwcsaf
 import numpy as np
 import sys
+from copy import deepcopy
+import socket
+
+if "tsa" in socket.gethostname():
+    #CSCS
+    map_dir="/store/msrad/sat/pytroll/shapes/"
+    #map_dir="/store/msrad/utils/shapes/"
+    logo_dir="/store/msrad/sat/pytroll/logos/"
+    font_file="/usr/share/fonts/dejavu/DejaVuSans.ttf"
+    result_dir="./"
+elif "zue" in socket.gethostname():
+    # meteoswiss
+    map_dir="/opt/users/common/shapes/"
+    logo_dir="/opt/users/common/logos/"
+    font_file="/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf"
+    result_dir="./"
+    #result_dir=start_time.strftime("/data/COALITION2/PicturesSatellite/%Y-%m-%d/")
+else:
+    print("*** Error, unknown hostname: ",socket.gethostname())
+    print("    please specify directories for shape files, logos, font etc")
+    quit()
 
 # Import the library OpenCV
 import cv2
@@ -98,8 +119,8 @@ def print_info(global_scene):
 
 
 
-read_RGBs = True
-#read_RGBs = False
+#read_RGBs = True
+read_RGBs = False
 
 # see https://github.com/pytroll/satpy/blob/main/satpy/etc/readers/nwcsaf-geo.yaml
 #['asii_prob', 'cloud_drop_effective_radius', 'cloud_ice_water_path', 'cloud_liquid_water_path', 'cloud_optical_thickness', 'cloud_top_height', 'cloud_top_phase', 'cloud_top_pressure', 'cloud_top_temperature', 'cloudmask', 'cloudtype', 'convection_initiation_prob30', 'convection_initiation_prob60', 'convection_initiation_prob90', 'convective_precipitation_hourly_accumulation', 'convective_rain_rate', 'lifted_index', 'precipitation_probability', 'rdt_cell_type', 'showalter_index', 'total_precipitable_water']
@@ -114,8 +135,7 @@ dataset_names['CTTH'] = ['cth']
 #dataset_names['CRR']  = ['crr', 'crr_accum', 'crr_conditions', 'crr_intensity', 'crr_intensity_pal', 'crr_pal', 'crr_quality', 'crr_status_flag']  
 dataset_names['CRR']  = ['crr']  
 #dataset_names['CRR-Ph']  = ['crr', 'crr_accum', 'crr_accum_pal', 'crr_conditions', 'crr_intensity', 'crr_intensity_pal', 'crr_pal', 'crr_quality', 'crr_status_flag'] 
-dataset_names['CRR-Ph']  = ['crr']   
-
+dataset_names['CRR-Ph']  = ['crrph_intensity']
 
 if len(sys.argv) == 2:
     product_list=[sys.argv[1]]
@@ -150,9 +170,6 @@ else:
     # sam's product_list = ['CMA', 'CT', 'CTTH', 'CMIC', 'PC', 'CRR', 'iSHAI', 'CI', 'RDT-CW', 'ASII-NG']
     quit()
 
-result_dir="./"
-result_dir=start_time.strftime("/data/COALITION2/PicturesSatellite/%Y-%m-%d/")
-
 for p_ in product_list:
        
     #file_pattern='S_NWC_' + product + '_' + sat_id + '_*_' + timestamp_NWCSAF + extension
@@ -171,7 +188,15 @@ for p_ in product_list:
                                        end_time=end_time,
                                        base_dir=base_dir,
                                        reader='nwcsaf-geo')
+
     print ("*** found following NWCSAF files:", files_nwc)
+    files = deepcopy(files_nwc['nwcsaf-geo'])
+    for f in files:
+        if not (product_list[0] in f):
+            files_nwc['nwcsaf-geo'].remove(f)
+            continue
+
+    print ("=== found following NWCSAF files:", files_nwc)
     #files = dict(files_sat.items() + files_nwc.items())
     #files = dict(list(files_nwc.items()))
 
@@ -207,9 +232,7 @@ for p_ in product_list:
         print("... load ", dataset_names[p_])
         global_scene.load(dataset_names[p_])
 
-    if False:
-        global_scene.save_dataset('cloudmask', "cloudmask.png", overlay={'coast_dir': '/data/OWARNA/hau/maps_pytroll/', 'color': (255, 255, 255), 'resolution': 'i'})
-
+    #global_scene.save_dataset('cloudmask', "cloudmask.png", overlay={'coast_dir': '/data/OWARNA/hau/maps_pytroll/', 'color': (255, 255, 255), 'resolution': 'i'})
     
     # resample to another projection
     area="ccs4"

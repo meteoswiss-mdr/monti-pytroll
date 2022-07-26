@@ -17,6 +17,8 @@ import time
 from satpy.resample import get_area_def
 from copy import deepcopy
 from satpy import find_files_and_readers
+from socket import gethostname
+from subprocess import check_output
 
 import warnings
 import logging
@@ -166,8 +168,23 @@ output:
 #
 #    return all_channels_needed
 
+def get_input_dir(product, nrt=False):
+    # calls a shellscript that returns the archiving directory
+    # input: product (string):     such as "MSG-HRIT" or "NWCSAF-v2016-alps"
+    #        nrt (logical):        True for near real time archive, False for long term archive
 
+    if "tsa" in gethostname():
+        # at CSCS
+        input_dir_str=check_output("/scratch/hamann/COALITION2-venv/coalition-2/get_data_directory.sh CSCS_dir "+product,
+                                              shell=True, executable="/bin/bash")
+    else:
+        # at MCH
+        if nrt:
+            input_dir_str=check_output("/data/COALITION2/shellscripts/get_data_directory.sh NRT_dir "+product, shell=True, executable="/bin/bash")
+        else:
+            input_dir_str=check_output("/data/COALITION2/shellscripts/get_data_directory.sh MCH_dir "+product, shell=True, executable="/bin/bash")
 
+    return input_dir_str.decode().strip("\n")
 
 def channel_num2str(channels):
 

@@ -11,13 +11,20 @@ from __future__ import print_function
 #from satpy.utils import debug_on
 #debug_on()
 
-map_dir="/opt/users/common/shapes/"
-
 import nwcsaf
 import numpy as np
 import sys
 from copy import deepcopy
 import socket
+from datetime import datetime
+
+# Import the library OpenCV
+import cv2
+
+from satpy import Scene, find_files_and_readers
+
+from my_msg_module_py3 import format_name
+from my_msg_module_py3 import get_input_dir
 
 if "tsa" in socket.gethostname():
     #CSCS
@@ -26,27 +33,21 @@ if "tsa" in socket.gethostname():
     logo_dir="/store/msrad/sat/pytroll/logos/"
     font_file="/usr/share/fonts/dejavu/DejaVuSans.ttf"
     result_dir="./"
+    cache_dir="/scratch/hamann/tmp/"
 elif "zue" in socket.gethostname():
     # meteoswiss
     map_dir="/opt/users/common/shapes/"
     logo_dir="/opt/users/common/logos/"
     font_file="/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf"
-    result_dir="./"
+    result_dir="/data/cinesat/out/"
+    #result_dir="./"
     #result_dir=start_time.strftime("/data/COALITION2/PicturesSatellite/%Y-%m-%d/")
+    cache_dir="/tmp/"
 else:
     print("*** Error, unknown hostname: ",socket.gethostname())
     print("    please specify directories for shape files, logos, font etc")
     quit()
 
-# Import the library OpenCV
-import cv2
-
-from my_msg_module_py3 import format_name
-
-from satpy import Scene, find_files_and_readers
-from datetime import datetime
-
-cache_dir="/tmp/"
 
 def remove_background(file_name):
     
@@ -117,11 +118,6 @@ def print_info(global_scene):
 
 #==========================================================
 
-
-
-#read_RGBs = True
-read_RGBs = False
-
 # see https://github.com/pytroll/satpy/blob/main/satpy/etc/readers/nwcsaf-geo.yaml
 #['asii_prob', 'cloud_drop_effective_radius', 'cloud_ice_water_path', 'cloud_liquid_water_path', 'cloud_optical_thickness', 'cloud_top_height', 'cloud_top_phase', 'cloud_top_pressure', 'cloud_top_temperature', 'cloudmask', 'cloudtype', 'convection_initiation_prob30', 'convection_initiation_prob60', 'convection_initiation_prob90', 'convective_precipitation_hourly_accumulation', 'convective_rain_rate', 'lifted_index', 'precipitation_probability', 'rdt_cell_type', 'showalter_index', 'total_precipitable_water']
 composite_names = {}
@@ -142,15 +138,15 @@ if len(sys.argv) == 2:
     from my_msg_module_py3 import get_last_SEVIRI_date
     start_time = get_last_SEVIRI_date(False, delay=10)
     end_time   = start_time
-    #base_dir="/data/cinesat/in/eumetcast1/"
-    base_dir=start_time.strftime("/data/cinesat/in/safnwc/")
+    base_dir=start_time.strftime(get_input_dir("NWCSAF-v2016-alps", nrt=True))
+    #base_dir="/data/cinesat/in/safnwc/"
 elif len(sys.argv) == 7:
     product_list=[sys.argv[1]]
     fixed_date=True
     start_time = datetime(int(sys.argv[2]),int(sys.argv[3]),int(sys.argv[4]),int(sys.argv[5]),int(sys.argv[6]))
     end_time   = start_time
-    #base_dir=start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2013/%Y/%m/%d/")
-    base_dir=start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/%Y/%m/%d/"+p_+"/")
+    base_dir=start_time.strftime(get_input_dir("NWCSAF-v2016-alps", nrt=False)+"/%Y/%m/%d/")
+    #base_dir=start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/%Y/%m/%d/"+p_+"/")
     #base_dir=start_time.strftime("./data/")
     #base_dir=start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/"+p_+"/")
 else:
@@ -170,8 +166,19 @@ else:
     # sam's product_list = ['CMA', 'CT', 'CTTH', 'CMIC', 'PC', 'CRR', 'iSHAI', 'CI', 'RDT-CW', 'ASII-NG']
     quit()
 
+
+if product_list[0]=="CT" or product_list[0]=="CMA":
+    read_RGBs = True
+else:
+    read_RGBs = False
+
 for p_ in product_list:
-       
+
+    if len(sys.argv) == 2:
+        base_dir_=base_dir
+    else:
+        base_dir_=base_dir+"/"+p_+"/"
+    
     #file_pattern='S_NWC_' + product + '_' + sat_id + '_*_' + timestamp_NWCSAF + extension
     #if glob.glob(file_pattern):
     #    print ("NWCSAF data product " + product + " exists and is readable")
@@ -179,14 +186,14 @@ for p_ in product_list:
     #    product_list_to_process.append(nwcsaf.product.get(product)[:])
     #else:
     #    print ("NWCSAF data product " + product + " is missing or is not readable")
-    
+
     print("======================")
     print("======================")
-    print ("... search files in "+ base_dir + " for "+ str(start_time))
+    print ("... search files in "+ base_dir_ + " for "+ str(start_time))
     files_nwc = find_files_and_readers(sensor='seviri',
                                        start_time=start_time,
                                        end_time=end_time,
-                                       base_dir=base_dir,
+                                       base_dir=base_dir_,
                                        reader='nwcsaf-geo')
 
     print ("*** found following NWCSAF files:", files_nwc)
@@ -242,8 +249,12 @@ for p_ in product_list:
     print("======================")
     print("======================")
     print("... resample to area: ", area)
-    local_scene = global_scene.resample(area, resampler='nearest', cache_dir=cache_dir, radius_of_influence=15000)
-    #print("dir(local_scene)", dir(local_scene))
+    if read_RGBs:
+        local_scene = global_scene.resample(area, resampler='nearest', cache_dir=cache_dir, radius_of_influence=15000)
+    else:
+        local_scene = global_scene.resample(area, cache_dir=cache_dir)
+        
+        #print("dir(local_scene)", dir(local_scene))
 
     if read_RGBs:
     
@@ -289,7 +300,7 @@ for p_ in product_list:
             #print ("p_name, type(local_scene[p_name]), type(local_scene[p_name].data)")
             #print (p_name, type(local_scene[p_name]), type(local_scene[p_name].data))
 
-            png_file = start_time.strftime(result_dir+ "/MSG_"+p_name+"-"+area+"_%y%m%d%H%M.png")
+            png_file = start_time.strftime(result_dir+ "/MSG_"+p_+"-"+area+"_%y%m%d%H%M.png")
             title = start_time.strftime(" "+local_scene[p_name].platform_name+', %y-%m-%d %H:%MUTC, '+p_name)
             #title=""
             #local_scene.show(p_name)
@@ -379,7 +390,7 @@ for p_ in product_list:
             product_dict['CRR-Ph']="CRPh"
             product_dict['CT']="CT"
             
-            outFile='/data/cinesat/out/MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
+            outFile=result_dir+'/MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
             outputFile = format_name(outFile, start_time, area=area, rgb=product_dict[p_])
 
             print("display "+outputFile+" &")

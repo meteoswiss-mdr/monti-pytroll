@@ -2,7 +2,7 @@ from __future__ import division
 from __future__ import print_function
 
 
-def input(in_msg):
+def input(in_msg, timeslot=None):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -36,6 +36,9 @@ def input(in_msg):
         in_msg.update_datetime(year, month, day, hour, minute)
         # !!!  if archive is used, adjust meteosat09.cfg accordingly !!!
 
+    if timeslot is not None:
+        in_msg.update_datetime(timeslot.year, timeslot.month, timeslot.day, timeslot.hour, timeslot.minute)
+        
     #----------------------
     # choose RGBs 
     #----------------------
@@ -272,6 +275,7 @@ def input(in_msg):
     # please download the shape file 
     # in_msg.mapDir='/data/OWARNA/hau/maps_pytroll/'
     # in_msg.mapDir='/opt/users/common/shapes/'
+    # in_msg.mapDir='/store/msrad/sat/pytroll/shapes/'
     in_msg.mapResolution=None      ## f  full resolution: Original (full) data resolution.          
                                    ## h  high resolution: About 80 % reduction in size and quality. 
                                    ## i  intermediate resolution: Another ~80 % reduction.          

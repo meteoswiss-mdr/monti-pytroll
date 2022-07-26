@@ -1,8 +1,6 @@
 from __future__ import division
 from __future__ import print_function
 
-from my_msg_module_py3 import check_near_real_time
-
 def input(in_msg, timeslot=None):
 
     import inspect
@@ -42,13 +40,11 @@ def input(in_msg, timeslot=None):
         hour=11
         minute=45
         in_msg.update_datetime(year, month, day, hour, minute)
-        in_msg.nrt = check_near_real_time(in_msg.datetime, 120)
         # !!!  if archive is used, adjust meteosat09.cfg accordingly !!!
         
     if timeslot is not None:
         in_msg.update_datetime(timeslot.year, timeslot.month, timeslot.day, timeslot.hour, timeslot.minute)
-        in_msg.nrt = check_near_real_time(in_msg.datetime, 120)
-            
+    
     in_msg.no_NWCSAF = False
 
     #----------------

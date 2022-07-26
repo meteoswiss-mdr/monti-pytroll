@@ -1,8 +1,6 @@
 from __future__ import division
 from __future__ import print_function
 
-from my_msg_module_py3 import check_near_real_time
-
 def input(in_msg, timeslot=None):
 
     import inspect
@@ -40,7 +38,6 @@ def input(in_msg, timeslot=None):
 
     if timeslot is not None:
         in_msg.update_datetime(timeslot.year, timeslot.month, timeslot.day, timeslot.hour, timeslot.minute)
-        in_msg.nrt = check_near_real_time(in_msg.datetime, 120)
 
     if in_msg.nrt:
         in_msg.input_dir="/data/cinesat/in/eumetcast1/"

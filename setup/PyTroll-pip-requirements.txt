@@ -60,7 +60,7 @@ lxml==3.4.4
 MarkupSafe==0.23
 matplotlib==1.5.1
 #-e git+https://github.com/pytroll/mipp.git@d053266d90bff3188d6a9a234a640612b1ebe35a#egg=mipp&subdirectory=../../../packages/mipp
-mistune==0.7.1
+mistune==2.0.3
 #-e git+https://github.com/meteoswiss-mdr/mpop.git@313132440d6c59be6f295fcb3e1c390b27073b1b#egg=mpop&subdirectory=../../../packages/mpop
 multipledispatch==0.4.8
 nbconvert==4.0.0

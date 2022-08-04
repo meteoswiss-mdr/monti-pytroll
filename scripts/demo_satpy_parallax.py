@@ -212,7 +212,9 @@ if __name__ == '__main__':
             files_sat['seviri_l1b_hrit'].remove(f)
             continue
 
+    print("... found files: ", files_sat['seviri_l1b_hrit'])
     global_scene = Scene(reader="seviri_l1b_hrit", filenames=files_sat)
+    print("... load "+channel)
     global_scene.load([channel])
 
 

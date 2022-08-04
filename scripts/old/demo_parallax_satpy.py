@@ -1,5 +1,10 @@
+##### seems like an unfinished attempt to update the mpop verion
+##### of the parallax correction to satpy 
+##### still lots of mpop calls 
+
 from mpop.satellites import GeostationaryFactory
-from mpop.projector import get_area_def
+#from mpop.projector import get_area_def
+from pyresample import get_area_def
 import datetime
 import numpy as np
 from trollimage.colormap import rainbow, greys
@@ -8,6 +13,7 @@ from copy import deepcopy
 from pydecorate import DecoratorAGG
 import nwcsaf
 import sys
+from my_msg_module import check_near_real_time
 
 def show_or_save_image(img, save_png, name):
     if save_png:
@@ -75,10 +81,9 @@ if __name__ == '__main__':
     show_chn_cloudy = False
     show_CTH        = True
     show_chn_PC     = True
-    near_real_time  = False
     #fill="False"            # fill options: "False" (default)
-    fill="nearest"          # fill options: "False", "nearest" or "bilinear"
-    #fill="bilinear"         # fill options: "False", "nearest" or "bilinear"
+    #fill="nearest"          # fill options: "False", "nearest" or "bilinear"
+    fill="bilinear"         # fill options: "False", "nearest" or "bilinear"
     estimate_CTH = False # if False use CTH from NWC-SAF (recommended), if True estimate CTH from IR_108
     save_data=True
     
@@ -90,8 +95,8 @@ if __name__ == '__main__':
     
     colors="rainbow"
     #colors="greys"
-
-    if near_real_time:
+    
+    if len(sys.argv)==1:
         from my_msg_module import get_last_SEVIRI_date
         time_slot = get_last_SEVIRI_date(False, delay=3)
     else:
@@ -102,11 +107,8 @@ if __name__ == '__main__':
             hh    = int(sys.argv[4])
             mm    = int(sys.argv[5])
         else:
-            yyyy  = int(sys.argv[1])
-            month = int(sys.argv[2])
-            dd    = int(sys.argv[3])
-            hh    = int(sys.argv[4])
-            mm    = int(sys.argv[5])            
+            print "unknown number of command line arguments"
+            print sys.argv[:]
             
         time_slot = datetime.datetime(yyyy, month, dd, hh, mm)
         print "*** CHECK THAT YOU ACTIVATED OFFLINE ENVIRONMENT "
@@ -116,9 +118,12 @@ if __name__ == '__main__':
         os.environ['PPP_CONFIG_DIR']=os.environ['PYTROLLHOME']+"/cfg_offline/"
         print "... set PPP_CONFIG_DIR to: " + os.environ['PPP_CONFIG_DIR']
 
+    near_real_time  = check_near_real_time(time_slot, 120)
+        
     if verbose:
         print str(time_slot)
-
+        print "near real time", near_real_time
+        
     ## define the geostationary factory 
     ## --------------------------------
     #global_data = GeostationaryFactory.create_scene("Meteosat-9", "", "seviri", time_slot)

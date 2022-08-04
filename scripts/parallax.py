@@ -1,3 +1,7 @@
+#### CODE FROM JUSSI FOR THE PARALLAX CORRECTION
+#### for examples search for ParallaxCorrection in the code
+#### grep ParallaxCorrection *py
+
 from datetime import datetime
 
 import numpy as np

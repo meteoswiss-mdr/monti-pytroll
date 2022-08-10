@@ -63,7 +63,7 @@ matplotlib==1.5.1
 mistune==0.7.1
 #-e git+https://github.com/meteoswiss-mdr/mpop.git@313132440d6c59be6f295fcb3e1c390b27073b1b#egg=mpop&subdirectory=../../../packages/mpop
 multipledispatch==0.4.8
-nbconvert==4.0.0
+nbconvert==6.3.0
 nbformat==4.0.1
 netCDF4==1.2.1
 netifaces==0.10.4

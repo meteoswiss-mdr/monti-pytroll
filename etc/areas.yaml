@@ -658,6 +658,20 @@ europe_center:
     lower_left_xy: [-1889030.73256, -1291641.71741]
     upper_right_xy: [1889030.73256, 1669202.60419]
 
+EuropeCenter:
+  description: Europe Center, 4km resolution
+  projection:
+    proj:  stere
+    lat_0:  46.5
+    lon_0:  5.0
+    ellps:  WGS84
+  shape:
+    height: 740
+    width:  1319
+  area_extent:
+    lower_left_xy: [-2889030.73256, -1291641.71741]
+    upper_right_xy: [2389030.73256, 1669202.60419]
+
 euro_north:
   description: Europe 3km/pixel
   projection:

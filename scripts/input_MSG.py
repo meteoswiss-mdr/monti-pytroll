@@ -38,6 +38,8 @@ def input(in_msg, timeslot=None):
 
     if timeslot is not None:
         in_msg.update_datetime(timeslot.year, timeslot.month, timeslot.day, timeslot.hour, timeslot.minute)
+    else:
+        in_msg.init_datetime()
 
     if in_msg.nrt:
         in_msg.input_dir="/data/cinesat/in/eumetcast1/"

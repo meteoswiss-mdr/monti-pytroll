@@ -1,7 +1,6 @@
 from __future__ import division
 from __future__ import print_function
 
-
 def input(in_msg, timeslot=None):
 
     import inspect

@@ -273,8 +273,9 @@ if __name__ == '__main__':
             img.save(png_file)
 
             # local_scene.save_dataset( 'lscl', png_file )
-            from pyresample.utils import load_area
-            swiss = load_area("/opt/users/hau/monti-pytroll/etc/areas.def", area)
+            ##from pyresample.utils import load_area
+            from pyresample import load_area
+            swiss = load_area("/opt/users/hau/monti-pytroll/etc/areas.yaml", area)
 
             from pycoast import ContourWriterAGG
             cw = ContourWriterAGG('/opt/users/common/shapes')

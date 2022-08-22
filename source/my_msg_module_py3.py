@@ -15,6 +15,7 @@ import datetime
 import time
 # from mpop.projector import get_area_def
 from satpy.resample import get_area_def
+from satpy import Scene, find_files_and_readers
 from copy import deepcopy
 from satpy import find_files_and_readers
 from socket import gethostname
@@ -25,6 +26,7 @@ import logging
 LOG = logging.getLogger(__name__)
 LOG.setLevel(40)
 #CRITICAL 50 #ERROR 40 #WARNING 30 #INFO 20 #DEBUG 10 #NOTSET 0
+
 
 '''
 input: RSS 
@@ -167,6 +169,47 @@ output:
 #    all_channels_needed = channel_num2str(all_channels_needed)
 #
 #    return all_channels_needed
+
+
+def create_seviri_scene(time_slot, base_dir_sat, reader='seviri_l1b_hrit', sat="", file_filter="", verbose=True):
+
+    if verbose:
+        print("*** read SEVIRI files for ", sat, "seviri", str(time_slot), ", reader="+reader)
+        print("    search for SEVIRI files in "+base_dir_sat)
+
+    try:
+        files_sat = find_files_and_readers(sensor='seviri',
+                                           start_time=time_slot, end_time=time_slot,
+                                           base_dir=base_dir_sat, reader=reader)
+    except:
+        print("*** no HRIT file found")
+        return None
+
+    if sat != "":
+        print("... filter for satellite: "+sat)
+        files = deepcopy(files_sat[reader])
+        for f in files:
+           if not (sat in f):
+              files_sat[reader].remove(f)
+    if file_filter != "":
+        print("... filter for satellite: "+file_filter)
+        files = deepcopy(files_sat[reader])
+        for f in files:
+           if not (file_filter in f):
+              files_sat[reader].remove(f)
+              
+    if len(files_sat[reader])<44:
+        print("*** Warning, "+str(len(files_sat[reader]))+" found in "+base_dir_sat+" for reader "+reader+" and time "+str(time_slot))
+        print("    but 44 files are required")
+        return None
+    else: 
+        if verbose:
+            print("    found "+str(len(files_sat[reader]))+" files for reader: "+reader)
+            for f in files_sat[reader]:
+                print(f)    
+        global_data = Scene(filenames=files_sat)
+        return global_data
+
 
 def get_input_dir(product, nrt=False):
     # calls a shellscript that returns the archiving directory

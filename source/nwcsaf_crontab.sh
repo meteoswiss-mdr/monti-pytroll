@@ -7,7 +7,7 @@ echo '*** start plot_lightning.sh'
 #export python=/usr/bin/python
 #export python=/opt/users/common/packages/anaconda3/envs/PyTroll_$LOGNAME/bin/python
 
-cd $PYTROLLHOME/scripts
+cd $PYTROLLHOME/source
 
 echo "*** Start to produce Low-stratus-confidence-level images+netCDF"
 ## execute plot_lightning pytroll script 

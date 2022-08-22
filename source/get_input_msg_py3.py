@@ -489,7 +489,6 @@ def get_date_and_inputfile_from_commandline(print_usage=None):
    # $: python plot_msg.py input_MSG 2014 07 23 16 10 ['HRoverview','fog'] ['ccs4','euro4']
    # and overwrite arguments given in the initialization in get_input_msg
 
-   timeslot = None
    if len(sys.argv) < 2:
       print_usage()
    else:
@@ -512,8 +511,6 @@ def get_date_and_inputfile_from_commandline(print_usage=None):
             day    = int(sys.argv[4])
             hour   = int(sys.argv[5])
             minute = int(sys.argv[6])
-            # update time slot in in_msg class
-            from datetime import datetime
             timeslot = datetime(year, month, day, hour, minute)
 
    # read input file and initialize in_msg
@@ -623,22 +620,29 @@ def parse_commandline_and_read_inputfile(input_file=None):
    # first obligatory argument is the input file (or as optional argument)
    if input_file is None:
       input_file = args[0]
-
+      
+   timeslot=None
+   print ('*** interpret date of the command line arguments')
+   for opt, value in list(options.__dict__.items()):
+      if value is not None:
+         if opt=='date':
+            # remember desired date for satellite observation 
+            timeslot = datetime(options.date[0],options.date[1],options.date[2],options.date[3],options.date[4])
+      
    # skip the '.py' at the end of the input filename
    if input_file[-3:] == '.py': 
       input_file=input_file[:-3]
-   # read input file and initialize 'in_msg'
-   in_msg = get_input_msg(input_file)
    
-   print ('*** overwrite options of the input_file with command line arguments')
+   # read input file and initialize 'in_msg'
+   in_msg = get_input_msg(input_file, timeslot=timeslot)
+
+   print ('*** interpret all other command line arguments and overwrite input file')
    for opt, value in list(options.__dict__.items()):
       if value is not None:
          if opt!='date':
             print(('...', opt, ' = ', value))
             setattr(in_msg, opt, value)
-         else:
-            in_msg.update_datetime(options.date[0],options.date[1],options.date[2],options.date[3],options.date[4])
-            
+   
    # initialize datetime, if not yet done per command line comment or in the input file 
    if in_msg.datetime is None:
       # choose timeslot of the latest possible satellite picture 

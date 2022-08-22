@@ -103,11 +103,16 @@ def rewrite_xy_axis(netCDF_file):
     ds["x"].units = 'Degrees East'
     ds.close()
 
-def save_image(local_scene, area, title="", filename="/tmp/tmp.png", rivers=False, coasts=False, show_interactively=False):
+def save_image(local_scene, area, chn, title="", filename="/tmp/tmp.png", rivers=False, coasts=False, show_interactively=False):
     from trollimage.colormap import rdbu
     from trollimage.image import Image as Timage
-    img = Timage(local_scene[channel].data, mode="L")
-    rdbu.set_range(225, 295)
+
+    #img = Timage(local_scene[chn].data, mode="L")
+    img = Timage(local_scene[chn].data.compute(), mode="L")
+    if ("VIS" in chn):
+        rdbu.set_range(0, 100)
+    else:
+        rdbu.set_range(225, 295)        
     img.colorize(rdbu)
     
     from pyresample import load_area
@@ -126,8 +131,7 @@ def save_image(local_scene, area, title="", filename="/tmp/tmp.png", rivers=Fals
     draw = ImageDraw.Draw(PIL_image)
     draw.rectangle([(0, 0), (PIL_image.size[0]*0.76, 25)], fill=(0,0,0,200))
     font = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf", 18)
-    titletext = start_time.strftime(title)
-    draw.text( (1, 1), titletext, "green" , font=font)  # (255,255,255)
+    draw.text( (1, 1), title, "green" , font=font)  # (255,255,255)
     
     from pydecorate import DecoratorAGG
     dc = DecoratorAGG(PIL_image)
@@ -141,7 +145,7 @@ def save_image(local_scene, area, title="", filename="/tmp/tmp.png", rivers=Fals
     
     if show_interactively:
         PIL_image.show()
-    if save_png:
+    else:
         PIL_image.save(filename)
         print("display " + filename +" &")
         
@@ -182,6 +186,7 @@ if __name__ == '__main__':
     show_interactively=False
     save_black_white_png=False
     save_png=True
+    save_netCDF=True
     
     print("")
     print("")
@@ -248,10 +253,14 @@ if __name__ == '__main__':
         global_nwc.load(['ct','ctth_alti'])
         #global_nwc.load(['ctth_alti'])
 
-        print(global_scene[channel].attrs.keys())
-        global_nwc["ctth_alti"].attrs['satellite_latitude']  = global_scene[channel].attrs['satellite_latitude']
-        global_nwc["ctth_alti"].attrs['satellite_altitude']  = global_scene[channel].attrs['satellite_altitude']
-        global_nwc["ctth_alti"].attrs['satellite_longitude'] = global_scene[channel].attrs['satellite_longitude']
+        #print(channel,"======")
+        #print(global_scene[channel].attrs.keys())
+        #print(global_scene[channel].attrs['orbital_parameters'])
+        # NWCSAF products are missing the orbital parameter metadata 
+        # dirty fix for missing information in NWCSAF object, maybe fixed in the meantime 
+        global_nwc["ctth_alti"].attrs['orbital_parameters']=global_scene[channel].attrs['orbital_parameters']
+        #print("ctth_alti ======")
+        #print(global_nwc["ctth_alti"].attrs.keys())
         
 
     # loop over areas, resample and create products
@@ -269,7 +278,6 @@ if __name__ == '__main__':
 
         area_def = get_area_def(area)
         
-        parallax_correction = ParallaxCorrection(area_def)
 
         print("resample to "+area+" (not parallax corrected)")
         local_scene = global_scene.resample(area_def)
@@ -282,27 +290,36 @@ if __name__ == '__main__':
         if show_interactively or save_png:
             filename = start_time.strftime('/data/COALITION2/tmp/MSG_'+channel+'-'+area+'_%y%m%d%H%M_org.png')
             title    = start_time.strftime(" "+sat[0:3]+"-"+sat[3]+', %y-%m-%d %H:%MUTC, no parallax correction')
-            save_image(local_scene, area, title=title, filename=filename, show_interactively=show_interactively)
-            
-        plax_corr_area = parallax_correction(global_nwc["ctth_alti"])
+            save_image(local_scene, area, channel, title=title, filename=filename, show_interactively=show_interactively)
 
         # resample MSG L2
         ##################
         print("")
         print("=======================")
         print("resample to "+area+" (parallax corrected)")
+            
+        # define method to do parallax correction for specific area
+        parallax_correction = ParallaxCorrection(area_def)
+
+        # calculate parallax corrected position, using cloud top height 
+        plax_corr_area = parallax_correction(global_nwc["ctth_alti"])
+
         local_scene = global_scene.resample(plax_corr_area)
 
         # print(global_nwc)
         local_nwc = global_nwc.resample(plax_corr_area)
 
-
         if show_interactively or save_png:
             filename = start_time.strftime('/data/COALITION2/tmp/MSG_'+channel+'-'+area+'_%y%m%d%H%M_pc.png')
             title    = start_time.strftime(" "+sat[0:3]+"-"+sat[3]+', %y-%m-%d %H:%MUTC, parallax correction')
-            save_image(local_scene, area, title=title, filename=filename, show_interactively=show_interactively)
+            save_image(local_scene, area, channel, title=title, filename=filename, show_interactively=show_interactively)
 
         if save_black_white_png:
             png_file='/data/cinesat/out/parallax/'+channel+'_'+area+'_pc.png'
             local_scene.save_dataset(channel, png_file)
             print('display '+png_file+' &')    
+
+        if save_netCDF:
+            nc_file='/data/cinesat/out/parallax/'+channel+'_'+area+'_pc.png'
+            local_nwc.save_datasets(writer='cf', datasets=['ct'], filename=nc_file)
+            print('ncview '+nc_file+' &')

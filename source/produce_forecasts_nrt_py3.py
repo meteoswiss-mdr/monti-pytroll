@@ -13,7 +13,6 @@ from datetime import timedelta
 import sys, string, os
 import logging
 
-from satpy import Scene, find_files_and_readers
 from satpy.resample import get_area_def
 from satpy.utils import debug_on
 
@@ -43,6 +42,7 @@ from my_msg_module_py3 import fill_with_closest_pixel
 #from my_msg_module import convert_NWCSAF_to_radiance_format
 #from my_msg_module import get_NWC_pge_name
 from my_msg_module_py3 import check_input
+from my_msg_module_py3 import create_seviri_scene
 
 from copy import deepcopy 
 import matplotlib.pyplot as plt
@@ -80,34 +80,7 @@ def print_usage():
    print("***           ")
    quit() # quit at this point
 #----------------------------------------------------------------------------------------------------------------
-
 # ------------------------------------------
-
-def create_seviri_scene(time_slot, base_dir_sat, reader='seviri_l1b_hrit', sat="", file_filter=""):
-    print("*** read SEVIRI files for ", sat, "seviri", str(time_slot), ", reader="+reader)
-    print("    search for SEVIRI files in "+base_dir_sat)
-
-    files_sat = find_files_and_readers(sensor='seviri',
-                                       start_time=time_slot, end_time=time_slot,
-                                       base_dir=base_dir_sat, reader=reader)
-
-    if sat != "":
-        print("... filter for satellite: "+sat)
-        files = deepcopy(files_sat[reader])
-        for f in files:
-           if not (sat in f):
-              files_sat[reader].remove(f)
-    if file_filter != "":
-        print("... filter for satellite: "+file_filter)
-        files = deepcopy(files_sat[reader])
-        for f in files:
-           if not (file_filter in f):
-              files_sat[reader].remove(f)
-    print("    found "+reader+" files: ", files_sat)
-
-    global_data = Scene(filenames=files_sat)
-    return global_data 
-
 
 def read_HRW(sat, time_slot, ntimes, dt=5, read_basic_or_detailed='DS', 
              min_correlation=85, min_conf_nwp=80, min_conf_no_nwp=80, cloud_type=None, level=None, p_limits=None):

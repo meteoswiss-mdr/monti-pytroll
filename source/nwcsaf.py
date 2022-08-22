@@ -23,7 +23,7 @@ datasets["CMIC"]    = [ 'cmic_cot', 'cmic_cot_pal', 'cmic_iwp', 'cmic_iwp_pal', 
 datasets["PC"]      = [ 'pc', 'pc_conditions', 'pc_pal', 'pc_quality' ]
 datasets["PC-Ph"]   = [ 'ppp' ] # ???
 datasets["CRR"]     = [ 'crr', 'crr_accum', 'crr_accum_pal', 'crr_conditions', 'crr_intensity', 'crr_intensity_pal', 'crr_pal', 'crr_quality', 'crr_status_flag' ]
-datasets["CRR-Ph"]  = [ 'crrp' ] # ???
+datasets["CRR-Ph"]  = [ 'crrph_intensity', 'crrph_pal', 'crrph_accum', 'crrph_iqf', 'crrph_ipf_pal', 'crrph_status_flag', 'crrph_conditions', 'crrph_quality' ] 
 datasets["iSHAI"]   = [ 'ihsai_status_flag', 'ishai_bl', 'ishai_bl_pal', 'ishai_conditions',
                         'ishai_diffbl', 'ishai_diffbl_pal', 'ishai_diffhl', 'ishai_diffhl_pal', 'ishai_diffml', 'ishai_diffml_pal',\
                         'ishai_diffki', 'ishai_diffki_pal', 'ishai_diffli', 'ishai_diffli_pal', 'ishai_diffshw', 'ishai_diffshw_pal',\

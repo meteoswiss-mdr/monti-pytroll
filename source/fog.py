@@ -30,6 +30,7 @@ import matplotlib.pyplot as plt
 
 import warnings
 #warnings.filterwarnings("ignore")
+from my_msg_module_py3 import get_input_dir
 
 def get_last_SEVIRI_date(RSS, delay=0, time_slot=None):
 
@@ -134,7 +135,9 @@ if __name__ == '__main__':
     if len(sys.argv) == 1:
         nrt=True
         start_time = get_last_SEVIRI_date(False, delay=6)
+        #base_dir_sat=start_time.strftime(get_input_dir("MSG-HRIT", nrt=True))
         base_dir_sat = "/data/cinesat/in/eumetcast1/"
+        #base_dir_nwc=start_time.strftime(get_input_dir("NWCSAF-v2016-FES", nrt=True)) 
         base_dir_nwc = "/data/cinesat/in/eumetcast1/"
         #base_dir_nwc = "/data/cinesat/in/safnwc/"
     elif len(sys.argv) == 6:

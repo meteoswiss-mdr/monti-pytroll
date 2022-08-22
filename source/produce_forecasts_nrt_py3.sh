@@ -17,7 +17,7 @@ esac
 #export python=/opt/users/common/packages/anaconda3/envs/PyTroll_$LOGNAME/bin/python
 
 cd $PYTROLLHOME/scripts
-python $PYTROLLHOME/scripts/produce_forecasts_nrt_py3.py input_coalition2_cronjob
+python $PYTROLLHOME/source/produce_forecasts_nrt_py3.py input_coalition2_cronjob
 #$python $PYTROLLHOME/scripts/produce_forecasts_nrt.py > /tmp/produce_forecasts_nrt.txt 2>&1
 
 # remove uncompressed data older than 10min

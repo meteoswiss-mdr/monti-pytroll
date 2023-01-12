@@ -49,8 +49,12 @@ We take the case of HRIT data from meteosat 10, as send through eumetcast.
 #debug_on()
 import sys
 from datetime import datetime, timedelta
+from time import sleep 
 from glob import glob
 from PIL import Image, ImageFont
+import numpy as np
+import dask as da
+from os.path import exists, getsize 
 
 from satpy import Scene, find_files_and_readers
 from satpy.writers import to_image
@@ -59,9 +63,25 @@ from satpy.composites import SandwichCompositor
 from satpy.resample import get_area_def
 from satpy.writers import add_decorate, add_overlay
 
-from my_msg_module_py3 import get_last_SEVIRI_date
+from copy import deepcopy 
+
+from my_msg_module_py3 import get_last_SEVIRI_date, format_name
+from get_input_msg_py3 import parse_commandline_and_read_inputfile
+
+from parallax_jussi import save_image
 
 from pycoast import ContourWriter
+
+from get_input_msg_py3 import get_input_msg 
+
+import warnings
+import subprocess
+
+def rename_outputFile(outputFile):
+    outputFile = outputFile.replace("-ir108", "ir108")
+    outputFile = outputFile.replace("-vis-with-ir", "HRVir108")
+    outputFile = outputFile.replace("natural-color", "natural")
+    return outputFile 
 
 if sys.version_info < (2, 5):
     import time
@@ -76,11 +96,54 @@ if sys.version_info < (2, 5):
 else:
     strptime = datetime.strptime
 
+#####################################
+# from https://stackoverflow.com/questions/37662180/interpolate-missing-values-2d-python
 
-# import the necessary packages
-import numpy as np
-import cv2
+def interpolate_missing_pixels(
+        image: np.ndarray,
+        mask: np.ndarray,
+        method: str = 'nearest',
+        fill_value: int = 0):
+    """
+    :param image: a 2D image
+    :param mask: a 2D boolean image, True indicates missing values
+    :param method: interpolation method, one of
+        'nearest', 'linear', 'cubic'.
+    :param fill_value: which value to use for filling up data outside the
+        convex hull of known pixel values.
+        Default is 0, Has no effect for 'nearest'.
+    :return: the image with missing values interpolated
+    """
+    from scipy import interpolate
+
+    h, w = image.shape[:2]
+    xx, yy = np.meshgrid(np.arange(w), np.arange(h))
+
+    known_x = xx[~mask]
+    known_y = yy[~mask]
+    known_v = image[~mask]
+    missing_x = xx[mask]
+    missing_y = yy[mask]
+
+    interp_values = interpolate.griddata(
+        (known_x, known_y), known_v, (missing_x, missing_y),
+        method=method, fill_value=fill_value
+    )
+
+    interp_image = image.copy()
+    interp_image[missing_y, missing_x] = interp_values
+
+    return interp_image
+
+
+# https://docs.xarray.dev/en/stable/generated/xarray.DataArray.interpolate_na.html
+# xr.DataArray(array, coords=da.coords, dims=da.dims, attrs=da.attrs)
+#############################################################
+
+
 def adjust_gamma(image, gamma=1.0):
+    # import the necessary packages
+    import cv2
     # build a lookup table mapping the pixel values [0, 255] to
     # their adjusted gamma values
     invGamma = 1.0 / gamma
@@ -92,248 +155,189 @@ def adjust_gamma(image, gamma=1.0):
 #######################################################
     
 if __name__ == '__main__':
+
+    # interpret command line arguments (first argument is configuration file) and read configuration file 
+    in_msg = parse_commandline_and_read_inputfile()
     
-    if len(sys.argv) < 2:
+    print("... produce satellite image for: "+in_msg.datetime.strftime("%Y-%m-%d, %H:%M:%S"))
+        
+    print("... check if RSS is available by counting RSS files 5 min ago") 
+    print("")
+    time_string = in_msg.datetime.strftime("%Y%m%d%H%M")
+    t_minus5 = in_msg.datetime - timedelta(minutes=5)
+    sat="MSG3"
+    
+    if (in_msg.nrt):
         data_hrit_in="/data/cinesat/in/eumetcast1/"
         data_nwcsaf_in="/data/cinesat/in/safnwc/"
-        time_slot = get_last_SEVIRI_date(True, delay=5)
-        t_minus5 = time_slot - timedelta(minutes=5)
-        n_files = len(glob(data_hrit_in+'/H*MSG3*'+t_minus5.strftime("%Y%m%d%H%M")+'*'))
-        if n_files > 43:
-            # assume that RSS is delivered 
-            sat="MSG3"
-        else:
-            # need to use full disk service
-            print("*** Warning, found not sufficient RSS files (",n_files,"), use full disk service instead")
-            time_slot = get_last_SEVIRI_date(False, delay=5)
-            sat="MSG4"
-        time_string = time_slot.strftime("%Y%m%d%H%M")
-    elif(len(sys.argv) == 2):
-        time_string = sys.argv[1]
-        sat="MSG3"
-        time_slot = strptime(time_string, "%Y%m%d%H%M")
-        data_hrit_in=time_slot.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
-        data_nwcsaf_in=time_slot.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/%Y/%m/%d/\*/")
     else:
-        print("Usage: " + sys.argv[0] + " time_string(%Y%m%d%H%M)")
-        sys.exit()
+        data_hrit_in=in_msg.datetime.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
+        data_nwcsaf_in=in_msg.datetime.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/%Y/%m/%d/*/")        
+            
+    n_files = len(glob(data_hrit_in+'/H*'+sat+'*'+t_minus5.strftime("%Y%m%d%H%M")+'*'))
+    if n_files > 38:   # 44 files are full delivery, but only 39 files are archived 
+        # assume that RSS is delivered
+        print("... found "+str(n_files)+" files of RSS mode in "+data_hrit_in+", use MSG3")
         
-    time_string_nwcsaf = time_slot.strftime("%Y%m%dT%H%M")
+    else:
+        # need to use full disk service
+        print("*** Warning, found not sufficient RSS files (",n_files,") in "+data_hrit_in+", use full disk service instead")
+        sat="MSG4"
+        #if len(sys.argv) < 2:
+        #    time_slot = get_last_SEVIRI_date(False, delay=5)
+        if in_msg.datetime.minute % 15 == 0:
+            print("... Full Disk Service available, switch to "+sat)
+        else:
+            print("... no Full Disk Service for this time slot, full stop")
+            quit()
+
+    # loop until EPI satellite data has arrived in folder
+    for i in range(30):   # maximum waiting time 30x30s = 15min = 1 Full Disk Scan 
+        EPI_file=glob(data_hrit_in+'/H*'+sat+'*'+"EPI"+"*"+time_string+'*')
+        if len(EPI_file) > 0:
+            if getsize(EPI_file[0]) > 370000:
+                print("... Epilog file (", EPI_file[0],") has arrived and its size is ", getsize(EPI_file[0]))
+                break
+        print("... Epilog file (", data_hrit_in+'/H*'+sat+'*'+"EPI"+"*"+time_string+'*',") has not arrived yet, sleep 30s")
+        sleep(30)
+    
+    print("")
+    print("search HRIT   input files for "+sat+" "+str(in_msg.datetime)+": " + data_hrit_in+'/H*'+sat+'*'+time_string+'*')
+    files_hrit=glob(data_hrit_in+'/H*'+sat+'*'+time_string+'*')
+    print("   found ", len(files_hrit), " files")
+    #print(files_hrit)
+    print("")
+    print("search NWCSAF input files for "+sat+" "+str(in_msg.datetime)+" in " + data_nwcsaf_in, ":",
+          data_nwcsaf_in+'/S_NWC*'+sat+'*'+in_msg.datetime.strftime("%Y%m%dT%H%M")+'*.nc')
+    files_nwcsaf=glob(data_nwcsaf_in+'/S_NWC*'+sat+'*'+in_msg.datetime.strftime("%Y%m%dT%H%M")+'*.nc')
+    print("   found ", len(files_nwcsaf), " files")
+    #print(files_nwcsaf)
+    print("")
+
+    print("... create satpy scene with all files")
     #print(glob(data_hrit_in+'/H*MSG3*'+time_string+'*'))
     #print(glob(data_nwcsaf_in+'/S_NWC*MSG3*'+time_string_nwcsaf+'*.nc'))
-    global_scene = Scene(filenames={'seviri_l1b_hrit': glob(data_hrit_in+'/H*'+sat+'*'+time_string+'*'),
-                                    'nwcsaf-geo': glob(data_nwcsaf_in+'/S_NWC*'+sat+'*'+time_string_nwcsaf+'*.nc')})
-    #global_scene = Scene(platform_name="Meteosat-9", sensor="seviri", reader="hrit_msg", start_time=time_slot)
-    #global_data = Scene.create_scene("meteosat", "09", "seviri", time_slot)
-
-    #outputDir="/data/cinesat/out/"
-    outputDir="./satlive/"
-  
-    ##############################################################
-    wishlist=[]
-    #### channels of SEVIRI
-    #wishlist.append("HRV")
-    #wishlist.append("VIS006")
-    #wishlist.append("VIS008")
-    #wishlist.append("IR_016")
-    #wishlist.append("IR_039")
-    wishlist.append("WV_062")
-    #wishlist.append("WV_073")
-    #wishlist.append("IR_097")
-    #wishlist.append("IR_108")
-    #wishlist.append("IR_120")
-    #wishlist.append("IR_134")
-    #### modified channels of SEVIRI, see satpy/satpy/etc/composites/seviri.yaml 
-    #wishlist.append("_vis06")
-    #wishlist.append("_hrv")
-    #wishlist.append("_vis06_filled_hrv")
-    wishlist.append("_ir108")
-    wishlist.append("_vis_with_ir")
-    #### modified channels for VISIR, see satpy/satpy/etc/composites/visir.yaml
-    #wishlist.append("ir108_3d")
-    #wishlist.append("ir_cloud_day")
-    #### backgrounds, see satpy/satpy/etc/composites/visir.yaml)
-    #wishlist.append("_night_background")
-    #wishlist.append("_night_background_hires")
-    # composites for SEVIRI, see, see satpy/satpy/etc/composites/seviri.yaml)
-    #wishlist.append("ct_masked_ir")
-    #wishlist.append("nwc_geo_ct_masked_ir")
-    wishlist.append("cloudtop")
-    #wishlist.append("cloudtop_daytime")
-    #wishlist.append("convection")
-    wishlist.append("night_fog")
-    #wishlist.append("snow")
-    #wishlist.append("day_microphysics")
-    #wishlist.append("day_microphysics_winter")
-    #wishlist.append("natural_color_raw")
-    wishlist.append("natural_color")
-    #wishlist.append("natural_color_nocorr")
-    wishlist.append("fog")
-    #wishlist.append("cloudmask")
-    #wishlist.append("cloudtype")
-    #wishlist.append("cloud_top_height")
-    #wishlist.append("cloud_top_pressure")
-    #wishlist.append("cloud_top_temperature")
-    #wishlist.append("cloud_top_phase")
-    #wishlist.append("cloud_drop_effective_radius")
-    #wishlist.append("cloud_optical_thickness")
-    #wishlist.append("cloud_liquid_water_path")
-    #wishlist.append("cloud_ice_water_path")
-    #wishlist.append("precipitation_probability")
-    #wishlist.append("convective_rain_rate")
-    #wishlist.append("convective_precipitation_hourly_accumulation")
-    #wishlist.append("total_precipitable_water")
-    #wishlist.append("showalter_index")
-    #wishlist.append("lifted_index")
-    #wishlist.append("convection_initiation_prob30")
-    #wishlist.append("convection_initiation_prob60")
-    #wishlist.append("convection_initiation_prob90")
-    #wishlist.append("asii_prob")
-    #wishlist.append("rdt_cell_type")
-    #wishlist.append("realistic_colors")
-    #wishlist.append("ir_overview")
-    #wishlist.append("overview_raw")
-    wishlist.append("overview")
-    wishlist.append("green_snow")
-    #wishlist.append("colorized_ir_clouds")
-    #wishlist.append("vis_sharpened_ir")
-    #wishlist.append("ir_sandwich")
-    #wishlist.append("natural_enh")
-    wishlist.append("hrv_clouds")
-    #wishlist.append("hrv_fog")
-    #wishlist.append("hrv_severe_storms")
-    #wishlist.append("hrv_severe_storms_masked")
-    #wishlist.append("natural_with_night_fog")
-    #wishlist.append("natural_color_with_night_ir")
-    #wishlist.append("natural_color_raw_with_night_ir")
-    #wishlist.append("natural_color_with_night_ir_hires")
-    #wishlist.append("natural_enh_with_night_ir")
-    #wishlist.append("natural_color_with_night_ir_hires")
-    #wishlist.append("natural_enh_with_night_ir")
-    #wishlist.append("natural_enh_with_night_ir_hires")
-    #wishlist.append("night_ir_alpha")
-    #wishlist.append("night_ir_with_background")
-    #wishlist.append("night_ir_with_background_hires")
-    #wishlist.append("vis_with_ir_cloud_overlay")
-    # general VISIR composites, see satpy/satpy/etc/composites/visir.yaml
-    wishlist.append("airmass")
-    wishlist.append("ash")
-    wishlist.append("cloudtop")
-    #wishlist.append("convection")
-    wishlist.append("snow")
-    #wishlist.append("day_microphysics")
-    wishlist.append("dust")
-    wishlist.append("fog")
-    wishlist.append("green_snow")
-    #wishlist.append("natural_enh")
-    #wishlist.append("natural_color_raw")
-    #wishlist.append("natural_color")
-    ##wishlist.append("night_fog")
-    ##wishlist.append("overview")
-    #wishlist.append("true_color_raw")          
-    #wishlist.append("natural_with_night_fog")
-    #wishlist.append("precipitation_probability")
-    #wishlist.append("cloudmask_extended")
-    #wishlist.append("cloudmask_probability")
-    #wishlist.append("cloud_drop_effective_radius")
-    #wishlist.append("cloud_optical_thickness")
-    #wishlist.append("night_microphysics")
-    #wishlist.append("cloud_phase_distinction")
-    #wishlist.append("cloud_phase_distinction_raw")
-    ###### CMIC products 
-    #wishlist.append("cloud_water_path")
-    #wishlist.append("ice_water_path")
-    #wishlist.append("liquid_water_path")
-    #wishlist.append("cloud_phase")          # needs 1.6, 2.2, 0.67
-    #wishlist.append("cloud_phase_raw")      # needs 1.6, 2.2, 0.67
-    #wishlist.append("cimss_cloud_type")     # needs 1.4, 04, 1.6
-    #wishlist.append("cimss_cloud_type_raw") # needs 1.4, 04, 1.6
-    #### self specified composites (need a modified satpy/satpy/etc/composites/seviri.yaml)
-    wishlist.append("DayNightMicrophysics")
-    wishlist.append("DayNightFog")
-    wishlist.append("DayConvectionNightMicrophysics")
-    wishlist.append("DayNightOverview")
-    #wishlist.append("SWconvection")
-    wishlist.append("DaySWconvectionNightMicrophysics")
+    #global_scene = Scene(filenames={'seviri_l1b_hrit': files_hrit,'nwcsaf-geo': files_nwcsaf})
+    global_scene = Scene(filenames={'seviri_l1b_hrit': files_hrit})
+    #global_scene = Scene(platform_name="Meteosat-9", sensor="seviri", reader="hrit_msg", start_time=in_msg.datetime)
     
-    shapes_dir='/opt/users/common/shapes/'
-
-    ###############################################################
-
-    #composites=["day_microphysics","_hrv"]  # does not work with to_image, only with show!!!
-    #composites=["convection","_hrv"]  # does not work with to_image, only with show!!!
-    #composites=["overview_raw","_hrv"]
-    #composites=["overview","_hrv"]
-    #composites=["vis_with_ir_cloud_overlay"]
-    #composites=["cloud_top_height"]
-    #composites=["DayNightMicrophysics"]
-    #composites=["DayNightFog"]
-    #composites=["DayConvectionNightMicrophysics"]
-    #composites=["HRoverview"]           # more yellowish than LuminanceSharpened overview_raw ??? 
-    #composites=["DayNightOverview","HRoverview"]
-    composites=wishlist 
+    print("")
+    print("... load composites")
+    for comp in in_msg.RGBs:
+        print("   "+comp.replace("_", "-")+"  scp:", comp in in_msg.scpProducts)
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=UserWarning)
+        warnings.filterwarnings("ignore", category=RuntimeWarning)
+        #global_scene.load(["VIS006",'ctth_alti'])
+        #global_scene.load(["IR_108",'ctth_alti'])
+        #global_scene["ctth_alti"].attrs['orbital_parameters']=global_scene["IR_108"].attrs['orbital_parameters']
+        global_scene.load(in_msg.RGBs)
     
-    print("... load composites: ", composites)
-    for comp in composites:
-        print("   "+comp)
-    global_scene.load(composites)
-
-    areas=[]
-    #areas.append("ccs4")
-    areas.append('EuropeCenter')
-    
-    for area in areas:
+    for area in in_msg.areas:
 
         areadef = get_area_def(area)
 
         print("... resample to area "+area)
         # https://satpy.readthedocs.io/en/stable/resample.html
-        if area=="ccs4":
-            #local_scene = global_scene.resample(area, resampler="bilinear", cache_dir='/tmp/', precompute=True)
-            #local_scene = global_scene.resample(area, resampler="bilinear", cache_dir='/tmp/')
-            local_scene = global_scene.resample(area, resampler="bilinear", precompute=True)
-        else:
-            local_scene = global_scene.resample(area, radius_of_influence=5000, precompute=True)
-
-        # reload composites
-        print("... reload composites")
-        local_scene.load(composites)
-            
-        for comp in composites:
-        #for comp in []:
-            
-            if False:
-              #local_scene.show(comp)
-              local_scene.show(comp, overlay={'coast_dir': shapes_dir, 'color': (255, 0, 0),
-                                                'resolution': 'i', 'width': 1.0})    #does not work level_coast=1, level_borders=1
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=RuntimeWarning)
+            warnings.filterwarnings("ignore", category=UserWarning)
+            #resampler="bilinear"
+            resampler="nearest"
+            if area=="ccs4":
+                #local_scene = global_scene.resample(area, resampler=resampler, cache_dir='/tmp/', precompute=True)
+                #local_scene = global_scene.resample(area, resampler=resampler, cache_dir='/tmp/')
+                local_scene = global_scene.resample(area, resampler=resampler, precompute=True)
             else:
-              pngfile = outputDir+comp+"_"+ area+"_"+time_string+".png"
-              print("... create "+pngfile)
-              local_scene.save_dataset(comp, pngfile)
-              #img = to_image(local_scene[comp])     # does not work with airmass, overview ... 
-              #if (comp=="HRoverview"):              # only works for pytroll img, not for PIL image
-              #    print("*** apply gamma enhancement")
-              #    img.gamma(2.0)                    # only works for pytroll img, not for PIL image
-              #img.save(pngfile)                     
-              ##original = cv2.imread(pngfile)
-              ##if (comp=="HRoverview"):                    # looks too yellowish, bright 
-              ##    print("*** apply gamma enhancement")
-              ##    img = adjust_gamma(original, gamma=2)
-              ##    cv2.imwrite(pngfile, img)
-              img = Image.open(pngfile)
-              cw = ContourWriter(shapes_dir)
-              cw.add_coastlines(img, areadef, resolution='i', outline='red')
-              cw.add_borders(img, areadef, resolution='i', outline='red')
-              #cw.add_rivers(img, areadef, resolution='i', outline='blue')     # h and f does not work
-              #font = ImageFont.truetype("/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerif.ttf",16)
-              #cw.add_grid(img, areadef, (2.0,2.0), (0.5,0.5), font, fill='blue', outline='blue', minor_outline='white')
-              img.save(pngfile)
-              print("display "+pngfile+" &")
-              print()
+                local_scene = global_scene.resample(area, radius_of_influence=5000, precompute=True)
+
+            # reload composites
+            print("... reload composites")
+            local_scene.load(in_msg.RGBs)
+        
+            for comp in in_msg.RGBs:
+            #for comp in []:
+
+                # show interactively 
+                if False:
+                    #local_scene.show(comp)
+                    local_scene.show(comp, overlay={'coast_dir': in_msg.mapDir, 'color': (255, 0, 0),
+                                                    'resolution': 'i', 'width': 1.0})    #does not work level_coast=1, level_borders=1
+                # save as png file 
+                if True:
+                    print(in_msg.datetime)
+                    print("==============")
+                    outputFile = in_msg.outputDir+"MSG_"+comp.replace("_", "-")+"-"+ area+"_"+in_msg.datetime.strftime("%y%m%d%H%M")+".png"
+                    outputFile = rename_outputFile(outputFile)
+                    #print("... create "+outputFile)
+                    title    = in_msg.datetime.strftime(" "+sat[0:3]+"-"+sat[3]+', %y-%m-%d %H:%MUTC, '+area+', '+comp)
+                    decorate = {
+                        'decorate': [
+                            {'logo': {'logo_path': '/opt/users/common/logos/meteoSwiss.png', 'height': 60, 'bg': 'white',
+                                      'bg_opacity': 255, 'align': {'top_bottom': 'top', 'left_right': 'right'}}},
+                            {'text': {'txt': title,
+                                      'align': {'top_bottom': 'top', 'left_right': 'left'},
+                                      'font': "/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf",
+                                      'font_size': 18,
+                                      'height': 26,
+                                      'bg': 'black',
+                                      'bg_opacity': 50,
+                                      'line': 'white'}}
+                        ]
+                    }
+                    
+                    local_scene.save_dataset(comp, outputFile, decorate=decorate)
+                    #img = to_image(local_scene[comp])     # does not work with airmass, overview ... 
+                    #if (comp=="HRoverview"):              # only works for pytroll img, not for PIL image
+                    #    print("*** apply gamma enhancement")
+                    #    img.gamma(2.0)                    # only works for pytroll img, not for PIL image
+                    #img.save(outputFile)                     
+                    #original = cv2.imread(outputFile)
+                    #if (comp=="HRoverview"):                    # looks too yellowish, bright 
+                    #    print("*** apply gamma enhancement")
+                    #    img = adjust_gamma(original, gamma=2)
+                    #    cv2.imwrite(outputFile, img)
+                    img = Image.open(outputFile)
+                    cw = ContourWriter(in_msg.mapDir)
+                    cw.add_coastlines(img, areadef, resolution='i', outline='red')
+                    cw.add_borders(img, areadef, resolution='i', outline='red')
+                    #cw.add_rivers(img, areadef, resolution='i', outline='blue')     # h and f does not work
+                    #font = ImageFont.truetype("/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerif.ttf",16)
+                    #cw.add_grid(img, areadef, (2.0,2.0), (0.5,0.5), font, fill='blue', outline='blue', minor_outline='white')
+                    img.save(outputFile)
+                    print("... display "+outputFile+" &")
+
+                    # secure copy file to another place
+                    if in_msg.scpOutput:
+                        if (comp in in_msg.scpProducts) or ('all' in [x.lower() for x in in_msg.scpProducts if type(x)==str]):
+                            scpOutputDir = format_name (in_msg.scpOutputDir, in_msg.datetime, area=area, rgb=comp.replace("_", "-") )
+                            scpOutputDir = rename_outputFile(scpOutputDir)
+                            if in_msg.compress_to_8bit:
+                                command_line_command="scp "+in_msg.scpID+" "+outputFile.replace(".png","-fs8.png")+" "+scpOutputDir+" 2>&1 &"
+                                if in_msg.verbose:
+                                    print("... secure copy: "+command_line_command)
+                                subprocess.call(command_line_command, shell=True)
+                            else:
+                                command_line_command="scp "+in_msg.scpID+" "+outputFile+" "+scpOutputDir+" 2>&1 &"
+                                if in_msg.verbose:
+                                    print("... secure copy: "+command_line_command)
+                                subprocess.call(command_line_command, shell=True)
+                    
+                if False:
+                    # for parallax corrected images, fill data gaps 
+                    print("fill missing values in data file")
+                    title    = in_msg.datetime.strftime(" "+sat[0:3]+"-"+sat[3]+', %y-%m-%d %H:%MUTC, parallax correction')
+                    filename = in_msg.datetime.strftime(in_msg.outputDir+'MSG_'+comp+'-'+area+'_%y%m%d%H%M_.png')
+                    show_interactively=False
+                    my_data = deepcopy(local_scene[comp].data)
+                    mask = np.isnan(local_scene[comp].data.compute())
+                    local_scene[comp].data = da.array.from_array(interpolate_missing_pixels(local_scene[comp].data.compute(), mask, method='linear'))
+                    save_image(local_scene, area, comp, title=title, filename=filename, show_interactively=show_interactively)
+                    
 
         LuminanceSharpening=False
         #LuminanceSharpening=True
-        comp=composites[0]
+        comp=in_msg.RGBs[0]
         if LuminanceSharpening:
             vis_data = local_scene['_hrv']
             base_image = local_scene[comp]
@@ -344,9 +348,9 @@ if __name__ == '__main__':
                 #from satpy.enhancements import gamma
                 #gamma(img, gamma=2)
                 img.gamma(2.0)
-            pngfile=outputDir+"HR"+comp+"_" + area + "_" + time_string + ".png"
-            img.save(pngfile)
-            print("display "+pngfile+" &")
+            outputFile=in_msg.outputDir+"MSG_HR"+comp+"-" + area + "_" + in_msg.datetime.strftime("%y%m%d%H%M") + ".png"
+            img.save(outputFile)
+            print("display "+outputFile+" &")
             print()
 
         #Sandwich=True
@@ -357,5 +361,7 @@ if __name__ == '__main__':
             compositor = SandwichCompositor("SW"+comp)
             composite = compositor([vis_data, base_image])
             img = to_image(composite)
-            pngfile=outputDir+"SW"+comp+"_" + area + "_" + time_string + ".png"
-            img.save(pngfile)
+            outputFile=in_msg.outputDir+"MSG_SW"+comp+"-" + area + "_" + in_msg.datetime.strftime("%y%m%d%H%M") + ".png"
+            img.save(outputFile)
+            print("display "+outputFile+" &")
+            print()

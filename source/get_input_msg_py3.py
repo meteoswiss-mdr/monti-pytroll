@@ -613,7 +613,8 @@ def parse_commandline_and_read_inputfile(input_file=None):
    #from get_input_msg import parse_commandline_and_read_inputfile
    #from get_input_msg import parse_commandline
    #from get_input_msg import get_input_msg
-
+   from datetime import datetime
+   
    # interpret command line arguments 
    (options, args) = parse_commandline()
 

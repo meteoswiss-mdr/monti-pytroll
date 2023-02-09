@@ -3,14 +3,14 @@ from __future__ import print_function
 
 from my_msg_module_py3 import format_name
 from os.path import isfile, join, exists, dirname
-from os import makedirs
+from os import makedirs, chmod
 import subprocess
 import inspect
 from copy import deepcopy
 
 def get_THX_filename(time_slot, area, outDir, outFile):
     print("    get_THX_filename THX for ", area)
-    from ConfigParser import ConfigParser
+    from configparser import ConfigParser
     from mpop import CONFIG_PATH
     conf = ConfigParser()
     conf.read(join(CONFIG_PATH, "swisslightning.cfg"))
@@ -24,7 +24,7 @@ def get_THX_filename(time_slot, area, outDir, outFile):
     return outputDir+filename
 
 def get_radar_filename(rgb, time_slot, area, outDir, outFile):
-    print("    get_radar_filename radar for ", area)
+    print("    get_radar_filename radar for ", area, end = '')
 
     if rgb=='radar':
         # backward comparbility (old convention for file names of radar products, not that good)
@@ -43,7 +43,7 @@ def get_radar_filename(rgb, time_slot, area, outDir, outFile):
     return outputDir+filename
 
 def get_odyssey_filename(time_slot, area, outDir, outFile):
-    print("    get_odyssey_filename radar for ", area)
+    print("    get_odyssey_filename radar for ", area, end = '')
     outputDir = format_name(outDir, time_slot, area=area, rgb="radar")
     if not exists(outputDir):
         print('... create output directory: ' + outputDir)
@@ -53,7 +53,7 @@ def get_odyssey_filename(time_slot, area, outDir, outFile):
     return outputDir+filename
 
 def get_TRT_filename(time_slot, area, outDir, outFile):
-    print("    get_TRT_filename TRT for ", area) 
+    print("    get_TRT_filename TRT for ", area, end = '') 
     outputDir = format_name(outDir, time_slot, area=area, rgb="TRT")
     if not exists(outputDir):
         print('... create output directory: ' + outputDir)
@@ -63,7 +63,7 @@ def get_TRT_filename(time_slot, area, outDir, outFile):
     return outputDir+filename
 
 def get_cosmo_filename(rgb, time_slot, area, outDir, outFile):
-    print("    get_cosmo_filename radar for ", area)
+    print("    get_cosmo_filename radar for ", area, end = '')
 
     outputDir = format_name(outDir, time_slot, area=area, rgb=rgb)
     filename = format_name('COSMO_'+rgb+'-'+area+'_%y%m%d%H%M.png', time_slot, area=area)   
@@ -75,7 +75,7 @@ def get_cosmo_filename(rgb, time_slot, area, outDir, outFile):
     return outputDir+filename
 
 def get_OT_filename(rgb, time_slot, area, outDir, outFile):
-    print("    get_OT_filename (overshooting top) for ", area) 
+    print("    get_OT_filename (overshooting top) for ", area, end = '') 
     outputDir = format_name(outDir, time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
     if not exists(outputDir):
         print('... create output directory: ' + outputDir)
@@ -85,7 +85,7 @@ def get_OT_filename(rgb, time_slot, area, outDir, outFile):
     return outputDir+filename
 
 def get_sat_filename(rgb, sat, sat_nr, time_slot, area, outDir, outFile):
-    print("    get_sat_filename for ", rgb, area)
+    print("    get_sat_filename for ", rgb, area, end = '')
     #outputDir = "/data/cinesat/out/"
     outputDir = format_name(outDir, time_slot, area=area, rgb=rgb, sat=sat, sat_nr=sat_nr)
     if not exists(outputDir):
@@ -181,6 +181,12 @@ def n_file_composite(composite, satellite, sat_nr, time_slot, area, outDir, outF
     if verbose:
         print("    "+command)
     subprocess.call(command, shell=True) #+" 2>&1 &"
+    # give right to all (user, group, all) to delete result file
+    try:
+        chmod(comp_file, 0o666)   
+    except:
+        print("*** ERROR, CANNOT CHANGE RIGHTS FOR READ/WRITE/EXECUTE",comp_file) 
+        
     # check if file is produced
     if isfile(comp_file):
         composites_done.append(composite)
@@ -392,6 +398,12 @@ def postprocessing (in_msg, time_slot, sat_nr, area):
                             print("/usr/bin/convert -resize "+str(in_msg.resize_montage)+"% " + outfile  +" tmp.png 2>&1 "+sleep_str)
                         subprocess.call("/usr/bin/convert -resize "+str(in_msg.resize_montage)+"% " + outfile  +" tmp.png; mv tmp.png "+ outfile+" 2>&1 ", shell=True)
 
+                # give right to all (user, group, all) to delete result file
+                try:
+                    chmod(outfile, 0o666)
+                except:
+                    print("*** ERROR; could not update following image:"+outfile)
+                    
                 # check if file is produced
                 if isfile(outfile) and files_complete:
                     montage_done.append(montage)

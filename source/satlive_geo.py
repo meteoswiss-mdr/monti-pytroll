@@ -45,16 +45,20 @@ We take the case of HRIT data from meteosat 10, as send through eumetcast.
 
 """
 
+black_white_composites=["HRV", "VIS006", "VIS008", "IR_016", "IR_039", "WV_062", "WV_073",
+                        "IR_097", "IR_108", "IR_120", "IR_134",
+                        "_vis06", "_hrv", "_vis06_filled_hrv", "_ir108", "_vis_with_ir", "ir108_3d"]
+
 #from satpy.utils import debug_on
 #debug_on()
 import sys
 from datetime import datetime, timedelta
-from time import sleep 
+from time import sleep, perf_counter
 from glob import glob
 from PIL import Image, ImageFont
 import numpy as np
 import dask as da
-from os.path import exists, getsize 
+from os.path import exists, getsize
 
 from satpy import Scene, find_files_and_readers
 from satpy.writers import to_image
@@ -72,7 +76,9 @@ from parallax_jussi import save_image
 
 from pycoast import ContourWriter
 
-from get_input_msg_py3 import get_input_msg 
+from get_input_msg_py3 import get_input_msg
+
+from postprocessing_py3 import postprocessing
 
 import warnings
 import subprocess
@@ -152,12 +158,51 @@ def adjust_gamma(image, gamma=1.0):
     # apply gamma correction using the lookup table
     return cv2.LUT(image, table)
 
+#----------------------------------------------------------------------------------------------------------------
+
+def choose_map_resolution(area, MapResolutionInputfile):
+
+   ## add coasts, borders, and rivers, database is heree 
+   ## http://www.soest.hawaii.edu/pwessel/gshhs/index.html
+   ## possible resolutions                                          
+   ## f  full resolution: Original (full) data resolution.          
+   ## h  high resolution: About 80 % reduction in size and quality. 
+   ## i  intermediate resolution: Another ~80 % reduction.          
+   ## l  low resolution: Another ~80 % reduction.                   
+   ## c  crude resolution: Another ~80 % reduction.   
+
+   if MapResolutionInputfile is None:         # if the user did not specify the resolution 
+      if area.find("EuropeCanary") != -1: # make a somewhat clever choise  
+         resolution='l'
+      if area.find("europe_") != -1:
+         resolution='i'
+      if area.find("EuropeC") != -1:  
+         resolution='i'
+      if area.find("odysseyS25") != -1:  
+         resolution='i'
+      elif area.find("ccs4") != -1:
+         resolution='i' 
+      elif area.find("ticino") != -1:
+         resolution='h'
+      elif area.find("cosmo") != -1:
+         resolution='i'
+      else:
+         resolution='l'
+   else:
+      resolution = MapResolutionInputfile     # otherwise take specification of user 
+
+   return resolution 
+
+
 #######################################################
     
 if __name__ == '__main__':
 
+    time_0 = perf_counter()
+    
     # interpret command line arguments (first argument is configuration file) and read configuration file 
     in_msg = parse_commandline_and_read_inputfile()
+    print(in_msg.msg_str(layout="%(msg)s%(msg_nr)s"))
     
     print("... produce satellite image for: "+in_msg.datetime.strftime("%Y-%m-%d, %H:%M:%S"))
         
@@ -165,7 +210,7 @@ if __name__ == '__main__':
     print("")
     time_string = in_msg.datetime.strftime("%Y%m%d%H%M")
     t_minus5 = in_msg.datetime - timedelta(minutes=5)
-    sat="MSG3"
+    sat=in_msg.msg_str(layout="%(msg)s%(msg_nr)s")
     
     if (in_msg.nrt):
         data_hrit_in="/data/cinesat/in/eumetcast1/"
@@ -173,24 +218,30 @@ if __name__ == '__main__':
     else:
         data_hrit_in=in_msg.datetime.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
         data_nwcsaf_in=in_msg.datetime.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/%Y/%m/%d/*/")        
-            
-    n_files = len(glob(data_hrit_in+'/H*'+sat+'*'+t_minus5.strftime("%Y%m%d%H%M")+'*'))
-    if n_files > 38:   # 44 files are full delivery, but only 39 files are archived 
-        # assume that RSS is delivered
-        print("... found "+str(n_files)+" files of RSS mode in "+data_hrit_in+", use MSG3")
-        
-    else:
-        # need to use full disk service
-        print("*** Warning, found not sufficient RSS files (",n_files,") in "+data_hrit_in+", use full disk service instead")
-        sat="MSG4"
-        #if len(sys.argv) < 2:
-        #    time_slot = get_last_SEVIRI_date(False, delay=5)
-        if in_msg.datetime.minute % 15 == 0:
-            print("... Full Disk Service available, switch to "+sat)
-        else:
-            print("... no Full Disk Service for this time slot, full stop")
-            quit()
 
+    time_read_input = perf_counter()
+        
+    if in_msg.RSS:
+        n_files = len(glob(data_hrit_in+'/H*'+sat+'*'+t_minus5.strftime("%Y%m%d%H%M")+'*'))
+        if n_files > 38:   # 44 files are full delivery, but only 39 files are archived 
+            # assume that RSS is delivered
+            print("... found "+str(n_files)+" files of RSS mode in "+data_hrit_in+", use MSG3")
+
+        else:
+            # need to use full disk service
+            print("*** Warning, found not sufficient RSS files (",n_files,") in "+data_hrit_in+", use full disk service instead")
+            sat="MSG4"
+            in_msg.sat_nr=11  # should not be overwritten !!!
+            #if len(sys.argv) < 2:
+            #    time_slot = get_last_SEVIRI_date(False, delay=5)
+            if in_msg.datetime.minute % 15 == 0:
+                print("... Full Disk Service available, switch to "+sat)
+            else:
+                print("... no Full Disk Service for this time slot, full stop")
+                quit()
+
+    time_check_RSS = perf_counter()
+                
     # loop until EPI satellite data has arrived in folder
     for i in range(30):   # maximum waiting time 30x30s = 15min = 1 Full Disk Scan 
         EPI_file=glob(data_hrit_in+'/H*'+sat+'*'+"EPI"+"*"+time_string+'*')
@@ -200,10 +251,13 @@ if __name__ == '__main__':
                 break
         print("... Epilog file (", data_hrit_in+'/H*'+sat+'*'+"EPI"+"*"+time_string+'*',") has not arrived yet, sleep 30s")
         sleep(30)
-    
+
+    time_wait_for_epilog = perf_counter()
+        
     print("")
     print("search HRIT   input files for "+sat+" "+str(in_msg.datetime)+": " + data_hrit_in+'/H*'+sat+'*'+time_string+'*')
     files_hrit=glob(data_hrit_in+'/H*'+sat+'*'+time_string+'*')
+    #files_hrit=glob('/tmp/SEVIRI_DECOMPRESSED/H*'+sat+'*'+time_string+'*')
     print("   found ", len(files_hrit), " files")
     #print(files_hrit)
     print("")
@@ -213,7 +267,12 @@ if __name__ == '__main__':
     print("   found ", len(files_nwcsaf), " files")
     #print(files_nwcsaf)
     print("")
+    
+    time_search_input_files = perf_counter()
 
+    #if len(in_msg.RGBs) == 0 and len(in_msg.postprocessing_areas) == 0:
+    #    return in_msg.RGBs
+    
     print("... create satpy scene with all files")
     #print(glob(data_hrit_in+'/H*MSG3*'+time_string+'*'))
     #print(glob(data_nwcsaf_in+'/S_NWC*MSG3*'+time_string_nwcsaf+'*.nc'))
@@ -232,9 +291,25 @@ if __name__ == '__main__':
         #global_scene.load(["IR_108",'ctth_alti'])
         #global_scene["ctth_alti"].attrs['orbital_parameters']=global_scene["IR_108"].attrs['orbital_parameters']
         global_scene.load(in_msg.RGBs)
+
+    time_load_data = perf_counter()
+    time_start_area = {}
+    time_interpolate = {}
+    time_reload = {}
+    time_images = {}
+    
+    ### dir(global_scene)
+    # 'all_composite_ids', 'all_composite_names', 'all_dataset_ids', 'all_dataset_names', 'all_modifier_names', 'all_same_area', 'all_same_proj', 'attrs', 'available_composite_ids', 'available_composite_names', 'available_dataset_ids', 'available_dataset_names', 'chunk', 'coarsest_area', 'compute', 'copy', 'crop', 'end_time', 'finest_area', 'generate_possible_composites', 'get', 'images', 'iter_by_area', 'keys', 'load', 'max_area', 'min_area', 'missing_datasets', 'persist', 'resample', 'save_dataset', 'save_datasets', 'sensor_names', 'show', 'slice', 'start_time', 'to_geoviews', 'to_xarray_dataset', 'unload', 'values', 'wishlist']
+    #print(in_msg.datetime)         2023-01-23 15:30:00
+    #print(global_scene.start_time) 2023-01-23 15:30:09.740000
+    #print(global_scene.end_time)   2023-01-23 15:42:43.046000
+    #print(global_scene.sensor_names) {'seviri'}
+    print(in_msg.sat_nr)
     
     for area in in_msg.areas:
 
+        time_start_area[area] = perf_counter()
+        
         areadef = get_area_def(area)
 
         print("... resample to area "+area)
@@ -243,18 +318,48 @@ if __name__ == '__main__':
             warnings.filterwarnings("ignore", category=RuntimeWarning)
             warnings.filterwarnings("ignore", category=UserWarning)
             #resampler="bilinear"
-            resampler="nearest"
+            #resampler="nearest"
+            resampler='gradient_search'
+            title_font_size = 18
+            title_height = 26
+            precompute=True
+            cache_dir='/tmp/resample/'
+            
             if area=="ccs4":
+                resampler="nearest"
                 #local_scene = global_scene.resample(area, resampler=resampler, cache_dir='/tmp/', precompute=True)
                 #local_scene = global_scene.resample(area, resampler=resampler, cache_dir='/tmp/')
-                local_scene = global_scene.resample(area, resampler=resampler, precompute=True)
+                local_scene = global_scene.resample(area, resampler=resampler, precompute=precompute, cache_dir=cache_dir)
+            elif area=="odysseyS25":
+                #resampler='gradient_search'
+                local_scene = global_scene.resample(area, resampler=resampler, radius_of_influence=250, precompute=precompute, cache_dir=cache_dir)
+                #local_scene = global_scene.aggregate(y=4, x=4) works for the original channels, but not for composites
+                print("... radius_of_influence=250")
+            elif area=="SeviriDiskFull00S4":
+                resampler='gradient_search'
+                local_scene = global_scene.resample(area, resampler=resampler, radius_of_influence=5000, precompute=precompute, cache_dir=cache_dir)
+                #local_scene = global_scene.aggregate(y=4, x=4) works for the original channels, but not for composites
+                print("... radius_of_influence=5000")
+                title_font_size = 16
+                title_height = 2
             else:
-                local_scene = global_scene.resample(area, radius_of_influence=5000, precompute=True)
+                local_scene = global_scene.resample(area, resampler=resampler, precompute=precompute, cache_dir=cache_dir)
 
+            print("... resampler: "+resampler)
+            if precompute:
+                print("... cache_dir: "+cache_dir)
+                
+            time_interpolate[area] = perf_counter()
+                
             # reload composites
             print("... reload composites")
             local_scene.load(in_msg.RGBs)
-        
+
+            time_reload[area] = perf_counter()
+
+            mapResolution = choose_map_resolution(area, in_msg.mapResolution)
+            print("... use map resolution for countour overlay: ", mapResolution)
+            
             for comp in in_msg.RGBs:
             #for comp in []:
 
@@ -262,7 +367,16 @@ if __name__ == '__main__':
                 if False:
                     #local_scene.show(comp)
                     local_scene.show(comp, overlay={'coast_dir': in_msg.mapDir, 'color': (255, 0, 0),
-                                                    'resolution': 'i', 'width': 1.0})    #does not work level_coast=1, level_borders=1
+                                                    'resolution': mapResolution, 'width': 1.0})    #does not work level_coast=1, level_borders=1
+
+                if in_msg.border_color != None:
+                    border_color=in_msg.border_color
+                else:
+                    if comp in black_white_composites:
+                        border_color="black"
+                    else:
+                        border_color="red"
+                        
                 # save as png file 
                 if True:
                     print(in_msg.datetime)
@@ -273,20 +387,20 @@ if __name__ == '__main__':
                     title    = in_msg.datetime.strftime(" "+sat[0:3]+"-"+sat[3]+', %y-%m-%d %H:%MUTC, '+area+', '+comp)
                     decorate = {
                         'decorate': [
-                            {'logo': {'logo_path': '/opt/users/common/logos/meteoSwiss.png', 'height': 60, 'bg': 'white',
+                            {'logo': {'logo_path': '/opt/users/common/logos/meteoSwiss.png', 'height': 55, 'bg': 'white',
                                       'bg_opacity': 255, 'align': {'top_bottom': 'top', 'left_right': 'right'}}},
                             {'text': {'txt': title,
                                       'align': {'top_bottom': 'top', 'left_right': 'left'},
                                       'font': "/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf",
-                                      'font_size': 18,
-                                      'height': 26,
+                                      'font_size': title_font_size,
+                                      'height': title_height,
                                       'bg': 'black',
-                                      'bg_opacity': 50,
+                                      'bg_opacity': 60,
                                       'line': 'white'}}
                         ]
                     }
                     
-                    local_scene.save_dataset(comp, outputFile, decorate=decorate)
+                    local_scene.save_dataset(comp, outputFile, decorate=decorate, fill_value=0)
                     #img = to_image(local_scene[comp])     # does not work with airmass, overview ... 
                     #if (comp=="HRoverview"):              # only works for pytroll img, not for PIL image
                     #    print("*** apply gamma enhancement")
@@ -299,9 +413,11 @@ if __name__ == '__main__':
                     #    cv2.imwrite(outputFile, img)
                     img = Image.open(outputFile)
                     cw = ContourWriter(in_msg.mapDir)
-                    cw.add_coastlines(img, areadef, resolution='i', outline='red')
-                    cw.add_borders(img, areadef, resolution='i', outline='red')
-                    #cw.add_rivers(img, areadef, resolution='i', outline='blue')     # h and f does not work
+                    if in_msg.add_borders:
+                        cw.add_coastlines(img, areadef, resolution=in_msg.mapResolution, outline=border_color)
+                        cw.add_borders(img, areadef, resolution=in_msg.mapResolution, outline=border_color)
+                    if in_msg.add_rivers:    
+                        cw.add_rivers(img, areadef, resolution=in_msg.mapResolution, outline=in_msg.river_color)     # h and f does not work
                     #font = ImageFont.truetype("/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerif.ttf",16)
                     #cw.add_grid(img, areadef, (2.0,2.0), (0.5,0.5), font, fill='blue', outline='blue', minor_outline='white')
                     img.save(outputFile)
@@ -333,7 +449,8 @@ if __name__ == '__main__':
                     mask = np.isnan(local_scene[comp].data.compute())
                     local_scene[comp].data = da.array.from_array(interpolate_missing_pixels(local_scene[comp].data.compute(), mask, method='linear'))
                     save_image(local_scene, area, comp, title=title, filename=filename, show_interactively=show_interactively)
-                    
+            
+            time_images[area] = perf_counter()
 
         LuminanceSharpening=False
         #LuminanceSharpening=True
@@ -365,3 +482,21 @@ if __name__ == '__main__':
             img.save(outputFile)
             print("display "+outputFile+" &")
             print()
+
+    ## start postprocessing
+    for area in in_msg.postprocessing_areas:
+        postprocessing(in_msg, in_msg.datetime, in_msg.sat_nr, area)
+            
+    print()
+    print("============================")
+    print("performance testing: ")
+    print(f"{time_read_input         - time_0:3.4f} s    reading input file")
+    print(f"{time_check_RSS          - time_read_input:3.4f} s    checking for RSS files")
+    print(f"{time_wait_for_epilog    - time_check_RSS:3.4f} s    wait for epilog file")
+    print(f"{time_search_input_files - time_wait_for_epilog:3.4f} s    reading input file")
+    print(f"{time_load_data          - time_search_input_files:3.4f} s    load input data (HRIT, S_NWC)")
+    for area in in_msg.areas:
+        print("plots for area: "+area)
+        print(f"{time_interpolate[area]       - time_start_area[area]:3.4f} s    regrid data")
+        print(f"{time_reload[area]            - time_interpolate[area]:3.4f} s    reloading composites")
+        print(f"{time_images[area]            - time_reload[area]:3.4f} s    create images")

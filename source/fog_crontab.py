@@ -123,10 +123,14 @@ if __name__ == '__main__':
         base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/%Y/%m/%d/")
         #base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
         base_dir_nwc = start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/CT/")
-    else:        
-        start_time = datetime(2020, 10, 7, 16, 0)
+    else:
+        start_time = datetime(2022, 11, 14, 0, 45)
         base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
-        base_dir_nwc = start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/%Y/%m/%d/CT/")
+        base_dir_nwc = start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/CT")
+        #base_dir_nwc = start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/%Y/%m/%d/CT/")
+        #base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/ccs4/%Y/%m/%d/")
+        #base_dir_nwc = start_time.strftime("/data/COALITION2/database/meteosat/ccs4/%Y/%m/%d/CT/")
+        
         
     print("... processing time ", start_time)
 
@@ -204,8 +208,10 @@ if __name__ == '__main__':
         ##################
         print("")
         print("=======================")
-        print("resample to "+area)
+        print("resample to "+area+" without gradient search")
         local_scene = global_scene.resample(area)
+        #print("resample to "+area+" with gradient search")
+        #local_scene = global_scene.resample(area, resampler='gradient_search')
 
         # fake a new channel
         print("fake a new channel")

@@ -1,6 +1,7 @@
 from __future__ import division
 from __future__ import print_function
 
+
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
@@ -69,10 +70,10 @@ from satpy.writers import add_decorate, add_overlay
 
 from copy import deepcopy 
 
-from my_msg_module_py3 import get_last_SEVIRI_date, format_name
+from my_msg_module_py3 import get_last_SEVIRI_date, format_name, check_RSS_availability
 from get_input_msg_py3 import parse_commandline_and_read_inputfile
 
-from parallax_jussi import save_image
+from demo_parallax import save_image
 
 from pycoast import ContourWriter
 
@@ -205,41 +206,38 @@ if __name__ == '__main__':
     print(in_msg.msg_str(layout="%(msg)s%(msg_nr)s"))
     
     print("... produce satellite image for: "+in_msg.datetime.strftime("%Y-%m-%d, %H:%M:%S"))
-        
-    print("... check if RSS is available by counting RSS files 5 min ago") 
-    print("")
     time_string = in_msg.datetime.strftime("%Y%m%d%H%M")
-    t_minus5 = in_msg.datetime - timedelta(minutes=5)
-    sat=in_msg.msg_str(layout="%(msg)s%(msg_nr)s")
     
+    time_read_input = perf_counter()
+
     if (in_msg.nrt):
         data_hrit_in="/data/cinesat/in/eumetcast1/"
         data_nwcsaf_in="/data/cinesat/in/safnwc/"
     else:
         data_hrit_in=in_msg.datetime.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
         data_nwcsaf_in=in_msg.datetime.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/%Y/%m/%d/*/")        
-
-    time_read_input = perf_counter()
-        
+    
     if in_msg.RSS:
-        n_files = len(glob(data_hrit_in+'/H*'+sat+'*'+t_minus5.strftime("%Y%m%d%H%M")+'*'))
-        if n_files > 38:   # 44 files are full delivery, but only 39 files are archived 
-            # assume that RSS is delivered
-            print("... found "+str(n_files)+" files of RSS mode in "+data_hrit_in+", use MSG3")
-
+        if check_RSS_availability(in_msg, data_hrit_in):
+            # RSS available
+            print("... RSS available, continue to use: "+in_msg.msg_str(layout="%(msg)s%(msg_nr)s"))
         else:
-            # need to use full disk service
-            print("*** Warning, found not sufficient RSS files (",n_files,") in "+data_hrit_in+", use full disk service instead")
-            sat="MSG4"
-            in_msg.sat_nr=11  # should not be overwritten !!!
-            #if len(sys.argv) < 2:
-            #    time_slot = get_last_SEVIRI_date(False, delay=5)
+            # RSS not available
+            print("... WARNING, RSS not available")
             if in_msg.datetime.minute % 15 == 0:
-                print("... Full Disk Service available, switch to "+sat)
+                in_msg.sat_nr = 10  # FDS changed to MSG-10, RSS by MSG-11, 22 March 2023 (22.03.2023)
+                print("... Full Disk Service available, switch to "+in_msg.msg_str(layout="%(msg)s%(msg_nr)s"))
+                #print("    sleep 10min, as Full Disk Service is expected to arrive 10min later")
+                #sleep(600)  # sleep for 10min, as time stamp is defined as starting time of MSG scan
+                #            # and FDS takes 15 min instead of 5 min
             else:
-                print("... no Full Disk Service for this time slot, full stop")
+                print("... ERROR, no Full Disk Service for this time slot, full stop")
+                print("=============================================================")
+                print("")
                 quit()
-
+    
+    sat=in_msg.msg_str(layout="%(msg)s%(msg_nr)s")
+    
     time_check_RSS = perf_counter()
                 
     # loop until EPI satellite data has arrived in folder
@@ -278,6 +276,8 @@ if __name__ == '__main__':
     #print(glob(data_nwcsaf_in+'/S_NWC*MSG3*'+time_string_nwcsaf+'*.nc'))
     #global_scene = Scene(filenames={'seviri_l1b_hrit': files_hrit,'nwcsaf-geo': files_nwcsaf})
     global_scene = Scene(filenames={'seviri_l1b_hrit': files_hrit})
+    #global_scene = Scene(filenames={'seviri_l1b_hrit': files_hrit}, reader_kwargs={'fill_hrv': False})
+    #global_scene = Scene(files, reader='seviri_l1b_hrit', reader_kwargs={'fill_hrv': False})
     #global_scene = Scene(platform_name="Meteosat-9", sensor="seviri", reader="hrit_msg", start_time=in_msg.datetime)
     
     print("")
@@ -326,10 +326,17 @@ if __name__ == '__main__':
             cache_dir='/tmp/resample/'
             
             if area=="ccs4":
-                resampler="nearest"
+                #resampler='gradient_search' # needs 11s regridding time
+                resampler="nearest"         # needs 10s regridding time 
+                #resampler="bilinear"         # needs 60s regridding time 
                 #local_scene = global_scene.resample(area, resampler=resampler, cache_dir='/tmp/', precompute=True)
                 #local_scene = global_scene.resample(area, resampler=resampler, cache_dir='/tmp/')
                 local_scene = global_scene.resample(area, resampler=resampler, precompute=precompute, cache_dir=cache_dir)
+            elif area=="EuropeCanaryS95":
+                resampler="nearest"
+                #resampler='gradient_search'
+                local_scene = global_scene.resample(area, resampler=resampler, radius_of_influence=8000, precompute=precompute, cache_dir=cache_dir)
+                print("... radius_of_influence=5000")    
             elif area=="odysseyS25":
                 #resampler='gradient_search'
                 local_scene = global_scene.resample(area, resampler=resampler, radius_of_influence=250, precompute=precompute, cache_dir=cache_dir)

@@ -123,8 +123,9 @@ def print_info(global_scene):
 composite_names = {}
 composite_names['CMA']    = [ 'cloudmask']
 composite_names["CTTH"]   = [ 'cloud_top_height', 'cloud_top_pressure', 'cloud_top_temperature']
-composite_names["CRR"]    = ['convective_rain_rate']
-composite_names["CRR-Ph"] = ['convective_precipitation_hourly_accumulation', 'convective_rain_rate']
+composite_names["CRR"]    = [ 'convective_rain_rate']
+composite_names["CRR-Ph"] = [ 'convective_precipitation_hourly_accumulation', 'convective_rain_rate']
+composite_names["RDT-CW"] = [ 'rdt_cell_type' ]
 dataset_names         = {}
 dataset_names['CT']   = ['ct']
 dataset_names['CTTH'] = ['cth']
@@ -132,6 +133,7 @@ dataset_names['CTTH'] = ['cth']
 dataset_names['CRR']  = ['crr']  
 #dataset_names['CRR-Ph']  = ['crr', 'crr_accum', 'crr_accum_pal', 'crr_conditions', 'crr_intensity', 'crr_intensity_pal', 'crr_pal', 'crr_quality', 'crr_status_flag'] 
 dataset_names['CRR-Ph']  = ['crrph_intensity']
+dataset_names["RDT-CW"] = [ 'MapCellCatType', 'MapCellCatType_pal', 'MapCell_conditions', 'MapCell_quality' ]
 
 if len(sys.argv) == 2:
     product_list=[sys.argv[1]]

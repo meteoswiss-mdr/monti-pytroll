@@ -23,9 +23,9 @@ python postprocessing_py3.py --parea ccs4 -c ["C2rgb-IR_108"] -m [["MSG_C2rgb-IR
 python postprocessing_py3.py --parea ccs4 -c ["C2rgb-IR_108"] -m [["MSG_C2rgb-IR-108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-HRVir108"]] --delay 24 input_coalition2_cronjob
 python postprocessing_py3.py --parea ccs4 -c ["C2rgb-IR_108"] -m [["MSG_C2rgb-IR-108","MSG_CT","MSG_HRoverview","MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-HRVir108"]] --delay 34 input_coalition2_cronjob
 
-python postprocessing_py3.py --parea ccs4 -c ["C2rgb-HRVir108"] -m [["MSG_C2rgb-HRVir108","MSG_CT","MSG_DayLSConvectionNightMicrophysics","MSG_TRT-radar-HRVir108","MSG_radar-HRVir108","MSG_THX-HRVir108"]] --delay 19 input_coalition2_cronjob
-python postprocessing_py3.py --parea ccs4 -c ["C2rgb-HRVir108"] -m [["MSG_C2rgb-HRVir108","MSG_CT","MSG_DayLSConvectionNightMicrophysics","MSG_TRT-radar-HRVir108","MSG_radar-HRVir108","MSG_THX-HRVir108"]] --delay 24 input_coalition2_cronjob
-python postprocessing_py3.py --parea ccs4 -c ["C2rgb-HRVir108"] -m [["MSG_C2rgb-HRVir108","MSG_CT","MSG_DayLSConvectionNightMicrophysics","MSG_TRT-radar-HRVir108","MSG_radar-HRVir108","MSG_THX-HRVir108"]] --delay 34 input_coalition2_cronjob
+python postprocessing_py3.py --parea ccs4 -c ["C2rgb-HRVir108"] -m [["MSG_C2rgb-HRVir108","MSG_cloudtop","MSG_DayLSConvectionNightMicrophysics","MSG_TRT-radar-HRVir108","MSG_radar-HRVir108","MSG_THX-HRVir108"]] --delay 19 input_coalition2_cronjob
+python postprocessing_py3.py --parea ccs4 -c ["C2rgb-HRVir108"] -m [["MSG_C2rgb-HRVir108","MSG_cloudtop","MSG_DayLSConvectionNightMicrophysics","MSG_TRT-radar-HRVir108","MSG_radar-HRVir108","MSG_THX-HRVir108"]] --delay 24 input_coalition2_cronjob
+python postprocessing_py3.py --parea ccs4 -c ["C2rgb-HRVir108"] -m [["MSG_C2rgb-HRVir108","MSG_cloudtop","MSG_DayLSConvectionNightMicrophysics","MSG_TRT-radar-HRVir108","MSG_radar-HRVir108","MSG_THX-HRVir108"]] --delay 34 input_coalition2_cronjob
 
 ## remove result files older than 1 hour (done in plot_ms.sh)
 echo "*** Remove all result files older than 1 hour"

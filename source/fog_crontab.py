@@ -24,6 +24,7 @@ LOG.setLevel(50)
 #CRITICAL 50 #ERROR 40 #WARNING 30 #INFO 20 #DEBUG 10 #NOTSET 0
 
 import matplotlib.pyplot as plt
+from my_msg_module_py3 import get_last_SEVIRI_date
 
 #from satpy.utils import debug_on
 #debug_on()
@@ -31,63 +32,6 @@ import matplotlib.pyplot as plt
 ##import warnings
 #warnings.filterwarnings("ignore")
 
-def get_last_SEVIRI_date(RSS, delay=0, time_slot=None):
-
-    '''
-    input: RSS 
-    logical variable True or False 
-    specifies if you like get 
-    (RSS=True)  the last rapid scan observation date (every 5  min) 
-    (RSS=False) the last full disk  observation date (every 15 min)
-    (delay=INT) number of minutes to substract before finding the date (good if data needs a few min before arriving)
-    (time_slot) If not given, take last time
-    otherwise search scanning time of SEVIRI before given time_slot
-    output:
-    date structure with the date of the last SEVIRI observation
-    '''
-    
-    from time import gmtime
-    
-    LOG.info("*** start get_last_SEVIRI_date ("+inspect.getfile(inspect.currentframe())+")")
-    
-    # if rapid scan service than 5min otherwise 15
-    if RSS:
-        nmin = 5 
-    else:
-        nmin = 15
-    
-    if (time_slot is None):
-        # get the current time
-        gmt = gmtime()
-        #print ("GMT time: "+ str(gmt))
-        # or alternatively 
-        # utc = datetime.utcnow()
-        # convert to datetime format
-        t0 = datetime(gmt.tm_year, gmt.tm_mon, gmt.tm_mday, gmt.tm_hour, gmt.tm_min, 0) 
-        LOG.debug("    current time = "+str(t0))
-    else:
-        t0 = time_slot + timedelta(seconds=nmin*60)  # we substract one scanning time later, so we can add it here
-        LOG.debug("    reference time = "+str(t0))
-    
-    # apply delay (if it usually takes 5 min for the data to arrive, use delay 5min)
-    if delay != 0:
-       t0 -= timedelta(minutes=delay)
-    LOG.debug("    applying delay "+str(delay)+" min delay, time = "+ str(t0))
-    
-    LOG.debug("    round by scanning time "+str(nmin)+" min, RSS = "+str(RSS))
-    #tm_min2 = gmt.tm_min - (gmt.tm_min % nmin)
-    minute1 = t0.minute - (t0.minute % nmin)
-    
-    # define current date rounded by one scan time 
-    #date1 = datetime(gmt.tm_year, gmt.tm_mon, gmt.tm_mday, gmt.tm_hour, tm_min2 , 0) 
-    t1 = datetime(t0.year, t0.month, t0.day, t0.hour, minute1, 0) 
-    LOG.debug("    end time of last scan: "+str(t1))
-    
-    # substracting one scan time (as the start time of scan is returned) 
-    t1 -= timedelta(seconds=nmin*60)
-    LOG.info("    start time of last scan: "+str(t1))
-    
-    return t1
 
 def rewrite_xy_axis(netCDF_file):
     print("... re-place values on the x and y axis with lon/lat values in "+netCDF_file)
@@ -105,8 +49,10 @@ def rewrite_xy_axis(netCDF_file):
 ###############################################################################################
 
 if __name__ == '__main__':
-    
-    sat='MSG4'
+
+    # HERE NEEDS TO BE THE FULL DISK SATELLITE, MANUAL CHANGE!
+    # MSG3 full disk service started 20.03.2023
+    sat='MSG3'
 
     if len(sys.argv) == 1:
         start_time = get_last_SEVIRI_date(False, delay=6)
@@ -120,8 +66,8 @@ if __name__ == '__main__':
         hour   = int(sys.argv[4])
         minute = int(sys.argv[5])
         start_time = datetime(year, month, day, hour, minute)
-        base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/%Y/%m/%d/")
-        #base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
+        #base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/%Y/%m/%d/")
+        base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
         base_dir_nwc = start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/CT/")
     else:
         start_time = datetime(2022, 11, 14, 0, 45)

@@ -13,7 +13,7 @@ echo "*** Start to produce images for SATLive"
 ## execute plot_lightning pytroll script 
 python  satlive_geo.py input_satlive_ccs4_EuropeCenter.py    # > /tmp/demo_satpy_fog.txt 2>&1
 
-python postprocessing_py3.py  --parea EuropeCenter  -c ["h03b-HRVir108"]    input_satlive_ccs4_EuropeCenter.py
+#python postprocessing_py3.py  --parea EuropeCenter  -c ["h03b-HRVir108"]    input_satlive_ccs4_EuropeCenter.py
 
 
 ## remove result files older than 1 hour (done in plot_ms.sh)

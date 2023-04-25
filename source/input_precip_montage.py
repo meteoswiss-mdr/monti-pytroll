@@ -7,13 +7,14 @@ def input(in_msg, timeslot=None):
     if timeslot is not None:
         in_msg.update_datetime(timeslot.year, timeslot.month, timeslot.day, timeslot.hour, timeslot.minute)
 
+    # RSS changed to MSG11, FDS to MSG 10, we want RSS here
     #in_msg.sat="Meteosat"
     #in_msg.sat_nr=9
     #in_msg.RSS=True
     #in_msg.sat_nr=10
-    #in_msg.RSS=True
+    #in_msg.RSS=False
     in_msg.sat_nr=11
-    in_msg.RSS=False
+    in_msg.RSS=True
        
     #in_msg.outputDir="./images/"
     in_msg.outputDir="/data/cinesat/out/"
@@ -189,8 +190,11 @@ def input(in_msg, timeslot=None):
     in_msg.mapDir='/opt/users/common/shapes/'
 
     in_msg.postprocessing_areas=['ccs4']
-    in_msg.postprocessing_composite = ["radar-HRVir108","CRR-HRVir108","h03b-HRVir108","CRPh-HRVir108"]
-    in_msg.postprocessing_montage = [["MSG_rrMlp-HRVir108","MSG_radar-HRVir108","MSG_CRR-HRVir108","MSG_rrMlpPm-HRVir108","MSG_h03b-HRVir108","MSG_CRPh-HRVir108"]]
+    in_msg.postprocessing_composite = ["radar-HRVir108","CRR-HRVir108","CRPh-HRVir108"]  #,"h03b-HRVir108"
+    #in_msg.postprocessing_montage = [["MSG_rrMlp-HRVir108","MSG_radar-HRVir108","MSG_CRR-HRVir108","MSG_rrMlpPm-HRVir108","MSG_h03b-HRVir108","MSG_CRPh-HRVir108"]]
+    in_msg.postprocessing_montage = [["MSG_rrMlp-HRVir108","MSG_radar-HRVir108","MSG_CRR-HRVir108","MSG_rrMlpPm-HRVir108","MSG_DayNightMicrophysics","MSG_CRPh-HRVir108"]]
     
     in_msg.scpOutput=True
-    in_msg.scpProducts=[["MSG_rrMlp-HRVir108","MSG_radar-HRVir108","MSG_CRR-HRVir108","MSG_rrMlpPm-HRVir108","MSG_h03b-HRVir108","MSG_CRPh-HRVir108"]]
+    #in_msg.scpProducts=[["MSG_rrMlp-HRVir108","MSG_radar-HRVir108","MSG_CRR-HRVir108","MSG_rrMlpPm-HRVir108","MSG_h03b-HRVir108","MSG_CRPh-HRVir108"]]
+    in_msg.scpProducts =[["MSG_rrMlp-HRVir108","MSG_radar-HRVir108","MSG_CRR-HRVir108","MSG_rrMlpPm-HRVir108","MSG_DayNightMicrophysics","MSG_CRPh-HRVir108"]]
+    

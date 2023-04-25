@@ -12,7 +12,8 @@ cd $PYTROLLHOME/source
 echo "*** Start to produce images for SATLive"
 ## execute plot_lightning pytroll script 
 
-python postprocessing_py3.py --delay 10 input_precip_montage.py  
+python postprocessing_py3.py --delay  6 input_precip_montage.py
+python postprocessing_py3.py --delay 12 input_precip_montage.py
 
 ## remove result files older than 1 hour (done in plot_ms.sh)
 #echo "*** Remove all result files older than 1 hour"

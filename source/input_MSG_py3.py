@@ -77,10 +77,11 @@ def input(in_msg, timeslot=None):
     ##in_msg.RGBs.append('WV_073')       # black and white
     ##in_msg.RGBs.append('IR_087')       # black and white
     ##in_msg.RGBs.append('IR_097')       # black and white
-    in_msg.RGBs.append('IR_108')       # black and white
+    #in_msg.RGBs.append('IR_108')       # black and white
     ##in_msg.RGBs.append('IR_120')       # black and white
     ##in_msg.RGBs.append('IR_134')       # black and white
     #in_msg.RGBs.append('HRV')          # black and white
+    #####################################################
     #in_msg.RGBs.append('VIS006c')      # colored version
     #in_msg.RGBs.append('VIS008c')      # colored version
     #in_msg.RGBs.append('IR_016c')      # colored version
@@ -93,6 +94,20 @@ def input(in_msg, timeslot=None):
     #in_msg.RGBs.append('IR_120c')      # colored version
     #in_msg.RGBs.append('IR_134c')      # colored version
     #in_msg.RGBs.append('HRVc')         # colored version
+    #####################################################
+    #in_msg.RGBs.append('VIS006pc')       # black and white, parallax corrected
+    #in_msg.RGBs.append('VIS008pc')       # black and white, parallax corrected
+    #in_msg.RGBs.append('IR_016pc')       # black and white, parallax corrected
+    #in_msg.RGBs.append('IR_039pc')       # black and white, parallax corrected
+    #in_msg.RGBs.append('WV_062pc')       # black and white, parallax corrected
+    #in_msg.RGBs.append('WV_073pc')       # black and white, parallax corrected
+    #in_msg.RGBs.append('IR_087pc')       # black and white, parallax corrected
+    #in_msg.RGBs.append('IR_097pc')       # black and white, parallax corrected
+    in_msg.RGBs.append('IR_108pc')       # black and white, parallax corrected
+    #in_msg.RGBs.append('IR_120pc')       # black and white, parallax corrected
+    #in_msg.RGBs.append('IR_134pc')       # black and white, parallax corrected
+    #in_msg.RGBs.append('HRVpc')          # black and white, parallax corrected
+
     #-------------------
     # satellite channel differences
     #in_msg.RGBs.append('IR_039-IR_108')

@@ -20,6 +20,7 @@ from copy import deepcopy
 from satpy import find_files_and_readers
 from socket import gethostname
 from subprocess import check_output
+from glob import glob
 
 import warnings
 import logging
@@ -170,6 +171,24 @@ output:
 #
 #    return all_channels_needed
 
+def check_RSS_availability(in_msg, data_hrit_in):
+    
+    print("... check if RSS is available by counting RSS files 5 min ago") 
+    print("")
+    t_minus5 = in_msg.datetime - datetime.timedelta(minutes=5)
+    
+    n_files = len(glob(data_hrit_in+'/H*'+in_msg.msg_str(layout="%(msg)s%(msg_nr)s")+'*'+t_minus5.strftime("%Y%m%d%H%M")+'*'))
+    if n_files > 38:   # 44 files are full delivery, but only 39 files are archived 
+        # assume that RSS is delivered
+        print("... found "+str(n_files)+" files for "+in_msg.msg_str(layout="%(msg)s%(msg_nr)s")+" in "+data_hrit_in)
+        print("    continue processing")
+        return True
+    else:
+        # need to use full disk service
+        print("*** WARNING, found not sufficient "+in_msg.msg_str(layout="%(msg)s%(msg_nr)s")+" files (",n_files,") in "+data_hrit_in)
+        print("    this is less files than expected for the Rapid Scan Service")
+        print("    It is recommend to use Full Disk Service instead")
+        return False
 
 def create_seviri_scene(time_slot, base_dir_sat, reader='seviri_l1b_hrit', sat="", file_filter="", verbose=True):
 

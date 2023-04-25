@@ -14,5 +14,6 @@ packages/anacon*
 **/*.nc
 **/*.png
 **/*.jpg
+mp
 ### ignore emacs backup files ### 
 **/*~

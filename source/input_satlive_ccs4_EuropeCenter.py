@@ -101,7 +101,7 @@ def input(in_msg, timeslot=None):
     #in_msg.RGBs.append("ir_sandwich")
     #in_msg.RGBs.append("natural_enh")
     #in_msg.RGBs.append("hrv_clouds")
-    in_msg.RGBs.append("hrvvis_clouds")           
+    #in_msg.RGBs.append("hrvvis_clouds")
     #in_msg.RGBs.append("hrv_fog")
     #in_msg.RGBs.append("hrv_severe_storms")
     #in_msg.RGBs.append("hrv_severe_storms_masked")

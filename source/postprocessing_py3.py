@@ -7,6 +7,7 @@ from os import makedirs, chmod
 import subprocess
 import inspect
 from copy import deepcopy
+from my_msg_module_py3 import check_RSS_availability
 
 def get_THX_filename(time_slot, area, outDir, outFile):
     print("    get_THX_filename THX for ", area)
@@ -500,13 +501,37 @@ if __name__ == '__main__':
 
    from get_input_msg_py3 import parse_commandline_and_read_inputfile
    in_msg = parse_commandline_and_read_inputfile()
-    
+
+   if (in_msg.nrt):
+       data_hrit_in="/data/cinesat/in/eumetcast1/"
+   else:
+       data_hrit_in=in_msg.datetime.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
+   
+   if in_msg.RSS:
+       if check_RSS_availability(in_msg, data_hrit_in):
+           # RSS available
+           print("... RSS available, continue to use: "+in_msg.msg_str(layout="%(msg)s%(msg_nr)s"))
+       else:
+           # RSS not available
+           print("... WARNING, RSS not available")
+           if in_msg.datetime.minute % 15 == 0:
+               in_msg.sat_nr=11
+               print("... Full Disk Service available, switch to "+in_msg.msg_str(layout="%(msg)s%(msg_nr)s"))
+               #print("    sleep 10min, as Full Disk Service is expected to arrive 10min later")
+               #sleep(600)  # sleep for 10min, as time stamp is defined as starting time of MSG scan
+               #            # and FDS takes 15 min instead of 5 min
+           else:
+               print("... ERROR, no Full Disk Service for this time slot, full stop")
+               print("=============================================================")
+               print("")
+               quit()
+
    print("*** start postprocessing for: ")
    print("    areas: ", in_msg.postprocessing_areas)
    print("    date: ", in_msg.datetime)
    print("    composite: ", in_msg.postprocessing_composite)
    print("    montage: ", in_msg.postprocessing_montage)
-              
+   
    # loop over all postprocessing areas
    for area in in_msg.postprocessing_areas:
        postprocessing(in_msg, in_msg.datetime, in_msg.sat_nr, area)

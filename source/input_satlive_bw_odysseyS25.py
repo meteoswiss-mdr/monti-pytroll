@@ -7,8 +7,11 @@ def input(in_msg, timeslot=None):
     if timeslot is not None:
         in_msg.update_datetime(timeslot.year, timeslot.month, timeslot.day, timeslot.hour, timeslot.minute)
 
-    in_msg.sat_nr=11
+    # FDS changed to MSG-10, RSS by MSG-11, 22 March 2023 (22.03.2023), we want FDS here
+    in_msg.sat_nr=10
     in_msg.RSS=False
+    #in_msg.sat_nr=11
+    #in_msg.RSS=True
         
     #in_msg.outputDir="./images/"
     in_msg.outputDir="/data/cinesat/out/"

@@ -17,6 +17,9 @@ import sys
 from copy import deepcopy
 import socket
 from datetime import datetime
+from time import sleep
+from os.path import getsize
+from pydecorate import DecoratorAGG
 
 # Import the library OpenCV
 import cv2
@@ -125,6 +128,8 @@ composite_names['CMA']    = [ 'cloudmask']
 composite_names["CTTH"]   = [ 'cloud_top_height', 'cloud_top_pressure', 'cloud_top_temperature']
 composite_names["CRR"]    = ['convective_rain_rate']
 composite_names["CRR-Ph"] = ['convective_precipitation_hourly_accumulation', 'convective_rain_rate']
+composite_names["CRRPh"]  = ['convective_precipitation_hourly_accumulation', 'convective_rain_rate']
+composite_names["RDT"]  = []
 dataset_names         = {}
 dataset_names['CT']   = ['ct']
 dataset_names['CTTH'] = ['cth']
@@ -132,11 +137,16 @@ dataset_names['CTTH'] = ['cth']
 dataset_names['CRR']  = ['crr']  
 #dataset_names['CRR-Ph']  = ['crr', 'crr_accum', 'crr_accum_pal', 'crr_conditions', 'crr_intensity', 'crr_intensity_pal', 'crr_pal', 'crr_quality', 'crr_status_flag'] 
 dataset_names['CRR-Ph']  = ['crrph_intensity']
+dataset_names['CRRPh']   = ['crrph_intensity']
+dataset_names['RDT'] = []
+
+parallax=False    # ATTENTION: !!! No PLAX files from CRR and CRRPh exists !!! 
 
 if len(sys.argv) == 2:
     product_list=[sys.argv[1]]
     from my_msg_module_py3 import get_last_SEVIRI_date
     start_time = get_last_SEVIRI_date(True, delay=4)
+    #start_time = get_last_SEVIRI_date(False, delay=12)  # FDS
     end_time   = start_time
     base_dir=start_time.strftime(get_input_dir("NWCSAF-v2016-alps", nrt=True))
     #base_dir="/data/cinesat/in/safnwc/"
@@ -145,14 +155,14 @@ elif len(sys.argv) == 7:
     fixed_date=True
     start_time = datetime(int(sys.argv[2]),int(sys.argv[3]),int(sys.argv[4]),int(sys.argv[5]),int(sys.argv[6]))
     end_time   = start_time
-    base_dir=start_time.strftime(get_input_dir("NWCSAF-v2016-alps", nrt=False)+"/%Y/%m/%d/")
+    #base_dir=start_time.strftime(get_input_dir("NWCSAF-v2016-alps", nrt=False)+"/%Y/%m/%d/")
     #base_dir=start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/%Y/%m/%d/"+p_+"/")
     #base_dir=start_time.strftime("./data/")
-    #base_dir=start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/"+p_+"/")
+    base_dir=start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/")
 else:
     print("Wrong number of arguments:", len(sys.argv))
     print("Usage: python demo_satpy_nwcsaf_py3.py PROD [YYYY MM DD hh mm]")
-    print("       where PROD might be: 'CMA', 'CT', 'CTTH', 'CMIC', 'PC', 'CRR', 'CRR-Ph', 'iSHAI', 'CI', 'RDT-CW', or 'ASII-NG'")
+    print("       where PROD might be: 'CMA', 'CT', 'CTTH', 'CMIC', 'PC', 'CRR', 'CRR-Ph', 'CRRPh', 'CRR-Ph', 'iSHAI', 'CI', 'RDT-CW', or 'ASII-NG'")
     #product_list = ['CMA']
     #product_list = ['CTTH']
     #product_list = ['CT']
@@ -173,7 +183,7 @@ else:
     read_RGBs = False
 
 for p_ in product_list:
-
+    
     if len(sys.argv) == 2:
         base_dir_=base_dir
     else:
@@ -187,21 +197,50 @@ for p_ in product_list:
     #else:
     #    print ("NWCSAF data product " + product + " is missing or is not readable")
 
-    print("======================")
-    print("======================")
-    print ("... search files in "+ base_dir_ + " for "+ str(start_time))
-    files_nwc = find_files_and_readers(sensor='seviri',
-                                       start_time=start_time,
-                                       end_time=end_time,
-                                       base_dir=base_dir_,
-                                       reader='nwcsaf-geo')
+    for i in range(60):   # maximum waiting time 30x30s = 15min = 1 Full Disk Scan
+        print("======================")
+        print("======================")
+        print ("... search files in "+ base_dir_ + " for "+ str(start_time))
+        filereader='nwcsaf-geo'
+        files_nwc={}
+        files_nwc[filereader]=[]
+        try:
+            files_nwc = find_files_and_readers(sensor='seviri',
+                                               start_time=start_time,
+                                               end_time=end_time,
+                                               base_dir=base_dir_,
+                                               reader=filereader)
+        except ValueError:
+            print("... no "+filereader+" file found yet")
+            
+        if len(files_nwc[filereader]) > 0:
+            if getsize(files_nwc[filereader][0]) > 60000:
+                print("... "+filereader+" file (", files_nwc[filereader][0],") has arrived and its size is ", getsize(files_nwc[filereader][0][0]))
+                break
+        print("... "+filereader+" file has not arrived yet, sleep 30s")
+        sleep(30)
 
-    print ("*** found following NWCSAF files:", files_nwc)
+    #print ("*** found following NWCSAF files:", files_nwc)
     files = deepcopy(files_nwc['nwcsaf-geo'])
+    # remove NWCSAF files which are not necessary for desired products
     for f in files:
-        if not (product_list[0] in f):
+        if not ("_"+product_list[0]+"_" in f):
             files_nwc['nwcsaf-geo'].remove(f)
             continue
+    #print ("xxx found following NWCSAF files:", files_nwc)
+    
+    # filter parallax or non-parallax files
+    files = deepcopy(files_nwc['nwcsaf-geo'])
+    if parallax:
+        for f in files:
+            if not ("PLAX" in f):
+                files_nwc['nwcsaf-geo'].remove(f)
+                continue
+    else:
+        for f in files:
+            if ("PLAX" in f):
+                files_nwc['nwcsaf-geo'].remove(f)
+                continue
 
     print ("=== found following NWCSAF files:", files_nwc)
     #files = dict(files_sat.items() + files_nwc.items())
@@ -246,6 +285,7 @@ for p_ in product_list:
     #area="EuropeCanaryS95"
     #area="europe_center"
     #area="cosmo1"
+    #area='cosmo1eqc3km'
     print("======================")
     print("======================")
     print("... resample to area: ", area)
@@ -329,8 +369,7 @@ for p_ in product_list:
             local_scene.save_dataset(p_name, png_file, fill_value=0,
                                      overlay={'coast_dir': map_dir, 'color': (255, 255, 255), 'resolution': 'i', 'width':1, 'level_coast': 1, 'level_borders': 2},
                                      decorate=decorate) 
-
-
+            
             ## local_scene.save_dataset( 'lscl', png_file )
             #from pyresample.utils import load_area
             #swiss = load_area("/opt/users/hau/monti-pytroll/etc/areas.def", area)
@@ -388,6 +427,7 @@ for p_ in product_list:
             product_dict={}
             product_dict['CRR']="CRR"
             product_dict['CRR-Ph']="CRPh"
+            product_dict['CRRPh']="CRPh"
             product_dict['CT']="CT"
             
             outFile=result_dir+'/MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
@@ -396,6 +436,40 @@ for p_ in product_list:
             print("display "+outputFile+" &")
             #img.save(outputFile)
             PIL_image=img.pil_image()
-            PIL_image.save(outputFile)  
+            PIL_image.save(outputFile)
             
             remove_background(outputFile)
+
+
+            from PIL import Image, ImageDraw, ImageFont
+
+            # add second line title to transparent image 
+            with Image.open(outputFile).convert("RGBA") as base:
+                
+                # make a blank image for the text, initialized to transparent text color
+                txt = Image.new("RGBA", base.size, (255, 255, 255, 0))
+                
+                # get a font
+                fnt = ImageFont.truetype("/usr/openv/java/jre/lib/fonts/LucidaTypewriterBold.ttf", 18)  
+                # get a drawing context
+                d = ImageDraw.Draw(txt)
+                
+                # draw text, half opacity
+                d.text((15, 30), p__, font=fnt, fill=(255, 255, 255, 255))
+                out = Image.alpha_composite(base, txt)
+                
+                #out.show()
+                out.save(outputFile)
+
+            
+            #print("================================HALLO WORLD====")
+            #from PIL import Image
+            #img = Image.open(outputFile)
+            #dc = DecoratorAGG(img)
+            #dc.new_line()
+            ##dc.add_text(p__)
+            #dc.add_text("This is a manually placed text over here.", cursor=[20,40])
+            #PIL_image.save(outputFile)
+            #print("====================================")
+
+            

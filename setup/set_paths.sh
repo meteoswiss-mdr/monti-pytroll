@@ -29,7 +29,9 @@ set_conda_path() {
 	else
 	    if [ "$1" == "python3" ] || [ "$1" == "py3" ] || [ "$1" == "3" ] ; then
 		echo "set_conda_path python3"
-		export CONDA_PATH="/opt/users/common/packages/anaconda3/"
+		export CONDA_PATH="/opt/users/common/packages/anaconda3_$LOGNAME/"
+		#export CONDA_PATH="/opt/users/common/packages/anaconda351/"
+		#export CONDA_PATH="/opt/users/common/packages/anaconda3/"
 	    else
 		echo "unknown command line option: set_conda_path" $1
 		export CONDA_PATH=""

@@ -8,13 +8,23 @@ def input(in_msg):
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
     print("*** read input from ", in_msg.input_file)
 
-    in_msg.sat = "cosmo"
-    in_msg.instrument = "cosmo"
-    in_msg.sat_nr="1"
-    in_msg.RSS=False  # better determine RSS automatically
+    # 8=MSG1, 9=MSG2, 10=MSG3
+    in_msg.sat = "Meteosat"
+    #in_msg.sat = "meteosat"
+    #in_msg.sat_nr=8
+    #in_msg.RSS=False 
+    #in_msg.sat_nr=9
+    #in_msg.RSS=True
+    #in_msg.sat_nr=10
+    #in_msg.RSS=True
+    in_msg.sat_nr=11
+    in_msg.RSS=False
 
-    # if forecast is not yet ready, the model run before is used 
-    in_msg.delay=0
+    # specify an delay (in minutes), when you like to process a time some minutes ago
+    # e.g. current time               2015-05-31 12:33 UTC
+    # delay 5 min                     2015-05-31 12:28 UTC
+    # last Rapid Scan Service picture 2015-05-31 12:25 UTC (Scan start) 
+    in_msg.delay=5
 
     if False:
         # offline mode (always a fixed time) # ignores command line arguments
@@ -45,18 +55,18 @@ def input(in_msg):
     ##in_msg.RGBs.append('IR_120')       # black and white
     ##in_msg.RGBs.append('IR_134')       # black and white
     ##in_msg.RGBs.append('HRV')          # black and white
-    #in_msg.RGBs.append('VIS006c')      # colored version
-    #in_msg.RGBs.append('VIS008c')      # colored version
-    #in_msg.RGBs.append('IR_016c')      # colored version
-    #in_msg.RGBs.append('IR_039c')      # colored version
-    #in_msg.RGBs.append('WV_062c')      # colored version
-    #in_msg.RGBs.append('WV_073c')      # colored version
-    #in_msg.RGBs.append('IR_087c')      # colored version
-    #in_msg.RGBs.append('IR_097c')      # colored version
-    #in_msg.RGBs.append('IR_108c')      # colored version
-    #in_msg.RGBs.append('IR_120c')      # colored version
-    #in_msg.RGBs.append('IR_134c')      # colored version
-    #in_msg.RGBs.append('HRVc')         # colored version
+    in_msg.RGBs.append('VIS006c')      # colored version
+    in_msg.RGBs.append('VIS008c')      # colored version
+    in_msg.RGBs.append('IR_016c')      # colored version
+    in_msg.RGBs.append('IR_039c')      # colored version
+    in_msg.RGBs.append('WV_062c')      # colored version
+    in_msg.RGBs.append('WV_073c')      # colored version
+    in_msg.RGBs.append('IR_087c')      # colored version
+    in_msg.RGBs.append('IR_097c')      # colored version
+    in_msg.RGBs.append('IR_108c')      # colored version
+    in_msg.RGBs.append('IR_120c')      # colored version
+    in_msg.RGBs.append('IR_134c')      # colored version
+    in_msg.RGBs.append('HRVc')         # colored version
     #-------------------
     # viewing geometry
     #-------------------
@@ -64,14 +74,12 @@ def input(in_msg):
     #in_msg.sat = "vaa"
 
     # satellite channel differences
-    #in_msg.RGBs.append('WV_062-WV_073')
-    #in_msg.RGBs.append('WV_062-IR_108')
-    #in_msg.RGBs.append('WV_073-IR_134')
-    #in_msg.RGBs.append('IR_087-IR_108')      
-    #in_msg.RGBs.append('IR_039-IR_108')      
-    #in_msg.RGBs.append('IR_120-IR_108')      
-    #in_msg.RGBs.append('IR_087-IR_120')      
-    #in_msg.RGBs.append('IR_120-IR_108')
+    #in_msg.RGBs.append('WV_062_minus_WV_073')
+    #in_msg.RGBs.append('WV_062_minus_IR_108')
+    #in_msg.RGBs.append('WV_073_minus_IR_134')
+    #in_msg.RGBs.append('IR_087_minus_IR_108')      
+    #in_msg.RGBs.append('IR_087_minus_IR_120')      
+    #in_msg.RGBs.append('IR_120_minus_IR_108')
     #in_msg.RGBs.append('trichannel')
     #-------------------
     # viewing geometry
@@ -111,9 +119,6 @@ def input(in_msg):
     #in_msg.RGBs.append('HRoverview')
     ##in_msg.RGBs.append('sandwich')
     ##in_msg.RGBs.append('ndvi')
-    #in_msg.RGBs.append('sza')
-    #in_msg.RGBs.append('HRVFog')
-    #in_msg.RGBs.append('DayNightFog')
     ##-------------------
     ## NWC SAF
     ##-------------------
@@ -226,59 +231,7 @@ def input(in_msg):
     #in_msg.RGBs.append('ot_pressure')
     #in_msg.RGBs.append('parallax_correction_latitude')
     #in_msg.RGBs.append('parallax_correction_longitude')
-    #-------------------
-    # COSMO (cosmo1)
-    #-------------------
-    in_msg.sat = "cosmo"
-    in_msg.instrument = "cosmo"
-    in_msg.sat_nr="1e"
-    in_msg.pressure_levels={}
-    #in_msg.RGBs.append('lon_1')
-    #in_msg.RGBs.append('lat_1')
-    #in_msg.RGBs.append('POT_VORTIC')
-    #in_msg.RGBs.append('THETAE')
-    #in_msg.RGBs.append('MCONV')
-    #in_msg.RGBs.append('geopotential_height')
-    #in_msg.RGBs.append('TWATER')
-    #in_msg.RGBs.append('tropopause_height')
-    #in_msg.RGBs.append('tropopause_temperature')
-    #in_msg.RGBs.append('tropopause_pressure')
-    #in_msg.RGBs.append('FF_10M')
-    #in_msg.RGBs.append('VMAX_10M')
-    #in_msg.RGBs.append('CAPE_MU')
-    #in_msg.RGBs.append('CAPE_ML')
-    #in_msg.RGBs.append('CIN_MU')
-    #in_msg.RGBs.append('CIN_ML')
-    #in_msg.RGBs.append('SLI')
-    #in_msg.RGBs.append('LCL_ML')
-    #in_msg.RGBs.append('LFC_ML')
-    #in_msg.RGBs.append('T_SO')
-    #in_msg.RGBs.append('T_2M')
-    #in_msg.RGBs.append('TD_2M')
-    #in_msg.RGBs.append('GLOB')
-    #in_msg.RGBs.append('PS')
-    #in_msg.RGBs.append('RELHUM')
-    #in_msg.RGBs.append('PMSL')
-    #in_msg.RGBs.append('PMSLr')
-    #in_msg.RGBs.append('HZEROCL')
-    #in_msg.RGBs.append('WSHEAR_0-3km')
-    #in_msg.RGBs.append('WSHEAR_0-6km')
-    #in_msg.RGBs.append('SYNMSG_BT_CL_IR10.8')
-    #in_msg.RGBs.append('U')
-    #in_msg.RGBs.append('U-100hPa')
-    #in_msg.pressure_levels["U"]=[800,500,300]
-    #in_msg.RGBs.append('V')
-    #in_msg.pressure_levels["V"]=[800,500,300]
-    #in_msg.RGBs.append('streamplot')
-    #in_msg.RGBs.append('streamplot-300hPa')
-    #in_msg.RGBs.append('streamplot-500hPa')
-    #in_msg.RGBs.append('streamplot-800hPa')
-    #in_msg.RGBs.append('T_2M')
-    in_msg.RGBs.append('LPI')
-    #in_msg.RGBs.append('DHAIL_AV')
-    #in_msg.RGBs.append('DHAIL_SD')
-    #in_msg.RGBs.append('DHAIL_MX')
-    
+
     # experimental
     #in_msg.RGBs.append('clouddepth')     # test according to Mecikalski, 2010
     ##in_msg.RGBs.append('RII')
@@ -289,21 +242,17 @@ def input(in_msg):
     in_msg.areas.append('ccs4')             # CCS4 Swiss projection 710x640
     #in_msg.areas.append('alps95')          # area around Switzerland processed by NWCSAF software 349x151 
     #in_msg.areas.append('ticino')          # stereographic proj of Ticino 342x311
+    #in_msg.areas.append('SeviriDisk00Cosmo')  # MSG image SEVIRI 0 degrees covering COSMO1E
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('EuropeCanary')    # upper third of MSG disk, satellite at 0.0 deg East, full resolution 
     #in_msg.areas.append('EuropeCanary95')  # upper third of MSG disk, satellite at 9.5 deg East, full resolution 
     #in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
-    #in_msg.areas.append('nrEURO1km')       # Switzerland 1.056km for COALTION
-    #in_msg.areas.append('euroHDready')      # Europe in HD resolution 1280 x 720
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
     #in_msg.areas.append('fullearth')       # full earth 600x300                    # does not yet work
     #in_msg.areas.append('met09globe')      # Cropped globe MSG image 3620x3620     # does not yet work
     #in_msg.areas.append('met09globeFull')  # Full    globe MSG image 3712x3712     # does not yet work
     #in_msg.areas.append('odysseyS25')      # Area of Odyssey composite (factor 2.5 smaller)
-    #in_msg.areas.append("nrEURO1km")
-    #in_msg.areas.append("EuroMercator")    # same projection as blitzortung.org
-
     in_msg.check_RSS_coverage()
 
     # please download the shape file 
@@ -318,20 +267,24 @@ def input(in_msg):
     if ('fullearth' in in_msg.areas) or ('met09globe' in in_msg.areas) or ('met09globeFull' in in_msg.areas): 
        in_msg.RSS=False 
 
-    in_msg.check_input = False
-    #in_msg.reader_level="seviri-level4" 
+    #in_msg.check_input = True    # for radiances check always PRO and EPI files
+    in_msg.check_input = False    # for radiances check always PRO and EPI files
+    #in_msg.reader_level="seviri-level4"
     #in_msg.parallax_correction = True
     #in_msg.estimate_cth=True
-    #in_msg.parallax_gapfilling = 'bilinear' # 'False' (default), 'nearest', 'bilinear'
-    #in_msg.save_reprojected_data=['ccs4']
-    in_msg.reprojected_data_filename='%(msg)s_%(area)s_%Y%m%d%H%M_nwcsaf.nc'
-    in_msg.reprojected_data_dir='/data/COALITION2/database/meteosat/ccs4/%Y/%m/%d/'
+    #in_msg.parallax_gapfilling = 'bilinear' # 'False' (default), 'nearest'
+    in_msg.save_reprojected_data=['ccs4']
+    in_msg.reprojected_data_filename='%(msg)s_%(area)s_%Y%m%d%H%M_rad.nc'
+    #in_msg.reprojected_data_filename='MSG_test_%Y%m%d%H%M.nc'
+    in_msg.reprojected_data_dir='/data/COALITION2/database/meteosat/%(area)s/%Y/%m/%d/'
+    #in_msg.save_statistics=True
     in_msg.save_statistics=False
-
-    in_msg.make_plots=True
-    in_msg.fill_value=None  # black (0,0,0) / white (1,1,1) / transparent None  
+    in_msg.HRV_enhancement=False
+    
+    in_msg.make_plots=False
+    in_msg.fill_value=(0,0,0)  # black (0,0,0) / white (1,1,1) / transparent None  
     in_msg.add_title = True
-    in_msg.title = [" %(sat)s, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s"]
+    in_msg.title = [" MSG-4, %Y-%m-%d %H:%MUTC, %(area)s, %(rgb)s"]
     in_msg.title_y_line_nr = 1  # (INT) at which line should the title start
     in_msg.add_borders = True
     in_msg.border_color = 'red'
@@ -339,36 +292,25 @@ def input(in_msg):
     in_msg.river_color = 'blue'
     in_msg.add_logos = False
     in_msg.logos_dir = "/opt/users/common/logos/"
-    in_msg.add_colorscale = True
+    in_msg.add_colorscale = False
     in_msg.HRV_enhancement = False
 
-    in_msg.outputFormats = ['png'] 
-    #in_msg.outputFormats = ['png','ninjotif'] 
-    in_msg.outputFile = 'COSMO_%(rgb)s-%(area)s_%y%m%d%H%M.png'
+    in_msg.outputFormats = ['png','ninjotif'] 
+    in_msg.outputFile = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
     in_msg.outputDir='./pics/'
     #in_msg.outputDir = "./%Y-%m-%d/%Y-%m-%d_%(rgb)s-%(area)s/"
     #in_msg.outputDir = '/data/cinesat/out/'
     in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'
     in_msg.compress_to_8bit=False
-
     
     in_msg.ninjotifFilename = 'MET%(sat_nr)s_%(RSS)s_%(rgb)s_%(area)s_%Y%m%d%H%M.tif' 
     in_msg.upload_ninjotif = False
 
     #in_msg.postprocessing_areas=['ccs4']
-    #in_msg.postprocessing_areas=['EuropeCanaryS95']
-    #in_msg.postprocessing_areas=["EuroMercator"]
+    in_msg.postprocessing_composite=["THX-IR_108","radar-convection","THX-radar-convection"]    
 
-    #in_msg.postprocessing_montage = [["MSG_IR-108c","COSMO_SYNMSG-BT-CL-IR10.8"]]
-    in_msg.postprocessing_montage = [["MSG_IR-108cpc","COSMO_SYNMSG-BT-CL-IR10.8"]]
-
-    #in_msg.resize_montage = 70
-    #in_msg.resize_composite = 100
-
-    in_msg.scpOutput = False
+    #in_msg.scpOutput = True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
     #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
     #default: in_msg.scpProducts = ['all']
-    #in_msg.scpProducts = [["MSG_IR-108cpc","COSMO_SYNMSG-BT-CL-IR10.8"]]
-    #in_msg.scpProducts = ["IR-108cpc-SYNMSG-BT-CL-IR10.8"]
-    #in_msg.scpProducts = ['IR_108c', "radar-convection"] # list of rgb, composite and montage strings
+    in_msg.scpProducts = ['IR_108c', "radar-convection"] # list of rgb, composite and montage strings

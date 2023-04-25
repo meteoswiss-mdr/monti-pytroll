@@ -7,7 +7,10 @@ def input(in_msg, timeslot=None):
     if timeslot is not None:
         in_msg.update_datetime(timeslot.year, timeslot.month, timeslot.day, timeslot.hour, timeslot.minute)
 
-    in_msg.sat_nr=10
+    # FDS changed to MSG-10, RSS by MSG-11, 22 March 2023 (22.03.2023), we want RSS here
+    #in_msg.sat_nr=10
+    #in_msg.RSS=False
+    in_msg.sat_nr=11
     in_msg.RSS=True
         
     #in_msg.outputDir="./images/"
@@ -186,8 +189,8 @@ def input(in_msg, timeslot=None):
     in_msg.postprocessing_composite=["THX-radar-DayLSConvectionNightMicrophysics","TRT-radar-DayLSConvectionNightMicrophysics",
                                      "THX-radar-convection","TRT-radar-convection", "C2rgb-IR_108", "C2rgb-HRVir108", "THX-HRVir108", "radar-HRVir108", "TRT-radar-HRVir108"]
 
-    in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108",  "MSG_CT","MSG_HRoverview",                      "MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-HRVir108"],
-                                     ["MSG_C2rgb-HRVir108","MSG_CT","MSG_DayLSConvectionNightMicrophysics","MSG_TRT-radar-HRVir108",  "MSG_radar-HRVir108",  "MSG_THX-HRVir108"]]
+    in_msg.postprocessing_montage = [["MSG_C2rgb-IR-108",  "MSG_CT",      "MSG_HRoverview",                      "MSG_TRT-radar-convection","MSG_radar-convection","MSG_THX-HRVir108"],
+                                     ["MSG_C2rgb-HRVir108","MSG_cloudtop","MSG_DayLSConvectionNightMicrophysics","MSG_TRT-radar-HRVir108",  "MSG_radar-HRVir108",  "MSG_THX-HRVir108"]]
     
     in_msg.scpOutput=True
     in_msg.scpProducts=["WV_062","_ir108","_vis_with_ir","airmass","ash","cloudtop","convection","DayLSConvectionNightMicrophysics",
@@ -197,4 +200,4 @@ def input(in_msg, timeslot=None):
                         "THX-radar-DayLSConvectionNightMicrophysics","radar-DayLSConvectionNightMicrophysics","TRT-radar-DayLSConvectionNightMicrophysics",
                         "THX-radar-convection","radar-convection","TRT-radar-convection", "h03b-HRVir108", "C2rgb-IR_108",
                         "C2rgb-HRVir108", "THX-HRVir108", "radar-HRVir108", "TRT-radar-HRVir108",
-                        ["MSG_C2rgb-HRVir108","MSG_CT","MSG_DayLSConvectionNightMicrophysics","MSG_TRT-radar-HRVir108","MSG_radar-HRVir108","MSG_THX-HRVir108"]]
+                        ["MSG_C2rgb-HRVir108","MSG_cloudtop","MSG_DayLSConvectionNightMicrophysics","MSG_TRT-radar-HRVir108","MSG_radar-HRVir108","MSG_THX-HRVir108"]]

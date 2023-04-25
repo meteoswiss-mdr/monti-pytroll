@@ -4,6 +4,7 @@ from __future__ import print_function
 from my_msg_module import format_name
 from os.path import isfile, join, exists, dirname
 from os import makedirs
+from os import chmod
 import subprocess
 import inspect
 from copy import deepcopy
@@ -181,6 +182,8 @@ def n_file_composite(composite, satellite, sat_nr, time_slot, area, outDir, outF
     if verbose:
         print("    "+command)
     subprocess.call(command, shell=True) #+" 2>&1 &"
+    chmod(comp_file, 0o777) # give access read/write access to group members / PYTHON3 syntax
+    
     # check if file is produced
     if isfile(comp_file):
         composites_done.append(composite)

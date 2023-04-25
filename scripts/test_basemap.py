@@ -12,9 +12,11 @@ tb37v = np.arange(1000)
 #lats = np.arange(-80, -90, -0.01)                                   # orginal example  -> shows north pole 
 #area_def = pr.utils.load_area('../cfg_test/areas.def', 'ease_sh')   # orginal example  -> shows north pole 
 lats = np.arange(80, 90, 0.01)                                       # ??? need to use positive lats for south pole ???
-area='ease_nh'
-#area="EuropeCanary95"  # this does not produce correct result, shows SEVIRI full disk projection for blue marble !!!
-area_def = pr.load_area('/data/OWARNA/hau/pytroll/cfg_test/areas.def', area)    # ??? need to use nh to show south pole ??? 
+#area='ease_nh'
+area="EuropeCanary95"  # this does not produce correct result, shows SEVIRI full disk projection for blue marble !!!
+
+#area_def = pr.load_area('/data/OWARNA/hau/pytroll/cfg_test/areas.def', area)    # ??? need to use nh to show south pole ??? 
+area_def = pr.load_area('/opt/users/hau/monti-pytroll/etc/areas.def', area)    # ??? need to use nh to show south pole ??? 
 
 swath_def = pr.geometry.SwathDefinition(lons, lats)
 result = pr.kd_tree.resample_nearest(swath_def, tb37v, area_def, radius_of_influence=20000, fill_value=None)

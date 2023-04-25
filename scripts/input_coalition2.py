@@ -1,7 +1,7 @@
 from __future__ import division
 from __future__ import print_function
 
-def input(in_msg):
+def input(in_msg, timeslot=None):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -14,10 +14,12 @@ def input(in_msg):
     # 8=MSG1, 9=MSG2, 10=MSG3
     #in_msg.sat_nr=8
     #in_msg.RSS=False 
-    #in_msg.sat_nr=9
-    #in_msg.RSS=True
-    in_msg.sat_nr=10
+    in_msg.sat_nr=9
     in_msg.RSS=True
+    #in_msg.sat_nr=10
+    #in_msg.RSS=True
+    #in_msg.sat_nr=11
+    #in_msg.RSS=False
 
     # specify an delay (in minutes), when you like to process a time some minutes ago
     # e.g. current time               2015-05-31 12:33 UTC
@@ -39,11 +41,10 @@ def input(in_msg):
         minute=45
         in_msg.update_datetime(year, month, day, hour, minute)
         # !!!  if archive is used, adjust meteosat09.cfg accordingly !!!
-
-    # near real time or offline (will be overwritten depending on the date) ###changed: should know, based on the date, where to look for things!!!
-    in_msg.nrt = False
-    #in_msg.nrt = True 
         
+    if timeslot is not None:
+        in_msg.update_datetime(timeslot.year, timeslot.month, timeslot.day, timeslot.hour, timeslot.minute)
+    
     in_msg.no_NWCSAF = False
 
     #----------------
@@ -54,7 +55,7 @@ def input(in_msg):
     #in_msg.areas.append('germ')            # Germany 1024x1024
     #in_msg.areas.append('EuropeCanary')    # upper third of MSG disk, satellite at 0.0 deg East, full resolution 
     #in_msg.areas.append('EuropeCanary95')  # upper third of MSG disk, satellite at 9.5 deg East, full resolution 
-    in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
+    #in_msg.areas.append('EuropeCanaryS95') # upper third of MSG disk, satellite at 9.5 deg East, reduced resolution 1000x400
     #in_msg.areas.append('euro4')           # Europe 4km, 1024x1024
     #in_msg.areas.append('MSGHRVN')         # High resolution northern quarter 11136x2784
     #in_msg.areas.append('fullearth')       # full earth 600x300                    # does not yet work
@@ -65,17 +66,16 @@ def input(in_msg):
     #in_msg.areas.append('EuropeCanaryS95') # "ccs4" "blitzortung" #"eurotv" # "eurotv"
     #in_msg.areas.append("EuroMercator")    # same projection as blitzortung.org
 
-
     in_msg.check_RSS_coverage()
 
     in_msg.properties_cells = False
     in_msg.plot_forecast = False
     
     #model which will be used to fit the history of the cells and extrapolate the future area
-    #in_msg.model_fit_area = "linear_exp" #reccomended
-    in_msg.model_fit_area = "linear_exp_exp" #reccomended
+    #in_msg.model_fit_area = "linear_exp"    # reccomended
+    in_msg.model_fit_area = "linear_exp_exp" # reccomended
     #in_msg.model_fit_area = "linear"
-        
+    
     in_msg.stop_history_when_smallForward = False
     in_msg.stop_history_when_smallBackward = False
     in_msg.threshold_stop_history_when_small = 0.4
@@ -92,8 +92,9 @@ def input(in_msg):
     in_msg.wind_source = "cosmo"
     in_msg.zlevel = 'pressure' 
     #in_msg.zlevel = 'modellevel'
-    
-    in_msg.pressure_limits = [440,680]#[400,700] #[]#[150,250,350,450,550,650,750,850]# #[250,400] #[300,500]#
+
+    # bounaries for cloud layers in hPa when extrapolating the cloud positions in 3 layers (with different winds)
+    in_msg.pressure_limits = [440,680] #[400,700] #[]#[150,250,350,450,550,650,750,850]# #[250,400] #[300,500]#
     
     in_msg.broad_areas = ['eurotv','blitzortung','EuropeCanaryS95','EuropeCanary95','germ','EuropeCanary','euro4','fullearth','met09globe','met09globeFull','odysseyS25']
     
@@ -110,19 +111,22 @@ def input(in_msg):
     #in_msg.show_clouds = 'mature'
     in_msg.show_clouds = 'developing_and_mature'
 
-    # directory containing the forecasted brightness temperatures
     if in_msg.nrt:
-        in_msg.nowcastDir = "/data/cinesat/out/C2-BT-forecasts/"
+        in_msg.base_dir_sat  = "/data/cinesat/in/eumetcast1/"
+        in_msg.base_dir_ctth = "/data/cinesat/in/safnwc/"
+        in_msg.base_dir_ct   = "/data/cinesat/in/safnwc/"
+        in_msg.nowcastDir    = "/data/cinesat/out/C2-BT-forecasts/"                                                          # directory containing the forecasted brightness temperatures
+        in_msg.labelsDir     = '/data/cinesat/out/labels/'
     else:
-        in_msg.nowcastDir = '/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels/'
-
-    #directors with labels
-    if in_msg.nrt:
-        in_msg.labelsDir = '/data/cinesat/out/labels/'
-    else:
-        #in_msg.labelsDir = '/opt/users/'+in_msg.user+'/PyTroll/scripts/labels/'
-        in_msg.labelsDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_labels_%(area)s/'
-
+        #base_dir_sat  = in_msg.datetime.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
+        in_msg.base_dir_sat  = in_msg.datetime.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/%Y/%m/%d/")
+        in_msg.base_dir_ctth = in_msg.datetime.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/%Y/%m/%d/CTTH/")    # NWCSAF produced by MeteoSwiss with RSS
+        in_msg.base_dir_ct   = in_msg.datetime.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/%Y/%m/%d/CT/")      # NWCSAF produced by MeteoSwiss with RSS
+        #base_dir_ctth = in_msg.datetime.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/CTTH/")                # NWCSAF produced by EUMETSAT   with FDS
+        in_msg.nowcastDir    = '/data/COALITION2/database/meteosat/rad_forecast/%Y-%m-%d/channels/'                          # directory containing the forecasted brightness temperatures
+        in_msg.labelsDir     = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_labels_%(area)s/'
+        #in_msg.labelsDir     = '/opt/users/'+in_msg.user+'/PyTroll/scripts/labels/'
+        
     # channels needed to produce the coalition2 product
     in_msg.RGBs=[]
     in_msg.RGBs.append('IR_039')
@@ -152,14 +156,14 @@ def input(in_msg):
     # mask that removed the thin cirrus
     in_msg.aux_results=[]
     #in_msg.aux_results.append('mask_cirrus')
-    #in_msg.aux_results.append('tests_glationation')
-    #in_msg.aux_results.append('tests_optical_thickness')
-    #in_msg.aux_results.append('tests_updraft')
-    #in_msg.aux_results.append('tests_small_ice')
-    #in_msg.aux_results.append('indicator_glationation')
-    #in_msg.aux_results.append('indicator_optical_thickness')
-    #in_msg.aux_results.append('indicator_updraft')
-    #in_msg.aux_results.append('indicator_small_ice')
+    in_msg.aux_results.append('tests_glationation')
+    in_msg.aux_results.append('tests_optical_thickness')
+    in_msg.aux_results.append('tests_updraft')
+    in_msg.aux_results.append('tests_small_ice')
+    in_msg.aux_results.append('indicator_glationation')
+    in_msg.aux_results.append('indicator_optical_thickness')
+    in_msg.aux_results.append('indicator_updraft')
+    in_msg.aux_results.append('indicator_small_ice')
     #in_msg.aux_results.append('CloudType')
     #in_msg.aux_results.append('fourth_mask')
     #in_msg.aux_results.append('developing_mask')
@@ -201,7 +205,8 @@ def input(in_msg):
     in_msg.standardOutputName = 'MSG_%(rgb)s-%(area)s_%y%m%d%H%M.png'
     if in_msg.nrt:
         #in_msg.outputDir = '/data/COALITION2/tmp/'
-        in_msg.outputDir = '/data/cinesat/out/'
+        #in_msg.outputDir = '/data/cinesat/out/'
+        in_msg.outputDir='./pics/'
     else:
         #in_msg.outputDir='./pics/'
         in_msg.outputDir = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_%(rgb)s_%(area)s/'

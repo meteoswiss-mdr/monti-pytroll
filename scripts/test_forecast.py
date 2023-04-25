@@ -607,7 +607,7 @@ if __name__ == '__main__':
     
     ttt = datetime(2015,7,7,13,0)
     interesting_cell = 67
-    outputFile = "/opt/users/"+getpass.getuser()+"/PyTroll/scripts/forecasting_labels/"    
+    outputFile = "/opt/users/"+getpass.getuser()+"/monti-pytroll/scripts/forecasting_labels/"    
                 
     model = "linear_exp_exp"
     #model = "linear"; ylabel = "channel"

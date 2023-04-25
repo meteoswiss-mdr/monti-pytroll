@@ -46,12 +46,18 @@ cd $PYTROLLHOME
 
 
 echo ""
-echo "*** Synchronize PyTroll modules (git submodule sync)"
+echo "*** Synchronize PyTroll submodules (git submodule sync)"
 echo "===================================================="
 git submodule sync
 echo "Does this look good? (press enter to continue or CTRL+c to abort)"
 read junk
 
+echo ""
+echo "*** Fetch tags for all submodules (git submodule foreach --recursive 'git fetch --tags')"
+echo "========================================================================================"
+git submodule foreach --recursive 'git fetch --tags'
+echo "Does this look good? (press enter to continue or CTRL+c to abort)"
+read junk
 
 echo ""
 echo "*** Update PyTroll modules (git submodule update --remote)"

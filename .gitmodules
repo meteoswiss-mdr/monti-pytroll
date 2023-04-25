@@ -1,35 +1,35 @@
 [submodule "packages/pyresample"]
 	path = packages/pyresample
 	url = https://github.com/meteoswiss-mdr/pyresample.git
-	branch = master
+	branch = main
 [submodule "packages/pycoast"]
 	path = packages/pycoast
 	url = https://github.com/pytroll/pycoast.git
-	branch = master
+	branch = main
 [submodule "packages/pyorbital"]
 	path = packages/pyorbital
 	url = https://github.com/meteoswiss-mdr/pyorbital.git
-	branch = master
+	branch = main
 [submodule "packages/posttroll"]
 	path = packages/posttroll
 	url = https://github.com/pytroll/posttroll.git
-	branch = master
+	branch = main
 [submodule "packages/trollsift"]
 	path = packages/trollsift
 	url = https://github.com/pytroll/trollsift.git
-	branch = master
+	branch = main
 [submodule "packages/pytroll-schedule"]
 	path = packages/pytroll-schedule
 	url = https://github.com/pytroll/pytroll-schedule.git
-	branch = master
+	branch = main
 [submodule "packages/trollimage"]
 	path = packages/trollimage
 	url = https://github.com/meteoswiss-mdr/trollimage.git
-	branch = master
+	branch = main
 [submodule "packages/mipp"]
 	path = packages/mipp
 	url = https://github.com/meteoswiss-mdr/mipp.git
-	branch = pre-master
+	branch = master
 [submodule "packages/mpop"]
 	path = packages/mpop
 	url = https://github.com/meteoswiss-mdr/mpop.git
@@ -45,15 +45,15 @@
 [submodule "packages/pydecorate"]
 	path = packages/pydecorate
 	url = https://github.com/pytroll/pydecorate.git
-	branch = master
+	branch = main
 [submodule "packages/satpy"]
 	path = packages/satpy
 	url = https://github.com/pytroll/satpy.git
-	branch = master
+	branch = main
 [submodule "packages/pytroll-collectors"]
 	path = packages/pytroll-collectors
 	url = https://github.com/pytroll/pytroll-collectors.git
-	branch = master
+	branch = main
 [submodule "packages/trollflow-sat"]
 	path = packages/trollflow-sat
 	url = https://github.com/pytroll/trollflow-sat.git

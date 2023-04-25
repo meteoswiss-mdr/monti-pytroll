@@ -38,7 +38,7 @@ from pycoast import ContourWriterAGG
 from pydecorate import DecoratorAGG
 from mpop.channel import Channel, GenericChannel
 import aggdraw
-from numpy import where, zeros
+from numpy import where, zeros, nanmin, nanmax
 import numpy.ma as ma
 from os.path import dirname, exists, join
 from os import makedirs, chmod, stat
@@ -586,6 +586,10 @@ def choose_map_resolution(area, MapResolutionInputfile):
    if MapResolutionInputfile is None:         # if the user did not specify the resolution 
       if area.find("EuropeCanary") != -1: # make a somewhat clever choise  
          resolution='l'
+      if area.find("europe_") != -1:
+         resolution='i'
+      if area.find("EuropeC") != -1:  
+         resolution='i'
       elif area.find("ccs4") != -1:
          resolution='i' 
       elif area.find("ticino") != -1:
@@ -775,14 +779,15 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
 
    #from numpy import log10    
    #prop=log10(prop)
-
+   
    # search minimum and maximum
    # (default)
    min_data = prop.min()
    max_data = prop.max()
-   # print "*** min/max data: ", min_data, max_data 
+   print("*** min/max data: ", min_data, max_data)
+   print("*** nanmin/nanmax data: ",nanmin(prop), nanmax(prop))
    # replace default with fixed min/max if specified 
-
+   
    if in_msg.fixed_minmax:
       if rgb in list(in_msg.rad_min.keys()):
          min_data = in_msg.rad_min[rgb]
@@ -812,10 +817,12 @@ def create_PIL_image(rgb, data, in_msg, colormap='rainbow', HRV_enhancement=Fals
          print("    use trollimage.image.image for colorized pictures (min="+str(min_data)+", max="+str(max_data)+")")
       img = trollimage(prop, mode="L", fill_value=in_msg.fill_value)
       if colormap.values[0] == 0.0 and colormap.values[-1]==1.0:  # scale normalized colormap to range of data 
-         colormap.set_range(min_data, max_data)
+         colormap.set_range(min_data, max_data)      
       img.colorize(colormap)
       in_msg.colormap[rgb] = colormap.reverse()
-      # print "in_msg.colormap[rgb]", rgb, in_msg.colormap[rgb]
+      # print("in_msg.colormap[rgb]", rgb, in_msg.colormap[rgb])
+      # img.show()
+      # quit()
    elif plot_type == 'palette':
       min_data = 0.
       max_data = float(len(data[rgb].palette)-1)
@@ -1080,12 +1087,12 @@ def add_colorscale(dc, rgb, in_msg, unit=None):
       minor_tick_marks=1
 
    #print("plot_msg.py (add_colorscale):", in_msg.colormap[rgb])
-   #print("plot_msg.py (add_colorscale):",tick_marks)
-   #print("plot_msg.py (add_colorscale):",minor_tick_marks)
-   #print("plot_msg.py (add_colorscale):",font_scale)
-   #print("plot_msg.py (add_colorscale):",unit)
-   #print("plot_msg.py (add_colorscale):",in_msg.colormap[rgb].values[0])
-   #print("plot_msg.py (add_colorscale):",in_msg.colormap[rgb].values[-1])
+   #print("plot_msg.py (add_colorscale):", tick_marks)
+   #print("plot_msg.py (add_colorscale):", minor_tick_marks)
+   #print("plot_msg.py (add_colorscale):", font_scale)
+   #print("plot_msg.py (add_colorscale):", unit)
+   #print("plot_msg.py (add_colorscale):", in_msg.colormap[rgb].values[0])
+   #print("plot_msg.py (add_colorscale):", in_msg.colormap[rgb].values[-1])
    
    if in_msg.verbose:
       print('... add colorscale ')

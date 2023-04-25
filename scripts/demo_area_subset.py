@@ -13,9 +13,16 @@ from __future__ import print_function
 #area_def = utils.get_area_def(area_id, area_name, proj_id, proj4_args,
 #                                      x_size, y_size, area_extent)
 
-from mpop.projector import get_area_def
-#area_def = get_area_def("SeviriDiskFull")
-area_def = get_area_def("SeviriDiskFull00")
+# old mpop verion
+## from mpop.projector import get_area_def
+##area_def = get_area_def("SeviriDiskFull")
+#area_def = get_area_def("SeviriDiskFull00")
+
+# new version
+from pyresample import load_area
+get_area_def = load_area 
+area_def = load_area("/opt/users/hau/monti-pytroll/etc/areas.def", "SeviriDiskFull00")
+
 import numpy as np
 
 print("dir(area_def)", dir(area_def))
@@ -37,7 +44,7 @@ print("area_def.pixel_upper_left", area_def.pixel_upper_left)     #(-5568748.275
 print("area_def.area_extent_ll  ", area_def.area_extent_ll)       #(1e+30, 1e+30, 1e+30, 1e+30)                                                               
                                                                     
              
-print("area_def.get_proj_coords()",area_def.get_proj_coords(cache=True))  # (array([[-5568748.27575635, -5565747.87259054, -5562747.46942472, ...,     
+print("area_def.get_proj_coords()",area_def.get_proj_coords())  # (array([[-5568748.27575635, -5565747.87259054, -5562747.46942472, ...,    works only with mpop (cache=True)
 print("area_def.projection_x_coords", area_def.projection_x_coords)       # [[-5568748.27575635 -5565747.87259054 -5562747.46942472 ..., 
 print("area_def.projection_y_coords", area_def.projection_y_coords)       # [[ 5568748.27575635  5568748.27575635  5568748.27575635 ...,
               

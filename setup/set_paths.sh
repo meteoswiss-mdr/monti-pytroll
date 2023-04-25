@@ -29,7 +29,7 @@ set_conda_path() {
 	else
 	    if [ "$1" == "python3" ] || [ "$1" == "py3" ] || [ "$1" == "3" ] ; then
 		echo "set_conda_path python3"
-		export CONDA_PATH="/opt/users/common/packages/anaconda3_$LOGNAME/"
+		export CONDA_PATH="/opt/users/common/packages/anaconda3_${LOGNAME}/"
 		#export CONDA_PATH="/opt/users/common/packages/anaconda351/"
 		#export CONDA_PATH="/opt/users/common/packages/anaconda3/"
 	    else
@@ -78,8 +78,6 @@ set_conda_path() {
 }
 
 
-
-
 set_pytroll_paths() {
 # function set_pytroll_paths {   # function syntax is not supported by crontab
 case $HOSTNAME in
@@ -92,8 +90,17 @@ case $HOSTNAME in
         fi
         export XRIT_DECOMPRESS_PATH=/opt/users/common/bin/xRITDecompress
         #export XRIT_DECOMPRESS_OUTDIR=/tmp/SEVIRI_DECOMPRESSED_$LOGNAME ;;
-        export XRIT_DECOMPRESS_OUTDIR=/tmp/SEVIRI_DECOMPRESSED ;;
+        export XRIT_DECOMPRESS_OUTDIR=/tmp/SEVIRI_DECOMPRESSED
         #export XRIT_DECOMPRESS_OUTDIR=/data/COALITION2/tmp/SEVIRI_DECOMPRESSED ;;
+        export SATPY_CACHE_DIR="/data/COALITION2/tmp/SATPY_CACHE_DIR/"
+        [ ! -d $SATPY_CACHE_DIR ] && mkdir $SATPY_CACHE_DIR
+        export SATPY_CACHE_LONLATS="True"
+        export SATPY_CACHE_SENSOR_ANGLES="True"
+        export SATPY_CONFIG_PATH=$PYTROLLHOME"/packages/satpy_config_path"
+        [ ! -d $SATPY_CONFIG_PATH ] && mkdir $SATPY_CONFIG_PATH
+        export SATPY_DATA_DIR="/tmp/SATPY_DATA_DIR"
+        [ ! -d $SATPY_DATA_DIR ] && mkdir $SATPY_DATA_DIR ;;
+        #export SATPY_DOWNLOAD_AUX="False"
     "keschln-"[0-9][0-9][0-9][0-9]|"ela"[0-9])
         export PYTROLLHOME=$HOME/monti-pytroll/
         export XRIT_DECOMPRESS_PATH=/store/mch/msrad/sat/pytroll/xRITDecompress
@@ -114,4 +121,9 @@ case $HOSTNAME in
     echo "... set PYGAC_CONFIG_FILE to: "$PYGAC_CONFIG_FILE
     export METRANETLIB_PATH=$PYTROLLHOME/packages/mpop/mpop/satin/metranet
     echo "... set METRANETLIB_PATH to:" $METRANETLIB_PATH
+    echo "... set SATPY_CACHE_LONLATS="$SATPY_CACHE_LONLATS
+    echo "... set SATPY_CACHE_SENSOR_ANGLES="$SATPY_CACHE_SENSOR_ANGLES
+    echo "... set SATPY_CONFIG_PATH="$SATPY_CONFIG_PATH 
+    echo "... set SATPY_DATA_DIR="$SATPY_DATA_DIR
+    echo "... set SATPY_CACHE_SENSOR_ANGLES="$SATPY_CACHE_SENSOR_ANGLES
 }

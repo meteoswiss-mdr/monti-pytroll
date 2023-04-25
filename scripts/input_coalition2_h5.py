@@ -1,7 +1,7 @@
 from __future__ import division
 from __future__ import print_function
 
-def input(in_msg):
+def input(in_msg, timeslot=None):
 
     import getpass
     import inspect
@@ -39,6 +39,9 @@ def input(in_msg):
         in_msg.update_datetime(year, month, day, hour, minute)
         # !!!  if archive is used, adjust meteosat09.cfg accordingly !!!
 
+    if timeslot is not None:
+        in_msg.update_datetime(timeslot.year, timeslot.month, timeslot.day, timeslot.hour, timeslot.minute)
+        
     in_msg.no_NWCSAF = False
 
     #----------------
@@ -202,7 +205,7 @@ def input(in_msg):
 
     #in_msg.scpOutput = True
     #default: in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
-    #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
+    #default: in_msg.scpID="-i /home/cinesat/.ssh/id_rsa_las"
 
     # !!!!!!!!!!!!!!!!!! tmp !HAU! !!!!!!!!!!!!!!!!!!!!!!!!!
     in_msg.reader_level = "seviri-level4"

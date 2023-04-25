@@ -1,7 +1,7 @@
 from __future__ import division
 from __future__ import print_function
 
-def input(in_msg):
+def input(in_msg, timeslot=None):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -33,6 +33,9 @@ def input(in_msg):
         in_msg.update_datetime(year, month, day, hour, minute)
         # !!!  if archive is used, adjust meteosat09.cfg accordingly !!!
 
+    if timeslot is not None:
+        in_msg.update_datetime(timeslot.year, timeslot.month, timeslot.day, timeslot.hour, timeslot.minute)
+    
     in_msg.no_NWCSAF = False
     in_msg.reader_level = "seviri-level4"
     #----------------
@@ -189,8 +192,7 @@ def input(in_msg):
         in_msg.outputDirForecasts = '/data/COALITION2/PicturesSatellite/%Y-%m-%d/%Y-%m-%d_forecasts_%(area)s/'
    
     in_msg.scpOutput = True
-    #in_msg.scpOutputDir="las@lomux240:/www/proj/OTL/WOL/cll/satimages"
-    #default: in_msg.scpID="-i /home/cinesat/.ssh/id_dsa_las"
+    # scpOutputDir and scpID are set in scp_settings.py
 
     in_msg.chosen_settings={}
     #settings: set to None for automatic choice

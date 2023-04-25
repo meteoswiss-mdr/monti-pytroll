@@ -2,7 +2,8 @@ from __future__ import division
 from __future__ import print_function
 
 
-def input(in_msg):
+
+def input(in_msg, timeslot=None):
 
     import inspect
     in_msg.input_file = inspect.getfile(inspect.currentframe()) 
@@ -38,6 +39,9 @@ def input(in_msg):
         in_msg.update_datetime(year, month, day, hour, minute)
         # !!!  if archive is used, adjust meteosat09.cfg accordingly !!!
 
+    if timeslot is not None:
+        in_msg.update_datetime(timeslot.year, timeslot.month, timeslot.day, timeslot.hour, timeslot.minute)
+        
     #----------------------
     # choose RGBs 
     #----------------------

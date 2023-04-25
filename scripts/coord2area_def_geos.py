@@ -53,7 +53,8 @@ REGION: met09globeFull {
 ## ([3411452.747249025], [2619322.000216889])
 ## AREA_EXTENT:    (-2297235.7282523895, 2619322.000216889, 3411452.747249025, 5322582.755436438)
 
-# https://pyresample.readthedocs.org/en/latest/geo_def.html#areadefinition
+# https://pyresample.readthedocs.org/en/latest/geo_def.html#areadefinition and 
+# https://proj.org/operations/projections/index.html
 
 
 import sys

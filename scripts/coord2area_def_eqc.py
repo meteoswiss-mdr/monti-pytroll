@@ -53,20 +53,23 @@ REGION: met09globeFull {
 ## ([3411452.747249025], [2619322.000216889])
 ## AREA_EXTENT:    (-2297235.7282523895, 2619322.000216889, 3411452.747249025, 5322582.755436438)
 
-# https://pyresample.readthedocs.org/en/latest/geo_def.html#areadefinition
+# https://pyresample.readthedocs.org/en/latest/geo_def.html#areadefinition and
+# https://proj.org/operations/projections/index.html
 
 
 import sys
 from pyproj import Proj
   
 if len(sys.argv) != 8:
-    print("Usage: ", sys.argv[0], "name lon_0 min_lat max_lat min_lon max_lon resolution")
+    print("Usage: ", sys.argv[0], "name lon_ts min_lat max_lat min_lon max_lon resolution")
+    print("   lat_ts = latitude of true scale latitude of true scale (k=h=1)")
+    print("   see also: https://proj.org/operations/projections/eqc.html")
     exit(1)
   
 name = sys.argv[1]
 proj = 'eqc'
 
-lon_0 = float(sys.argv[2])
+lat_ts = float(sys.argv[2])
 
 up    = float(sys.argv[3])
 down  = float(sys.argv[4])
@@ -74,13 +77,12 @@ left  = float(sys.argv[5])
 right = float(sys.argv[6])
 
 res = float(sys.argv[7]) * 1000
- 
-lat_0 = 0.0
-#lat_0 = (up + down) / 2
-#lon_0 = (right + left) / 2
+
+lat_0 = (up + down) / 2
+lon_0 = (right + left) / 2
   
 #p = Proj(proj=proj, lat_0=lat_0, lon_0=lon_0, ellps="WGS84")
-p = Proj(proj=proj, ellps="WGS84", units="m", lon_0=lon_0, lat_0=0)
+p = Proj(proj=proj, ellps="WGS84", units="m", lon_0=lon_0, lat_0=lat_0, lat_ts=lat_ts)
 
 left_ex1,  up_ex1   = p(left, up)    # 3, 1
 right_ex1, up_ex2   = p(right, up)   # 4, 1
@@ -99,7 +101,7 @@ print("REGION:", name, "{")
 print("\tNAME:\t", name)
 print("\tPCS_ID:\t", proj + "_" + str(lon_0) + "_" + str(lat_0))
 #print ("\tPCS_DEF:\tproj=" + proj + ",lat_0=" + str(lat_0) + ",lon_0=" + str(lon_0) + ",ellps=WGS84")
-print(("\tPCS_DEF:\tproj="+proj+", lon_0=" + str(lon_0) + ", ellps=wgs84, units=m, lon_0=lon_0, lat_0=0"))
+print(("\tPCS_DEF:\tproj="+proj+", lat_ts=" + str(lat_ts) + ", ellps=WGS84, units=m, lon_0="+ str(lon_0)+", lat_0="+ str(lat_0)))
 print("\tXSIZE:\t", xsize)
 print("\tYSIZE:\t", ysize)
 print("\tAREA_EXTENT:\t", area_extent)

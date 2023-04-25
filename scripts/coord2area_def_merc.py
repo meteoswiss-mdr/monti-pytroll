@@ -21,11 +21,15 @@ from __future__ import print_function
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# https://pyresample.readthedocs.org/en/latest/geo_def.html#areadefinition and
+# https://proj.org/operations/projections/index.html
+
+
 import sys
 from pyproj import Proj
 
-if len(sys.argv) != 6:
-    print("Usage: ", sys.argv[0], "name min_lat max_lat min_lon max_lon")
+if len(sys.argv) != 7:
+    print("Usage: ", sys.argv[0], "name min_lat max_lat min_lon max_lon res[km]")
     exit(1)
     
 name = sys.argv[1]
@@ -37,6 +41,8 @@ down = float(sys.argv[3])   # !!! lat_max
 left = float(sys.argv[4])
 right = float(sys.argv[5])
 
+res = float(sys.argv[6]) * 1000
+
 #lat_0 = 0 # (up + down) / 2
 #lon_0 = (right + left) / 2
 
@@ -47,7 +53,7 @@ lon_0 = (right + left) / 2
 #p = Proj(proj="geos", lon_0=10.0, a=6378169.00, b=6356583.80, h=35785831.0)
 #p = Proj(proj="geos", lon_0=9.5, a=6378169.00, b=6356583.80, h=35785831.0)
 #p = Proj(proj="geos", lon_0=0.0, a=6378169.00, b=6356583.80, h=35785831.0)
-p = Proj(proj=proj,ellps='WGS84',lat_ts=0,lon_0=15)
+p = Proj(proj=proj, ellps='WGS84', lat_ts=lat_0, lon_0=lon_0)
 
 # python coord2area_def_merc.py BalticSea 53.3 62.9 7.8 26
 #lat_0=0
@@ -71,6 +77,9 @@ area_extent = (min(left_ex1, left_ex2),
                max(right_ex1, right_ex2),
                max(down_ex1, down_ex2))
 
+xsize = int((area_extent[2] - area_extent[0]) / res)
+ysize = int((area_extent[3] - area_extent[1]) / res)
+
 print("REGION:", name, "{")
 print("\tNAME:\t", name)
 print("\tPCS_ID:\t", proj + "_" + str(lon_0) + "_" + str(lat_0))
@@ -78,8 +87,8 @@ print(("\tPCS_DEF:\tproj=" + proj +
        ",lat_0=" + str(lat_0) +
        ",lon_0=" + str(lon_0) +
        ",ellps=WGS84"))
-print("\tXSIZE:\t")
-print("\tYSIZE:\t")
+print("\tXSIZE:\t", xsize)
+print("\tYSIZE:\t", ysize)
 print("\tAREA_EXTENT:\t", area_extent)
 print("};")
 

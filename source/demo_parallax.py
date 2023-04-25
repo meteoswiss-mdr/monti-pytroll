@@ -18,6 +18,10 @@ import netCDF4
 import subprocess
 import sys
 import warnings
+from time import perf_counter
+
+from get_input_msg_py3 import parse_commandline_and_read_inputfile
+from my_msg_module_py3 import format_name
 
 from parallax import ParallaxCorrection
 
@@ -41,7 +45,7 @@ def get_last_SEVIRI_date(RSS, delay=0, time_slot=None):
     input: RSS 
     logical variable True or False 
     specifies if you like get 
-    (RSS=True)  the last rapid scan observation date (every 5  min) 
+    (RSS=True)  the last rapid scan observation date (every  5 min) 
     (RSS=False) the last full disk  observation date (every 15 min)
     (delay=INT) number of minutes to substract before finding the date (good if data needs a few min before arriving)
     (time_slot) If not given, take last time
@@ -104,6 +108,44 @@ def rewrite_xy_axis(netCDF_file):
     ds["x"].units = 'Degrees East'
     ds.close()
 
+def read_satellite_data(in_msg, base_dir, products, reader='seviri_l1b_hrit', filters=[]):
+
+    # read MSG (full disk service) L2
+    #################################
+    
+    print("... read "+in_msg.msg_str()+", "+reader+" data ")
+    print("    search for files in "+base_dir)
+    files_sat = find_files_and_readers(sensor='seviri',
+                                   start_time=in_msg.datetime, end_time=in_msg.datetime,
+                                   base_dir=base_dir,
+                                   reader=reader)
+
+    # remove unnecessary file from file list
+    print("    use only "+in_msg.msg_str(layout="%(msg)s%(msg_nr)s"))
+    if len(filters)>0:
+        print("    remove also following files: ")
+        for filt in filters:
+            print("     ", filt)
+    
+    files = deepcopy(files_sat[reader])
+    for f in files:
+        # remove files from other MSG satellites
+        if not (in_msg.msg_str(layout="%(msg)s%(msg_nr)s") in f):
+            files_sat[reader].remove(f)
+            continue
+        # remove files according to the filters
+        for filt in filters:
+            if (filt in f):
+                files_sat[reader].remove(f)
+                continue
+    #print("... found input files (filtered): ", files_sat['seviri_l1b_hrit'])
+
+    global_scene = Scene(reader=reader, filenames=files_sat)
+    print("    load products")
+    [print("      "+str(p)) for p in products]
+    global_scene.load(products)
+    return global_scene
+    
 def save_image(local_scene, area, chn, title="", filename="/tmp/tmp.png", rivers=False, coasts=False, show_interactively=False):
     
     from trollimage.colormap import rdbu
@@ -156,117 +198,56 @@ def save_image(local_scene, area, chn, title="", filename="/tmp/tmp.png", rivers
 ###############################################################################################
 
 if __name__ == '__main__':
+
+
+    time_0 = perf_counter()
     
-    if len(sys.argv) == 1:
-        start_time = get_last_SEVIRI_date(False, delay=6)
-        base_dir_sat = "/data/cinesat/in/eumetcast1/"
-        base_dir_nwc = "/data/cinesat/in/eumetcast1/"
-        base_dir_ctth = "/data/cinesat/in/eumetcast1/"
-        #base_dir_nwc = "/data/cinesat/in/safnwc/"
-    elif len(sys.argv) == 6:
-        year   = int(sys.argv[1])
-        month  = int(sys.argv[2])
-        day    = int(sys.argv[3])
-        hour   = int(sys.argv[4])
-        minute = int(sys.argv[5])
-        start_time = datetime(year, month, day, hour, minute)
-        #base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/case-studies/%Y/%m/%d/")
-        base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
-        base_dir_nwc = start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/CT/")
-        base_dir_ctth = start_time.strftime("/data/OWARNA/hau/database/meteosat/SAFNWC/%Y/%m/%d/CTTH/")
-    else:        
-        start_time = datetime(2020, 10, 7, 16, 0)
-        base_dir_sat = start_time.strftime("/data/COALITION2/database/meteosat/radiance_HRIT/%Y/%m/%d/")
-        base_dir_nwc = start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/%Y/%m/%d/CT/")
-        base_dir_ctth = start_time.strftime("/data/COALITION2/database/meteosat/SAFNWC_v2016/%Y/%m/%d/CTTH/")
-        
-    print("... processing time ", start_time)
+    # interpret command line arguments (first argument is configuration file) and read configuration file 
+    in_msg = parse_commandline_and_read_inputfile()
+    print(in_msg.msg_str(layout="%(msg)s%(msg_nr)s"))
+    
+    print("... produce satellite image for: "+in_msg.datetime.strftime("%Y-%m-%d, %H:%M:%S"))
+    time_string = in_msg.datetime.strftime("%Y%m%d%H%M")
+    
+    time_read_input = perf_counter()
+
+    base_dir_sat  = in_msg.datetime.strftime(in_msg.base_dir_sat)
+    base_dir_nwc  = in_msg.datetime.strftime(in_msg.base_dir_ct)
+    base_dir_ctth = in_msg.datetime.strftime(in_msg.base_dir_ctth)
+                    
+    print("... processing time ", in_msg.datetime)
 
     show_interactively=False
     save_black_white_png=False
-    save_png=True
-    save_netCDF=True
-    sat='MSG4'
-    #areas=['SeviriDisk00Cosmo',"cosmo1x150"]
-    #areas=['cosmo1', 'cosmo1eqc3km']
-    #areas=['cosmo1eqc3km']
-    areas=['ccs4']
-    #areas=['cosmo1x150', 'cosmo1eqc3km']
+    save_png=False
+    #resampler='gradient_search'
+    #resampler="bilinear"
+    resampler="nearest"
 
-    
     print("")
-    print("")
-
-    # specify the product that you like to have parallax corrected 
-    channel="IR_108"
-
-    # read MSG (full disk service) L2
-    #################################
-    print("... read "+sat+" L1.5 data")
-    print("    search for HRIT files in "+base_dir_sat)
-
-    files_sat = find_files_and_readers(sensor='seviri',
-                                   start_time=start_time, end_time=start_time,
-                                   base_dir=base_dir_sat,
-                                   reader='seviri_l1b_hrit')
-
-    files = deepcopy(files_sat['seviri_l1b_hrit'])
-    #print("    found SEVIRI files: ", files_sat)
-    for f in files:
-        if not (sat in f):
-            files_sat['seviri_l1b_hrit'].remove(f)
-            continue
-        if ("HRV" in f) or ("VIS006" in f) or ("VIS008" in f) or ("IR_016" in f) or ("IR_039" in f):
-            files_sat['seviri_l1b_hrit'].remove(f)
-            continue
-        if  ("WV_062" in f) or ("WV_073" in f) or ("IR_097" in f) or ("IR_134" in f):
-            # or ("IR_108" in f)
-            files_sat['seviri_l1b_hrit'].remove(f)
-            continue
-
-    print("... found files: ", files_sat['seviri_l1b_hrit'])
-    global_scene = Scene(reader="seviri_l1b_hrit", filenames=files_sat)
-    print("... load "+channel)
-    global_scene.load([channel])
-
-
-    # read NWCSAF files
-    ########################
     
-    print("... read "+sat+" NWCSAF CTTH")
-    print("    search for NWCSAF files in "+base_dir_nwc)
+    # DIRTY FIX: need at least one channel to get satellite position, which is not in NWCSAF scene
+    # properly done: fix NWCSAF reader to get satellite position in NWCSAF scene
+    save_msg_plax = len(in_msg.msg_pc) > 0
+    msg_dummy_channel='IR_108'
+    in_msg.msg_pc = list(np.unique(in_msg.msg_pc+[msg_dummy_channel]))
 
-    files_nwc = find_files_and_readers(sensor='seviri',
-                                       start_time=start_time, end_time=start_time,
-                                       base_dir=base_dir_nwc, reader='nwcsaf-geo')
-        
-    print("    found NWCSAF files: ", files_nwc)
-    files_ctth = find_files_and_readers(sensor='seviri',
-                                        start_time=start_time, end_time=start_time,
-                                        base_dir=base_dir_ctth, reader='nwcsaf-geo')
-        
-    files_nwc['nwcsaf-geo'].extend(files_ctth['nwcsaf-geo'])
+    # read satellite data
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=RuntimeWarning)
+        global_scene = read_satellite_data(in_msg, base_dir_sat, in_msg.msg_pc)  # default reader='seviri_l1b_hrit'
 
-    files = deepcopy(files_nwc['nwcsaf-geo'])
-    for f in files:
-        # remove files from other satellites 
-        if not (sat in f):
-            files_nwc['nwcsaf-geo'].remove(f)
-            continue
-        # remove CTTH files 
-        # if ("CTTH" in f):
-        #    files_nwc['nwcsaf-geo'].remove(f)
-        #    continue
-
-    global_nwc = Scene(filenames=files_nwc)
-    global_nwc.load(['ct','ctth_alti'])
-    #global_nwc.load(['ctth_alti'])
-
+    # read NWCSAF files (at least CTH is needed for parallax correction)
+    save_nwc_plax = len(in_msg.nwcsaf_pc) > 0
+    in_msg.nwcsaf_pc = list(np.unique(in_msg.nwcsaf_pc+['ctth_alti']))
+    print(base_dir_nwc, "======")
+    global_nwc = read_satellite_data(in_msg, base_dir_nwc, in_msg.nwcsaf_pc, reader='nwcsaf-geo', filters=["PLAX","RDT"])
+    
     #!!! dirty fix for missing information in NWCSAF object, maybe fixed in the meantime 
     # NWCSAF products are missing the orbital parameter metadata 
-    global_nwc["ctth_alti"].attrs['orbital_parameters']=global_scene[channel].attrs['orbital_parameters']
-    #print(global_scene[channel].attrs.keys())
-    print(global_scene[channel].attrs['orbital_parameters'])
+    global_nwc["ctth_alti"].attrs['orbital_parameters']=global_scene[msg_dummy_channel].attrs['orbital_parameters']
+    #print(global_scene[msg_dummy_channel].attrs.keys())
+    #print(global_scene[msg_dummy_channel].attrs['orbital_parameters'])
     #print(global_nwc["ctth_alti"].attrs.keys())
 
 
@@ -279,7 +260,7 @@ if __name__ == '__main__':
         # create netCDF file for area cosmo1
         # create png    file for area cosmo1_150 (50% more pixels)
         ############################################################
-        for area in areas:
+        for area in in_msg.areas:
 
             area_def = get_area_def(area)
 
@@ -287,14 +268,14 @@ if __name__ == '__main__':
             local_scene = global_scene.resample(area_def)
     
             if save_black_white_png:
-                png_file='/data/cinesat/out/parallax/'+channel+'_'+area+'_org.png'
-                local_scene.save_dataset(channel, png_file)
+                png_file='/data/cinesat/out/parallax/MSG_'+msg_dummy_channel+'_'+area+'_org.png'
+                local_scene.save_dataset(msg_dummy_channel, png_file)
                 print('display '+png_file+' &')
 
             if show_interactively or save_png:
-                filename = start_time.strftime('/data/COALITION2/tmp/MSG_'+channel+'-'+area+'_%y%m%d%H%M_org.png')
-                title    = start_time.strftime(" "+sat[0:3]+"-"+sat[3]+', %y-%m-%d %H:%MUTC, no parallax correction')
-                save_image(local_scene, area, channel, title=title, filename=filename, show_interactively=show_interactively)
+                filename = in_msg.datetime.strftime('/data/COALITION2/tmp/MSG_'+msg_dummy_channel+'-'+area+'_%y%m%d%H%M_org.png')
+                title    = in_msg.datetime.strftime(" "+in_msg.msg_str()+', %y-%m-%d %H:%MUTC, no parallax correction')
+                save_image(local_scene, area, msg_dummy_channel, title=title, filename=filename, show_interactively=show_interactively)
 
             # resample MSG L2
             ##################
@@ -308,27 +289,39 @@ if __name__ == '__main__':
             plax_corr_area = parallax_correction(global_nwc["ctth_alti"])
             
             # actual projection to parallax corrected positions (MSG channel)
-            local_scene = global_scene.resample(plax_corr_area)
+            if save_msg_plax:
+                local_scene = global_scene.resample(plax_corr_area, resampler=resampler, precompute=True, cache_dir='/tmp/resample/')
+            
             # actual projection to parallax corrected positions (NWCSAF product)
+            
             local_nwc = global_nwc.resample(plax_corr_area)
 
             if show_interactively or save_png:
-                filename = start_time.strftime('/data/COALITION2/tmp/MSG_'+channel+'-'+area+'_%y%m%d%H%M_pc.png')
+                filename = in_msg.datetime.strftime('/data/COALITION2/tmp/MSG_'+msg_dummy_channel+'-'+area+'_%y%m%d%H%M_pc.png')
                 print("... save image: "+filename)
-                title    = start_time.strftime(" "+sat[0:3]+"-"+sat[3]+', %y-%m-%d %H:%MUTC, parallax correction')
-                save_image(local_scene, area, channel, title=title, filename=filename, show_interactively=show_interactively)
+                title    = in_msg.datetime.strftime(" "+in_msg.msg_str()+', %y-%m-%d %H:%MUTC, parallax correction')
+                save_image(local_scene, area, msg_dummy_channel, title=title, filename=filename, show_interactively=show_interactively)
                 print("=======================")
 
             if save_black_white_png:
-                png_file='/data/cinesat/out/parallax/'+channel+'_'+area+'_pc.png'
+                png_file='/data/cinesat/out/parallax/MSG_'+msg_dummy_channel+'_'+area+'_pc.png'
                 print("... save black white image: "+png_file)
-                local_scene.save_dataset(channel, png_file)
+                local_scene.save_dataset(msg_dummy_channel, png_file)
                 print('display '+png_file+' &')    
                 print("=======================")
                 
-            if save_netCDF:
-                nc_file='/data/cinesat/out/parallax/'+channel+'_'+area+'_pc.nc'
-                print("... save netCDF file:"+nc_file)
-                local_nwc.save_datasets(writer='cf', datasets=['ct'], filename=nc_file)
+            if save_msg_plax:
+                nc_file = format_name( in_msg.msg_pc_data_dir+in_msg.msg_pc_filename, in_msg.datetime,
+                                       sat=in_msg.msg_str(layout="%(msg)s%(msg_nr)s"), sat_nr=in_msg.sat_nr, area=area )
+                print("... save parallax corrected MSG SEVIRI Level 1.5 data in netCDF file:"+nc_file)
+                local_scene.save_datasets(writer='cf', datasets=in_msg.msg_pc, filename=nc_file)
+                print('ncview '+nc_file+' &')
+                print("=======================")
+
+            if save_nwc_plax:
+                nc_file = format_name( in_msg.nwc_pc_data_dir+in_msg.nwc_pc_filename, in_msg.datetime,
+                                       sat=in_msg.msg_str(layout="%(msg)s%(msg_nr)s"), sat_nr=in_msg.sat_nr, area=area )
+                print("... save parallax corrected NWCSAF data in netCDF file:"+nc_file)
+                local_nwc.save_datasets(writer='cf', datasets=in_msg.nwcsaf_pc, filename=nc_file)
                 print('ncview '+nc_file+' &')
                 print("=======================")

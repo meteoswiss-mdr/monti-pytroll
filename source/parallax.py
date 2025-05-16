@@ -46,12 +46,12 @@ class ParallaxCorrection:
     def corrected_area(self, cth_dataset):
         area = cth_dataset.area
         (sat_lon, sat_lat, sat_alt) = get_satpos(cth_dataset)
-        cth_dataset = self._preprocess_cth(cth_dataset)       
-        (pixel_lon, pixel_lat) = area.get_lonlats()        
-        
+        cth_dataset = self._preprocess_cth(cth_dataset)
+        (pixel_lon, pixel_lat) = area.get_lonlats()
+
         # Pixel coordinates according to parallax correction
         (corr_lon, corr_lat) = parallax_correct(
-            sat_lon, sat_lat, sat_alt, 
+            sat_lon, sat_lat, sat_alt,
             np.array(pixel_lon), np.array(pixel_lat), np.array(cth_dataset)
         )
 
@@ -65,15 +65,15 @@ class ParallaxCorrection:
         # where we should retrieve a value for a given pixel.
         (proj_lon, proj_lat) = self._invert_lonlat(pixel_lon, pixel_lat,
             corr_area)
-        proj_lon = xr.DataArray(proj_lon)
-        proj_lat = xr.DataArray(proj_lat)
+        proj_lon = xr.DataArray(proj_lon, dims=("y", "x"))
+        proj_lat = xr.DataArray(proj_lat, dims=("y", "x"))
 
         return SwathDefinition(proj_lon, proj_lat)
 
     def correct_points(self, cth_dataset, lons, lats):
         area = cth_dataset.area
         (sat_lon, sat_lat, sat_alt) = get_satpos(cth_dataset)
-        cth_dataset = self._preprocess_cth(cth_dataset)        
+        cth_dataset = self._preprocess_cth(cth_dataset)
         grid_proj = projection.GridProjection(area)
         (y, x) = grid_proj(lons, lats)
 
@@ -110,7 +110,7 @@ class ParallaxCorrection:
     def _preprocess_cth(self, cth_dataset):
         units = cth_dataset.units
         cth = cth_dataset.copy().fillna(0.0)
-        if units == 'm': # convert to km
+        if units in ['m', 'metres']:  # convert to km
             cth = cth * 1e-3
         return cth
 
@@ -126,7 +126,7 @@ class ParallaxCorrection:
         num_in_area = np.count_nonzero(valid)
         s = np.sqrt(np.prod(self.base_area.shape) / num_in_area) / 1.18
         r = int(round(s*4))
-        (kx,ky) = np.mgrid[-r:r+1,-r:r+1]        
+        (kx,ky) = np.mgrid[-r:r+1,-r:r+1]
         k = np.exp(-0.5*(kx**2+ky**2)/s**2)
         k /= k.sum()
 
@@ -148,7 +148,7 @@ class ParallaxCorrection:
             c[y,x] = pixel_coord
             c = convolve(c, k, mode='same') / weight_sum
             return c[r:-r,r:-r].copy().astype(np.float32)
-        
+
         inv_lon = inv_coord(pixel_lon)
         inv_lat = inv_coord(pixel_lat)
 
